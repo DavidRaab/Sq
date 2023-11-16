@@ -78,19 +78,35 @@ sub iter($iter, $f) {
     return;
 }
 
+sub fold($iter, $state, $folder) {
+    # when $state is reference, we assume $folder mutate $state
+    if ( ref $state ) {
+        iter($iter, sub($x) {
+            $folder->($state, $x);
+        });
+        return $state;
+    }
+    # otherwise $folder returns new $state
+    else {
+        iter($iter, sub($x) {
+            $state = $folder->($state, $x);
+        });
+        return $state;
+    }
+}
+
 #- Converter
 #    Those are functions converting Seq to none Seq types
 
 sub to_array($iter) {
-    my @array;
-
-    iter($iter, sub($x) {
-        push @array, $x;
+    return fold($iter, [], sub($array, $x) {
+        push @$array, $x;
     });
-
-    return \@array;
 }
 
+sub count($iter) {
+    return fold($iter, 0, sub($count, $x) { $count+1 });
+}
 
 =head1 NAME
 
