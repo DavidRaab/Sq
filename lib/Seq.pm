@@ -189,6 +189,19 @@ sub take($iter, $amount) {
     }, 'Seq');
 }
 
+sub skip($iter, $amount) {
+    return bless(sub {
+        my $it = $iter->();
+        my $count = 0;
+        return sub {
+            while ( $count++ < $amount ) {
+                $it->();
+            }
+            return $it->();
+        }
+    }, 'Seq');
+}
+
 sub indexed($iter) {
     my $index = 0;
     return $iter->map(sub($x) {
