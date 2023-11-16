@@ -103,8 +103,46 @@ is(
     $range->to_array,
     'concat');
 like(
-    dies { Seq->concat() },
-    qr/^concat needs at least one element./,
-    'concat with zero elements dies');
+    Seq->concat()->to_array,
+    Seq->empty->to_array,
+    'concat on zero is empty');
+is(
+    Seq->from_list(1 .. 10)->to_array,
+    $range->to_array,
+    'from_list');
+is(
+    Seq->from_list(Seq->range(1,10)->to_list)->to_array,
+    [1 .. 10],
+    'from_list and to_list is isomorph');
+is(
+    Seq->from_list(1..5)->append(
+        Seq->from_list(6..10)
+    )->to_array,
+    Seq->concat(
+        Seq->from_list(1..3),
+        Seq->from_list(4..6),
+        Seq->from_list(7..10),
+    )->to_array,
+    'append vs. concat');
+is(
+    Seq->empty->append(Seq->range(1,5))->append(Seq->range(6,10))->to_array,
+    $range->to_array,
+    'append on empty');
+is(
+    Seq->concat(
+        Seq->empty,
+        Seq->range(1,5),
+        Seq->empty,
+        Seq->range(10,12),
+        Seq->empty,
+        Seq->wrap("Hello"),
+        Seq->empty
+    )->to_array,
+    Seq->from_list(1..5, 10..12, "Hello")->to_array,
+    'concat with empties');
+is(
+    Seq->from_array([1..10])->to_array,
+    Seq->from_list(1..10)->to_array,
+    'from_array and from_list');
 
 done_testing;

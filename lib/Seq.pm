@@ -7,6 +7,14 @@ use DDP;
 #- Constructurs
 #    Those are functions that create Seq types
 
+sub empty($class) {
+    return bless(sub {
+        return sub {
+            return undef;
+        }
+    }, 'Seq');
+}
+
 sub wrap($class, $x) {
     return bless(sub {
         my $returned_once = 0;
@@ -108,9 +116,32 @@ sub range_step($class, $start, $step, $stop) {
     }
 }
 
+# turns a list into a Seq
+sub from_list($class, @xs) {
+    return bless(sub {
+        my $idx  = 0;
+        my $last = $#xs;
+
+        return sub {
+            if ( $idx <= $last ) {
+                return $xs[$idx++];
+            }
+            else {
+                return undef;
+            }
+        };
+    }, 'Seq');
+}
+
+sub from_array($class, $arrayref) {
+    return from_list('Seq', @$arrayref);
+}
+
 # Concatenates a list of Seq into a single Seq
 sub concat($class, @iters) {
-    croak "concat needs at least one element." if $#iters == -1;
+    # with no values to concat, return an empty iterator
+    return empty('Seq') if $#iters == -1;
+
     return bless(sub {
         my $idx  = 0;
         my $last = $#iters;
