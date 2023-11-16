@@ -165,6 +165,21 @@ sub concat($class, @iters) {
     }, 'Seq');
 }
 
+sub unfold($class, $state, $f) {
+    return bless(sub {
+        return sub {
+            my $x;
+            if ( defined $state ) {
+                ($x, $state) = $f->($state);
+                return $x;
+            }
+            else {
+                return undef;
+            }
+        }
+    }, 'Seq');
+}
+
 #- Methods
 #    functions operating on Seq and returning another Seq
 

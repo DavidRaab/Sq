@@ -144,5 +144,16 @@ is(
     Seq->from_array([1..10])->to_array,
     Seq->from_list(1..10)->to_array,
     'from_array and from_list');
+is(
+    Seq->unfold(10, sub($state) {
+        if ( $state > 0 ) {
+            return $state, $state-1;
+        }
+        else {
+            return undef;
+        }
+    })->to_array,
+    Seq->range(1,10)->rev->to_array,
+    'unfold');
 
 done_testing;
