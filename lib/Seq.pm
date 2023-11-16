@@ -20,6 +20,22 @@ sub wrap($class, $x) {
     }, 'Seq');
 }
 
+sub init($class, $count, $f) {
+    return bless(sub {
+        my $index = 0;
+        return sub {
+            if ( $index < $count ) {
+                my $generate = $f->($index);
+                $index++;
+                return $generate;
+            }
+            else {
+                return undef;
+            }
+        }
+    }, 'Seq');
+}
+
 sub range($class, $start, $stop) {
     # Ascending order
     if ( $start <= $stop ) {
@@ -159,6 +175,13 @@ sub take($iter, $amount) {
             return;
         }
     }, 'Seq');
+}
+
+sub indexed($iter) {
+    my $index = 0;
+    return $iter->map(sub($x) {
+        return [$index++, $x];
+    });
 }
 
 #- Side-Effects

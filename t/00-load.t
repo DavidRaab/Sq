@@ -10,6 +10,7 @@ is($Seq::VERSION, number_ge("0.001"), 'Check minimum version number');
 my $range     = Seq->range(1, 10);
 my $rangeDesc = Seq->range(10, 1);
 
+my $id      = sub($x) { $x          };
 my $add1    = sub($x) { $x + 1      };
 my $double  = sub($x) { $x * 2      };
 my $square  = sub($x) { $x * $x     };
@@ -65,17 +66,28 @@ is($range->sum, 55, 'sum');
 is($range->sum, $range->rev->sum, 'sum 2');
 
 # Checking wrap & rangeStep
-is(Seq->wrap(5)->to_array, [5], 'wrap');
-is(
-    Seq->wrap(5)->append(Seq->wrap(10))->to_array,
-    [5, 10],
-    'wrap and append');
-is(
-    Seq->range(1,5)->append(Seq->range(6,10))->to_array,
-    Seq->range(1,10)->to_array,
-    'append two ranges');
-is(Seq->range_step(1, 2, 10)->to_array, [ 1,3,5,7,9], '1 .. 10 step 2');
-is(Seq->range_step(10, 2, 1)->to_array, [10,8,6,4,2], '10 .. 1 step 2');
+{
+    is(Seq->wrap(5)->to_array, [5], 'wrap');
+    is(
+        Seq->wrap(5)->append(Seq->wrap(10))->to_array,
+        [5, 10],
+        'wrap and append');
+    is(
+        Seq->range(1,5)->append(Seq->range(6,10))->to_array,
+        Seq->range(1,10)->to_array,
+        'append two ranges');
+    is(Seq->range_step(1, 2, 10)->to_array, [ 1,3,5,7,9], '1 .. 10 step 2');
+    is(Seq->range_step(10, 2, 1)->to_array, [10,8,6,4,2], '10 .. 1 step 2');
+}
 
+is(
+    $range->take(3)->indexed->to_array,
+    [[0,1], [1,2], [2,3]],
+    'indexed');
+
+is(
+    Seq->init(10, $id)->map($add1)->to_array,
+    $range->to_array,
+    'init and map');
 
 done_testing;
