@@ -5,6 +5,21 @@ our $VERSION = '0.001';
 #- Constructurs
 #    Those are functions that create Seq types
 
+sub wrap($class, $x) {
+    return bless(sub {
+        my $returned_once = 0;
+        return sub {
+            if ( $returned_once ) {
+                return undef;
+            }
+            else {
+                $returned_once = 1;
+                return $x;
+            }
+        }
+    }, 'Seq');
+}
+
 sub range($class, $start, $stop) {
     # Ascending order
     if ( $start <= $stop ) {
@@ -15,7 +30,7 @@ sub range($class, $start, $stop) {
                     return $current++;
                 }
                 else {
-                    undef;
+                    return undef;
                 }
             }
         }, $class);
@@ -29,15 +44,78 @@ sub range($class, $start, $stop) {
                     return $current--;
                 }
                 else {
-                    undef;
+                    return undef;
                 }
             }
         }, $class);
     }
 }
 
+sub range_step($class, $start, $step, $stop) {
+    # Ascending order
+    if ( $start <= $stop ) {
+        append(
+            wrap('Seq', $start),
+            bless(sub {
+                my $current = $start;
+                return sub {
+                    $current += $step;
+                    if ( $current <= $stop ) {
+                        return $current;
+                    }
+                    else {
+                        return undef;
+                    }
+                }
+            }, 'Seq')
+        );
+    }
+    # Descending
+    else {
+        append(
+            wrap('Seq', $start),
+            bless(sub {
+                my $current = $start;
+                return sub {
+                    $current -= $step;
+                    if ( $current >= $stop ) {
+                        return $current;
+                    }
+                    else {
+                        return undef;
+                    }
+                }
+            }, 'Seq')
+        );
+    }
+}
+
 #- Methods
 #    functions operating on Seq and returning another Seq
+
+sub append($iterA, $iterB) {
+    return bless(sub {
+        my $exhaustedA = 0;
+        my $itA = $iterA->();
+        my $itB = $iterB->();
+
+        return sub {
+            REDO:
+            if ( $exhaustedA ) {
+                return $itB->();
+            }
+            else {
+                if ( defined(my $x = $itA->()) ) {
+                    return $x;
+                }
+                else {
+                    $exhaustedA = 1;
+                    goto REDO;
+                }
+            }
+        };
+    }, 'Seq');
+}
 
 sub map($iter, $f) {
     return bless(sub {
