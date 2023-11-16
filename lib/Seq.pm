@@ -30,22 +30,7 @@ sub wrap($class, $x) {
     }, 'Seq');
 }
 
-sub init($class, $count, $f) {
-    return bless(sub {
-        my $index = 0;
-        return sub {
-            if ( $index < $count ) {
-                my $generate = $f->($index);
-                $index++;
-                return $generate;
-            }
-            else {
-                return undef;
-            }
-        }
-    }, 'Seq');
-}
-
+# TODO: When $state is a reference. Same handling as in fold?
 sub unfold($class, $state, $f) {
     return bless(sub {
         # Important: Perl signatures are aliases. As we assign
@@ -64,6 +49,17 @@ sub unfold($class, $state, $f) {
             }
         }
     }, 'Seq');
+}
+
+sub init($class, $count, $f) {
+    unfold('Seq', 0, sub($index) {
+        if ( $index < $count ) {
+            return $f->($index), $index+1;
+        }
+        else {
+            return undef;
+        }
+    });
 }
 
 sub range_step($class, $start, $step, $stop) {
