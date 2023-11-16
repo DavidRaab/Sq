@@ -6,17 +6,34 @@ our $VERSION = '0.001';
 #    Those are functions that create Seq types
 
 sub range($class, $start, $stop) {
-    return bless(sub {
-        my $current = $start;
-        return sub {
-            if ( $current <= $stop ) {
-                return $current++;
+    # Ascending order
+    if ( $start <= $stop ) {
+        return bless(sub {
+            my $current = $start;
+            return sub {
+                if ( $current <= $stop ) {
+                    return $current++;
+                }
+                else {
+                    undef;
+                }
             }
-            else {
-                undef;
+        }, $class);
+    }
+    # Descending
+    else {
+        return bless(sub {
+            my $current = $start;
+            return sub {
+                if ( $current >= $stop ) {
+                    return $current--;
+                }
+                else {
+                    undef;
+                }
             }
-        }
-    }, $class);
+        }, $class);
+    }
 }
 
 #- Methods
@@ -80,7 +97,7 @@ sub iter($iter, $f) {
 
 sub rev($iter) {
     return bless(sub {
-        my @list = @{ to_array($iter) };
+        my @list = to_list($iter);
         return sub {
             if ( defined(my $x = pop @list) ) {
                 return $x;
@@ -116,8 +133,16 @@ sub to_array($iter) {
     });
 }
 
+sub to_list($iter) {
+    return @{ to_array($iter) };
+}
+
 sub count($iter) {
     return fold($iter, 0, sub($count, $x) { $count+1 });
+}
+
+sub sum($iter) {
+    return fold($iter, 0, sub($sum, $x) { $sum + $x });
 }
 
 =head1 NAME
