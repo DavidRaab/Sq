@@ -218,7 +218,7 @@ is(
     'join');
 
 is(
-    Seq->wrap(qw/Hello World you are awesome/)->group_by(sub($value) { length($value) }),
+    Seq->wrap(qw/Hello World you are awesome/)->to_hash(sub($value) { length($value) }),
     hash {
         field 5 => "World";
         field 3 => "are";
@@ -228,7 +228,7 @@ is(
     'group_by');
 
 is(
-    Seq->wrap(qw/Hello World you are awesome/)->group_by_duplicates(sub($value) { length($value) }),
+    Seq->wrap(qw/Hello World you are awesome/)->group_by(sub($value) { length($value) }),
     hash {
         field 5 => array { item "Hello";   item "World" };
         field 3 => array { item "you";     item "are"   };

@@ -286,7 +286,7 @@ sub join($iter, $sep) {
 
 # Build a hash by providing a keying function. Later elements
 # in the sequence overwrite previous one.
-sub group_by($iter, $get_key) {
+sub to_hash($iter, $get_key) {
     my %hash;
     iter($iter, sub($x) {
         $hash{$get_key->($x)} = $x;
@@ -296,7 +296,7 @@ sub group_by($iter, $get_key) {
 
 # Build a hash by providing a keying function. Values
 # are put into arrays to allow key with multiple values.
-sub group_by_duplicates($iter, $get_key) {
+sub group_by($iter, $get_key) {
     my %hash;
     iter($iter, sub($x) {
         push @{ $hash{$get_key->($x)} }, $x;
