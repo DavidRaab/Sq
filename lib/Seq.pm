@@ -5,6 +5,12 @@ use List::Util qw(reduce);
 use Carp qw(croak);
 use DDP;
 
+# TODO: contains, first, firstIndex?, mapX, reduce?, sort,
+#       interspers, slice, zip, unzip, foldBack, any,
+#       forall, none, max, max_by, min, min_by, average, average_by,
+#       pairwise, windowed, transpose, choose, item, chunk_by_size,
+#       cartesian, one, minmax, minmax_by
+
 # id function
 my $id = sub($x) { return $x };
 
@@ -80,8 +86,24 @@ sub from_list($class, @xs) {
 }
 
 # turns an arrayref into a seq
-sub from_array($class, $arrayref) {
-    return wrap('Seq', @$arrayref);
+sub from_array($class, $xs) {
+    return unfold('Seq', 0, sub($idx) {
+        return $xs->[$idx], $idx+1 if $idx <= $xs->$#*;
+        return undef;
+    });
+}
+
+sub from_hash($class, $hashref, $f) {
+    return bless(sub {
+        my $idx  = 0;
+        my @keys = keys %$hashref;
+        my $last = $#keys;
+        return sub {
+            return undef if $idx > $last;
+            my $key = $keys[$idx++];
+            return $f->($key, $hashref->{$key});
+        }
+    }, 'Seq');
 }
 
 # Concatenates a list of Seq into a single Seq
