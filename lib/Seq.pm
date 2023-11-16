@@ -68,7 +68,7 @@ sub take($iter, $amount) {
 
 #- Side-Effects
 #    functions that have side-effects or produce side-effects. Those are
-#    immediately executed.
+#    immediately executed, usually consuming all elements of Seq at once.
 
 sub iter($iter, $f) {
     my $it = $iter->();
@@ -77,6 +77,21 @@ sub iter($iter, $f) {
     }
     return;
 }
+
+sub rev($iter) {
+    return bless(sub {
+        my @list = @{ to_array($iter) };
+        return sub {
+            if ( defined(my $x = pop @list) ) {
+                return $x;
+            }
+            return undef;
+        };
+    }, 'Seq');
+}
+
+#- Converter
+#    Those are functions converting Seq to none Seq types
 
 sub fold($iter, $state, $folder) {
     # when $state is reference, we assume $folder mutate $state
@@ -94,9 +109,6 @@ sub fold($iter, $state, $folder) {
         return $state;
     }
 }
-
-#- Converter
-#    Those are functions converting Seq to none Seq types
 
 sub to_array($iter) {
     return fold($iter, [], sub($array, $x) {
