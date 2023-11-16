@@ -237,9 +237,34 @@ is(
     },
     'group_by_duplicates');
 
+is(Seq->wrap(1,1,2,3,1,4,5,4,3,2,6)->distinct->to_array, [1..6],              'distinct 1');
+is(Seq->wrap(1,2,3,2,23,123,4,12,2)->distinct->to_array, [1,2,3,23,123,4,12], 'distinct 2');
+
+# distinct_by tests
+{
+    my $data = Seq->wrap(
+        {id => 1, name => "Foo"},
+        {id => 2, name => "Bar"},
+        {id => 3, name => "Baz"},
+        {id => 1, name => "Foo"},
+    );
+
+    is($data->count, 4, 'distinct_by starts with 4');
+    is($data->distinct->count, 4, 'still 4 as HashRefs are always unequal');
+    is($data->distinct_by(sub($x) { $x->{id} })->count, 3, 'one element less');
+    is(
+        $data->distinct_by(sub($x) { $x->{id} })->to_array,
+        [
+            {id => 1, name => "Foo"},
+            {id => 2, name => "Bar"},
+            {id => 3, name => "Baz"},
+        ],
+        'check elements and order');
+}
+
 is(
-    Seq->wrap(1,1,2,3,1,4,5,4,3,2,6)->distinct->to_array,
-    [1..6],
-    'distinct');
+    Seq->wrap(qw/A B C D E F/)->mapi($id)->to_array,
+    [[0,'A'], [1,'B'], [2,'C'], [3,'D'], [4, 'E'], [5, 'F']],
+    'mapi');
 
 done_testing;

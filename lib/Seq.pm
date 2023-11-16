@@ -5,6 +5,9 @@ use List::Util qw(reduce);
 use Carp qw(croak);
 use DDP;
 
+# id function
+my $id = sub($x) { return $x };
+
 #- Constructurs
 #    Those are functions that create Seq types
 
@@ -132,6 +135,10 @@ sub map($iter, $f) {
     }, 'Seq');
 }
 
+sub mapi($iter, $f) {
+    return indexed($iter)->map($f);
+}
+
 sub filter($iter, $predicate) {
     return bless(sub {
         my $it = $iter->();
@@ -180,18 +187,16 @@ sub indexed($iter) {
     });
 }
 
-# remove duplicates - it uses a hash to remember seen items
-# so it only works good when Seq contains Strings or Numbers.
-# Use distinct_by for other data.
-sub distinct($iter) {
+sub distinct_by($iter, $f) {
     return bless(sub {
         my $it = $iter->();
         my %seen;
         return sub {
             SKIP:
             if ( defined(my $x = $it->()) ) {
-                goto SKIP if exists $seen{$x};
-                $seen{$x} = 1;
+                my $key = $f->($x);
+                goto SKIP if exists $seen{$key};
+                $seen{$key} = 1;
                 return $x;
             }
             return undef;
@@ -199,6 +204,12 @@ sub distinct($iter) {
     }, 'Seq');
 }
 
+# remove duplicates - it uses a hash to remember seen items
+# so it only works good when Seq contains Strings or Numbers.
+# Use distinct_by for other data.
+sub distinct($iter) {
+    return distinct_by($iter, $id);
+}
 
 #- Side-Effects
 #    functions that have side-effects or produce side-effects. Those are
@@ -245,9 +256,8 @@ sub fold($iter, $state, $folder) {
 }
 
 sub to_array($iter) {
-    return fold($iter, [], sub($array, $x) {
-        push @$array, $x;
-    });
+    state $folder = sub($array, $x) { push @$array, $x };
+    return fold($iter, [], $folder);
 }
 
 sub to_list($iter) {
@@ -255,11 +265,13 @@ sub to_list($iter) {
 }
 
 sub count($iter) {
-    return fold($iter, 0, sub($count, $x) { $count+1 });
+    state $folder = sub($count, $x) { $count+1 };
+    return fold($iter, 0, $folder);
 }
 
 sub sum($iter) {
-    return fold($iter, 0, sub($sum, $x) { $sum + $x });
+    state $folder = sub($sum, $x) { $sum + $x };
+    return fold($iter, 0, $folder);
 }
 
 sub sum_by($iter, $f) {
