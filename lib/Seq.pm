@@ -46,74 +46,53 @@ sub init($class, $count, $f) {
     }, 'Seq');
 }
 
-sub range($class, $start, $stop) {
-    # Ascending order
-    if ( $start <= $stop ) {
-        return bless(sub {
-            my $current = $start;
-            return sub {
-                if ( $current <= $stop ) {
-                    return $current++;
-                }
-                else {
-                    return undef;
-                }
+sub unfold($class, $state, $f) {
+    return bless(sub {
+        # Important: Perl signatures are aliases. As we assign
+        # to $state later, we need to make a copy here.
+        my $state = $state;
+        my $abort = 0;
+        my $x;
+        return sub {
+            if ( $abort ) {
+                return undef;
             }
-        }, $class);
-    }
-    # Descending
-    else {
-        return bless(sub {
-            my $current = $start;
-            return sub {
-                if ( $current >= $stop ) {
-                    return $current--;
-                }
-                else {
-                    return undef;
-                }
+            else {
+                ($x, $state) = $f->($state);
+                $abort =1 if not defined $x;
+                return $x;
             }
-        }, $class);
-    }
+        }
+    }, 'Seq');
 }
 
 sub range_step($class, $start, $step, $stop) {
     # Ascending order
     if ( $start <= $stop ) {
-        append(
-            wrap('Seq', $start),
-            bless(sub {
-                my $current = $start;
-                return sub {
-                    $current += $step;
-                    if ( $current <= $stop ) {
-                        return $current;
-                    }
-                    else {
-                        return undef;
-                    }
-                }
-            }, 'Seq')
-        );
+        unfold('Seq', $start, sub($current) {
+            if ( $current <= $stop ) {
+                return $current, $current+$step;
+            }
+            else {
+                return undef;
+            }
+        });
     }
     # Descending
     else {
-        append(
-            wrap('Seq', $start),
-            bless(sub {
-                my $current = $start;
-                return sub {
-                    $current -= $step;
-                    if ( $current >= $stop ) {
-                        return $current;
-                    }
-                    else {
-                        return undef;
-                    }
-                }
-            }, 'Seq')
-        );
+        unfold('Seq', $start, sub($current) {
+            if ( $current >= $stop ) {
+                return $current, $current-$step;
+            }
+            else {
+                return undef;
+            }
+        });
     }
+}
+
+sub range($class, $start, $stop) {
+    range_step('Seq', $start, 1, $stop);
 }
 
 # turns a list into a Seq
@@ -160,21 +139,6 @@ sub concat($class, @iters) {
                 else {
                     return undef;
                 }
-            }
-        }
-    }, 'Seq');
-}
-
-sub unfold($class, $state, $f) {
-    return bless(sub {
-        return sub {
-            my $x;
-            if ( defined $state ) {
-                ($x, $state) = $f->($state);
-                return $x;
-            }
-            else {
-                return undef;
             }
         }
     }, 'Seq');
