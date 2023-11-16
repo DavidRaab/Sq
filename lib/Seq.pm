@@ -271,6 +271,12 @@ sub sum($iter) {
     return fold($iter, 0, sub($sum, $x) { $sum + $x });
 }
 
+sub sumBy($iter, $f) {
+    return fold($iter, 0, sub($sum, $x) {
+        return $sum + $f->($x);
+    });
+}
+
 =head1 NAME
 
 Seq - The great new Seq!

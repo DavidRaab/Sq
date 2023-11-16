@@ -18,6 +18,9 @@ my $double  = sub($x) { $x * 2      };
 my $square  = sub($x) { $x * $x     };
 my $is_even = sub($x) { $x % 2 == 0 };
 
+my $fst     = sub($array) { $array->[0] };
+my $snd     = sub($array) { $array->[1] };
+
 # Basic checks of range and rangeDesc
 is($range, D(),                 'range returns something');
 is($range, check_isa('Seq'),    'returns a Seq');
@@ -207,5 +210,7 @@ is(
         $range->rev
     )->to_array,
     'concat with rev');
+
+is(Seq->wrap([A => 1], [B => 2], [C => 3])->sumBy($snd), 6, 'sumBy');
 
 done_testing;
