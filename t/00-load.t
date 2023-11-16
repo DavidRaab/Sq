@@ -220,21 +220,26 @@ is(
 is(
     Seq->wrap(qw/Hello World you are awesome/)->group_by(sub($value) { length($value) }),
     hash {
-        field 3 => "are";
         field 5 => "World";
+        field 3 => "are";
         field 7 => "awesome";
         end;
     },
     'group_by');
 
 is(
-    my $x = Seq->wrap(qw/Hello World you are awesome/)->group_by_duplicates(sub($value) { length($value) }),
+    Seq->wrap(qw/Hello World you are awesome/)->group_by_duplicates(sub($value) { length($value) }),
     hash {
-        field 3 => array { item "you";     item "are"   };
         field 5 => array { item "Hello";   item "World" };
+        field 3 => array { item "you";     item "are"   };
         field 7 => array { item "awesome";              };
         end;
     },
     'group_by_duplicates');
+
+is(
+    Seq->wrap(1,1,2,3,1,4,5,4,3,2,6)->distinct->to_array,
+    [1..6],
+    'distinct');
 
 done_testing;

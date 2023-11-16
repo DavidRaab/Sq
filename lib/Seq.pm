@@ -25,26 +25,19 @@ sub unfold($class, $state, $f) {
         my $abort = 0;
         my $x;
         return sub {
-            if ( $abort ) {
-                return undef;
-            }
-            else {
-                ($x, $state) = $f->($state);
-                $abort =1 if not defined $x;
-                return $x;
-            }
+            return undef if $abort;
+
+            ($x, $state) = $f->($state);
+            $abort =1 if not defined $x;
+            return $x;
         }
     }, 'Seq');
 }
 
 sub init($class, $count, $f) {
     return unfold('Seq', 0, sub($index) {
-        if ( $index < $count ) {
-            return $f->($index), $index+1;
-        }
-        else {
-            return undef;
-        }
+        return $f->($index), $index+1 if $index < $count;
+        return undef;
     });
 }
 
@@ -52,23 +45,15 @@ sub range_step($class, $start, $step, $stop) {
     # Ascending order
     if ( $start <= $stop ) {
         return unfold('Seq', $start, sub($current) {
-            if ( $current <= $stop ) {
-                return $current, $current+$step;
-            }
-            else {
-                return undef;
-            }
+            return $current, $current+$step if $current <= $stop;
+            return undef;
         });
     }
     # Descending
     else {
         return unfold('Seq', $start, sub($current) {
-            if ( $current >= $stop ) {
-                return $current, $current-$step;
-            }
-            else {
-                return undef;
-            }
+            return $current, $current-$step if $current >= $stop;
+            return undef;
         });
     }
 }
@@ -81,12 +66,8 @@ sub range($class, $start, $stop) {
 sub wrap($class, @xs) {
     my $last = $#xs;
     return unfold('Seq', 0, sub($idx) {
-        if ( $idx <= $last ) {
-            return $xs[$idx], $idx+1;
-        }
-        else {
-            return undef;
-        }
+        return $xs[$idx], $idx+1 if $idx <= $last;
+        return undef;
     });
 }
 
@@ -105,17 +86,11 @@ sub concat($class, @iters) {
     my $count = @iters;
 
     # with no values to concat, return an empty iterator
-    if ( $count == 0 ) {
-        return empty('Seq') if $#iters == -1;
-    }
+    return empty('Seq') if $count == 0;
     # one element can be returned as-is
-    elsif ( $count == 1 ) {
-        return $iters[0];
-    }
-    # at least two
-    else {
-        return reduce { append($a, $b) } @iters;
-    }
+    return $iters[0]    if $count == 1;
+    # at least two items
+    return reduce { append($a, $b) } @iters;
 }
 
 #- Methods
@@ -152,9 +127,7 @@ sub map($iter, $f) {
             if ( defined(my $x = $it->()) ) {
                 return $f->($x);
             }
-            else {
-                return undef;
-            }
+            return undef;
         }
     }, 'Seq');
 }
@@ -164,9 +137,7 @@ sub filter($iter, $predicate) {
         my $it = $iter->();
         return sub {
             while ( defined(my $x = $it->()) ) {
-                if ( $predicate->($x) ) {
-                    return $x;
-                }
+                return $x if $predicate->($x);
             }
             return undef;
         }
@@ -208,6 +179,26 @@ sub indexed($iter) {
         return [$index++, $x];
     });
 }
+
+# remove duplicates - it uses a hash to remember seen items
+# so it only works good when Seq contains Strings or Numbers.
+# Use distinct_by for other data.
+sub distinct($iter) {
+    return bless(sub {
+        my $it = $iter->();
+        my %seen;
+        return sub {
+            SKIP:
+            if ( defined(my $x = $it->()) ) {
+                goto SKIP if exists $seen{$x};
+                $seen{$x} = 1;
+                return $x;
+            }
+            return undef;
+        }
+    }, 'Seq');
+}
+
 
 #- Side-Effects
 #    functions that have side-effects or produce side-effects. Those are
