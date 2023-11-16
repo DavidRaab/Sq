@@ -271,10 +271,34 @@ sub sum($iter) {
     return fold($iter, 0, sub($sum, $x) { $sum + $x });
 }
 
-sub sumBy($iter, $f) {
+sub sum_by($iter, $f) {
     return fold($iter, 0, sub($sum, $x) {
         return $sum + $f->($x);
     });
+}
+
+sub join($iter, $sep) {
+    return join($sep, to_list($iter));
+}
+
+# Build a hash by providing a keying function. Later elements
+# in the sequence overwrite previous one.
+sub group_by($iter, $get_key) {
+    my %hash;
+    iter($iter, sub($x) {
+        $hash{$get_key->($x)} = $x;
+    });
+    return \%hash;
+}
+
+# Build a hash by providing a keying function. Values
+# are put into arrays to allow key with multiple values.
+sub group_by_duplicates($iter, $get_key) {
+    my %hash;
+    iter($iter, sub($x) {
+        push @{ $hash{$get_key->($x)} }, $x;
+    });
+    return \%hash;
 }
 
 =head1 NAME

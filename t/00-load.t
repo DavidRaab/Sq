@@ -2,7 +2,7 @@
 use 5.036;
 use List::Util qw(reduce);
 use Seq;
-use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies/;
+use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end/;
 # use DDP;
 
 diag( "Testing Seq $Seq::VERSION, Perl $], $^X" );
@@ -211,6 +211,30 @@ is(
     )->to_array,
     'concat with rev');
 
-is(Seq->wrap([A => 1], [B => 2], [C => 3])->sumBy($snd), 6, 'sumBy');
+is(Seq->wrap([A => 1], [B => 2], [C => 3])->sum_by($snd), 6, 'sumBy');
+is(
+    Seq->wrap(qw/H e l l o W o r l d !/)->join('-'),
+    "H-e-l-l-o-W-o-r-l-d-!",
+    'join');
+
+is(
+    Seq->wrap(qw/Hello World you are awesome/)->group_by(sub($value) { length($value) }),
+    hash {
+        field 3 => "are";
+        field 5 => "World";
+        field 7 => "awesome";
+        end;
+    },
+    'group_by');
+
+is(
+    my $x = Seq->wrap(qw/Hello World you are awesome/)->group_by_duplicates(sub($value) { length($value) }),
+    hash {
+        field 3 => array { item "you";     item "are"   };
+        field 5 => array { item "Hello";   item "World" };
+        field 7 => array { item "awesome";              };
+        end;
+    },
+    'group_by_duplicates');
 
 done_testing;
