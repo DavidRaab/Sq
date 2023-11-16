@@ -12,9 +12,11 @@ my $builder = Module::Build->new(
         'Module::Build' => '0.4004',
     },
     test_requires => {
-        'Test2::V0' => '0.000156',
+        'Test2::V0'  => '0.000156',
+        'List::Util' => '0',
     },
     requires => {
+        'Carp' => '0',
         #'ABC'              => '1.6',
         #'Foo::Bar::Module' => '5.0401',
     },

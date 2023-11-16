@@ -1,7 +1,9 @@
 #!perl
 use 5.036;
+use List::Util qw(reduce);
 use Seq;
-use Test2::V0 ':DEFAULT', qw/number_ge check_isa/;
+use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies/;
+# use DDP;
 
 diag( "Testing Seq $Seq::VERSION, Perl $], $^X" );
 is($Seq::VERSION, number_ge("0.001"), 'Check minimum version number');
@@ -83,11 +85,26 @@ is($range->sum, $range->rev->sum, 'sum 2');
 is(
     $range->take(3)->indexed->to_array,
     [[0,1], [1,2], [2,3]],
-    'indexed');
-
+    'take->indexed');
 is(
     Seq->init(10, $id)->map($add1)->to_array,
     $range->to_array,
-    'init and map');
+    'init->map');
+is(
+    Seq->range(1,10)->indexed->to_array,
+    Seq->init(10, sub($idx) { [$idx, $idx+1] })->to_array,
+    'range->indexed vs. init');
+is(
+    (reduce { $a->append($b) } map { Seq->wrap($_) } 1 .. 10)->to_array,
+    $range->to_array,
+    'append a list of wrapped values');
+is(
+    Seq->concat(map { Seq->wrap($_) } 1 .. 10)->to_array,
+    $range->to_array,
+    'concat');
+like(
+    dies { Seq->concat() },
+    qr/^concat needs at least one element./,
+    'concat with zero elements dies');
 
 done_testing;

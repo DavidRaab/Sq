@@ -1,6 +1,8 @@
 package Seq;
 use 5.036;
 our $VERSION = '0.001';
+use Carp qw(croak);
+use DDP;
 
 #- Constructurs
 #    Those are functions that create Seq types
@@ -104,6 +106,32 @@ sub range_step($class, $start, $step, $stop) {
             }, 'Seq')
         );
     }
+}
+
+# Concatenates a list of Seq into a single Seq
+sub concat($class, @iters) {
+    croak "concat needs at least one element." if $#iters == -1;
+    return bless(sub {
+        my $idx  = 0;
+        my $last = $#iters;
+        my $it   = $iters[$idx]->();
+
+        return sub {
+            REDO:
+            if ( defined(my $x = $it->()) ) {
+                return $x;
+            }
+            else {
+                if ( $idx < $last ) {
+                    $it = $iters[++$idx]->();
+                    goto REDO;
+                }
+                else {
+                    return undef;
+                }
+            }
+        }
+    }, 'Seq');
 }
 
 #- Methods
