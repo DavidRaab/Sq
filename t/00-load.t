@@ -155,5 +155,38 @@ is(
     })->to_array,
     Seq->range(1,10)->rev->to_array,
     'unfold');
+is(
+    Seq->wrap(1,2,3)->to_array,
+    Seq->from_list(1,2,3)->to_array,
+    'from_list is an alias to wrap');
+is(
+    Seq->wrap->to_array,
+    Seq->from_list->to_array,
+    'wrap and from_list without arguments is the same');
+is(
+    Seq->wrap->to_array,
+    Seq->empty->to_array,
+    'wrap without arguments same as empty');
+
+# concat tests
+{
+    is(Seq->concat->to_array, [], 'Empty concat');
+    is(Seq->concat($range)->to_array, $range->to_array, 'concat with 1 element');
+    is(
+        Seq->concat(
+            Seq->range(1,5),
+            Seq->range(6,10),
+        )->to_array,
+        [1..10],
+        'concat with 2 elemets');
+    is(
+        Seq->concat(
+            Seq->range(1,5),
+            Seq->range(6,10),
+            Seq->range(11,15),
+        )->to_array,
+        [1..15],
+        'concat with 3 elements');
+}
 
 done_testing;

@@ -1,6 +1,7 @@
 package Seq;
 use 5.036;
 our $VERSION = '0.001';
+use List::Util qw(reduce);
 use Carp qw(croak);
 use DDP;
 
@@ -11,21 +12,6 @@ sub empty($class) {
     return bless(sub {
         return sub {
             return undef;
-        }
-    }, 'Seq');
-}
-
-sub wrap($class, $x) {
-    return bless(sub {
-        my $returned_once = 0;
-        return sub {
-            if ( $returned_once ) {
-                return undef;
-            }
-            else {
-                $returned_once = 1;
-                return $x;
-            }
         }
     }, 'Seq');
 }
@@ -52,7 +38,7 @@ sub unfold($class, $state, $f) {
 }
 
 sub init($class, $count, $f) {
-    unfold('Seq', 0, sub($index) {
+    return unfold('Seq', 0, sub($index) {
         if ( $index < $count ) {
             return $f->($index), $index+1;
         }
@@ -65,7 +51,7 @@ sub init($class, $count, $f) {
 sub range_step($class, $start, $step, $stop) {
     # Ascending order
     if ( $start <= $stop ) {
-        unfold('Seq', $start, sub($current) {
+        return unfold('Seq', $start, sub($current) {
             if ( $current <= $stop ) {
                 return $current, $current+$step;
             }
@@ -76,7 +62,7 @@ sub range_step($class, $start, $step, $stop) {
     }
     # Descending
     else {
-        unfold('Seq', $start, sub($current) {
+        return unfold('Seq', $start, sub($current) {
             if ( $current >= $stop ) {
                 return $current, $current-$step;
             }
@@ -88,13 +74,13 @@ sub range_step($class, $start, $step, $stop) {
 }
 
 sub range($class, $start, $stop) {
-    range_step('Seq', $start, 1, $stop);
+    return range_step('Seq', $start, 1, $stop);
 }
 
-# turns a list into a Seq
-sub from_list($class, @xs) {
+# turns all arguments into an sequence
+sub wrap($class, @xs) {
     my $last = $#xs;
-    unfold('Seq', 0, sub($idx) {
+    return unfold('Seq', 0, sub($idx) {
         if ( $idx <= $last ) {
             return $xs[$idx], $idx+1;
         }
@@ -104,36 +90,32 @@ sub from_list($class, @xs) {
     });
 }
 
+# turns a list into a Seq - alias to wrap
+sub from_list($class, @xs) {
+    return wrap($class, @xs);
+}
+
+# turns an arrayref into a seq
 sub from_array($class, $arrayref) {
-    return from_list('Seq', @$arrayref);
+    return wrap('Seq', @$arrayref);
 }
 
 # Concatenates a list of Seq into a single Seq
 sub concat($class, @iters) {
+    my $count = @iters;
+
     # with no values to concat, return an empty iterator
-    return empty('Seq') if $#iters == -1;
-
-    return bless(sub {
-        my $idx  = 0;
-        my $last = $#iters;
-        my $it   = $iters[$idx]->();
-
-        return sub {
-            REDO:
-            if ( defined(my $x = $it->()) ) {
-                return $x;
-            }
-            else {
-                if ( $idx < $last ) {
-                    $it = $iters[++$idx]->();
-                    goto REDO;
-                }
-                else {
-                    return undef;
-                }
-            }
-        }
-    }, 'Seq');
+    if ( $count == 0 ) {
+        return empty('Seq') if $#iters == -1;
+    }
+    # one element can be returned as-is
+    elsif ( $count == 1 ) {
+        return $iters[0];
+    }
+    # at least two
+    else {
+        return reduce { append($a, $b) } @iters;
+    }
 }
 
 #- Methods
