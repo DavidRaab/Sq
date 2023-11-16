@@ -12,7 +12,7 @@ my $builder = Module::Build->new(
         'Module::Build' => '0.4004',
     },
     test_requires => {
-        'Test2::Suite' => '0',
+        'Test2::V0' => '0.000156',
     },
     requires => {
         #'ABC'              => '1.6',

@@ -1,13 +1,18 @@
 #!perl
 use 5.036;
-use strict;
-use warnings;
-use Test::More;
-
-plan tests => 1;
-
-BEGIN {
-    use_ok( 'Seq' ) || print "Bail out!\n";
-}
+use Seq;
+use Test2::V0 ':DEFAULT', qw/number_ge check_isa/;
 
 diag( "Testing Seq $Seq::VERSION, Perl $], $^X" );
+is($Seq::VERSION, number_ge("0.001"), 'Check minimum version number');
+
+# Some values, functions, ... for testing
+my $range  = Seq->range(1, 10);
+my $double = sub($x) { $x * 2 };
+
+is($range, D(),                 'range returns something');
+is($range, check_isa('Seq'),    'returns a Seq');
+is($range->to_array, [1 .. 10], 'to_array');
+is($range->map($double)->to_array, [2,4,6,8,10,12,14,16,18,20], 'map');
+
+done_testing;

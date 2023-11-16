@@ -1,8 +1,66 @@
 package Seq;
-
 use 5.036;
-use strict;
-use warnings;
+our $VERSION = '0.001';
+
+#- Constructurs
+#    Those are functions that create Seq types
+
+sub range($class, $start, $stop) {
+    return bless(sub {
+        my $current = $start;
+        return sub {
+            if ( $current <= $stop ) {
+                return $current++;
+            }
+            else {
+                undef;
+            }
+        }
+    }, $class);
+}
+
+#- Methods
+#    functions operating on Seq
+
+sub map($iter, $f) {
+    return bless(sub {
+        my $it = $iter->();
+        return sub {
+            if ( defined(my $x = $it->()) ) {
+                return $f->($x);
+            }
+            else {
+                return undef;
+            }
+        }
+    }, 'Seq');
+}
+
+#- Side-Effects
+#    functions that have side-effects or produce side-effects. Those are
+#    immediately executed.
+
+sub iter($iter, $f) {
+    my $it = $iter->();
+    while ( defined(my $x = $it->()) ) {
+        $f->($x);
+    }
+    return;
+}
+
+#- Converter
+#    Those are functions converting Seq to none Seq types
+
+sub to_array($iter) {
+    my @array;
+
+    $iter->iter(sub($x) {
+        push @array, $x;
+    });
+
+    return \@array;
+}
+
 
 =head1 NAME
 
@@ -11,11 +69,6 @@ Seq - The great new Seq!
 =head1 VERSION
 
 Version 0.01
-
-=cut
-
-our $VERSION = '0.001';
-
 
 =head1 SYNOPSIS
 
@@ -37,18 +90,6 @@ if you don't export anything, such as for a purely object-oriented module.
 
 =head2 function1
 
-=cut
-
-sub function1 {
-}
-
-=head2 function2
-
-=cut
-
-sub function2 {
-}
-
 =head1 AUTHOR
 
 David Raab, C<< <davidraab83 at gmail.com> >>
@@ -58,9 +99,6 @@ David Raab, C<< <davidraab83 at gmail.com> >>
 Please report any bugs or feature requests to C<bug-seq at rt.cpan.org>, or through
 the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Seq>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
-
-
-
 
 =head1 SUPPORT
 
