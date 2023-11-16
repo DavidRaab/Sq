@@ -20,7 +20,7 @@ sub range($class, $start, $stop) {
 }
 
 #- Methods
-#    functions operating on Seq
+#    functions operating on Seq and returning another Seq
 
 sub map($iter, $f) {
     return bless(sub {
@@ -32,6 +32,36 @@ sub map($iter, $f) {
             else {
                 return undef;
             }
+        }
+    }, 'Seq');
+}
+
+sub filter($iter, $predicate) {
+    return bless(sub {
+        my $it = $iter->();
+        return sub {
+            while ( defined(my $x = $it->()) ) {
+                if ( $predicate->($x) ) {
+                    return $x;
+                }
+            }
+            return undef;
+        }
+    }, 'Seq');
+}
+
+sub take($iter, $amount) {
+    return bless(sub {
+        my $i             = $iter->();
+        my $returnedSoFar = 0;
+        return sub {
+            if ( $returnedSoFar < $amount ) {
+                $returnedSoFar++;
+                if ( defined(my $x = $i->()) ) {
+                    return $x;
+                }
+            }
+            return;
         }
     }, 'Seq');
 }
@@ -54,7 +84,7 @@ sub iter($iter, $f) {
 sub to_array($iter) {
     my @array;
 
-    $iter->iter(sub($x) {
+    iter($iter, sub($x) {
         push @array, $x;
     });
 
