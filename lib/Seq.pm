@@ -97,19 +97,15 @@ sub range($class, $start, $stop) {
 
 # turns a list into a Seq
 sub from_list($class, @xs) {
-    return bless(sub {
-        my $idx  = 0;
-        my $last = $#xs;
-
-        return sub {
-            if ( $idx <= $last ) {
-                return $xs[$idx++];
-            }
-            else {
-                return undef;
-            }
-        };
-    }, 'Seq');
+    my $last = $#xs;
+    unfold('Seq', 0, sub($idx) {
+        if ( $idx <= $last ) {
+            return $xs[$idx], $idx+1;
+        }
+        else {
+            return undef;
+        }
+    });
 }
 
 sub from_array($class, $arrayref) {
