@@ -51,6 +51,8 @@ sub init($class, $count, $f) {
 }
 
 sub range_step($class, $start, $step, $stop) {
+    croak '$step is 0. Will run forever.' if $step == 0;
+
     # Ascending order
     if ( $start <= $stop ) {
         return unfold('Seq', $start, sub($current) {

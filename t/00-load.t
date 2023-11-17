@@ -2,7 +2,7 @@
 use 5.036;
 use List::Util qw(reduce);
 use Seq;
-use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end bag/;
+use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end bag float/;
 # use DDP;
 
 diag( "Testing Seq $Seq::VERSION, Perl $], $^X" );
@@ -338,5 +338,79 @@ is(
     is($data1->count, 10, '$data1 still has 10 items');
     is($data2->count, 11, '$data2 now has 11 items');
 }
+
+# Fibonacci numbers
+{
+    my $fib =
+        Seq->concat(
+            Seq->wrap(1,1),
+            Seq->unfold([1,1], sub($state) {
+                my $next = $state->[0] + $state->[1];
+                return $next, [$state->[1],$next];
+            })
+        );
+
+    is(
+        $fib->take(20)->to_array,
+        [1,1,2,3,5,8,13,21,34,55,89,144,233,377,610,987,1597,2584,4181,6765],
+        'First 20 Fibonacci numbers');
+}
+
+# Same Fibonacci as above but unfold does not create a new arrayref on every
+# iteration. It changes the $state instead. This way less garbage is created
+# and could be potential a little bit faster. But it envolves writing more code.
+{
+    my $fib =
+        Seq->concat(
+            Seq->wrap(1,1),
+            Seq->unfold([1,1], sub($state) {
+                my $next = $state->[0] + $state->[1];
+                $state->[0] = $state->[1];
+                $state->[1] = $next;
+                return $next, $state;
+            })
+        );
+
+    is(
+        $fib->take(20)->to_array,
+        [1,1,2,3,5,8,13,21,34,55,89,144,233,377,610,987,1597,2584,4181,6765],
+        'First 20 Fibonacci numbers');
+}
+
+# You also can use a hash as a state.
+{
+    my $fib =
+        Seq->concat(
+            Seq->wrap(1,1),
+            Seq->unfold({x => 1, y => 1}, sub($state) {
+                my $next = $state->{x} + $state->{y};
+                $state->{x} = $state->{y};
+                $state->{y} = $next;
+                return $next, $state;
+            })
+        );
+
+    is(
+        $fib->take(20)->to_array,
+        [1,1,2,3,5,8,13,21,34,55,89,144,233,377,610,987,1597,2584,4181,6765],
+        'First 20 Fibonacci numbers');
+}
+
+is(Seq->init( 0,  sub($idx) { $idx })->to_array, [], 'init with count 0');
+is(Seq->init(-1,  sub($idx) { $idx })->to_array, [], 'init with count -1');
+is(Seq->init(-10, sub($idx) { $idx })->to_array, [], 'init with count -10');
+is(Seq->range_step(1,1,1)->to_array, [1], 'range_step with 1,1,1');
+is(
+    Seq->range_step(0,0.1,1)->to_array,
+    array {
+        for (my $f=0.0; $f <= 1.0; $f+=0.1) {
+            item float $f;
+        }
+    },
+    'range_step with 0,0.1,1');
+like(
+    dies { Seq->range_step(0,0,1)->to_array },
+    qr/^\$step is 0/,
+    'range_step dies with step size of zero');
 
 done_testing;
