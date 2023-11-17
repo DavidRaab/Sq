@@ -5,7 +5,7 @@ use List::Util qw(reduce);
 use Carp qw(croak);
 use DDP;
 
-# TODO: contains, first, firstIndex?, mapX, reduce?, sort,
+# TODO: contains?, firstIndex?, mapX, reduce?, sort,
 #       interspers, slice, zip, unzip, foldBack, any,
 #       forall, none, max, max_by, min, min_by, average, average_by,
 #       pairwise, windowed, transpose, item, chunk_by_size,
@@ -342,6 +342,14 @@ sub group_by($iter, $get_key) {
         push @{ $hash{$get_key->($x)} }, $x;
     });
     return \%hash;
+}
+
+sub first($iter, $predicate) {
+    my $it = $iter->();
+    while ( defined(my $x = $it->()) ) {
+        return $x if $predicate->($x);
+    }
+    return;
 }
 
 =head1 NAME
