@@ -8,7 +8,7 @@ use DDP;
 # TODO: contains, first, firstIndex?, mapX, reduce?, sort,
 #       interspers, slice, zip, unzip, foldBack, any,
 #       forall, none, max, max_by, min, min_by, average, average_by,
-#       pairwise, windowed, transpose, choose, item, chunk_by_size,
+#       pairwise, windowed, transpose, item, chunk_by_size,
 #       cartesian, one, minmax, minmax_by
 
 # id function
@@ -153,6 +153,22 @@ sub map($iter, $f) {
         return sub {
             if ( defined(my $x = $it->()) ) {
                 return $f->($x);
+            }
+            return undef;
+        }
+    }, 'Seq');
+}
+
+# combines map and filter
+sub choose($iter, $chooser) {
+    return bless(sub {
+        my $it = $iter->();
+        return sub {
+            SKIP:
+            if ( defined(my $x = $it->()) ) {
+                my $opt = $chooser->($x);
+                return $opt if defined $opt;
+                goto SKIP;
             }
             return undef;
         }

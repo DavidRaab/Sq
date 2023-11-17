@@ -413,4 +413,12 @@ like(
     qr/^\$step is 0/,
     'range_step dies with step size of zero');
 
+is(
+    $range->map($square)->filter($is_even)->to_array,
+    $range->choose(sub($x) {
+        my $s = $x * $x;
+        $s % 2 == 0 ? $s : undef
+    })->to_array,
+    'choose same as map->filter');
+
 done_testing;
