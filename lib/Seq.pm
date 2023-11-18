@@ -1,7 +1,8 @@
 package Seq;
 use 5.036;
 our $VERSION = '0.001';
-use subs 'bind';
+use subs 'bind', 'join';
+use Scalar::Util qw(reftype);
 use List::Util qw(reduce);
 use Carp qw(croak);
 use DDP;
@@ -195,10 +196,107 @@ sub flatten($iter) {
 
 # cartesian : Seq<'a> -> Seq<'b> -> Seq<'a * 'b>
 sub cartesian($seqA, $seqB) {
-    return bind($seqA, sub($a) {
-        return bind($seqB, sub($b) {
-            return wrap('Seq', [$a, $b]);
-        });
+    bind($seqA, sub($a) {
+    bind($seqB, sub($b) {
+        wrap('Seq', [$a, $b]);
+    })});
+}
+
+# join creates the cartesian product, but only for those elements
+# $predicate returns true.
+# join : Seq<'a> -> Seq<'b> -> ('a -> 'b -> bool) -> Seq<'a * 'b>
+sub join($seqA, $seqB, $predicate) {
+    bind($seqA, sub($a) {
+    bind($seqB, sub($b) {
+        return wrap('Seq', [$a, $b]) if $predicate->($a, $b);
+        return empty('Seq');
+    })});
+}
+
+# Expects a sequence of tuples. For example what join returns.
+# Provides a merging function to combine 'a and 'b into something new 'c
+# merge : Seq<'a * 'b> -> ('a -> 'b -> 'c) -> Seq<'c>
+sub merge($iter, $merge) {
+    bind($iter, sub($tuple) {
+        my ($a, $b) = @$tuple;
+        my $c = $merge->($a, $b);
+        return wrap('Seq', $c);
+    });
+}
+
+# Merges a sequence that contains tuples with hashes. Like: [{...}, {...}]
+# $mapA contains the selection from the first element of the tuple
+# $mapB contains the selection from the second element of the tuple
+#
+# Selection can either be a hashref mapping a hashname to a
+# new hashname { id => 'some_id' }
+#
+# or an array of hashnames that should be picked: [qw/id name/]
+sub merge_hash($iter, $mapA, $mapB) {
+    # Transforms the different inputs a user can give into a
+    # hash and an array containing the keys
+    state $gen_input = sub($mapping) {
+        my $hash;
+        my $keys;
+        if ( reftype $mapping eq 'HASH' ) {
+            $hash = $mapping;
+            $keys = [ keys $mapping->%* ];
+        }
+        elsif ( reftype $mapping eq 'ARRAY' ) {
+            $hash = { map { $_ => $_ } @$mapping };
+            $keys = $mapping;
+        }
+        elsif ( not defined reftype $mapping ) {
+            if ( $mapping =~ m/\Aall\z/i ) {
+                return ['ALL'];
+            }
+            elsif ( $mapping =~ m/\Anone\z/i ) {
+                return ['NONE'];
+            }
+            else {
+                croak "When not arrayref or hashref must be either 'ALL' or 'NONE'";
+            }
+        }
+        else {
+            croak '$mappings must be tuple and either contain hashref or arrayref';
+        }
+
+        # Returns a discriminated union with three cases
+        # ['ALL']
+        # ['NONE']
+        # ['SELECTION', $mapping, $keys]
+        return [SELECTION => $hash, $keys];
+    };
+
+    my $caseA = $gen_input->($mapA);
+    my $caseB = $gen_input->($mapB);
+
+    merge($iter, sub($a, $b) {
+        my %new_hash;
+
+        if ( $caseA->[0] eq 'ALL' ) {
+        }
+        elsif ( $caseA->[0] eq 'NONE' ) {
+        }
+        else {
+            my ($mapping, $keys) = $caseA->@[1,2];
+            for my $key ( @$keys ) {
+                $new_hash{$mapping->{$key}} = $a->{$key};
+            }
+        }
+
+        if ( $caseB->[0] eq 'ALL' ) {
+        }
+        elsif ( $caseB->[0] eq 'NONE' ) {
+        }
+        else {
+            my ($mapping, $keys) = $caseB->@[1,2];
+            for my $key ( @$keys ) {
+                $new_hash{$mapping->{$key}} = $b->{$key};
+            }
+        }
+
+        return \%new_hash;
     });
 }
 
@@ -363,8 +461,8 @@ sub sum_by($iter, $f) {
     });
 }
 
-sub join($iter, $sep) {
-    return join($sep, to_list($iter));
+sub str_join($iter, $sep) {
+    return CORE::join($sep, to_list($iter));
 }
 
 # Build a hash by providing a keying function. Later elements

@@ -130,7 +130,7 @@ is(
     $range->to_array,
     'concat');
 like(
-    Seq->concat()->to_array,
+    Seq->concat->to_array,
     Seq->empty->to_array,
     'concat on zero is empty');
 is(
@@ -237,9 +237,9 @@ is(
 
 is(Seq->wrap([A => 1], [B => 2], [C => 3])->sum_by($snd), 6, 'sumBy');
 is(
-    Seq->wrap(qw/H e l l o W o r l d !/)->join('-'),
+    Seq->wrap(qw/H e l l o W o r l d !/)->str_join('-'),
     "H-e-l-l-o-W-o-r-l-d-!",
-    'join');
+    'str_join');
 
 is(
     Seq->wrap(qw/Hello World you are awesome/)->to_hash(sub($value) { length($value) }),
@@ -479,5 +479,75 @@ is(
         (map { [diamond => $_ ] } qw/7 8 9 10 B D K A/),
     ],
     'cartesian');
+
+# complex example of join
+{
+    my $objects = Seq->wrap(
+        {id => 1, name => 'David'},
+        {id => 2, name => 'Bob'  },
+        {id => 3, name => 'Alex' },
+    );
+
+    my $tags = Seq->wrap(
+        {id => 1, name => 'WoW'     },
+        {id => 2, name => 'Super'   },
+        {id => 3, name => 'Awesome' },
+    );
+
+    my $objects_to_tags = Seq->wrap(
+        {id => 1, object_id => 1, tag_id => 1},
+        {id => 2, object_id => 1, tag_id => 2},
+        {id => 3, object_id => 2, tag_id => 3},
+        {is => 4, object_id => 3, tag_id => 2},
+    );
+
+    my $query =
+        $objects
+        ->join($objects_to_tags, sub($obj, $tag) {$obj->{id} == $tag->{object_id} })
+        ->merge_hash({id => 'object_id', name => 'object_name'}, [qw/tag_id/])
+        ->join($tags, sub($left, $tag) { $left->{tag_id} == $tag->{id} })
+        ->merge_hash([qw/object_id object_name/], {name => 'tag_name'});
+
+    is(
+        $query->to_array,
+        array {
+            item hash {
+                field object_id   => 1;
+                field object_name => "David";
+                field tag_name    => "WoW";
+                end;
+            };
+            item hash {
+                field object_id   => 1;
+                field object_name => "David";
+                field tag_name    => "Super";
+                end;
+            };
+            item hash {
+                field object_id   => 2;
+                field object_name => "Bob";
+                field tag_name    => "Awesome";
+                end;
+            };
+            item hash {
+                field object_id   => 3;
+                field object_name => 'Alex';
+                field tag_name    => 'Super';
+                end;
+            };
+            end;
+        },
+        'join and merge_hash');
+
+    my @david_tags =
+        $query
+        ->filter(sub($obj) { $obj->{object_name} eq 'David' })
+        ->map(   sub($obj) { $obj->{tag_name} });
+
+    my @alex_tags =
+        $query
+        ->filter(sub($obj) { $obj->{object_name} eq 'Bob' })
+        ->map(   sub($obj) { $obj->{tag_name} });
+}
 
 done_testing;
