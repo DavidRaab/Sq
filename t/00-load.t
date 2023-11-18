@@ -72,6 +72,10 @@ is($range->sum, $range->rev->sum, 'sum 2');
 
 # Checking wrap & rangeStep
 {
+    # Currently on undef it aborts, should it just skip the undef and return
+    # the values from 1 to 6?
+    is(Seq->wrap(1,2,3,undef,4,5,6)->to_array, [1..3], 'wrap containing an undef');
+
     is(Seq->wrap(5)->to_array, [5], 'wrap');
     is(
         Seq->wrap(5)->append(Seq->wrap(10))->to_array,
@@ -358,6 +362,8 @@ is(
     is($data1->count, 10, '$data1 still has 10 items');
     is($data2->count, 11, '$data2 now has 11 items');
 }
+
+
 
 # Fibonacci numbers
 {
