@@ -85,6 +85,26 @@ is($range->sum, $range->rev->sum, 'sum 2');
     is(Seq->range_step(10, 2, 1)->to_array, [10,8,6,4,2], '10 .. 1 step 2');
 }
 
+# OO and functional interface -- both work
+{
+    is(
+        Seq
+        ->wrap(1,2,3)
+        ->append(Seq->wrap(4,5,6))
+        ->to_array,
+
+        [1..6],
+        'append with oo chaining');
+    is(
+        Seq::append(
+            Seq->wrap(1,2,3),
+            Seq->wrap(4,5,6),
+        )->to_array,
+
+        [1..6],
+        'append as function');
+}
+
 is(
     $range->take(3)->indexed->to_array,
     [[0,1], [1,2], [2,3]],
