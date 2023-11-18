@@ -7,11 +7,11 @@ use List::Util qw(reduce);
 use Carp qw(croak);
 use DDP;
 
-# TODO: contains?, firstIndex?, mapX, reduce?, sort,
+# TODO: contains?, firstIndex?, mapX, reduce?, sort, cache
 #       interspers, slice, zip, unzip, foldBack, any,
 #       forall, none, max, max_by, min, min_by, average, average_by,
 #       pairwise, windowed, transpose, item, chunk_by_size,
-#       cartesian, one, minmax, minmax_by
+#       one, minmax, minmax_by
 
 # id function
 my $id = sub($x) { return $x };
@@ -412,6 +412,19 @@ sub iter($iter, $f) {
         $f->($x);
     }
     return;
+}
+
+# Similar to iter(). But returns the $seq as-is.
+# Useful for doing something between a chain. For example printing
+# all elements of a sequence.
+#
+# $seq->do(sub($x) { print Dumper($x) })->...
+sub do($iter, $f) {
+    my $it = $iter->();
+    while ( defined(my $x = $it->()) ) {
+        $f->($x);
+    }
+    return $iter;
 }
 
 sub rev($iter) {
