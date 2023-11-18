@@ -1,7 +1,7 @@
 package Seq;
 use 5.036;
 our $VERSION = '0.001';
-use subs 'bind', 'join';
+use subs 'bind', 'join', 'select';
 use Scalar::Util qw(reftype);
 use List::Util qw(reduce);
 use Carp qw(croak);
@@ -232,21 +232,13 @@ sub merge($iter, $merge) {
 # new hashname { id => 'some_id' }
 #
 # or an array of hashnames that should be picked: [qw/id name/]
-sub merge_hash($iter, $mapA, $mapB) {
+sub select($iter, $mapA, $mapB) {
     # Transforms the different inputs a user can give into a
     # hash and an array containing the keys
     state $gen_input = sub($mapping) {
         my $hash;
         my $keys;
-        if ( reftype $mapping eq 'HASH' ) {
-            $hash = $mapping;
-            $keys = [ keys $mapping->%* ];
-        }
-        elsif ( reftype $mapping eq 'ARRAY' ) {
-            $hash = { map { $_ => $_ } @$mapping };
-            $keys = $mapping;
-        }
-        elsif ( not defined reftype $mapping ) {
+        if ( not defined reftype $mapping) {
             if ( $mapping =~ m/\Aall\z/i ) {
                 return ['ALL'];
             }
@@ -256,6 +248,14 @@ sub merge_hash($iter, $mapA, $mapB) {
             else {
                 croak "When not arrayref or hashref must be either 'ALL' or 'NONE'";
             }
+        }
+        elsif ( reftype $mapping eq 'HASH' ) {
+            $hash = $mapping;
+            $keys = [ keys $mapping->%* ];
+        }
+        elsif ( reftype $mapping eq 'ARRAY' ) {
+            $hash = { map { $_ => $_ } @$mapping };
+            $keys = $mapping;
         }
         else {
             croak '$mappings must be tuple and either contain hashref or arrayref';
@@ -274,9 +274,13 @@ sub merge_hash($iter, $mapA, $mapB) {
     merge($iter, sub($a, $b) {
         my %new_hash;
 
+        # Merge keys from $seqA
         if ( $caseA->[0] eq 'ALL' ) {
+            # Copies hash
+            %new_hash = %$a;
         }
         elsif ( $caseA->[0] eq 'NONE' ) {
+            # do nothing here ...
         }
         else {
             my ($mapping, $keys) = $caseA->@[1,2];
@@ -285,9 +289,15 @@ sub merge_hash($iter, $mapA, $mapB) {
             }
         }
 
+        # Merge keys from $seqB
         if ( $caseB->[0] eq 'ALL' ) {
+            # add keys from $b to new hash
+            for my $key ( keys %$b ) {
+                $new_hash{$key} = $b->{$key};
+            }
         }
         elsif ( $caseB->[0] eq 'NONE' ) {
+            # do nothing here ...
         }
         else {
             my ($mapping, $keys) = $caseB->@[1,2];

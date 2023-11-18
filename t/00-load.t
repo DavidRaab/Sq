@@ -504,9 +504,9 @@ is(
     my $query =
         $objects
         ->join($objects_to_tags, sub($obj, $tag) {$obj->{id} == $tag->{object_id} })
-        ->merge_hash({id => 'object_id', name => 'object_name'}, [qw/tag_id/])
+        ->select({id => 'object_id', name => 'object_name'}, [qw/tag_id/])
         ->join($tags, sub($left, $tag) { $left->{tag_id} == $tag->{id} })
-        ->merge_hash([qw/object_id object_name/], {name => 'tag_name'});
+        ->select(ALL => {name => 'tag_name'});
 
     is(
         $query->to_array,
@@ -514,24 +514,28 @@ is(
             item hash {
                 field object_id   => 1;
                 field object_name => "David";
+                field tag_id      => 1;
                 field tag_name    => "WoW";
                 end;
             };
             item hash {
                 field object_id   => 1;
                 field object_name => "David";
+                field tag_id      => 2;
                 field tag_name    => "Super";
                 end;
             };
             item hash {
                 field object_id   => 2;
                 field object_name => "Bob";
+                field tag_id      => 3;
                 field tag_name    => "Awesome";
                 end;
             };
             item hash {
                 field object_id   => 3;
                 field object_name => 'Alex';
+                field tag_id      => 2;
                 field tag_name    => 'Super';
                 end;
             };
