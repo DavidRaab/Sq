@@ -1,6 +1,7 @@
 package Seq;
 use 5.036;
 our $VERSION = '0.001';
+use subs 'bind';
 use List::Util qw(reduce);
 use Carp qw(croak);
 use DDP;
@@ -147,6 +148,7 @@ sub append($iterA, $iterB) {
     }, 'Seq');
 }
 
+# map : Seq<'a> -> ('a -> 'b) -> Seq<'b'>
 sub map($iter, $f) {
     return bless(sub {
         my $it = $iter->();
@@ -157,6 +159,47 @@ sub map($iter, $f) {
             return undef;
         }
     }, 'Seq');
+}
+
+# bind : Seq<'a> -> ('a -> Seq<'b>) -> Seq<'b>
+sub bind($iter, $f) {
+    return bless(sub {
+        my $it   = $iter->();
+        my $seqB = undef;
+
+        return sub {
+            REDO:
+            # when $seqB is defined. an entry from the seq is returned
+            if ( defined $seqB ) {
+                if ( defined(my $b = $seqB->()) ) {
+                    return $b;
+                }
+                # as soon an undef is returned, $seqB finished
+                $seqB = undef;
+            }
+            # when $seqB is undef, we request/create a new $seqB
+            if ( defined(my $a = $it->()) ) {
+                $seqB = $f->($a)->();
+                goto REDO;
+            }
+            # when $seqB is not defined and $it does not return new values
+            return undef;
+        }
+    }, 'Seq');
+}
+
+# flatten : Seq<Seq<'a>> -> Seq<'a>
+sub flatten($iter) {
+    return bind($iter, $id);
+}
+
+# cartesian : Seq<'a> -> Seq<'b> -> Seq<'a * 'b>
+sub cartesian($seqA, $seqB) {
+    return bind($seqA, sub($a) {
+        return bind($seqB, sub($b) {
+            return wrap('Seq', [$a, $b]);
+        });
+    });
 }
 
 # combines map and filter

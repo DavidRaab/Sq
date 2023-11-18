@@ -444,4 +444,34 @@ is(
 is($range->first(sub($x) { $x > 5  }),     6, 'first 1');
 is($range->first(sub($x) { $x > 10 }), undef, 'first 2');
 
+is(
+    $range->bind(sub($x) { Seq->wrap($x) })->to_array,
+    [1 .. 10],
+    'bind - somehow like id');
+
+is(
+    Seq->wrap(
+        Seq->wrap(1,1),
+        Seq->wrap(2,3,5,8,13),
+    )->flatten->to_array,
+    [1,1,2,3,5,8,13],
+    'flatten - flattens a seq of seq');
+
+is(Seq->wrap([1,1], [1,2])->to_array, [[1,1],[1,2]], 'wrap with arrays');
+is(Seq->wrap([1,1])       ->to_array, [[1,1]],       'wrap with array');
+is(Seq->from_array([1,1]) ->to_array, [1,1],         'from_array vs. wrap');
+
+is(
+    Seq::cartesian(
+        Seq->wrap(qw/clubs spades hearts diamond/),
+        Seq->wrap(qw/7 8 9 10 B D K A/),
+    )->to_array,
+    [
+        (map { [clubs   => $_ ] } qw/7 8 9 10 B D K A/),
+        (map { [spades  => $_ ] } qw/7 8 9 10 B D K A/),
+        (map { [hearts  => $_ ] } qw/7 8 9 10 B D K A/),
+        (map { [diamond => $_ ] } qw/7 8 9 10 B D K A/),
+    ],
+    'cartesian');
+
 done_testing;
