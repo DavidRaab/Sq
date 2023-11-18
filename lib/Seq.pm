@@ -228,10 +228,10 @@ sub merge($iter, $merge) {
 # $mapA contains the selection from the first element of the tuple
 # $mapB contains the selection from the second element of the tuple
 #
-# Selection can either be a hashref mapping a hashname to a
+# Selection can either be a hashref mapping a hashnames to a
 # new hashname { id => 'some_id' }
 #
-# or an array of hashnames that should be picked: [qw/id name/]
+# or an array of names that should be picked: [qw/id name/]
 sub select($iter, $mapA, $mapB) {
     # Transforms the different inputs a user can give into a
     # hash and an array containing the keys
