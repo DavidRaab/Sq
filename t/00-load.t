@@ -539,15 +539,32 @@ is(
         },
         'join and merge_hash');
 
-    my @david_tags =
+    is(
         $query
         ->filter(sub($obj) { $obj->{object_name} eq 'David' })
-        ->map(   sub($obj) { $obj->{tag_name} });
+        ->map(   sub($obj) { $obj->{tag_name} })
+        ->to_array,
 
-    my @alex_tags =
+        [qw/WoW Super/],
+        'davids tags');
+
+    is(
         $query
         ->filter(sub($obj) { $obj->{object_name} eq 'Bob' })
-        ->map(   sub($obj) { $obj->{tag_name} });
+        ->map(   sub($obj) { $obj->{tag_name} })
+        ->to_array,
+
+        [qw/Awesome/],
+        'Bobs Tags');
+
+    is(
+        $query
+        ->filter(sub($obj) { $obj->{object_name} eq 'Alex' })
+        ->map(   sub($obj) { $obj->{tag_name} })
+        ->to_array,
+
+        [qw/Super/],
+        'Bobs Tags');
 }
 
 done_testing;
