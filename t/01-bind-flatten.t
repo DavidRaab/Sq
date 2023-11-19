@@ -20,7 +20,22 @@ my $snd     = sub($array) { $array->[1] };
 
 #----------
 
-my $flatten = sub($aoa) {
+# lazy
+my $data1 =
+    Seq->wrap(
+        Seq->wrap(1,1),
+        Seq->wrap(2,3,5,8,13),
+    );
+
+# non-lazy
+my $data2 =
+    [
+        [1,1],
+        [2,3,5,8,13],
+    ];
+
+# non lazy implementation of flatten
+sub flatten($aoa) {
     my @flattened;
     for my $outer ( @$aoa ) {
         for my $inner ( @$outer ) {
@@ -30,28 +45,26 @@ my $flatten = sub($aoa) {
     return \@flattened;
 };
 
-my $data = Seq->wrap(
-    Seq->wrap(1,1),
-    Seq->wrap(2,3,5,8,13),
-);
-
-# Seq->flatten same as non-lazy variant
+# test both calling styles
 is(
-    $data->flatten->to_array,
-    $flatten->([
-        [1,1],
-        [2,3,5,8,13],
-    ]),
-    'flatten - non-lazy');
+    Seq::flatten($data1)->to_array,
+    flatten($data2),
+    'flatten fp - non-lazy');
+
+is(
+    $data1->flatten->to_array,
+    flatten($data2),
+    'flatten oo - non-lazy');
 
 ## Implementing bind with map->flatten
 my $bind = sub($s, $f) {
     return $s->map($f)->flatten;
 };
 
+# check if bind is same as map->flatten
 is(
-    $data->bind($id)->to_array,
-    $bind->($data, $id)->to_array,
+    $data1->bind($id)->to_array,
+    $bind->($data1, $id)->to_array,
     'bind implemented with map and flatten');
 
 done_testing;
