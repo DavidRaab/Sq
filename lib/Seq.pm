@@ -509,22 +509,61 @@ sub sum_by($iter, $f) {
     });
 }
 
-# returns the max value or undef when sequence is empty
-sub max($seq) {
-    return fold($seq, undef, sub($max, $x) {
-        defined $max
-            ? ($x > $max ? $x : $max)
-            : $x;
-    });
+# returns the min value or undef on empty sequence
+# min value is compared with numerical <
+sub min($seq, $default=undef) {
+    min_by($seq, $id, $default);
 }
 
-# returns the min value or undef when sequence is empty
-sub min($seq) {
+# returns the min value or undef on empty sequence
+# min value is compared using lt
+sub min_str($seq, $default=undef) {
+    min_by_str($seq, $id, $default);
+}
+
+sub min_by($seq, $key, $default=undef) {
     return fold($seq, undef, sub($min, $x) {
+        my $value = $key->($x);
         defined $min
-            ? ($x < $min ? $x : $min)
-            : $x;
-    });
+            ? ($value < $min) ? $value : $min
+            : $value;
+    }) // $default;
+}
+
+sub min_by_str($seq, $key, $default=undef) {
+    return fold($seq, undef, sub($min, $x) {
+        my $value = $key->($x);
+        defined $min
+            ? ($value lt $min) ? $value : $min
+            : $value;
+    }) // $default;
+}
+
+# returns the max value or undef when sequence is empty
+sub max($seq, $default=undef) {
+    max_by($seq, $id, $default);
+}
+
+sub max_str($seq, $default=undef) {
+    max_by_str($seq, $id, $default);
+}
+
+sub max_by($seq, $key, $default=undef) {
+    return fold($seq, undef, sub($max, $x) {
+        my $value = $key->($x);
+        defined $max
+            ? ($value > $max) ? $value : $max
+            : $value;
+    }) // $default;
+}
+
+sub max_by_str($seq, $key, $default=undef) {
+    return fold($seq, undef, sub($max, $x) {
+        my $value = $key->($x);
+        defined $max
+            ? ($value gt $max) ? $value : $max
+            : $value;
+    }) // $default;
 }
 
 sub str_join($iter, $sep) {

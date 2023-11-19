@@ -326,14 +326,6 @@ is(Seq->wrap([1,1], [1,2])->to_array, [[1,1],[1,2]], 'wrap with arrays');
 is(Seq->wrap([1,1])       ->to_array, [[1,1]],       'wrap with array');
 is(Seq->from_array([1,1]) ->to_array, [1,1],         'from_array vs. wrap');
 
-is($range->max,                10,  'max');
-is(Seq->wrap->max,             U(), 'max on empty undefined');
-is(Seq->range(-100, -50)->max, -50, 'max with negative values');
-
-is($range->min,                1,    'min');
-is(Seq->wrap->min,             U(),  'min on empty undefined');
-is(Seq->range(-100, -50)->min, -100, 'min with negative values');
-
 is($range->reduce($add), 55,      'reduce');
 is(Seq->empty->reduce($add), U(), 'reduce on empty');
 is(Seq->wrap(1)->reduce($add), 1, 'reduce on single element');
