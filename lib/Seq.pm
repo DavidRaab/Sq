@@ -1,7 +1,7 @@
 package Seq;
 use 5.036;
 our $VERSION = '0.002';
-use subs 'bind', 'join', 'select';
+use subs 'bind', 'join', 'select', 'last';
 use Scalar::Util qw(reftype);
 use List::Util;
 use Carp qw(croak);
@@ -472,6 +472,15 @@ sub reduce($seq, $reducer) {
 sub first($seq, $default=undef) {
     my $first = $seq->()();
     return $first if defined $first;
+    return $default;
+}
+
+sub last($seq, $default=undef) {
+    my $last;
+    iter($seq, sub($x) {
+        $last = $x;
+    });
+    return $last if defined $last;
     return $default;
 }
 

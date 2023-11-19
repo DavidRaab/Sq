@@ -338,4 +338,14 @@ is($range->reduce($add), 55,      'reduce');
 is(Seq->empty->reduce($add), U(), 'reduce on empty');
 is(Seq->wrap(1)->reduce($add), 1, 'reduce on single element');
 
+is(Seq->empty->first,    U(), 'first on empty is undef');
+is(Seq->empty->first(0),   0, 'first with default value');
+is($range->first,          1, 'first on non empty without default');
+is($range->first(0),       1, 'first on non empty with default');
+
+is(Seq->empty->last,   U(), 'last on empty is undef');
+is(Seq->empty->last(0),  0, 'last with default value');
+is($range->last,        10, 'last on non empty without default');
+is($range->last(0),     10, 'last on non empty with default');
+
 done_testing;
