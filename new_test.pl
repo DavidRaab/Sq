@@ -4,20 +4,44 @@ use open ':std', ':encoding(UTF-8)';
 use Data::Printer;
 use Getopt::Long::Descriptive;
 use Path::Tiny;
+use Seq;
+
+my $use =
+    join("\n",
+        q(USAGE:),
+        qq(\t%c %o),
+        q(),
+        q(EXAMPLE:),
+        qq(\t\$ new_test.pl -t hello),
+        qq(\tCreated 't/02-hello.t' ...),
+        q(),
+        q(OPTIONS:)
+    );
 
 my ($opt, $usage) = describe_options(
-    'Usage: %c %o',
-    ['test|t=s', 'new testfile script', {required => 1}],
-    ['help|h',   'Print this message',  {shortcircuit => 1}],
+    $use,
+    ['test|t=s', 'name of the test. Without number and .t',
+        {required => 1}],
+    ['help|h',   'Print this message',
+        {shortcircuit => 1}],
 );
 
 $usage->die if $opt->help;
+
+# get the maximum id from test-files so far
+my $maximum_id =
+    Seq
+    ->wrap(   path('t')->children )
+    ->map(    sub($x) { $x->basename })
+    ->choose( sub($x) { $x =~ m/\A(\d+) .* \.t\z/xms ? $1 : undef } )
+    ->fold(0, sub($max, $x) { $x > $max ? $x : $max });
 
 # Load DATA into array
 my @content = <DATA>;
 
 # file to create
-my $file = path('t', $opt->test);
+my $basename = sprintf "%02d-%s.t", ($maximum_id + 1), $opt->test;
+my $file     = path(t => $basename);
 
 # abort when file exists
 if ( -e $file ) {
@@ -26,6 +50,7 @@ if ( -e $file ) {
 # create template test file
 else {
     $file->spew_utf8(@content);
+    printf "Created '%s' ...\n", $file;
 }
 
 
