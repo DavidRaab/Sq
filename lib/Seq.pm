@@ -315,11 +315,9 @@ sub choose($iter, $chooser) {
     return bless(sub {
         my $it = $iter->();
         return sub {
-            SKIP:
-            if ( defined(my $x = $it->()) ) {
-                my $opt = $chooser->($x);
-                return $opt if defined $opt;
-                goto SKIP;
+            while ( defined(my $x = $it->()) ) {
+                my $optional = $chooser->($x);
+                return $optional if defined $optional;
             }
             return undef;
         }
