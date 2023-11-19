@@ -3,7 +3,7 @@ use 5.036;
 use List::Util qw(reduce);
 use Seq;
 use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end bag float/;
-# use DDP;
+use DDP;
 
 diag( "Testing Seq $Seq::VERSION, Perl $], $^X" );
 is($Seq::VERSION, number_ge("0.001"), 'Check minimum version number');
