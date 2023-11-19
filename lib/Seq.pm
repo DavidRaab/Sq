@@ -491,6 +491,15 @@ sub max($seq) {
     });
 }
 
+# returns the min value or undef when sequence is empty
+sub min($seq) {
+    return fold($seq, undef, sub($min, $x) {
+        defined $min
+            ? ($x < $min ? $x : $min)
+            : $x;
+    });
+}
+
 sub str_join($iter, $sep) {
     return CORE::join($sep, to_list($iter));
 }
