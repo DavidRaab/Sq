@@ -12,11 +12,12 @@ is($Seq::VERSION, number_ge("0.002"), 'Check minimum version number');
 my $range     = Seq->range(1, 10);
 my $rangeDesc = Seq->range(10, 1);
 
-my $id      = sub($x) { $x          };
-my $add1    = sub($x) { $x + 1      };
-my $double  = sub($x) { $x * 2      };
-my $square  = sub($x) { $x * $x     };
-my $is_even = sub($x) { $x % 2 == 0 };
+my $id      = sub($x)     { $x          };
+my $add     = sub($x, $y) { $x + $y     };
+my $add1    = sub($x)     { $x + 1      };
+my $double  = sub($x)     { $x * 2      };
+my $square  = sub($x)     { $x * $x     };
+my $is_even = sub($x)     { $x % 2 == 0 };
 
 my $fst     = sub($array) { $array->[0] };
 my $snd     = sub($array) { $array->[1] };
@@ -305,8 +306,8 @@ is(
     'Non Lazy Perl implementation of choose');
 
 
-is($range->first(sub($x) { $x > 5  }),     6, 'first 1');
-is($range->first(sub($x) { $x > 10 }), undef, 'first 2');
+is($range->find(sub($x) { $x > 5  }),     6, 'find 1');
+is($range->find(sub($x) { $x > 10 }), undef, 'find 2');
 
 is(
     $range->bind(sub($x) { Seq->wrap($x) })->to_array,
@@ -332,5 +333,9 @@ is(Seq->range(-100, -50)->max, -50, 'max with negative values');
 is($range->min,                1,    'min');
 is(Seq->wrap->min,             U(),  'min on empty undefined');
 is(Seq->range(-100, -50)->min, -100, 'min with negative values');
+
+is($range->reduce($add), 55,      'reduce');
+is(Seq->empty->reduce($add), U(), 'reduce on empty');
+is(Seq->wrap(1)->reduce($add), 1, 'reduce on single element');
 
 done_testing;

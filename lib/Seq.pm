@@ -3,7 +3,7 @@ use 5.036;
 our $VERSION = '0.002';
 use subs 'bind', 'join', 'select';
 use Scalar::Util qw(reftype);
-use List::Util qw(reduce);
+use List::Util;
 use Carp qw(croak);
 use DDP;
 
@@ -119,7 +119,7 @@ sub concat($class, @seqs) {
     # one element can be returned as-is
     return $seqs[0]    if $count == 1;
     # at least two items
-    return reduce { append($a, $b) } @seqs;
+    return List::Util::reduce { append($a, $b) } @seqs;
 }
 
 #- Methods
@@ -457,6 +457,24 @@ sub fold($iter, $state, $folder) {
     }
 }
 
+# Like fold, but without an initial state. When sequence is empty
+# it returns an undef. Otherwise combines two elements from
+# left to right to produce an output. Needs a sequence
+# with one item to work properly. It is encouraged to use `fold`
+# instead.
+sub reduce($seq, $reducer) {
+    my $f = first(take($seq, 1));
+
+    return fold(skip($seq, 1), $f, $reducer) if defined $f;
+    return undef;
+}
+
+sub first($seq, $default=undef) {
+    my $first = $seq->()();
+    return $first if defined $first;
+    return $default;
+}
+
 sub to_array($iter) {
     state $folder = sub($array, $x) { push @$array, $x };
     return fold($iter, [], $folder);
@@ -524,7 +542,8 @@ sub group_by($iter, $get_key) {
     return \%hash;
 }
 
-sub first($iter, $predicate) {
+# returns first element for which the given $predicate returns true
+sub find($iter, $predicate) {
     my $it = $iter->();
     while ( defined(my $x = $it->()) ) {
         return $x if $predicate->($x);
