@@ -76,31 +76,4 @@ is(
 
     'chaining and starting with empty');
 
-# wrap
-is(
-    Seq::wrap(1,2,3)->to_array,
-    Seq->wrap(1,2,3)->to_array,
-    'wrap in both styles 1');
-
-# but this is awkward ...
-# but i will probably accept that edge case
-is(
-    Seq::wrap('Seq',1,2,3)->to_array,
-    Seq->wrap(1,2,3)->to_array,
-    'wrap in both styles 2');
-
-# concat
-is(
-    Seq::concat(
-        Seq::wrap(1,2,3),
-        Seq::wrap(4,5,6),
-    )->to_array,
-
-    Seq->concat(
-        Seq->wrap(1,2,3),
-        Seq->wrap(4,5,6),
-    )->to_array,
-
-    'concat in both styles');
-
 done_testing;

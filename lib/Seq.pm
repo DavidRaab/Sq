@@ -13,17 +13,6 @@ use DDP;
 #       pairwise, windowed, transpose, item, chunk_by_size,
 #       one, minmax, minmax_by
 
-# helper function
-my $called_as_method = sub($x) {
-    return 1 if (not defined reftype $x) && ($x eq 'Seq');
-    return 0;
-};
-my $ignore_method_call = sub {
-    my ($obj, @rest) = @_;
-    return @rest        if (not defined reftype $obj) && ($obj eq 'Seq');
-    return $obj, @rest;
-};
-
 # id function
 my $id = sub($x) { return $x };
 
@@ -87,8 +76,7 @@ sub range($class, $start, $stop) {
 }
 
 # turns all arguments into an sequence
-sub wrap {
-    my @xs   = $ignore_method_call->(@_);
+sub wrap($class, @xs) {
     my $last = $#xs;
     return unfold('Seq', 0, sub($idx) {
         return $xs[$idx], $idx+1 if $idx <= $last;
@@ -98,7 +86,7 @@ sub wrap {
 
 # turns a list into a Seq - alias to wrap
 sub from_list($class, @xs) {
-    return wrap($class, @xs);
+    return wrap(Seq => @xs);
 }
 
 # turns an arrayref into a seq
@@ -123,16 +111,15 @@ sub from_hash($class, $hashref, $f) {
 }
 
 # Concatenates a list of Seq into a single Seq
-sub concat(@args) {
-    my @iters = $ignore_method_call->(@args);
-    my $count = @iters;
+sub concat($class, @seqs) {
+    my $count = @seqs;
 
     # with no values to concat, return an empty iterator
     return empty('Seq') if $count == 0;
     # one element can be returned as-is
-    return $iters[0]    if $count == 1;
+    return $seqs[0]    if $count == 1;
     # at least two items
-    return reduce { append($a, $b) } @iters;
+    return reduce { append($a, $b) } @seqs;
 }
 
 #- Methods
@@ -211,7 +198,7 @@ sub flatten($iter) {
 sub cartesian($seqA, $seqB) {
     bind($seqA, sub($a) {
     bind($seqB, sub($b) {
-        wrap [$a, $b];
+        wrap('Seq', [$a, $b]);
     })});
 }
 
@@ -221,7 +208,7 @@ sub cartesian($seqA, $seqB) {
 sub join($seqA, $seqB, $predicate) {
     bind($seqA, sub($a) {
     bind($seqB, sub($b) {
-        return wrap [$a, $b] if $predicate->($a, $b);
+        return wrap(Seq => [$a, $b]) if $predicate->($a, $b);
         return empty('Seq');
     })});
 }
@@ -233,7 +220,7 @@ sub merge($iter, $merge) {
     bind($iter, sub($tuple) {
         my ($a, $b) = @$tuple;
         my $c = $merge->($a, $b);
-        return wrap $c;
+        return wrap(Seq => $c);
     });
 }
 
