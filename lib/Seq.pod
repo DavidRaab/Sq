@@ -1,0 +1,90 @@
+# PODNAME: Seq
+# ABSTRACT: What is Seq, and how do I use it?
+
+__END__
+
+=head1 NAME
+
+Seq - A lazy sequence implementation
+
+=head1 VERSION
+
+Version 0.002
+
+=head1 SYNOPSIS
+
+This is a lazy sequence implementation. C# has LINQ, Java has Stream, F#
+has Seq. Perl also has Seq.
+
+    use v5.36;
+    use Seq;
+
+    # Fibonacci Generator
+    my $fib =
+        Seq->concat(
+            Seq->wrap(1,1),
+            Seq->unfold([1,1], sub($state) {
+                my $next = $state->[0] + $state->[1];
+                return $next, [$state->[1],$next];
+            })
+        );
+
+    # prints: 1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987 1597 2584 4181 6765
+    $fib->take(20)->iter(sub($x) {
+        say $x;
+    });
+
+    # Represents all possible combinations
+    # [[clubs => 7], [clubs => 8], [clubs => 9], ...]
+    my $cards =
+        Seq::cartesian(
+            Seq->wrap(qw/clubs spades hearts diamond/),
+            Seq->wrap(qw/7 8 9 10 B D K A/)
+        );
+
+    use Path::Tiny qw(path);
+    # get the maximum id from test-files so far
+    my $maximum_id =
+        Seq
+        ->wrap(   path('t')->children )
+        ->map(    sub($x) { $x->basename })
+        ->choose( sub($x) { $x =~ m/\A(\d+) .* \.t\z/xms ? $1 : undef } )
+        ->max;
+
+=head1 EXPORT
+
+This modules does not export anything.
+
+=head1 SUBROUTINES/METHODS
+
+=head2 function1
+
+=head1 AUTHOR
+
+David Raab, C<< <davidraab83 at gmail.com> >>
+
+=head1 Github
+
+Development project is on Github. L<https://github.com/DavidRaab/Seq>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-seq at rt.cpan.org>, or through
+the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Seq>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Seq
+
+You can also look for information at:
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2023 by David Raab.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
