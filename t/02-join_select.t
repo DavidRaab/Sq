@@ -18,7 +18,27 @@ my $is_even = sub($x) { $x % 2 == 0 };
 my $fst     = sub($array) { $array->[0] };
 my $snd     = sub($array) { $array->[1] };
 
-#----------
+
+#--- ---
+
+
+# check cartesian first -- is used by join/select
+is(
+    Seq::cartesian(
+        Seq->wrap(qw/clubs spades hearts diamond/),
+        Seq->wrap(qw/7 8 9 10 B D K A/),
+    )->to_array,
+    [
+        (map { [clubs   => $_ ] } qw/7 8 9 10 B D K A/),
+        (map { [spades  => $_ ] } qw/7 8 9 10 B D K A/),
+        (map { [hearts  => $_ ] } qw/7 8 9 10 B D K A/),
+        (map { [diamond => $_ ] } qw/7 8 9 10 B D K A/),
+    ],
+    'cartesian');
+
+
+#--- ---
+
 
 # Some data tables
 my $objects = Seq->wrap(
@@ -111,5 +131,15 @@ is(
 
     [qw/Super/],
     'Bobs Tags');
+
+
+# filter->map can be replaced with choose
+is(
+    $query
+    ->choose(sub($obj) { $obj->{object_name} eq 'David' ? $obj->{tag_name} : undef })
+    ->to_array,
+
+    [qw/WoW Super/],
+    'davids tags');
 
 done_testing;

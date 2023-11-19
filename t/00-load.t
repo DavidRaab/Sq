@@ -475,20 +475,6 @@ is(
 is(Seq->wrap([1,1], [1,2])->to_array, [[1,1],[1,2]], 'wrap with arrays');
 is(Seq->wrap([1,1])       ->to_array, [[1,1]],       'wrap with array');
 is(Seq->from_array([1,1]) ->to_array, [1,1],         'from_array vs. wrap');
-
-is(
-    Seq::cartesian(
-        Seq->wrap(qw/clubs spades hearts diamond/),
-        Seq->wrap(qw/7 8 9 10 B D K A/),
-    )->to_array,
-    [
-        (map { [clubs   => $_ ] } qw/7 8 9 10 B D K A/),
-        (map { [spades  => $_ ] } qw/7 8 9 10 B D K A/),
-        (map { [hearts  => $_ ] } qw/7 8 9 10 B D K A/),
-        (map { [diamond => $_ ] } qw/7 8 9 10 B D K A/),
-    ],
-    'cartesian');
-
 is($range->max, 10, 'max');
 is(Seq->wrap->max, U(), 'max on empty undefined');
 
