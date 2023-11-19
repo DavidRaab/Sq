@@ -34,7 +34,7 @@ my $maximum_id =
     ->wrap(   path('t')->children )
     ->map(    sub($x) { $x->basename })
     ->choose( sub($x) { $x =~ m/\A(\d+) .* \.t\z/xms ? $1 : undef } )
-    ->fold(0, sub($max, $x) { $x > $max ? $x : $max });
+    ->max;
 
 # Load DATA into array
 my @content = <DATA>;
@@ -59,7 +59,7 @@ __DATA__
 use 5.036;
 use List::Util qw(reduce);
 use Seq;
-use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end bag float/;
+use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end bag float U/;
 use DDP;
 
 # Some values, functions, ... for testing

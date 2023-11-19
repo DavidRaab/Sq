@@ -2,11 +2,11 @@
 use 5.036;
 use List::Util qw(reduce);
 use Seq;
-use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end bag float/;
+use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end bag float U/;
 use DDP;
 
 diag( "Testing Seq $Seq::VERSION, Perl $], $^X" );
-is($Seq::VERSION, number_ge("0.001"), 'Check minimum version number');
+is($Seq::VERSION, number_ge("0.002"), 'Check minimum version number');
 
 # Some values, functions, ... for testing
 my $range     = Seq->range(1, 10);
@@ -579,5 +579,8 @@ is(
         [qw/Super/],
         'Bobs Tags');
 }
+
+is($range->max, 10, 'max');
+is(Seq->wrap->max, U(), 'max on empty undefined');
 
 done_testing;

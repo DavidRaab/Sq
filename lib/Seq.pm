@@ -1,6 +1,6 @@
 package Seq;
 use 5.036;
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use subs 'bind', 'join', 'select';
 use Scalar::Util qw(reftype);
 use List::Util qw(reduce);
@@ -479,6 +479,15 @@ sub sum($iter) {
 sub sum_by($iter, $f) {
     return fold($iter, 0, sub($sum, $x) {
         return $sum + $f->($x);
+    });
+}
+
+# returns the max value or undef when sequence is empty
+sub max($seq) {
+    return fold($seq, undef, sub($max, $x) {
+        defined $max
+            ? ($x > $max ? $x : $max)
+            : $x;
     });
 }
 
