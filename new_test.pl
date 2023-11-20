@@ -4,7 +4,7 @@ use open ':std', ':encoding(UTF-8)';
 use Data::Printer;
 use Getopt::Long::Descriptive;
 use Path::Tiny;
-use Seq;
+use Seq qw(id fst snd key);
 
 my $use =
     join("\n",
