@@ -1,9 +1,9 @@
 #!perl
 use 5.036;
 use List::Util qw(reduce);
-use Seq;
-use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end bag float U/;
-use DDP;
+use Seq qw(key);
+use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash array item end bag float U/;
+#use DDP;
 
 # Some values, functions, ... for testing
 my $range     = Seq->range(1, 10);
@@ -59,14 +59,14 @@ my $data = Seq->wrap(
     { id => 3, name => 'C' },
 );
 
-my $by_id   = sub($h) { $h->{id}   };
-my $by_name = sub($h) { $h->{name} };
+my $by_id   = key "id";
+my $by_name = key "name";
 
 # min_by
-is($data->min_by($by_id),           1, 'min_by');
-is($data->min_by($by_id, 0),        1, 'min_by with default');
-is(Seq->empty->min_by($by_id),    U(), 'min_by on empty');
-is(Seq->empty->min_by($by_id, 0),   0, 'min_by on empty with default');
+is($data->min_by(key "id"),           1, 'min_by');
+is($data->min_by(key "id", 0),        1, 'min_by with default');
+is(Seq->empty->min_by(key "id"),    U(), 'min_by on empty');
+is(Seq->empty->min_by(key "id", 0),   0, 'min_by on empty with default');
 
 # min_by_str
 is($data->min_by_str($by_name),           'A', 'min_by_str');

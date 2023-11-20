@@ -7,7 +7,7 @@ use List::Util;
 use Carp qw(croak);
 use Sub::Exporter -setup => {
     exports => [
-        qw(id fst snd),
+        qw(id fst snd key),
     ],
 };
 use DDP;
@@ -22,6 +22,12 @@ use DDP;
 sub id ($x)     { return $x          }
 sub fst($array) { return $array->[0] }
 sub snd($array) { return $array->[1] }
+
+# a helper to create a function for selecting a hash-key
+sub key :prototype($) {
+    my $name = $_[0];
+    return sub($hash) { return $hash->{$name} };
+}
 
 #- Constructurs
 #    Those are functions that create Seq types
