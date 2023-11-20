@@ -125,6 +125,9 @@ sub from_array($class, $xs) {
     });
 }
 
+# Pass it a hashref. The function $f is executed for every
+# (key, value) pair. The result is used as a single item in
+# the sequence.
 sub from_hash($class, $hashref, $f) {
     return bless(sub {
         my $idx  = 0;
