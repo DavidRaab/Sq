@@ -1,12 +1,22 @@
 Build.PL
 Changes
+examples/choose.pl
 lib/Seq.pm
+lib/Seq.pod
 LICENSE
 MANIFEST			This list of files
 META.json
 META.yml
+new_test.pl
 README
 t/00-load.t
+t/01-bind-flatten.t
+t/02-join_select.t
+t/03-fibonacci.t
+t/04-mutable.t
+t/05-interface.t
+t/06-min_max.t
+t/csv_example/00-main.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
