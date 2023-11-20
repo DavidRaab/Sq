@@ -7,7 +7,7 @@ use List::Util;
 use Carp qw(croak);
 use Sub::Exporter -setup => {
     exports => [
-        qw(id fst snd key),
+        qw(id fst snd key assign),
     ],
 };
 use DDP;
@@ -16,7 +16,16 @@ use DDP;
 #       interspers, slice, zip, unzip, foldBack, any,
 #       forall, none, average, average_by,
 #       pairwise, windowed, transpose, item, chunk_by_size,
-#       one, minmax, minmax_by
+#       one, minmax, minmax_by,
+#
+# + ways to do regexes on strings
+# + using this module to scan file-system
+# ? how about a data checker tool
+# + more ways to transform data, especially complex structures
+# ? A data transformation/selection language
+# o Error checking through another module that adds signature type check through AOP
+# o Maybe DU, Record fist-class support when i implement them.
+# o good way to also implement async with it?
 
 # Important functions used in FP code. So adding them.
 sub id ($x)     { return $x          }
@@ -27,6 +36,11 @@ sub snd($array) { return $array->[1] }
 sub key :prototype($) {
     my $name = $_[0];
     return sub($hash) { return $hash->{$name} };
+}
+
+# allows writing a code block to create a value
+sub assign :prototype(&) {
+    return $_[0]->();
 }
 
 #- Constructurs
