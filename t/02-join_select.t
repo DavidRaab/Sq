@@ -3,6 +3,7 @@ use 5.036;
 use List::Util qw(reduce);
 use Seq;
 use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end bag float U/;
+use Data::Dumper;
 use DDP;
 
 # Some values, functions, ... for testing
@@ -18,24 +19,64 @@ my $is_even = sub($x) { $x % 2 == 0 };
 my $fst     = sub($array) { $array->[0] };
 my $snd     = sub($array) { $array->[1] };
 
+sub Dump($x) {
+    local $Data::Dumper::Indent = 0;
+    print Data::Dumper::Dumper($x);
+    return;
+}
 
 #--- ---
 
-
-# check cartesian first -- is used by join/select
-is(
+my $cards =
     Seq::cartesian(
         Seq->wrap(qw/clubs spades hearts diamond/),
         Seq->wrap(qw/7 8 9 10 B D K A/),
-    )->to_array,
+    );
+
+# check cartesian first -- is used by join/select
+is(
+    $cards->to_array,
     [
         (map { [clubs   => $_ ] } qw/7 8 9 10 B D K A/),
         (map { [spades  => $_ ] } qw/7 8 9 10 B D K A/),
         (map { [hearts  => $_ ] } qw/7 8 9 10 B D K A/),
         (map { [diamond => $_ ] } qw/7 8 9 10 B D K A/),
     ],
-    'cartesian');
+    'cartesian 1');
 
+# testing full output
+is(
+    $cards->to_array,
+    [
+        ['clubs'  ,'7'],['clubs'  ,'8'],['clubs'  ,'9'],['clubs'  ,'10'],
+        ['clubs'  ,'B'],['clubs'  ,'D'],['clubs'  ,'K'],['clubs'  ,'A' ],
+        ['spades' ,'7'],['spades' ,'8'],['spades' ,'9'],['spades' ,'10'],
+        ['spades' ,'B'],['spades' ,'D'],['spades' ,'K'],['spades' ,'A' ],
+        ['hearts' ,'7'],['hearts' ,'8'],['hearts' ,'9'],['hearts' ,'10'],
+        ['hearts' ,'B'],['hearts' ,'D'],['hearts' ,'K'],['hearts' ,'A' ],
+        ['diamond','7'],['diamond','8'],['diamond','9'],['diamond','10'],
+        ['diamond','B'],['diamond','D'],['diamond','K'],['diamond','A' ],
+    ],
+    'cartesian 2');
+
+# testing against non-lazy variant
+sub cartesian($arrayA, $arrayB) {
+    my @output;
+    for my $a ( @$arrayA ) {
+        for my $b ( @$arrayB ) {
+            push @output, [$a, $b];
+        }
+    }
+    return \@output;
+}
+
+is(
+    $cards->to_array,
+    cartesian(
+        [qw/clubs spades hearts diamond/],
+        [qw/7 8 9 10 B D K A/],
+    ),
+    'cartesian non-lazy');
 
 #--- ---
 
