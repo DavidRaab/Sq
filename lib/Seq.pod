@@ -49,13 +49,16 @@ has Seq. Perl also has Seq.
 
 =head1 EXPORT
 
-This modules does not export anything.
+This modules does not export anything by default. But you can request the following
+functions: id, fst, snd, key, assign
 
 =head1 CONSTRUCTORS
 
 This module uses functional-programming as the main paradigm. Functions are
 divided into constructors that create *Sequences* and functions
-that operate on Sequences.
+that operate on Sequences (Methods). They are called methods for convenience,
+but no object-orientation is involved. Perls OO capabilities are only
+used as a chaning mechanism.
 
 Constructors must be called with the Package name. Functions that operate
 on Sequences can either be called as a method or directly from the Package.
@@ -109,10 +112,6 @@ Takes multiple *Sequences* and returns a single flattened sequence.
         Seq->range(5, 1),
     );
 
-=head1 AUTHOR
-
-David Raab, C<< <davidraab83 at gmail.com> >>
-
 =head1 Github
 
 Development project is on Github. L<https://github.com/DavidRaab/Seq>
@@ -130,6 +129,10 @@ You can find documentation for this module with the perldoc command.
     perldoc Seq
 
 You can also look for information at:
+
+=head1 AUTHOR
+
+David Raab, C<< <davidraab83 at gmail.com> >>
 
 =head1 LICENSE AND COPYRIGHT
 
