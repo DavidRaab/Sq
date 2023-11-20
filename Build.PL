@@ -13,6 +13,7 @@ my $builder = Module::Build->new(
     },
     test_requires => {
         'Test2::V0'  => '0.000156',
+        'Path::Tiny' => '0',
         'List::Util' => '0',
     },
     requires => {
