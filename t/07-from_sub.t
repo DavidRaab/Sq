@@ -17,17 +17,23 @@ my $is_even = sub($x) { $x % 2 == 0 };
 #----------
 
 sub range($start, $stop) {
-    # NO CODE SHOULD BE HERE
-    # OTHERWISE WILL BE CAUSE OF BUGS
+    ###-- -- -- -- -- IMPORTANT -- -- -- -- --###
+    #          NO CODE SHOULD BE HERE           #
+    #    Otherwise it will be CAUSE of BUGS.    #
+    # You also should never manipulate function #
+    # arguments not even assign a new value to  #
+    # it. Do an explicit new assignment in the  #
+    #          INITIALIZATION STAGE             #
+    ###-- -- -- -- -- -- --- -- -- -- -- -- --###
     return Seq->from_sub(sub {
-        # Initialization code for a sequence
+        # INITIALIZATION STAGE:
         my $current = $start;
 
         # The iterator returning one element when asked
         return sub {
             # As long $current is equal or smaller
             if ( $current <= $stop ) {
-                # return $current and +1 it
+                # return $current and increase by 1
                 return $current++;
             }
             # otherwise return undef to indicate end of sequence
@@ -40,6 +46,6 @@ sub range($start, $stop) {
 
 my $r = range(1,10);
 is($r->to_array, Seq->range(1,10)->to_array, 'from_sub');
-is($r->to_array, Seq->range(1,10)->to_array, 'from_sub');
+is($r->to_array, Seq->range(1,10)->to_array, 'testing that $r is not exhausted');
 
 done_testing;

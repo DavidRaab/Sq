@@ -46,12 +46,16 @@ sub assign :prototype(&) {
 #- Constructurs
 #    Those are functions that create Seq types
 
+# creates a sequence from a subroutine
+sub from_sub($class, $f) {
+    return bless($f, 'Seq');
+}
+
+# always an empty sequence
 sub empty($class) {
-    return bless(sub {
-        return sub {
-            return undef;
-        }
-    }, 'Seq');
+    return from_sub('Seq', sub {
+        return sub { undef };
+    });
 }
 
 # TODO: When $state is a reference. Same handling as in fold?
@@ -110,11 +114,6 @@ sub wrap($class, @xs) {
         return $xs[$idx], $idx+1 if $idx <= $last;
         return undef;
     });
-}
-
-# creates a sequence from a subroutine
-sub from_sub($class, $f) {
-    return bless($f, 'Seq');
 }
 
 # turns a list into a Seq - alias to wrap
