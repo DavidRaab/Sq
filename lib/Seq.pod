@@ -7,10 +7,6 @@ __END__
 
 Seq - A lazy sequence implementation
 
-=head1 VERSION
-
-Version 0.002
-
 =head1 SYNOPSIS
 
 This is a lazy sequence implementation. C# has LINQ, Java has Stream, F#
@@ -55,9 +51,63 @@ has Seq. Perl also has Seq.
 
 This modules does not export anything.
 
-=head1 SUBROUTINES/METHODS
+=head1 CONSTRUCTORS
 
-=head2 function1
+This module uses functional-programming as the main paradigm. Functions are
+divided into constructors that create *Sequences* and functions
+that operate on Sequences.
+
+Constructors must be called with the Package name. Functions that operate
+on Sequences can either be called as a method or directly from the Package.
+
+    my $range =
+        Seq
+        ->wrap(1,2,3)
+        ->append(Seq->wrap(4,5,6));
+
+or
+
+    my $range =
+        Seq::to_array(
+            Seq::append(
+                Seq->wrap(1,2,3),
+                Seq->wrap(4,5,6),
+            )
+        );
+
+=head2 $seq = Seq->empty()
+
+Returns an empty sequence. Useful as an initial state or as a starting point.
+
+    Seq->empty->append( $another_seq )
+
+=head2 $seq = Seq->range($start, $stop)
+
+Returns a sequence from $start to $stop. Range can also be backwards. $start
+and $stop are inclusive.
+
+    Seq->range(1, 5); # 1,2,3,4,5
+    Seq->range(5, 1); # 5,4,3,2,1
+    Seq->range(1, 1); # 1
+
+=head2 $seq = Seq->wrap(...)
+
+Just takes whatever you pass it to, and puts it in a sequence. This should be
+your primarily way to create a sequence with values.
+
+    Seq->wrap(qw/Hello World/); # "Hello", "World"
+    Seq->wrap(1 .. 10);         # AVOID this, use Seq->range(1, 10) instead.
+    Seq->wrap(@array);
+
+=head2 $seq = Seq->concat(@sequences)
+
+Takes multiple *Sequences* and returns a single flattened sequence.
+
+    # 1, 2, 3, 4, 5, 5, 4, 3, 2, 1
+    Seq->concat(
+        Seq->range(1, 5),
+        Seq->range(5, 1),
+    );
 
 =head1 AUTHOR
 
