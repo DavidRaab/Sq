@@ -112,6 +112,11 @@ sub wrap($class, @xs) {
     });
 }
 
+# creates a sequence from a subroutine
+sub from_sub($class, $f) {
+    return bless($f, 'Seq');
+}
+
 # turns a list into a Seq - alias to wrap
 sub from_list($class, @xs) {
     return wrap(Seq => @xs);

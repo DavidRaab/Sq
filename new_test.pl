@@ -57,8 +57,7 @@ else {
 __DATA__
 #!perl
 use 5.036;
-use List::Util qw(reduce);
-use Seq qw(id fst snd key);
+use Seq qw(id fst snd key assign);
 use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end bag float U/;
 use DDP;
 
@@ -72,3 +71,5 @@ my $square  = sub($x) { $x * $x     };
 my $is_even = sub($x) { $x % 2 == 0 };
 
 #----------
+
+done_testing;
