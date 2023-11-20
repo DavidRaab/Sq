@@ -1,7 +1,7 @@
 #!perl
 use 5.036;
 use List::Util qw(reduce);
-use Seq;
+use Seq qw/id fst snd/;
 use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end bag float U/;
 use DDP;
 
@@ -9,14 +9,11 @@ use DDP;
 my $range     = Seq->range(1, 10);
 my $rangeDesc = Seq->range(10, 1);
 
-my $id      = sub($x) { $x          };
 my $add1    = sub($x) { $x + 1      };
 my $double  = sub($x) { $x * 2      };
 my $square  = sub($x) { $x * $x     };
 my $is_even = sub($x) { $x % 2 == 0 };
 
-my $fst     = sub($array) { $array->[0] };
-my $snd     = sub($array) { $array->[1] };
 
 #----------
 
@@ -27,8 +24,8 @@ my $snd     = sub($array) { $array->[1] };
         Seq->concat(
             Seq->wrap(1,1),
             Seq->unfold([1,1], sub($state) {
-                my $next = $state->[0] + $state->[1];
-                return $next, [$state->[1],$next];
+                my $next = fst($state) + snd $state;
+                return $next, [snd($state),$next];
             })
         );
 
@@ -46,8 +43,8 @@ my $snd     = sub($array) { $array->[1] };
         Seq->concat(
             Seq->wrap(1,1),
             Seq->unfold([1,1], sub($state) {
-                my $next = $state->[0] + $state->[1];
-                $state->[0] = $state->[1];
+                my $next = fst($state) + snd($state);
+                $state->[0] = snd $state;
                 $state->[1] = $next;
                 return $next, $state;
             })

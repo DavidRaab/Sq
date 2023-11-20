@@ -5,16 +5,23 @@ use subs 'bind', 'join', 'select', 'last';
 use Scalar::Util qw(reftype);
 use List::Util;
 use Carp qw(croak);
+use Sub::Exporter -setup => {
+    exports => [
+        qw(id fst snd),
+    ],
+};
 use DDP;
 
 # TODO: contains?, firstIndex?, mapX, reduce?, sort, cache
 #       interspers, slice, zip, unzip, foldBack, any,
-#       forall, none, max, max_by, min, min_by, average, average_by,
+#       forall, none, average, average_by,
 #       pairwise, windowed, transpose, item, chunk_by_size,
 #       one, minmax, minmax_by
 
-# id function
-my $id = sub($x) { return $x };
+# Important functions used in FP code. So adding them.
+sub id ($x)     { return $x          }
+sub fst($array) { return $array->[0] }
+sub snd($array) { return $array->[1] }
 
 #- Constructurs
 #    Those are functions that create Seq types
@@ -30,8 +37,9 @@ sub empty($class) {
 # TODO: When $state is a reference. Same handling as in fold?
 sub unfold($class, $state, $f) {
     return bless(sub {
-        # Important: Perl signatures are aliases. As we assign
+        # IMPORTANT: Perl signatures are aliases. As we assign
         # to $state later, we need to make a copy here.
+        # Removing this lines causes bugs.
         my $state = $state;
         my $abort = 0;
         my $x;
@@ -39,7 +47,7 @@ sub unfold($class, $state, $f) {
             return undef if $abort;
 
             ($x, $state) = $f->($state);
-            $abort =1 if not defined $x;
+            $abort = 1 if not defined $x;
             return $x;
         }
     }, 'Seq');
@@ -191,7 +199,7 @@ sub bind($iter, $f) {
 
 # flatten : Seq<Seq<'a>> -> Seq<'a>
 sub flatten($iter) {
-    return bind($iter, $id);
+    return bind($iter, \&id);
 }
 
 # cartesian : Seq<'a> -> Seq<'b> -> Seq<'a * 'b>
@@ -397,7 +405,7 @@ sub distinct_by($iter, $f) {
 # so it only works good when Seq contains Strings or Numbers.
 # Use distinct_by for other data.
 sub distinct($iter) {
-    return distinct_by($iter, $id);
+    return distinct_by($iter, \&id);
 }
 
 #- Side-Effects
@@ -512,13 +520,13 @@ sub sum_by($iter, $f) {
 # returns the min value or undef on empty sequence
 # min value is compared with numerical <
 sub min($seq, $default=undef) {
-    min_by($seq, $id, $default);
+    min_by($seq, \&id, $default);
 }
 
 # returns the min value or undef on empty sequence
 # min value is compared using lt
 sub min_str($seq, $default=undef) {
-    min_by_str($seq, $id, $default);
+    min_by_str($seq, \&id, $default);
 }
 
 sub min_by($seq, $key, $default=undef) {
@@ -541,11 +549,11 @@ sub min_by_str($seq, $key, $default=undef) {
 
 # returns the max value or undef when sequence is empty
 sub max($seq, $default=undef) {
-    max_by($seq, $id, $default);
+    max_by($seq, \&id, $default);
 }
 
 sub max_str($seq, $default=undef) {
-    max_by_str($seq, $id, $default);
+    max_by_str($seq, \&id, $default);
 }
 
 sub max_by($seq, $key, $default=undef) {

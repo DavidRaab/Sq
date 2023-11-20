@@ -1,7 +1,7 @@
 #!perl
 use 5.036;
 use List::Util qw(reduce);
-use Seq;
+use Seq qw/id fst snd/;
 use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end bag float U/;
 use DDP;
 
@@ -12,15 +12,11 @@ is($Seq::VERSION, number_ge("0.002"), 'Check minimum version number');
 my $range     = Seq->range(1, 10);
 my $rangeDesc = Seq->range(10, 1);
 
-my $id      = sub($x)     { $x          };
 my $add     = sub($x, $y) { $x + $y     };
 my $add1    = sub($x)     { $x + 1      };
 my $double  = sub($x)     { $x * 2      };
 my $square  = sub($x)     { $x * $x     };
 my $is_even = sub($x)     { $x % 2 == 0 };
-
-my $fst     = sub($array) { $array->[0] };
-my $snd     = sub($array) { $array->[1] };
 
 # Basic checks of range and rangeDesc
 is($range, D(),                 'range returns something');
@@ -95,7 +91,7 @@ is(
     [[0,1], [1,2], [2,3]],
     'take->indexed');
 is(
-    Seq->init(10, $id)->map($add1)->to_array,
+    Seq->init(10, \&id)->map($add1)->to_array,
     $range->to_array,
     'init->map');
 is(
@@ -216,7 +212,7 @@ is(
     )->to_array,
     'concat with rev');
 
-is(Seq->wrap([A => 1], [B => 2], [C => 3])->sum_by($snd), 6, 'sumBy');
+is(Seq->wrap([A => 1], [B => 2], [C => 3])->sum_by(\&snd), 6, 'sumBy');
 is(
     Seq->wrap(qw/H e l l o W o r l d !/)->str_join('-'),
     "H-e-l-l-o-W-o-r-l-d-!",
@@ -268,7 +264,7 @@ is(Seq->wrap(1,2,3,2,23,123,4,12,2)->distinct->to_array, [1,2,3,23,123,4,12], 'd
 }
 
 is(
-    Seq->wrap(qw/A B C D E F/)->mapi($id)->to_array,
+    Seq->wrap(qw/A B C D E F/)->mapi(\&id)->to_array,
     [[0,'A'], [1,'B'], [2,'C'], [3,'D'], [4, 'E'], [5, 'F']],
     'mapi');
 
