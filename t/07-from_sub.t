@@ -122,19 +122,19 @@ my $second = $temp->filter(sub ($x) { $x =~ m/second/i });
 my $third  = $temp->filter(sub ($x) { $x =~ m/third/i  });
 
 # on empty file
-is($temp->count,       0, '0 - empty file');
-is($first->first,  undef, '0 - no first');
-is($second->first, undef, '0 - no second');
-is($third->first,  undef, '0 - no third');
+is($temp->count,                 0, '0 - empty file');
+is($first->first,            undef, '0 - no first');
+is($second->first,           undef, '0 - no second');
+is($third->first,            undef, '0 - no third');
 
 # add one line to file
 $fh->printflush("First Line\n");
 
 # run tests again
-is($temp->count,               1, '1 - 1 line');
-is($first->first, "First Line\n", '1 - first line');
-is($second->first,         undef, '1 - no second');
-is($third->first,          undef, '1 - no third');
+is($temp->count,                 1, '1 - 1 line');
+is($first->first,   "First Line\n", '1 - first line');
+is($second->first,           undef, '1 - no second');
+is($third->first,            undef, '1 - no third');
 
 # add second line
 $fh->printflush("Second Line\n");
@@ -154,6 +154,7 @@ is($first->first,   "First Line\n", '3 - first line');
 is($second->first, "Second Line\n", '3 - second line');
 is($third->first,   "Third Line\n", '3 - third lines');
 
+close $fh;
 undef $temp;
 
 done_testing;
