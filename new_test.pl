@@ -34,7 +34,7 @@ my $maximum_id =
     ->wrap(   path('t')->children )
     ->map(    sub($x) { $x->basename })
     ->choose( sub($x) { $x =~ m/\A(\d+) .* \.t\z/xms ? $1 : undef } )
-    ->max;
+    ->max(0);
 
 # Load DATA into array
 my @content = <DATA>;
@@ -58,7 +58,7 @@ __DATA__
 #!perl
 use 5.036;
 use List::Util qw(reduce);
-use Seq;
+use Seq qw(id fst snd key);
 use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end bag float U/;
 use DDP;
 
@@ -66,14 +66,9 @@ use DDP;
 my $range     = Seq->range(1, 10);
 my $rangeDesc = Seq->range(10, 1);
 
-my $id      = sub($x) { $x          };
 my $add1    = sub($x) { $x + 1      };
 my $double  = sub($x) { $x * 2      };
 my $square  = sub($x) { $x * $x     };
 my $is_even = sub($x) { $x % 2 == 0 };
 
-my $fst     = sub($array) { $array->[0] };
-my $snd     = sub($array) { $array->[1] };
-
 #----------
-
