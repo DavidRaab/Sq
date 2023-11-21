@@ -9,10 +9,17 @@ Seq - A lazy sequence implementation
 
 =head1 SYNOPSIS
 
-This is a lazy sequence implementation. C# has LINQ, Java has Stream, F#
-has Seq. Perl also has Seq. Some useful stuff implemented, but currently
-lacking Documentation. Look at test scripts so far. API not completely stable,
-some functions will maybe change, added or deleted.
+The Seq module provides a lazy sequence implementation that can be
+executed multiple times. A sequence just represent a computation without
+computing any values until they are requested.
+
+Different to iterators they can be executed multiple times. A sequence
+can somehow considered an immutable iterator.
+
+At the moment Documentation is lacking, but the source-code is well-documented
+including the test-files. Maybe you want to look at the test-files until
+I have written more documentation. The API is not fully stable at the moment
+and can be changed.
 
     use v5.36;
     use Seq;
