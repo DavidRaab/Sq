@@ -514,6 +514,24 @@ sub rev($iter) {
     });
 }
 
+sub sort($seq, $comparer) {
+    from_sub('Seq', sub {
+        local ($a, $b);
+        my @array = CORE::sort { $comparer->($a, $b) } to_list($seq);
+        my $idx   = 0;
+        my $count = @array;
+
+        return sub {
+            if ( $idx < $count ) {
+                my $x = $array[$idx];
+                $idx++;
+                return $x;
+            }
+            return undef;
+        };
+    });
+}
+
 #- Converter
 #    Those are functions converting Seq to none Seq types
 
@@ -674,24 +692,6 @@ sub find($iter, $predicate) {
         return $x if $predicate->($x);
     }
     return;
-}
-
-sub sort($seq, $comparer) {
-    from_sub('Seq', sub {
-        local ($a, $b);
-        my @array = CORE::sort { $comparer->($a, $b) } to_list($seq);
-        my $idx   = 0;
-        my $count = @array;
-
-        return sub {
-            if ( $idx < $count ) {
-                my $x = $array[$idx];
-                $idx++;
-                return $x;
-            }
-            return undef;
-        };
-    });
 }
 
 1;
