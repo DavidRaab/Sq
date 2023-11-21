@@ -61,54 +61,66 @@ used as a chaning mechanism.
 Constructors must be called with the Package name. Functions that operate
 on Sequences can either be called as a method or directly from the Package.
 
-    my $range =
-        Seq
-        ->wrap(1,2,3)
-        ->append(Seq->wrap(4,5,6));
+```perl
+my $range =
+    Seq
+    ->wrap(1,2,3)
+    ->append(Seq->wrap(4,5,6));
+```
 
 or
 
-    my $range =
-        Seq::to_array(
-            Seq::append(
-                Seq->wrap(1,2,3),
-                Seq->wrap(4,5,6),
-            )
-        );
+```perl
+my $range =
+    Seq::to_array(
+        Seq::append(
+            Seq->wrap(1,2,3),
+            Seq->wrap(4,5,6),
+        )
+    );
+```
 
 ## $seq = Seq->empty()
 
 Returns an empty sequence. Useful as an initial state or as a starting point.
 
-    Seq->empty->append( $another_seq )
+```perl
+Seq->empty->append( $another_seq )
+```
 
 ## $seq = Seq->range($start, $stop)
 
 Returns a sequence from $start to $stop. Range can also be backwards. $start
 and $stop are inclusive.
 
-    Seq->range(1, 5); # 1,2,3,4,5
-    Seq->range(5, 1); # 5,4,3,2,1
-    Seq->range(1, 1); # 1
+```perl
+Seq->range(1, 5); # 1,2,3,4,5
+Seq->range(5, 1); # 5,4,3,2,1
+Seq->range(1, 1); # 1
+```
 
 ## $seq = Seq->wrap(...)
 
 Just takes whatever you pass it to, and puts it in a sequence. This should be
 your primarily way to create a sequence with values.
 
-    Seq->wrap(qw/Hello World/); # "Hello", "World"
-    Seq->wrap(1 .. 10);         # AVOID this, use Seq->range(1, 10) instead.
-    Seq->wrap(@array);
+```perl
+Seq->wrap(qw/Hello World/); # "Hello", "World"
+Seq->wrap(1 .. 10);         # AVOID this, use Seq->range(1, 10) instead.
+Seq->wrap(@array);
+```
 
 ## $seq = Seq->concat(@sequences)
 
 Takes multiple *Sequences* and returns a single flattened sequence.
 
-    # 1, 2, 3, 4, 5, 5, 4, 3, 2, 1
-    Seq->concat(
-        Seq->range(1, 5),
-        Seq->range(5, 1),
-    );
+```perl
+# 1, 2, 3, 4, 5, 5, 4, 3, 2, 1
+Seq->concat(
+    Seq->range(1, 5),
+    Seq->range(5, 1),
+);
+```
 
 # Github
 
