@@ -157,4 +157,13 @@ is($third->first(undef),   "Third Line\n", '3 - third lines');
 close $fh;
 undef $temp;
 
+
+my $always = Seq->from_sub(sub {
+    return sub {
+        return 1;
+    }
+});
+
+is($always->take(10)->to_array, [1,1,1,1,1,1,1,1,1,1], '10 times 1');
+
 done_testing;
