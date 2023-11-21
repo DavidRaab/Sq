@@ -355,5 +355,44 @@ is(
     [1..9],
     'flatten_array');
 
+is(
+    Seq::zip(
+        Seq->range(1,6),
+        Seq->wrap(qw(A B C D E F))
+    )->to_array,
+    [[qw/1 A/],[qw/2 B/],[qw/3 C/],[qw/4 D/],[qw/5 E/],[qw/6 F/]],
+    'zip 1');
+
+is(
+    Seq::zip(
+        Seq->range(1,3),
+        Seq->wrap(qw(A B C D E F))
+    )->to_array,
+    [[qw/1 A/],[qw/2 B/],[qw/3 C/]],
+    'zip 2');
+
+is(
+    Seq::zip(
+        Seq->range(1,6),
+        Seq->wrap(qw(A B C D))
+    )->to_array,
+    [[qw/1 A/],[qw/2 B/],[qw/3 C/],[qw/4 D/]],
+    'zip 3');
+
+is(
+    Seq::zip(
+        Seq->empty,
+        Seq->wrap(qw(A B C D E F))
+    )->to_array,
+    [],
+    'zip 4');
+
+is(
+    Seq::zip(
+        Seq->range(1,6),
+        Seq->empty,
+    )->to_array,
+    [],
+    'zip 5');
 
 done_testing;

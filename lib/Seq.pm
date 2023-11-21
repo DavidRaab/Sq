@@ -451,6 +451,21 @@ sub snds($seq) {
     return $seq->map(sub ($x) { $x->[1] });
 }
 
+sub zip($seqA, $seqB) {
+    return bless(sub {
+        my $itA = $seqA->();
+        my $itB = $seqB->();
+
+        return sub {
+            if (defined (my $a = $itA->())) {
+            if (defined (my $b = $itB->())) {
+                    return [$a,$b];
+            }}
+            return undef;
+        }
+    }, 'Seq');
+}
+
 #- Side-Effects
 #    functions that have side-effects or produce side-effects. Those are
 #    immediately executed, usually consuming all elements of Seq at once.
