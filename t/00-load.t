@@ -347,8 +347,13 @@ is(
     'sort 2');
 
 my $fs = Seq->wrap([1,"Hi"],[2,"Foo"],[3,"Bar"],[4,"Mug"]);
-is($fs->fsts->to_array, [1,2,3,4], 'fsts');
-is($fs->snds->to_array, [qw/Hi Foo Bar Mug/]);
+is($fs->fsts->to_array, [1,2,3,4],            'fsts');
+is($fs->snds->to_array, [qw/Hi Foo Bar Mug/], 'snds');
+
+is(
+    Seq->wrap([1,2,3], [4,5,6], [7,8,9])->flatten_array->to_array,
+    [1..9],
+    'flatten_array');
 
 
 done_testing;

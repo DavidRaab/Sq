@@ -17,6 +17,7 @@ use DDP;
 #       forall, none, average, average_by,
 #       pairwise, windowed, transpose, item, chunk_by_size,
 #       one, minmax, minmax_by,
+#       regex_match, regex_replace
 #
 # + ways to do regexes on strings
 # + using this module to scan file-system
@@ -227,6 +228,13 @@ sub bind($iter, $f) {
 # flatten : Seq<Seq<'a>> -> Seq<'a>
 sub flatten($iter) {
     return bind($iter, \&id);
+}
+
+# flatten_array : Seq<Array<'a>> -> Seq<'a>
+sub flatten_array($seq) {
+    return bind($seq, sub($array) {
+        return from_array('Seq', $array);
+    });
 }
 
 # cartesian : Seq<'a> -> Seq<'b> -> Seq<'a * 'b>
