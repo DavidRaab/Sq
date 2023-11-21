@@ -124,13 +124,7 @@ Seq->concat(
 
 # Github
 
-Development project is on Github. L<https://github.com/DavidRaab/Seq>
-
-# BUGS
-
-Please report any bugs or feature requests to C<bug-seq at rt.cpan.org>, or through
-the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Seq>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Development project is on Github [Perl-Seq](https://github.com/DavidRaab/Seq)
 
 # SUPPORT
 
@@ -138,7 +132,7 @@ You can find documentation for this module with the perldoc command.
 
     perldoc Seq
 
-You can also look for information at:
+You can also look for information at [my Blog on Perl Seq](https://davidraab.github.io/tags/perl-seq/)
 
 # AUTHOR
 
