@@ -435,6 +435,14 @@ sub distinct($iter) {
     return distinct_by($iter, \&id);
 }
 
+sub fsts($seq) {
+    return $seq->map(sub ($x) { $x->[0] });
+}
+
+sub snds($seq) {
+    return $seq->map(sub ($x) { $x->[1] });
+}
+
 #- Side-Effects
 #    functions that have side-effects or produce side-effects. Those are
 #    immediately executed, usually consuming all elements of Seq at once.
