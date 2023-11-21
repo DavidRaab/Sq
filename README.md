@@ -1,59 +1,56 @@
-# PODNAME: Seq
-# ABSTRACT: What is Seq, and how do I use it?
-
-__END__
-
-=head1 NAME
+# NAME
 
 Seq - A lazy sequence implementation
 
-=head1 SYNOPSIS
+# SYNOPSIS
 
 This is a lazy sequence implementation. C# has LINQ, Java has Stream, F#
 has Seq. Perl also has Seq. Some useful stuff implemented, but currently
 lacking Documentation. Look at test scripts so far.
 
-    use v5.36;
-    use Seq;
+```perl
+use v5.36;
+use Seq;
 
-    # Fibonacci Generator
-    my $fib =
-        Seq->concat(
-            Seq->wrap(1,1),
-            Seq->unfold([1,1], sub($state) {
-                my $next = $state->[0] + $state->[1];
-                return $next, [$state->[1],$next];
-            })
-        );
+# Fibonacci Generator
+my $fib =
+    Seq->concat(
+        Seq->wrap(1,1),
+        Seq->unfold([1,1], sub($state) {
+            my $next = $state->[0] + $state->[1];
+            return $next, [$state->[1],$next];
+        })
+    );
 
-    # prints: 1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987 1597 2584 4181 6765
-    $fib->take(20)->iter(sub($x) {
-        say $x;
-    });
+# prints: 1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987 1597 2584 4181 6765
+$fib->take(20)->iter(sub($x) {
+    say $x;
+});
 
-    # Represents all possible combinations
-    # [[clubs => 7], [clubs => 8], [clubs => 9], ...]
-    my $cards =
-        Seq::cartesian(
-            Seq->wrap(qw/clubs spades hearts diamond/),
-            Seq->wrap(qw/7 8 9 10 B D K A/)
-        );
+# Represents all possible combinations
+# [[clubs => 7], [clubs => 8], [clubs => 9], ...]
+my $cards =
+    Seq::cartesian(
+        Seq->wrap(qw/clubs spades hearts diamond/),
+        Seq->wrap(qw/7 8 9 10 B D K A/)
+    );
 
-    use Path::Tiny qw(path);
-    # get the maximum id from test-files so far
-    my $maximum_id =
-        Seq
-        ->wrap(   path('t')->children )
-        ->map(    sub($x) { $x->basename })
-        ->choose( sub($x) { $x =~ m/\A(\d+) .* \.t\z/xms ? $1 : undef } )
-        ->max;
+use Path::Tiny qw(path);
+# get the maximum id from test-files so far
+my $maximum_id =
+    Seq
+    ->wrap(   path('t')->children )
+    ->map(    sub($x) { $x->basename })
+    ->choose( sub($x) { $x =~ m/\A(\d+) .* \.t\z/xms ? $1 : undef } )
+    ->max;
+```
 
-=head1 EXPORT
+# EXPORT
 
 This modules does not export anything by default. But you can request the following
 functions: id, fst, snd, key, assign
 
-=head1 CONSTRUCTORS
+# CONSTRUCTORS
 
 This module uses functional-programming as the main paradigm. Functions are
 divided into constructors that create *Sequences* and functions
@@ -79,13 +76,13 @@ or
             )
         );
 
-=head2 $seq = Seq->empty()
+## $seq = Seq->empty()
 
 Returns an empty sequence. Useful as an initial state or as a starting point.
 
     Seq->empty->append( $another_seq )
 
-=head2 $seq = Seq->range($start, $stop)
+## $seq = Seq->range($start, $stop)
 
 Returns a sequence from $start to $stop. Range can also be backwards. $start
 and $stop are inclusive.
@@ -94,7 +91,7 @@ and $stop are inclusive.
     Seq->range(5, 1); # 5,4,3,2,1
     Seq->range(1, 1); # 1
 
-=head2 $seq = Seq->wrap(...)
+## $seq = Seq->wrap(...)
 
 Just takes whatever you pass it to, and puts it in a sequence. This should be
 your primarily way to create a sequence with values.
@@ -103,7 +100,7 @@ your primarily way to create a sequence with values.
     Seq->wrap(1 .. 10);         # AVOID this, use Seq->range(1, 10) instead.
     Seq->wrap(@array);
 
-=head2 $seq = Seq->concat(@sequences)
+## $seq = Seq->concat(@sequences)
 
 Takes multiple *Sequences* and returns a single flattened sequence.
 
@@ -113,17 +110,17 @@ Takes multiple *Sequences* and returns a single flattened sequence.
         Seq->range(5, 1),
     );
 
-=head1 Github
+# Github
 
 Development project is on Github. L<https://github.com/DavidRaab/Seq>
 
-=head1 BUGS
+# BUGS
 
 Please report any bugs or feature requests to C<bug-seq at rt.cpan.org>, or through
 the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Seq>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
-=head1 SUPPORT
+# SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
@@ -131,11 +128,11 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-=head1 AUTHOR
+# AUTHOR
 
 David Raab, C<< <davidraab83 at gmail.com> >>
 
-=head1 LICENSE AND COPYRIGHT
+# LICENSE AND COPYRIGHT
 
 This software is Copyright (c) 2023 by David Raab.
 
