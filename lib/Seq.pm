@@ -28,9 +28,9 @@ use DDP;
 # o good way to also implement async with it?
 
 # Important functions used in FP code. So adding them.
-sub id ($x)     { return $x          }
-sub fst($array) { return $array->[0] }
-sub snd($array) { return $array->[1] }
+sub id  :prototype($) { return $_[0]    }
+sub fst :prototype($) { return $_[0][0] }
+sub snd :prototype($) { return $_[0][1] }
 
 # a helper to create a function for selecting a hash-key
 sub key :prototype($) {

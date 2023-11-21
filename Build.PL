@@ -18,10 +18,8 @@ my $builder = Module::Build->new(
     },
     requires => {
         'Carp' => '0',
-        #'ABC'              => '1.6',
-        #'Foo::Bar::Module' => '5.0401',
     },
-    add_to_cleanup     => [ 'Seq-*' ],
+    add_to_cleanup => [ 'Seq-*' ],
 );
 
 $builder->create_build_script();
