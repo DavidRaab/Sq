@@ -1,7 +1,7 @@
 package Seq;
 use 5.036;
 our $VERSION = '0.004';
-use subs 'bind', 'join', 'select', 'last';
+use subs 'bind', 'join', 'select', 'last', 'sort';
 use Scalar::Util qw(reftype);
 use List::Util;
 use Carp qw(croak);
@@ -632,6 +632,24 @@ sub find($iter, $predicate) {
         return $x if $predicate->($x);
     }
     return;
+}
+
+sub sort($seq, $comparer) {
+    return bless(sub {
+        local ($a, $b);
+        my @array = CORE::sort { $comparer->($a, $b) } to_list($seq);
+        my $idx   = 0;
+        my $count = @array;
+
+        return sub {
+            if ( $idx < $count ) {
+                my $x = $array[$idx];
+                $idx++;
+                return $x;
+            }
+            return undef;
+        };
+    }, 'Seq');
 }
 
 1;

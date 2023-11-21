@@ -336,4 +336,14 @@ is(Seq->empty->last(0),  0, 'last with default value');
 is($range->last,        10, 'last on non empty without default');
 is($range->last(0),     10, 'last on non empty with default');
 
+is(
+    Seq->wrap(1,5,-3,10,9,-2)->sort(sub($x,$y) { $x <=> $y })->to_array,
+    [-3,-2,1,5,9,10],
+    'sort 1');
+
+is(
+    Seq->wrap(qw/B b c A a C/)->sort(sub($x,$y) { $x cmp $y })->to_array,
+    [qw/A B C a b c/],
+    'sort 2');
+
 done_testing;
