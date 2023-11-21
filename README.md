@@ -4,9 +4,17 @@ Seq - A lazy sequence implementation
 
 # SYNOPSIS
 
-This is a lazy sequence implementation. C# has LINQ, Java has Stream, F#
-has Seq. Perl also has Seq. Some useful stuff implemented, but currently
-lacking Documentation. Look at test scripts so far.
+The Seq module provides a lazy sequence implementation that can be
+executed multiple times. A sequence just represent a computation without
+computing any values until they are requested.
+
+Different to iterators they can be executed multiple times. A sequence
+can somehow considered an immutable iterator.
+
+At the moment Documentation is lacking, but the source-code is well-documented
+including the test-files. Maybe you want to look at the test-files until
+I have written more documentation. The API is not fully stable at the moment
+and can be changed.
 
 ```perl
 use v5.36;
@@ -53,10 +61,13 @@ functions: id, fst, snd, key, assign
 # CONSTRUCTORS
 
 This module uses functional-programming as the main paradigm. Functions are
-divided into constructors that create *Sequences* and functions
-that operate on Sequences (Methods). They are called methods for convenience,
-but no object-orientation is involved. Perls OO capabilities are only
-used as a chaning mechanism.
+divided into constructors, methods and converters.
+
+Constructor create a sequence. Methods operate on sequences and return
+another new sequence. Converter transforms a sequence to some other data-type.
+
+Methods are called methods for convenience, but no object-orientation is
+involved. Perls OO capabilities are only used as a chaning mechanism.
 
 Constructors must be called with the Package name. Functions that operate
 on Sequences can either be called as a method or directly from the Package.
@@ -72,12 +83,10 @@ or
 
 ```perl
 my $range =
-    Seq::to_array(
-        Seq::append(
-            Seq->wrap(1,2,3),
-            Seq->wrap(4,5,6),
-        )
-    );
+    Seq::append(
+        Seq->wrap(1,2,3),
+        Seq->wrap(4,5,6),
+    )
 ```
 
 ## $seq = Seq->empty()
@@ -121,6 +130,29 @@ Seq->concat(
     Seq->range(5, 1),
 );
 ```
+
+# MISSING DOC
+
+Implemented, but not documented yet:
+
+from_sub, unfold, init, range_step, from_list, from_array, from_hash
+
+# METHODS
+
+Implemented, but not documented yet:
+
+append, map, bind, flatten cartesian, join, merge, select*, choose, mapi,
+filter, take, skip, indexed, distinct, distinct_by, iter, do, rev
+
+* will maybe change
+
+# CONVERTERS
+
+Implemented, but not documented yet:
+
+fold, reduce, first, last, to_array, to_list, count, sum, sum_by, min,
+min_by, min_by_str, max, max_str, max_by, max_by_str, str_join, to_hash,
+group_by, find
 
 # Github
 

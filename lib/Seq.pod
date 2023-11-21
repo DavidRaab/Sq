@@ -122,7 +122,7 @@ Takes multiple *Sequences* and returns a single flattened sequence.
         Seq->range(5, 1),
     );
 
-=head2
+=head2 MISSING DOC
 
 Implemented, but not documented yet:
 
