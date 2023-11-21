@@ -1,5 +1,5 @@
 {
-   "abstract" : "The great new Seq!",
+   "abstract" : "A lazy sequence implementation",
    "author" : [
       "David Raab <davidraab83@gmail.com>"
    ],
@@ -19,16 +19,23 @@
             "Module::Build" : "0.4004"
          }
       },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0"
+         }
+      },
       "test" : {
          "requires" : {
-            "Test2::Suite" : "0"
+            "List::Util" : "0",
+            "Path::Tiny" : "0",
+            "Test2::V0" : "0.000156"
          }
       }
    },
    "provides" : {
       "Seq" : {
          "file" : "lib/Seq.pm",
-         "version" : "0.001"
+         "version" : "0.003"
       }
    },
    "release_status" : "unstable",
@@ -37,6 +44,6 @@
          "http://www.opensource.org/licenses/mit-license.php"
       ]
    },
-   "version" : "0.001",
+   "version" : "0.003",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

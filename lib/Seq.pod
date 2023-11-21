@@ -10,7 +10,8 @@ Seq - A lazy sequence implementation
 =head1 SYNOPSIS
 
 This is a lazy sequence implementation. C# has LINQ, Java has Stream, F#
-has Seq. Perl also has Seq.
+has Seq. Perl also has Seq. Some useful stuff implemented, but currently
+lacking Documentation. Look at test scripts so far.
 
     use v5.36;
     use Seq;

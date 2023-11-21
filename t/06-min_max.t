@@ -1,6 +1,5 @@
 #!perl
 use 5.036;
-use List::Util qw(reduce);
 use Seq qw(key);
 use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash array item end bag float U/;
 #use DDP;

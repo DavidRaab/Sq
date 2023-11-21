@@ -1,10 +1,7 @@
 #!perl
 use 5.036;
-use List::Util qw(reduce);
 use Seq;
 use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end bag float U/;
-use Data::Dumper;
-use DDP;
 
 # Some values, functions, ... for testing
 my $range     = Seq->range(1, 10);
@@ -19,11 +16,6 @@ my $is_even = sub($x) { $x % 2 == 0 };
 my $fst     = sub($array) { $array->[0] };
 my $snd     = sub($array) { $array->[1] };
 
-sub Dump($x) {
-    local $Data::Dumper::Indent = 0;
-    print Data::Dumper::Dumper($x);
-    return;
-}
 
 #--- ---
 

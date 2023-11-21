@@ -1,9 +1,8 @@
 #!perl
 use 5.036;
-use List::Util qw(reduce);
 use Seq;
 use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end bag float/;
-use DDP;
+# use DDP;
 
 # Some values, functions, ... for testing
 my $range     = Seq->range(1, 10);

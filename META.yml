@@ -1,9 +1,11 @@
 ---
-abstract: 'The great new Seq!'
+abstract: 'A lazy sequence implementation'
 author:
   - 'David Raab <davidraab83@gmail.com>'
 build_requires:
-  Test2::Suite: '0'
+  List::Util: '0'
+  Path::Tiny: '0'
+  Test2::V0: '0.000156'
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
@@ -16,8 +18,10 @@ name: Seq
 provides:
   Seq:
     file: lib/Seq.pm
-    version: '0.001'
+    version: '0.003'
+requires:
+  Carp: '0'
 resources:
   license: http://www.opensource.org/licenses/mit-license.php
-version: '0.001'
+version: '0.003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -91,3 +91,6 @@
 
 # Avoid archives of this distribution
 \bSeq-[\d\.\_]+
+
+# avoid own script-file
+^new_test.pl$
