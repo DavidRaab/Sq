@@ -102,7 +102,7 @@ is(
 
 is($file->skip(1) ->first('EMPTY'), "File\n", 'getting second line');
 is($file->skip(10)->first('EMPTY'),  "EMPTY", 'getting default value');
-is($file->skip(10)->first(),             U(), 'getting undef');
+is($file->skip(10)->first(undef),        U(), 'getting undef');
 
 my $length_of_lines =
     $file->map(sub($line) { length $line });
@@ -122,37 +122,37 @@ my $second = $temp->filter(sub ($x) { $x =~ m/second/i });
 my $third  = $temp->filter(sub ($x) { $x =~ m/third/i  });
 
 # on empty file
-is($temp->count,                 0, '0 - empty file');
-is($first->first,            undef, '0 - no first');
-is($second->first,           undef, '0 - no second');
-is($third->first,            undef, '0 - no third');
+is($temp->count,                        0, '0 - empty file');
+is($first->first(undef),            undef, '0 - no first');
+is($second->first(undef),           undef, '0 - no second');
+is($third->first(undef),            undef, '0 - no third');
 
 # add one line to file
 $fh->printflush("First Line\n");
 
 # run tests again
-is($temp->count,                 1, '1 - 1 line');
-is($first->first,   "First Line\n", '1 - first line');
-is($second->first,           undef, '1 - no second');
-is($third->first,            undef, '1 - no third');
+is($temp->count,                        1, '1 - 1 line');
+is($first->first(undef),   "First Line\n", '1 - first line');
+is($second->first(undef),           undef, '1 - no second');
+is($third->first(undef),            undef, '1 - no third');
 
 # add second line
 $fh->printflush("Second Line\n");
 
 # run tests again
-is($temp->count,                 2, '2 - 2 lines');
-is($first->first,   "First Line\n", '2 - first line');
-is($second->first, "Second Line\n", '2 - second line');
-is($third->first,            undef, '2 - no third');
+is($temp->count,                        2, '2 - 2 lines');
+is($first->first(undef),   "First Line\n", '2 - first line');
+is($second->first(undef), "Second Line\n", '2 - second line');
+is($third->first(undef),            undef, '2 - no third');
 
 # add third line
 $fh->printflush("Third Line\n");
 
 # run tests again
-is($temp->count,                 3, '3 - 3 lines');
-is($first->first,   "First Line\n", '3 - first line');
-is($second->first, "Second Line\n", '3 - second line');
-is($third->first,   "Third Line\n", '3 - third lines');
+is($temp->count,                        3, '3 - 3 lines');
+is($first->first(undef),   "First Line\n", '3 - first line');
+is($second->first(undef), "Second Line\n", '3 - second line');
+is($third->first(undef),   "Third Line\n", '3 - third lines');
 
 close $fh;
 undef $temp;

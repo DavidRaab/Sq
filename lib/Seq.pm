@@ -12,7 +12,7 @@ use Sub::Exporter -setup => {
 };
 use DDP;
 
-# TODO: contains?, firstIndex?, mapX, reduce?, sort, cache
+# TODO: contains?, firstIndex?, mapX, sort, cache
 #       interspers, slice, zip, unzip, foldBack, any,
 #       forall, none, average, average_by,
 #       pairwise, windowed, transpose, item, chunk_by_size,
@@ -498,19 +498,19 @@ sub fold($iter, $state, $folder) {
 # with one item to work properly. It is encouraged to use `fold`
 # instead.
 sub reduce($seq, $reducer) {
-    my $f = first(take($seq, 1));
+    my $first = first($seq, undef);
 
-    return fold(skip($seq, 1), $f, $reducer) if defined $f;
+    return fold(skip($seq, 1), $first, $reducer) if defined $first;
     return undef;
 }
 
-sub first($seq, $default=undef) {
+sub first($seq, $default) {
     my $first = $seq->()();
     return $first if defined $first;
     return $default;
 }
 
-sub last($seq, $default=undef) {
+sub last($seq, $default) {
     my $last;
     iter($seq, sub($x) {
         $last = $x;
@@ -546,17 +546,17 @@ sub sum_by($iter, $f) {
 
 # returns the min value or undef on empty sequence
 # min value is compared with numerical <
-sub min($seq, $default=undef) {
+sub min($seq, $default) {
     min_by($seq, \&id, $default);
 }
 
 # returns the min value or undef on empty sequence
 # min value is compared using lt
-sub min_str($seq, $default=undef) {
+sub min_str($seq, $default) {
     min_by_str($seq, \&id, $default);
 }
 
-sub min_by($seq, $key, $default=undef) {
+sub min_by($seq, $key, $default) {
     return fold($seq, undef, sub($min, $x) {
         my $value = $key->($x);
         defined $min
@@ -565,7 +565,7 @@ sub min_by($seq, $key, $default=undef) {
     }) // $default;
 }
 
-sub min_by_str($seq, $key, $default=undef) {
+sub min_by_str($seq, $key, $default) {
     return fold($seq, undef, sub($min, $x) {
         my $value = $key->($x);
         defined $min
@@ -575,15 +575,15 @@ sub min_by_str($seq, $key, $default=undef) {
 }
 
 # returns the max value or undef when sequence is empty
-sub max($seq, $default=undef) {
+sub max($seq, $default) {
     max_by($seq, \&id, $default);
 }
 
-sub max_str($seq, $default=undef) {
+sub max_str($seq, $default) {
     max_by_str($seq, \&id, $default);
 }
 
-sub max_by($seq, $key, $default=undef) {
+sub max_by($seq, $key, $default) {
     return fold($seq, undef, sub($max, $x) {
         my $value = $key->($x);
         defined $max
@@ -592,7 +592,7 @@ sub max_by($seq, $key, $default=undef) {
     }) // $default;
 }
 
-sub max_by_str($seq, $key, $default=undef) {
+sub max_by_str($seq, $key, $default) {
     return fold($seq, undef, sub($max, $x) {
         my $value = $key->($x);
         defined $max
