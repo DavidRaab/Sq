@@ -7,7 +7,7 @@ my $builder = Module::Build->new(
     license             => 'mit',
     dist_author         => q{David Raab <davidraab83@gmail.com>},
     dist_version_from   => 'lib/Seq.pm',
-    release_status      => 'unstable',
+    release_status      => 'stable',
     configure_requires => {
         'Module::Build' => '0.4004',
     },
