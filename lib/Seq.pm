@@ -49,7 +49,18 @@ sub assign :prototype(&) {
 
 # creates a sequence from a subroutine
 sub from_sub($class, $f) {
-    return bless($f, 'Seq');
+    return bless(sub {
+        my $abort = 0;
+        my $it    = $f->();
+        return sub {
+            return undef if $abort;
+            if ( defined(my $x = $it->()) ) {
+                return $x;
+            }
+            $abort = 1;
+            undef $it;
+        }
+    }, 'Seq');
 }
 
 # always an empty sequence
