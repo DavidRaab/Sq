@@ -72,7 +72,7 @@ sub empty($class) {
 
 # TODO: When $state is a reference. Same handling as in fold?
 sub unfold($class, $state, $f) {
-    return bless(sub {
+    from_sub('Seq', sub {
         # IMPORTANT: Perl signatures are aliases. As we assign
         # to $state later, we need to make a copy here.
         # Removing this lines causes bugs.
@@ -86,7 +86,7 @@ sub unfold($class, $state, $f) {
             $abort = 1 if not defined $x;
             return $x;
         }
-    }, 'Seq');
+    });
 }
 
 sub init($class, $count, $f) {
@@ -145,7 +145,7 @@ sub from_array($class, $xs) {
 # (key, value) pair. The result is used as a single item in
 # the sequence.
 sub from_hash($class, $hashref, $f) {
-    return bless(sub {
+    from_sub('Seq', sub {
         my $idx  = 0;
         my @keys = keys %$hashref;
         my $last = $#keys;
@@ -154,7 +154,7 @@ sub from_hash($class, $hashref, $f) {
             my $key = $keys[$idx++];
             return $f->($key, $hashref->{$key});
         }
-    }, 'Seq');
+    });
 }
 
 # Concatenates a list of Seq into a single Seq
@@ -173,7 +173,7 @@ sub concat($class, @seqs) {
 #    functions operating on Seq and returning another Seq
 
 sub append($iterA, $iterB) {
-    return bless(sub {
+    from_sub('Seq', sub {
         my $exhaustedA = 0;
         my $itA = $iterA->();
         my $itB = $iterB->();
@@ -193,12 +193,12 @@ sub append($iterA, $iterB) {
                 }
             }
         };
-    }, 'Seq');
+    });
 }
 
 # map : Seq<'a> -> ('a -> 'b) -> Seq<'b'>
 sub map($iter, $f) {
-    return bless(sub {
+    from_sub('Seq', sub {
         my $it = $iter->();
         return sub {
             if ( defined(my $x = $it->()) ) {
@@ -206,12 +206,12 @@ sub map($iter, $f) {
             }
             return undef;
         }
-    }, 'Seq');
+    });
 }
 
 # bind : Seq<'a> -> ('a -> Seq<'b>) -> Seq<'b>
 sub bind($iter, $f) {
-    return bless(sub {
+    from_sub('Seq', sub {
         my $it   = $iter->();
         my $seqB = undef;
 
@@ -233,7 +233,7 @@ sub bind($iter, $f) {
             # when $seqB is not defined and $it does not return new values
             return undef;
         }
-    }, 'Seq');
+    });
 }
 
 # flatten : Seq<Seq<'a>> -> Seq<'a>
@@ -366,7 +366,7 @@ sub select($iter, $mapA, $mapB) {
 
 # combines map and filter
 sub choose($iter, $chooser) {
-    return bless(sub {
+    from_sub('Seq', sub {
         my $it = $iter->();
         return sub {
             while ( defined(my $x = $it->()) ) {
@@ -375,7 +375,7 @@ sub choose($iter, $chooser) {
             }
             return undef;
         }
-    }, 'Seq');
+    });
 }
 
 sub mapi($iter, $f) {
@@ -383,7 +383,7 @@ sub mapi($iter, $f) {
 }
 
 sub filter($iter, $predicate) {
-    return bless(sub {
+    from_sub('Seq', sub {
         my $it = $iter->();
         return sub {
             while ( defined(my $x = $it->()) ) {
@@ -391,11 +391,11 @@ sub filter($iter, $predicate) {
             }
             return undef;
         }
-    }, 'Seq');
+    });
 }
 
 sub take($iter, $amount) {
-    return bless(sub {
+    from_sub('Seq', sub {
         my $i             = $iter->();
         my $returnedSoFar = 0;
         return sub {
@@ -407,11 +407,11 @@ sub take($iter, $amount) {
             }
             return;
         }
-    }, 'Seq');
+    });
 }
 
 sub skip($iter, $amount) {
-    return bless(sub {
+    from_sub('Seq', sub {
         my $it = $iter->();
         my $count = 0;
         return sub {
@@ -420,7 +420,7 @@ sub skip($iter, $amount) {
             }
             return $it->();
         }
-    }, 'Seq');
+    });
 }
 
 sub indexed($iter) {
@@ -431,7 +431,7 @@ sub indexed($iter) {
 }
 
 sub distinct_by($iter, $f) {
-    return bless(sub {
+    from_sub('Seq', sub {
         my $it = $iter->();
         my %seen;
         return sub {
@@ -444,7 +444,7 @@ sub distinct_by($iter, $f) {
             }
             return undef;
         }
-    }, 'Seq');
+    });
 }
 
 # remove duplicates - it uses a hash to remember seen items
@@ -463,7 +463,7 @@ sub snds($seq) {
 }
 
 sub zip($seqA, $seqB) {
-    return bless(sub {
+    from_sub('Seq', sub {
         my $itA = $seqA->();
         my $itB = $seqB->();
 
@@ -474,7 +474,7 @@ sub zip($seqA, $seqB) {
             }}
             return undef;
         }
-    }, 'Seq');
+    });
 }
 
 #- Side-Effects
@@ -503,7 +503,7 @@ sub do($iter, $f) {
 }
 
 sub rev($iter) {
-    return bless(sub {
+    from_sub('Seq', sub {
         my @list = to_list($iter);
         return sub {
             if ( defined(my $x = pop @list) ) {
@@ -511,7 +511,7 @@ sub rev($iter) {
             }
             return undef;
         };
-    }, 'Seq');
+    });
 }
 
 #- Converter
@@ -677,7 +677,7 @@ sub find($iter, $predicate) {
 }
 
 sub sort($seq, $comparer) {
-    return bless(sub {
+    from_sub('Seq', sub {
         local ($a, $b);
         my @array = CORE::sort { $comparer->($a, $b) } to_list($seq);
         my $idx   = 0;
@@ -691,7 +691,7 @@ sub sort($seq, $comparer) {
             }
             return undef;
         };
-    }, 'Seq');
+    });
 }
 
 1;
