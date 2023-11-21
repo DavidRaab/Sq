@@ -18,10 +18,10 @@ name: Seq
 provides:
   Seq:
     file: lib/Seq.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Carp: '0'
 resources:
   license: http://www.opensource.org/licenses/mit-license.php
-version: '0.003'
+version: '0.004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
