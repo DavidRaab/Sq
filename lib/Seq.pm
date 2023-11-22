@@ -10,7 +10,6 @@ use Sub::Exporter -setup => {
         qw(id fst snd key assign),
     ],
 };
-use DDP;
 
 # TODO: contains?, firstIndex?, mapX, sort, cache
 #       interspers, slice, zip, unzip, foldBack, any,
