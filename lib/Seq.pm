@@ -1,6 +1,6 @@
 package Seq;
 use 5.036;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 use subs 'bind', 'join', 'select', 'last', 'sort';
 use Scalar::Util qw(reftype);
 use List::Util;

@@ -1,6 +1,6 @@
 Revision history for Seq
 
-xxxxx   xxxxxx
+0.005   2023-11-22
         Added more Documentation
 
         Added:   sort, fsts, sdns, flatten_array, zip, fold_mut,
