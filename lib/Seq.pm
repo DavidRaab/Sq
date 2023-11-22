@@ -534,9 +534,9 @@ sub do($seq, $f) {
 # rev : Seq<'a> -> Seq<'a>
 sub rev($seq) {
     from_sub('Seq', sub {
-        my @list = to_list($seq);
+        my $list = to_array($seq);
         return sub {
-            pop @list;
+            pop @$list;
         };
     });
 }
@@ -545,7 +545,8 @@ sub rev($seq) {
 sub sort($seq, $comparer) {
     from_sub('Seq', sub {
         local ($a, $b);
-        my @sorted = CORE::sort { $comparer->($a, $b) } to_list($seq);
+        my $array  = to_array($seq);
+        my @sorted = CORE::sort { $comparer->($a, $b) } @$array;
         my $idx    = 0;
 
         return sub {
@@ -559,10 +560,11 @@ sub sort_by($seq, $comparer, $get_key) {
     from_sub('Seq', sub {
         local ($a, $b, $_);
         my $idx    = 0;
+        my $array  = to_array($seq);
         my @sorted =
             CORE::map  { $_->[1] }
             CORE::sort { $comparer->($a->[0], $b->[0]) }
-            CORE::map  { [$get_key->($_), $_] } to_list($seq);
+            CORE::map  { [$get_key->($_), $_] } @$array;
 
         return sub {
             return $sorted[$idx++];
