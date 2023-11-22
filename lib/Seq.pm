@@ -454,6 +454,10 @@ sub distinct($iter) {
     return distinct_by($iter, \&id);
 }
 
+# TODO: Instead of fsts and snds provide a function to pick the index of an array.
+#       Maybe even a function to pick and re-order multiple elements
+#         Like: ->pick([3,1,5])
+
 sub fsts($seq) {
     return $seq->map(sub ($x) { $x->[0] });
 }
@@ -462,6 +466,7 @@ sub snds($seq) {
     return $seq->map(sub ($x) { $x->[1] });
 }
 
+# TODO: zip can handle a list of sequences
 sub zip($seqA, $seqB) {
     from_sub('Seq', sub {
         my $itA = $seqA->();
