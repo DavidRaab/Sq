@@ -62,8 +62,8 @@ is(
     $range->to_array,
     'fold with reftype 2');
 is(
-    $range->fold_mut([], sub($array, $x) { push @$array, $x }),
-    $range->to_array,
+    $range->fold    ([], sub($array, $x) { push @$array, $x; $array }),
+    $range->fold_mut([], sub($array, $x) { push @$array, $x         }),
     'fold_mut');
 
 is($range->rev, check_isa('Seq'), 'rev return Seq');
