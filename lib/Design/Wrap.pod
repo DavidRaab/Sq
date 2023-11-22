@@ -3,9 +3,7 @@
 
 Currently Seq->wrap stops at the first C<undef>.
 
- perl
- my $list = Seq->wrap(1,2,3,undef,4,5,6)
-
+    my $list = Seq->wrap(1,2,3,undef,4,5,6)
 
 This input will only contain the elements C<1,2,3> in a sequence.
 Everything after C<undef> is discarded.
