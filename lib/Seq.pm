@@ -684,9 +684,9 @@ sub str_join($iter, $sep) {
 
 # Build a hash by providing a keying function. Later elements
 # in the sequence overwrite previous one.
-sub to_hash($iter, $get_key) {
+sub to_hash($seq, $get_key) {
     my %hash;
-    iter($iter, sub($x) {
+    iter($seq, sub($x) {
         $hash{$get_key->($x)} = $x;
     });
     return \%hash;
@@ -694,9 +694,11 @@ sub to_hash($iter, $get_key) {
 
 # Build a hash by providing a keying function. Values
 # are put into arrays to allow key with multiple values.
-sub to_hash_of_array($iter, $get_key) {
+#
+# to_hash_of_array: Seq<'a> -> ('a -> 'Key) -> Hash<'Key, Array<'a>>
+sub to_hash_of_array($seq, $get_key) {
     my %hash;
-    iter($iter, sub($x) {
+    iter($seq, sub($x) {
         push @{ $hash{$get_key->($x)} }, $x;
     });
     return \%hash;
