@@ -405,7 +405,7 @@ sub choose($seq, $chooser) {
 }
 
 sub mapi($seq, $f) {
-    return indexed($seq)->map($f);
+    return Seq::map(indexed($seq), $f);
 }
 
 sub filter($seq, $predicate) {
@@ -448,7 +448,7 @@ sub skip($seq, $amount) {
 
 sub indexed($seq) {
     my $index = 0;
-    return $seq->map(sub($x) {
+    return Seq::map($seq, sub($x) {
         return [$index++, $x];
     });
 }
@@ -483,11 +483,11 @@ sub distinct($seq) {
 #         Like: ->pick([3,1,5])
 
 sub fsts($seq) {
-    return $seq->map(sub ($x) { $x->[0] });
+    return Seq::map($seq, sub ($x) { $x->[0] });
 }
 
 sub snds($seq) {
-    return $seq->map(sub ($x) { $x->[1] });
+    return Seq::map($seq, sub ($x) { $x->[1] });
 }
 
 # TODO: zip can handle a list of sequences
@@ -511,12 +511,11 @@ sub zip($seqA, $seqB) {
 #    functions that have side-effects or produce side-effects. Those are
 #    immediately executed, usually consuming all elements of Seq at once.
 
+# iter : Seq<'a> -> ('a -> unit) -> unit
 sub iter($seq, $f) {
     my $it = $seq->();
     my $x;
-    while ( defined($x = $it->()) ) {
-        $f->($x);
-    }
+    $f->($x) while defined($x = $it->());
     return;
 }
 
@@ -528,12 +527,11 @@ sub iter($seq, $f) {
 sub do($seq, $f) {
     my $it = $seq->();
     my $x;
-    while ( defined($x = $it->()) ) {
-        $f->($x);
-    }
+    $f->($x) while defined($x = $it->());
     return $seq;
 }
 
+# rev : Seq<'a> -> Seq<'a>
 sub rev($seq) {
     from_sub('Seq', sub {
         my @list = to_list($seq);
@@ -543,6 +541,7 @@ sub rev($seq) {
     });
 }
 
+# sort : Seq<'a> -> ('a -> 'a -> int) -> Seq<'a>
 sub sort($seq, $comparer) {
     from_sub('Seq', sub {
         local ($a, $b);
@@ -555,6 +554,7 @@ sub sort($seq, $comparer) {
     });
 }
 
+# sort_by : Seq<'a> -> ('Key -> 'Key -> int) -> ('a -> 'Key) -> Seq<'a>
 sub sort_by($seq, $comparer, $get_key) {
     from_sub('Seq', sub {
         local ($a, $b, $_);
