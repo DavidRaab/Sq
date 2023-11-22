@@ -51,9 +51,10 @@ sub from_sub($class, $f) {
     return bless(sub {
         my $abort = 0;
         my $it    = $f->();
+        my $x;
         return sub {
             return undef if $abort;
-            if ( defined(my $x = $it->()) ) {
+            if ( defined($x = $it->()) ) {
                 return $x;
             }
             $abort = 1;
@@ -70,24 +71,23 @@ sub empty($class) {
 }
 
 # TODO: When $state is a reference. Same handling as in fold?
+#
+# Seq->unfold : 'State -> ('State -> Option<list<'a,'State>>) -> Seq<'a>
 sub unfold($class, $state, $f) {
     from_sub('Seq', sub {
         # IMPORTANT: Perl signatures are aliases. As we assign
         # to $state later, we need to make a copy here.
         # Removing this lines causes bugs.
         my $state = $state;
-        my $abort = 0;
         my $x;
         return sub {
-            return undef if $abort;
-
             ($x, $state) = $f->($state);
-            $abort = 1 if not defined $x;
             return $x;
         }
     });
 }
 
+# Seq->init : int -> (int -> 'a) -> Seq<'a>
 sub init($class, $count, $f) {
     return unfold('Seq', 0, sub($index) {
         return $f->($index), $index+1 if $index < $count;
@@ -95,6 +95,7 @@ sub init($class, $count, $f) {
     });
 }
 
+# Seq->range_step : float -> float -> float -> Seq<float>
 sub range_step($class, $start, $step, $stop) {
     croak '$step is 0. Will run forever.' if $step == 0;
 
@@ -114,16 +115,15 @@ sub range_step($class, $start, $step, $stop) {
     }
 }
 
+# Seq->range : int -> int -> Seq<int>
 sub range($class, $start, $stop) {
     return range_step('Seq', $start, 1, $stop);
 }
 
 # turns all arguments into an sequence
 sub wrap($class, @xs) {
-    my $last = $#xs;
     return unfold('Seq', 0, sub($idx) {
-        return $xs[$idx], $idx+1 if $idx <= $last;
-        return undef;
+        return $xs[$idx], $idx+1;
     });
 }
 
@@ -135,8 +135,7 @@ sub from_list($class, @xs) {
 # turns an arrayref into a seq
 sub from_array($class, $xs) {
     return unfold('Seq', 0, sub($idx) {
-        return $xs->[$idx], $idx+1 if $idx <= $xs->$#*;
-        return undef;
+        return $xs->[$idx], $idx+1;
     });
 }
 
@@ -150,9 +149,10 @@ sub from_hash($class, $hashref, $f) {
         my $idx  = 0;
         my @keys = keys %$hashref;
         my $last = $#keys;
+        my $key;
         return sub {
             return undef if $idx > $last;
-            my $key = $keys[$idx++];
+            $key = $keys[$idx++];
             return $f->($key, $hashref->{$key});
         }
     });
@@ -177,7 +177,8 @@ sub append($seqA, $seqB) {
     from_sub('Seq', sub {
         my $exhaustedA = 0;
         my $itA = $seqA->();
-        my $itB = $seqB->();
+        my $itB;
+        my $x;
 
         return sub {
             REDO:
@@ -185,13 +186,14 @@ sub append($seqA, $seqB) {
                 return $itB->();
             }
             else {
-                if ( defined(my $x = $itA->()) ) {
+                if ( defined($x = $itA->()) ) {
                     return $x;
                 }
-                else {
-                    $exhaustedA = 1;
-                    goto REDO;
-                }
+
+                undef $itA;
+                $exhaustedA = 1;
+                $itB = $seqB->();
+                goto REDO;
             }
         };
     });
@@ -201,8 +203,9 @@ sub append($seqA, $seqB) {
 sub map($seq, $f) {
     from_sub('Seq', sub {
         my $it = $seq->();
+        my $x;
         return sub {
-            if ( defined(my $x = $it->()) ) {
+            if ( defined($x = $it->()) ) {
                 return $f->($x);
             }
             return undef;
@@ -215,20 +218,20 @@ sub bind($seq, $f) {
     from_sub('Seq', sub {
         my $it   = $seq->();
         my $seqB = undef;
-
+        my $x;
         return sub {
             REDO:
             # when $seqB is defined. an entry from the seq is returned
             if ( defined $seqB ) {
-                if ( defined(my $b = $seqB->()) ) {
-                    return $b;
+                if ( defined($x = $seqB->()) ) {
+                    return $x;
                 }
                 # as soon an undef is returned, $seqB finished
                 $seqB = undef;
             }
             # when $seqB is undef, we request/create a new $seqB
-            if ( defined(my $a = $it->()) ) {
-                $seqB = $f->($a)->();
+            if ( defined($x = $it->()) ) {
+                $seqB = $f->($x)->();
                 goto REDO;
             }
             # when $seqB is not defined and $it does not return new values
@@ -367,9 +370,10 @@ sub select($iter, $mapA, $mapB) {
 sub choose($iter, $chooser) {
     from_sub('Seq', sub {
         my $it = $iter->();
+        my ($x, $optional);
         return sub {
-            while ( defined(my $x = $it->()) ) {
-                my $optional = $chooser->($x);
+            while ( defined($x = $it->()) ) {
+                $optional = $chooser->($x);
                 return $optional if defined $optional;
             }
             return undef;
@@ -384,8 +388,9 @@ sub mapi($iter, $f) {
 sub filter($iter, $predicate) {
     from_sub('Seq', sub {
         my $it = $iter->();
+        my $x;
         return sub {
-            while ( defined(my $x = $it->()) ) {
+            while ( defined($x = $it->()) ) {
                 return $x if $predicate->($x);
             }
             return undef;
@@ -397,14 +402,10 @@ sub take($iter, $amount) {
     from_sub('Seq', sub {
         my $i             = $iter->();
         my $returnedSoFar = 0;
+        my $x;
         return sub {
-            if ( $returnedSoFar < $amount ) {
-                $returnedSoFar++;
-                if ( defined(my $x = $i->()) ) {
-                    return $x;
-                }
-            }
-            return;
+            return $i->() if $returnedSoFar++ < $amount;
+            return undef;
         }
     });
 }
@@ -433,9 +434,10 @@ sub distinct_by($iter, $f) {
     from_sub('Seq', sub {
         my $it = $iter->();
         my %seen;
+        my $x;
         return sub {
             SKIP:
-            if ( defined(my $x = $it->()) ) {
+            if ( defined($x = $it->()) ) {
                 my $key = $f->($x);
                 goto SKIP if exists $seen{$key};
                 $seen{$key} = 1;
@@ -470,10 +472,11 @@ sub zip($seqA, $seqB) {
     from_sub('Seq', sub {
         my $itA = $seqA->();
         my $itB = $seqB->();
+        my ($a, $b);
 
         return sub {
-            if (defined (my $a = $itA->())) {
-            if (defined (my $b = $itB->())) {
+            if (defined ($a = $itA->())) {
+            if (defined ($b = $itB->())) {
                     return [$a,$b];
             }}
             return undef;
@@ -487,7 +490,8 @@ sub zip($seqA, $seqB) {
 
 sub iter($iter, $f) {
     my $it = $iter->();
-    while ( defined(my $x = $it->()) ) {
+    my $x;
+    while ( defined($x = $it->()) ) {
         $f->($x);
     }
     return;
@@ -500,7 +504,8 @@ sub iter($iter, $f) {
 # $seq->do(sub($x) { print Dumper($x) })->...
 sub do($iter, $f) {
     my $it = $iter->();
-    while ( defined(my $x = $it->()) ) {
+    my $x;
+    while ( defined($x = $it->()) ) {
         $f->($x);
     }
     return $iter;
@@ -510,10 +515,7 @@ sub rev($iter) {
     from_sub('Seq', sub {
         my @list = to_list($iter);
         return sub {
-            if ( defined(my $x = pop @list) ) {
-                return $x;
-            }
-            return undef;
+            pop @list;
         };
     });
 }
@@ -523,15 +525,9 @@ sub sort($seq, $comparer) {
         local ($a, $b);
         my @array = CORE::sort { $comparer->($a, $b) } to_list($seq);
         my $idx   = 0;
-        my $count = @array;
 
         return sub {
-            if ( $idx < $count ) {
-                my $x = $array[$idx];
-                $idx++;
-                return $x;
-            }
-            return undef;
+            return $array[$idx++];
         };
     });
 }
@@ -562,9 +558,10 @@ sub group_fold($seq, $get_state, $get_key, $folder) {
         push $group{$key}->@*, $a;
     });
 
+    my $a;
     return from_hash('Seq', \%group, sub($key, $array) {
         my $state = $get_state->();
-        for my $a ( @$array ) {
+        for $a ( @$array ) {
             $state = $folder->($state, $a);
         }
         return $state;
@@ -612,8 +609,7 @@ sub reduce($seq, $reducer, $default) {
 # first : Seq<'a> -> 'a -> 'a
 sub first($seq, $default) {
     my $first = $seq->()();
-    return $first if defined $first;
-    return $default;
+    return defined $first ? $first : $default;
 }
 
 # last : Seq<'a> -> 'a -> 'a
@@ -622,8 +618,7 @@ sub last($seq, $default) {
     iter($seq, sub($x) {
         $last = $x;
     });
-    return $last if defined $last;
-    return $default;
+    return defined $last ? $last : $default;
 }
 
 # to_array : Seq<'a> -> Array<'a>
@@ -752,7 +747,8 @@ sub to_array_of_array($seq) {
 # find : Seq<'a> -> ('a -> bool) -> 'a
 sub find($seq, $default, $predicate) {
     my $it = $seq->();
-    while ( defined(my $x = $it->()) ) {
+    my $x;
+    while ( defined($x = $it->()) ) {
         return $x if $predicate->($x);
     }
     return $default;
