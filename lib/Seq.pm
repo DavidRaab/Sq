@@ -172,11 +172,11 @@ sub concat($class, @seqs) {
 #- Methods
 #    functions operating on Seq and returning another Seq
 
-sub append($iterA, $iterB) {
+sub append($seqA, $seqB) {
     from_sub('Seq', sub {
         my $exhaustedA = 0;
-        my $itA = $iterA->();
-        my $itB = $iterB->();
+        my $itA = $seqA->();
+        my $itB = $seqB->();
 
         return sub {
             REDO:
@@ -197,9 +197,9 @@ sub append($iterA, $iterB) {
 }
 
 # map : Seq<'a> -> ('a -> 'b) -> Seq<'b'>
-sub map($iter, $f) {
+sub map($seq, $f) {
     from_sub('Seq', sub {
-        my $it = $iter->();
+        my $it = $seq->();
         return sub {
             if ( defined(my $x = $it->()) ) {
                 return $f->($x);
@@ -210,9 +210,9 @@ sub map($iter, $f) {
 }
 
 # bind : Seq<'a> -> ('a -> Seq<'b>) -> Seq<'b>
-sub bind($iter, $f) {
+sub bind($seq, $f) {
     from_sub('Seq', sub {
-        my $it   = $iter->();
+        my $it   = $seq->();
         my $seqB = undef;
 
         return sub {
