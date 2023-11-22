@@ -166,4 +166,28 @@ my $always = Seq->from_sub(sub {
 
 is($always->take(10)->to_array, [1,1,1,1,1,1,1,1,1,1], '10 times 1');
 
+
+#------ Check if from_sub stops on first undef ------#
+
+my $contains_undef = Seq->from_sub(sub {
+    my @data = (1,2,3,undef,4,5,6);
+    my $idx  = 0;
+    return sub {
+        return undef if $idx >= @data;
+        my $x = $data[$idx++];
+        return $x;
+    }
+});
+
+is($contains_undef->to_array, [1,2,3], 'contains undef');
+
+# test internal
+my $it = $contains_undef->();
+is($it->(), 1,     'it 1');
+is($it->(), 2,     'it 2');
+is($it->(), 3,     'it 3');
+is($it->(), undef, 'it 4');
+is($it->(), undef, 'it 5');
+is($it->(), undef, 'it 6');
+
 done_testing;
