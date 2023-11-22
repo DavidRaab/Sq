@@ -173,13 +173,18 @@ my $contains_undef = Seq->from_sub(sub {
     my @data = (1,2,3,undef,4,5,6);
     my $idx  = 0;
     return sub {
-        return undef if $idx >= @data;
-        my $x = $data[$idx++];
-        return $x;
+        # This ust work because of two reason.
+        #  1. index 3 returns undef, so it should abort there
+        #  2. index 7+ also returns undef
+        return $data[$idx++];
     }
 });
 
-is($contains_undef->to_array, [1,2,3], 'contains undef');
+is($contains_undef->to_array,      [1,2,3], 'contains undef 1');
+is($contains_undef->skip(2)->to_array, [3], 'contains undef 2');
+is($contains_undef->skip(3)->to_array,  [], 'contains undef 3');
+is($contains_undef->skip(4)->to_array,  [], 'contains undef 4');
+is($contains_undef->skip(5)->to_array,  [], 'contains undef 5');
 
 # test internal
 my $it = $contains_undef->();
