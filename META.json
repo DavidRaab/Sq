@@ -38,7 +38,7 @@
          "version" : "0.004"
       }
    },
-   "release_status" : "stable",
+   "release_status" : "unstable",
    "resources" : {
       "license" : [
          "http://www.opensource.org/licenses/mit-license.php"

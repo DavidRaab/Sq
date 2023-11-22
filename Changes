@@ -1,5 +1,32 @@
 Revision history for Seq
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
+xxxxx   xxxxxx
+        Added more Documentation
 
+        Added:   sort, fsts, sdns, flatten_array, zip, fold_mut,
+                 group_fold, to_array_of_array
+        Changes: fold, min*, max*, first, last, find, group_by
+        Renamed: group_by -> to_hash
+
+0.004   2023-11-21
+        Version bump just to re-release as stable
+
+0.003   2023-11-21
+        First CPAN Release - Unstable
+        Added some Documentation
+
+        Added:  min, max, min_str, max_str, min_by, max_by,
+                min_str, min_by_str, max_by_str,
+                reduce, last, from_sub
+        Changed: first, find
+
+0.002   2023-11-19
+        Added: range, map, iter, to_array, filter, take, fold, count
+               rec, sum, to_list, wrap, range_step, append, indexed,
+               init, concat, empty, from_list, from_array, from_hash,
+               unfold, skip, sum_by, join, group_py, group_by_distinct,
+               distinct, distinct_by, mapi, first, choose, bind,
+               flatten, cartesian, merge, select, do,
+
+0.001   2023-11-16
+        Empty project

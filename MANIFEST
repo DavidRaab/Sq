@@ -1,6 +1,15 @@
 Build.PL
 Changes
 examples/choose.pl
+lib/Design/FoldMut.pod
+lib/Design/MinMax.pod
+lib/Design/Wrap.md
+lib/Design/Wrap.pod
+lib/Examples/ReadingFromFile.md
+lib/Examples/ReadingFromFile.pod
+lib/Manual.md
+lib/Manual.pod
+lib/Manual/FromSub.pod
 lib/Seq.pm
 lib/Seq.pod
 LICENSE
@@ -16,7 +25,7 @@ t/04-mutable.t
 t/05-interface.t
 t/06-min_max.t
 t/07-from_sub.t
-t/csv_example/00-main.t
+t/08-group_by.t
 t/data/07-from_sub/text.txt
 t/manifest.t
 t/pod-coverage.t
