@@ -535,6 +535,12 @@ sub sort($seq, $comparer) {
 #- Converter
 #    Those are functions converting Seq to none Seq types
 
+# fold is like a foreach-loop. You iterate through all items generating
+# a new 'State. The $folder is passed the latest
+# 'State and one 'a from the sequence. You return
+# the next 'State that should be used. Once all elements of 'a
+# sequence are processed. The last 'State is returned.
+#
 # fold : Seq<'a> -> 'State -> ('State -> 'a -> 'State) -> 'State
 sub fold($seq, $state, $folder) {
     iter($seq, sub($x) {
@@ -543,6 +549,9 @@ sub fold($seq, $state, $folder) {
     return $state;
 }
 
+# Same as fold. But when you mutate 'State and return 'State from
+# the lambda. You can use this function instead.
+#
 # fold : Seq<'a> -> 'State -> ('State -> 'a -> 'State) -> 'State
 sub fold_mut($seq, $state, $folder) {
     iter($seq, sub($x) {
@@ -561,12 +570,14 @@ sub reduce($seq, $reducer, $default) {
     return fold(skip($seq, 1), first($seq, $default), $reducer);
 }
 
+# first : Seq<'a> -> 'a -> 'a
 sub first($seq, $default) {
     my $first = $seq->()();
     return $first if defined $first;
     return $default;
 }
 
+# last : Seq<'a> -> 'a -> 'a
 sub last($seq, $default) {
     my $last;
     iter($seq, sub($x) {
@@ -576,27 +587,31 @@ sub last($seq, $default) {
     return $default;
 }
 
+# to_array : Seq<'a> -> Array<'a>
 sub to_array($seq) {
     state $folder = sub($array, $x) { push @$array, $x };
     return fold_mut($seq, [], $folder);
 }
 
-sub to_list($iter) {
-    return @{ to_array($iter) };
+sub to_list($seq) {
+    return @{ to_array($seq) };
 }
 
-sub count($iter) {
+# count : Seq<'a> -> int
+sub count($seq) {
     state $folder = sub($count, $x) { $count+1 };
-    return fold($iter, 0, $folder);
+    return fold($seq, 0, $folder);
 }
 
-sub sum($iter) {
+# sum : Seq<'a> -> float
+sub sum($seq) {
     state $folder = sub($sum, $x) { $sum + $x };
-    return fold($iter, 0, $folder);
+    return fold($seq, 0, $folder);
 }
 
-sub sum_by($iter, $f) {
-    return fold($iter, 0, sub($sum, $x) {
+# sum_by : Seq<'a> -> (float -> 'a -> float) -> float
+sub sum_by($seq, $f) {
+    return fold($seq, 0, sub($sum, $x) {
         return $sum + $f->($x);
     });
 }
