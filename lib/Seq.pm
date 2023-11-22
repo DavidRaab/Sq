@@ -123,9 +123,17 @@ sub range($class, $start, $stop) {
 # turns all arguments into an sequence
 # Seq->wrap : List<'a> -> Seq<'a>
 sub wrap($class, @xs) {
-    return unfold('Seq', 0, sub($idx) {
-        return $xs[$idx], $idx+1;
-    });
+    return bless(sub {
+        my $abort = 0;
+        my $idx   = 0;
+        my $x;
+        return sub {
+            return undef if $abort;
+            return $x if defined($x = $xs[$idx++]);
+            $abort = 1;
+            return undef;
+        }
+    }, 'Seq');
 }
 
 # turns a list into a Seq - alias to wrap
