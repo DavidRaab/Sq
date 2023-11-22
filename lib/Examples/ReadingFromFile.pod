@@ -8,39 +8,34 @@ First, we can create a function C<from_file> that serves as a Constructor
 for opening a file and returning a sequence. We do this with the help
 of C<<< Seq->from_sub >>>
 
-```perl
-sub from_file($file) {
-    return Seq->from_sub(sub {
-        # On initialization we open the file
-        open my $fh, '<', $file or die "Cannot open: $!\n";
+    sub from_file($file) {
+        return Seq->from_sub(sub {
+            # On initialization we open the file
+            open my $fh, '<', $file or die "Cannot open: $!\n";
 
-        return sub {
-            # as long filehandle is defined we read from it
-            if ( defined $fh ) {
-                # when a line can be read, we return it
-                if (defined(my $line = <$fh>)) {
-                    return $line;
+            return sub {
+                # as long filehandle is defined we read from it
+                if ( defined $fh ) {
+                    # when a line can be read, we return it
+                    if (defined(my $line = <$fh>)) {
+                        return $line;
+                    }
+                    # when no line can be returned anymore
+                    # we close the filehandle and undef it
+                    else {
+                        close $fh;
+                        $fh = undef;
+                    }
                 }
-                # when no line can be returned anymore
-                # we close the filehandle and undef it
-                else {
-                    close $fh;
-                    $fh = undef;
-                }
-            }
-            # when filehandle is not defined, we return undef
-            return undef;
-        };
-    });
-
-}
-```
+                # when filehandle is not defined, we return undef
+                return undef;
+            };
+        });
+    }
 
 We now can create a sequence from a filename.
 
- perl
- my $file = from_file($test_dir->child('text.txt'));
-
+    my $file = from_file($test_dir->child('text.txt'));
 
 Here are the interesting bits.
 
@@ -50,26 +45,21 @@ Here are the interesting bits.
 
 No file is opened. As long no value is read from the sequence. Nothing happens.
 
-
 =item *
 
 Only getting elements from the file opens it. It will only read as much
   lines as needed.
-
 
 =item *
 
 But file can be opened a lot of times, depending on how often we execute or ask
   it for values.
 
-
 =back
 
 Consider just getting the C<count> of a file.
 
- perl
- $file->count()
-
+    $file->count()
 
 This will basically return the amount of line numbers. C<count> will open the
 file, starts counting how many elements exists. Then aborts and closing
@@ -98,3 +88,8 @@ then served from this C<cache>.
 
 This way, we can have both. An automatic-updating computation or better
 performance.
+
+=head1 SEE ALSO
+
+Look into test-file C<t/07-from_sub.t> it has an extended example of reading
+from a file and it's behaviour.
