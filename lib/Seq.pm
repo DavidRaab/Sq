@@ -703,12 +703,14 @@ sub to_hash_of_array($iter, $get_key) {
 }
 
 # returns first element for which the given $predicate returns true
-sub find($iter, $predicate) {
-    my $it = $iter->();
+#
+# find : Seq<'a> -> ('a -> bool) -> 'a
+sub find($seq, $default, $predicate) {
+    my $it = $seq->();
     while ( defined(my $x = $it->()) ) {
         return $x if $predicate->($x);
     }
-    return;
+    return $default;
 }
 
 1;
