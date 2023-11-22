@@ -177,7 +177,7 @@ sub concat($class, @seqs) {
     # with no values to concat, return an empty iterator
     return empty('Seq') if $count == 0;
     # one element can be returned as-is
-    return $seqs[0]    if $count == 1;
+    return $seqs[0]     if $count == 1;
     # at least two items
     return List::Util::reduce { append($a, $b) } @seqs;
 }
