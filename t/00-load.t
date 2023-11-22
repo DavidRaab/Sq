@@ -405,4 +405,17 @@ is(
     [],
     'zip 5');
 
+is(
+    Seq->wrap(
+        Seq->wrap(1,2,3),
+        Seq->wrap(4,5,6),
+        Seq->wrap(7,8,9),
+    )->to_array_of_array,
+    [
+        [1,2,3],
+        [4,5,6],
+        [7,8,9],
+    ],
+    'to_array_of_array');
+
 done_testing;

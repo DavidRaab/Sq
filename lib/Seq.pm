@@ -739,6 +739,15 @@ sub to_hash_of_array($seq, $get_key) {
     return \%hash;
 }
 
+# to_array_of_array : Seq<Seq<'a>> -> Array<Array<'a>>
+sub to_array_of_array($seq) {
+    my @outer;
+    iter($seq, sub($inner) {
+        push @outer, to_array($inner);
+    });
+    return \@outer;
+}
+
 # returns first element for which the given $predicate returns true
 #
 # find : Seq<'a> -> ('a -> bool) -> 'a
