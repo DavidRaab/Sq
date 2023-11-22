@@ -537,6 +537,41 @@ sub sort($seq, $comparer) {
     });
 }
 
+# group_by : Seq<'a> -> ('a -> 'Key) -> Seq<'Key * Seq<'a>>
+sub group_by($seq, $get_key) {
+    my %group;
+    iter($seq, sub($a) {
+        my $key = $get_key->($a);
+        push $group{$key}->@*, $a;
+    });
+
+    return from_hash('Seq', \%group, sub($key, $value) {
+        return [$key, from_array('Seq', $value)];
+    });
+}
+
+# group_fold :
+#   Seq<'a>
+#   -> (unit -> 'State)
+#   -> ('a -> 'Key)
+#   -> ('State -> 'a -> 'State)
+#   -> Seq<'State>
+sub group_fold($seq, $get_state, $get_key, $folder) {
+    my %group;
+    iter($seq, sub($a) {
+        my $key = $get_key->($a);
+        push $group{$key}->@*, $a;
+    });
+
+    return from_hash('Seq', \%group, sub($key, $array) {
+        my $state = $get_state->();
+        for my $a ( @$array ) {
+            $state = $folder->($state, $a);
+        }
+        return $state;
+    });
+}
+
 #- Converter
 #    Those are functions converting Seq to none Seq types
 
