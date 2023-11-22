@@ -144,6 +144,8 @@ sub from_array($class, $xs) {
 # Pass it a hashref. The function $f is executed for every
 # (key, value) pair. The result is used as a single item in
 # the sequence.
+#
+# Seq->from_hash : Hash<'Key, 'Value> -> ('Key -> 'Value -> 'a) -> Seq<'a>
 sub from_hash($class, $hashref, $f) {
     from_sub('Seq', sub {
         my $idx  = 0;
