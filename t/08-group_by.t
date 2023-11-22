@@ -45,24 +45,30 @@ my @data = (
     my $grouped = Seq->from_array(\@data)->group_by(key 'id');
     is($grouped->count, 3, '3 elements');
 
-    sub get_id($grouped, $id) {
-        return snd $grouped->find(undef, sub($tuple) { fst $tuple == $id });
-    }
+    # turn seq of seq into AoA
+    my $data =
+        $grouped
+        ->map(sub($group) { $group->to_array })
+        ->sort(sub($x,$y) { $x->[0]{id} <=> $y->[0]{id} })
+        ->to_array;
 
     is(
-        get_id($grouped, 1)->map(key 'tag')->to_array,
-        [qw/WoW How Super/],
-        '3 tags from David');
-
-    is(
-        get_id($grouped, 2)->map(key 'tag')->to_array,
-        [qw/Mega Huhu/],
-        '2 tags from Alex');
-
-    is(
-        get_id($grouped, 3)->map(key 'tag')->to_array,
-        [qw/Toll/],
-        '1 tag from Bob');
+        $data,
+        [
+            [
+                { id => 1, name => 'David', tag => 'WoW'   },
+                { id => 1, name => 'David', tag => 'How'   },
+                { id => 1, name => 'David', tag => 'Super' },
+            ],
+            [
+                { id => 2, name => 'Alex', tag => 'Mega' },
+                { id => 2, name => 'Alex', tag => 'Huhu' },
+            ],
+            [
+                { id => 3, name => 'Bob', tag => 'Toll' },
+            ]
+        ],
+        'group_by');
 }
 
 # group_fold

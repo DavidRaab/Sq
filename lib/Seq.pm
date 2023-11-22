@@ -537,7 +537,7 @@ sub sort($seq, $comparer) {
     });
 }
 
-# group_by : Seq<'a> -> ('a -> 'Key) -> Seq<'Key * Seq<'a>>
+# group_by : Seq<'a> -> ('a -> 'Key) -> Seq<Seq<'a>>
 sub group_by($seq, $get_key) {
     my %group;
     iter($seq, sub($a) {
@@ -546,7 +546,7 @@ sub group_by($seq, $get_key) {
     });
 
     return from_hash('Seq', \%group, sub($key, $value) {
-        return [$key, from_array('Seq', $value)];
+        return from_array('Seq', $value);
     });
 }
 
