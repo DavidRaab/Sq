@@ -9,17 +9,27 @@ Seq - A lazy sequence implementation
 
 =head1 SYNOPSIS
 
-The Seq module provides a lazy sequence implementation that can be
-executed multiple times. A sequence just represent a computation without
-computing any values until they are requested.
+A sequence is a generator for iterators. But you never use the iterators
+directly. Instead you do operation on a sequence. A sequence don't
+do anything immiadetely. It will wait with its computation until you
+request values from it.
 
-Different to iterators they can be executed multiple times. A sequence
-can somehow considered an immutable iterator.
+As a sequence generates iterators when needed. You always can execute a
+sequence as often as you want. From its usage it looks like an immutable
+iterator.
+
+    # always represents the range from 1 to 100.
+    my $range = Seq->range(1,100);
+
+    # prints numbers 1 to 100
+    $range->iter(sub($x) { print $x });
+
+    # prints numbers 1 to 100 again ...
+    $range->iter(sub($x) { print $x });
 
 At the moment Documentation is lacking, but the source-code is well-documented
 including the test-files. Maybe you want to look at the test-files until
-I have written more documentation. The API is not fully stable at the moment
-and can be changed.
+I have written more documentation. The API is not fully stable at the moment.
 
     use v5.36;
     use Seq;
@@ -58,8 +68,51 @@ and can be changed.
 
 =head1 EXPORT
 
-This modules does not export anything by default. But you can request the following
-functions: id, fst, snd, key, assign
+This modules does not export anything by default. But you can request the
+following functions.
+
+=head2 id
+
+return its input as-is
+
+    sub id($x) { return $x }
+
+=head2 fst
+
+return the first element of an array
+
+    sub fst($array) { return $array->[0] }
+
+=head2 snd
+
+return the second element of an array
+
+    sub snd($array) { return $array->[1] }
+
+=head2 key
+
+generates a function that picks a value from a hash.
+
+    sub key($name) { sub($hash) { return $hash->{$name} } }
+
+=head2 assign
+
+allows you to assign a value, but also do a computation.
+
+    my $value = assign {
+        my $x = ...  # code to compute $x
+        my $y = ...  # code to compute $y
+        $x + $y;
+    };
+
+Same as
+
+    my $value;
+    {
+        my $x = ...  # code to compute $x
+        my $y = ...  # code to compute $y
+        $value = $x + $y;
+    }
 
 =head1 CONSTRUCTORS
 
