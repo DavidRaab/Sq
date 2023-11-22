@@ -606,10 +606,9 @@ sub group_fold($seq, $get_state, $get_key, $folder) {
         push $group{$key}->@*, $a;
     });
 
-    my $a;
     return from_hash('Seq', \%group, sub($key, $array) {
         my $state = $get_state->();
-        for $a ( @$array ) {
+        for my $a ( @$array ) {
             $state = $folder->($state, $a);
         }
         return $state;
