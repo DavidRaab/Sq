@@ -68,10 +68,10 @@ is(Seq->empty->min_by(key "id", undef),     U(), 'min_by on empty');
 is(Seq->empty->min_by(key "id", 0),           0, 'min_by on empty with default');
 
 # min_by_str
-is($data->min_by_str($by_name, undef),      'A', 'min_by_str');
-is($data->min_by_str($by_name, '0'),        'A', 'min_by_str with default');
-is(Seq->empty->min_by_str($by_name, undef), U(), 'min_by_str on empty');
-is(Seq->empty->min_by_str($by_name, '0'),     0, 'min_by_str on empty with default');
+is($data->min_str_by($by_name, undef),      'A', 'min_by_str');
+is($data->min_str_by($by_name, '0'),        'A', 'min_by_str with default');
+is(Seq->empty->min_str_by($by_name, undef), U(), 'min_by_str on empty');
+is(Seq->empty->min_str_by($by_name, '0'),     0, 'min_by_str on empty with default');
 
 # max_by
 is($data->max_by($by_id, undef),              3, 'max_by');
@@ -80,9 +80,9 @@ is(Seq->empty->max_by($by_id, undef),       U(), 'max_by on empty');
 is(Seq->empty->max_by($by_id, 0),             0, 'max_by on empty with default');
 
 # max_by_str
-is($data->max_by_str($by_name, undef),      'C', 'max_by_str');
-is($data->max_by_str($by_name, '0'),        'C', 'max_by_str with default');
-is(Seq->empty->max_by_str($by_name, undef), U(), 'max_by_str on empty');
-is(Seq->empty->max_by_str($by_name, '0'),     0, 'max_by_str on empty with default');
+is($data->max_str_by($by_name, undef),      'C', 'max_by_str');
+is($data->max_str_by($by_name, '0'),        'C', 'max_by_str with default');
+is(Seq->empty->max_str_by($by_name, undef), U(), 'max_by_str on empty');
+is(Seq->empty->max_str_by($by_name, '0'),     0, 'max_by_str on empty with default');
 
 done_testing;

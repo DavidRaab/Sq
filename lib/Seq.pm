@@ -656,12 +656,6 @@ sub min($seq, $default) {
     min_by($seq, \&id, $default);
 }
 
-# returns the min value or undef on empty sequence
-# min value is compared using lt
-sub min_str($seq, $default) {
-    min_by_str($seq, \&id, $default);
-}
-
 sub min_by($seq, $key, $default) {
     return fold($seq, undef, sub($min, $x) {
         my $value = $key->($x);
@@ -671,7 +665,13 @@ sub min_by($seq, $key, $default) {
     }) // $default;
 }
 
-sub min_by_str($seq, $key, $default) {
+# returns the min value or undef on empty sequence
+# min value is compared using lt
+sub min_str($seq, $default) {
+    min_str_by($seq, \&id, $default);
+}
+
+sub min_str_by($seq, $key, $default) {
     return fold($seq, undef, sub($min, $x) {
         my $value = $key->($x);
         defined $min
@@ -685,10 +685,6 @@ sub max($seq, $default) {
     max_by($seq, \&id, $default);
 }
 
-sub max_str($seq, $default) {
-    max_by_str($seq, \&id, $default);
-}
-
 sub max_by($seq, $key, $default) {
     return fold($seq, undef, sub($max, $x) {
         my $value = $key->($x);
@@ -698,7 +694,11 @@ sub max_by($seq, $key, $default) {
     }) // $default;
 }
 
-sub max_by_str($seq, $key, $default) {
+sub max_str($seq, $default) {
+    max_str_by($seq, \&id, $default);
+}
+
+sub max_str_by($seq, $key, $default) {
     return fold($seq, undef, sub($max, $x) {
         my $value = $key->($x);
         defined $max
