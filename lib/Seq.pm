@@ -215,29 +215,47 @@ sub map($seq, $f) {
 
 # bind : Seq<'a> -> ('a -> Seq<'b>) -> Seq<'b>
 sub bind($seq, $f) {
-    from_sub('Seq', sub {
-        my $it   = $seq->();
-        my $seqB = undef;
-        my $x;
+    return bless(sub {
+        # 0 = read from $itA
+        # 1 = read from $itB
+        # 2 = undef
+        my $state = 0;
+
+        my $itA  = $seq->();
+        my $itB  = undef;
+        my ($a, $b);
         return sub {
             REDO:
-            # when $seqB is defined. an entry from the seq is returned
-            if ( defined $seqB ) {
-                if ( defined($x = $seqB->()) ) {
-                    return $x;
+            # read from $itA
+            if ( $state == 0 ) {
+                $a = $itA->();
+                if ( defined $a ) {
+                    $itB   = $f->($a)->();
+                    $state = 1;
                 }
-                # as soon an undef is returned, $seqB finished
-                $seqB = undef;
+                else {
+                    $state = 2;
+                    undef $itA;
+                    undef $itB;
+                    undef $a;
+                }
             }
-            # when $seqB is undef, we request/create a new $seqB
-            if ( defined($x = $it->()) ) {
-                $seqB = $f->($x)->();
-                goto REDO;
+
+            # read from $itB
+            if ( $state == 1 ) {
+                $b = $itB->();
+                if ( defined $b ) {
+                    return $b;
+                }
+                else {
+                    $state = 0;
+                    goto REDO;
+                }
             }
-            # when $seqB is not defined and $it does not return new values
+
             return undef;
         }
-    });
+    }, 'Seq');
 }
 
 # flatten : Seq<Seq<'a>> -> Seq<'a>
