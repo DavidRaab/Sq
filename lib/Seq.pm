@@ -2,9 +2,9 @@ package Seq;
 use 5.036;
 our $VERSION = '0.005';
 use subs 'bind', 'join', 'select', 'last', 'sort';
-use Scalar::Util qw(reftype);
+use Scalar::Util;
 use List::Util;
-use Carp qw(croak);
+use Carp;
 use Sub::Exporter -setup => {
     exports => [
         qw(id fst snd key assign),
@@ -12,7 +12,7 @@ use Sub::Exporter -setup => {
 };
 
 # TODO: contains?, firstIndex?, mapX, cache
-#       interspers, slice, zip, unzip, foldBack, any,
+#       interspers, slice, unzip, foldBack, any,
 #       forall, none, average, average_by,
 #       pairwise, windowed, transpose, item, chunk_by_size,
 #       one, minmax, minmax_by,
@@ -97,7 +97,7 @@ sub init($class, $count, $f) {
 
 # Seq->range_step : float -> float -> float -> Seq<float>
 sub range_step($class, $start, $step, $stop) {
-    croak '$step is 0. Will run forever.' if $step == 0;
+    Carp::croak '$step is 0. Will run forever.' if $step == 0;
 
     # Ascending order
     if ( $start <= $stop ) {
@@ -294,7 +294,7 @@ sub select($iter, $mapA, $mapB) {
     state $gen_input = sub($mapping) {
         my $hash;
         my $keys;
-        if ( not defined reftype $mapping) {
+        if ( not defined Scalar::Util::reftype $mapping) {
             if ( $mapping =~ m/\Aall\z/i ) {
                 return ['ALL'];
             }
@@ -302,19 +302,19 @@ sub select($iter, $mapA, $mapB) {
                 return ['NONE'];
             }
             else {
-                croak "When not arrayref or hashref must be either 'ALL' or 'NONE'";
+                Carp::croak "When not arrayref or hashref must be either 'ALL' or 'NONE'";
             }
         }
-        elsif ( reftype $mapping eq 'HASH' ) {
+        elsif ( Scalar::Util::reftype $mapping eq 'HASH' ) {
             $hash = $mapping;
             $keys = [ keys $mapping->%* ];
         }
-        elsif ( reftype $mapping eq 'ARRAY' ) {
+        elsif ( Scalar::Util::reftype $mapping eq 'ARRAY' ) {
             $hash = { map { $_ => $_ } @$mapping };
             $keys = $mapping;
         }
         else {
-            croak '$mappings must be tuple and either contain hashref or arrayref';
+            Carp::croak '$mappings must be tuple and either contain hashref or arrayref';
         }
 
         # Returns a discriminated union with three cases
