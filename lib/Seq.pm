@@ -11,7 +11,7 @@ use Sub::Exporter -setup => {
     ],
 };
 
-# TODO: contains?, firstIndex?, mapX, sort, cache
+# TODO: contains?, firstIndex?, mapX, cache
 #       interspers, slice, zip, unzip, foldBack, any,
 #       forall, none, average, average_by,
 #       pairwise, windowed, transpose, item, chunk_by_size,
@@ -523,12 +523,27 @@ sub rev($iter) {
 sub sort($seq, $comparer) {
     from_sub('Seq', sub {
         local ($a, $b);
-        my @array = CORE::sort { $comparer->($a, $b) } to_list($seq);
-        my $idx   = 0;
+        my @sorted = CORE::sort { $comparer->($a, $b) } to_list($seq);
+        my $idx    = 0;
 
         return sub {
-            return $array[$idx++];
+            return $sorted[$idx++];
         };
+    });
+}
+
+sub sort_by($seq, $comparer, $get_key) {
+    from_sub('Seq', sub {
+        local ($a, $b, $_);
+        my $idx    = 0;
+        my @sorted =
+            CORE::map  { $_->[1] }
+            CORE::sort { $comparer->($a->[0], $b->[0]) }
+            CORE::map  { [$get_key->($_), $_] } to_list($seq);
+
+        return sub {
+            return $sorted[$idx++];
+        }
     });
 }
 

@@ -356,6 +356,50 @@ is(
     [qw/A B C a b c/],
     'sort 2');
 
+# Schwartzian Transformation
+{
+    my $data = Seq->wrap(
+        { id => 1, char => 'W' },
+        { id => 4, char => 'L' },
+        { id => 5, char => 'D' },
+        { id => 2, char => 'O' },
+        { id => 3, char => 'R' },
+    );
+
+    is(
+        $data->sort_by(sub($x,$y) { $x <=> $y }, sub($x) { $x->{id} })->to_array,
+        [
+            { id => 1, char => 'W' },
+            { id => 2, char => 'O' },
+            { id => 3, char => 'R' },
+            { id => 4, char => 'L' },
+            { id => 5, char => 'D' },
+        ],
+        'sort_by 1');
+
+    is(
+        $data->sort_by(sub($x,$y) { $x cmp $y }, sub($x) { $x->{char} })->to_array,
+        [
+            { id => 5, char => 'D' },
+            { id => 4, char => 'L' },
+            { id => 2, char => 'O' },
+            { id => 3, char => 'R' },
+            { id => 1, char => 'W' },
+        ],
+        'sort_by 2');
+
+    is(
+        $data
+        ->map (sub($x)    { [$x->{id} ,  $x     ] })
+        ->sort(sub($x,$y) {  $x->[0] <=> $y->[0]  })
+        ->map (sub($x)    {  $x->[1]              })
+        ->to_array,
+
+        $data->sort_by(sub($x,$y) { $x <=> $y }, sub($x) { $x->{id} })->to_array,
+        'sort_by 3');
+}
+
+
 my $fs = Seq->wrap([1,"Hi"],[2,"Foo"],[3,"Bar"],[4,"Mug"]);
 is($fs->fsts->to_array, [1,2,3,4],            'fsts');
 is($fs->snds->to_array, [qw/Hi Foo Bar Mug/], 'snds');

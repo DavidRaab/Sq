@@ -1,5 +1,9 @@
 Revision history for Seq
 
+0.xxx   xxxxx
+        * Added: sort_by
+        * Renamed (min|max)_by_str -> (min|max)_str_by
+
 0.005   2023-11-22
         Added more Documentation
 
