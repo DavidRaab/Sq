@@ -272,9 +272,7 @@ sub join($seqA, $seqB, $predicate) {
 # merge : Seq<'a * 'b> -> ('a -> 'b -> 'c) -> Seq<'c>
 sub merge($iter, $merge) {
     bind($iter, sub($tuple) {
-        my ($a, $b) = @$tuple;
-        my $c = $merge->($a, $b);
-        return wrap(Seq => $c);
+        return wrap(Seq => $merge->($tuple->[0], $tuple->[1]));
     });
 }
 
