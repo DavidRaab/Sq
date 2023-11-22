@@ -54,9 +54,17 @@ is(
     $range->count,
     'fold with non-reftype');
 is(
-    $range->fold([], sub($array, $x) { push @$array, $x }),
+    $range->fold([], sub($array, $x) { push @$array, $x; $array }),
     $range->to_array,
-    'fold with reftype');
+    'fold with reftype 1');
+is(
+    $range->fold([], sub($array, $x) { [@$array, $x ] }),
+    $range->to_array,
+    'fold with reftype 2');
+is(
+    $range->fold_mut([], sub($array, $x) { push @$array, $x }),
+    $range->to_array,
+    'fold_mut');
 
 is($range->rev, check_isa('Seq'), 'rev return Seq');
 is($range->rev->to_array, [10,9,8,7,6,5,4,3,2,1], 'rev');
@@ -322,9 +330,10 @@ is(Seq->wrap([1,1], [1,2])->to_array, [[1,1],[1,2]], 'wrap with arrays');
 is(Seq->wrap([1,1])       ->to_array, [[1,1]],       'wrap with array');
 is(Seq->from_array([1,1]) ->to_array, [1,1],         'from_array vs. wrap');
 
-is($range->reduce($add), 55,      'reduce');
-is(Seq->empty->reduce($add), U(), 'reduce on empty');
-is(Seq->wrap(1)->reduce($add), 1, 'reduce on single element');
+is($range->reduce($add, undef),      55, 'reduce');
+is(Seq->empty->reduce($add, undef), U(), 'reduce on empty 1');
+is(Seq->empty->reduce($add, 0),       0, 'reduce on empty 2');
+is(Seq->wrap(1)->reduce($add, 0),     1, 'reduce on single element');
 
 is(Seq->empty->first(undef), U(), 'first on empty is undef');
 is(Seq->empty->first(0),       0, 'first with default value');

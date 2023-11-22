@@ -535,21 +535,20 @@ sub sort($seq, $comparer) {
 #- Converter
 #    Those are functions converting Seq to none Seq types
 
-sub fold($iter, $state, $folder) {
-    # when $state is reference, we assume $folder mutate $state
-    if ( ref $state ) {
-        iter($iter, sub($x) {
-            $folder->($state, $x);
-        });
-        return $state;
-    }
-    # otherwise $folder returns new $state
-    else {
-        iter($iter, sub($x) {
-            $state = $folder->($state, $x);
-        });
-        return $state;
-    }
+# fold : Seq<'a> -> 'State -> ('State -> 'a -> 'State) -> 'State
+sub fold($seq, $state, $folder) {
+    iter($seq, sub($x) {
+        $state = $folder->($state, $x);
+    });
+    return $state;
+}
+
+# fold : Seq<'a> -> 'State -> ('State -> 'a -> 'State) -> 'State
+sub fold_mut($seq, $state, $folder) {
+    iter($seq, sub($x) {
+        $folder->($state, $x);
+    });
+    return $state;
 }
 
 # Like fold, but without an initial state. When sequence is empty
@@ -557,11 +556,9 @@ sub fold($iter, $state, $folder) {
 # left to right to produce an output. Needs a sequence
 # with one item to work properly. It is encouraged to use `fold`
 # instead.
-sub reduce($seq, $reducer) {
-    my $first = first($seq, undef);
-
-    return fold(skip($seq, 1), $first, $reducer) if defined $first;
-    return undef;
+# reduce: Seq<'a> -> ('a -> 'a -> 'a) -> 'a
+sub reduce($seq, $reducer, $default) {
+    return fold(skip($seq, 1), first($seq, $default), $reducer);
 }
 
 sub first($seq, $default) {
@@ -579,9 +576,9 @@ sub last($seq, $default) {
     return $default;
 }
 
-sub to_array($iter) {
+sub to_array($seq) {
     state $folder = sub($array, $x) { push @$array, $x };
-    return fold($iter, [], $folder);
+    return fold_mut($seq, [], $folder);
 }
 
 sub to_list($iter) {

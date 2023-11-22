@@ -108,7 +108,7 @@ my $length_of_lines =
     $file->map(sub($line) { length $line });
 
 is($length_of_lines->to_array, [8, 5, 7], 'line lengths');
-is($length_of_lines->reduce($add),    20, 'characters in file');
+is($length_of_lines->reduce($add,0),  20, 'characters in file');
 
 
 #------ Create a temp-file for testing lazyiness
