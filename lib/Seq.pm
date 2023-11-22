@@ -121,6 +121,7 @@ sub range($class, $start, $stop) {
 }
 
 # turns all arguments into an sequence
+# Seq->wrap : List<'a> -> Seq<'a>
 sub wrap($class, @xs) {
     return unfold('Seq', 0, sub($idx) {
         return $xs[$idx], $idx+1;
@@ -128,11 +129,13 @@ sub wrap($class, @xs) {
 }
 
 # turns a list into a Seq - alias to wrap
+# Seq->from_list : List<'a> -> Seq<'a>
 sub from_list($class, @xs) {
     return wrap(Seq => @xs);
 }
 
 # turns an arrayref into a seq
+# Seq->from_array : Array<'a> -> Seq<'a>
 sub from_array($class, $xs) {
     return unfold('Seq', 0, sub($idx) {
         return $xs->[$idx], $idx+1;
@@ -159,6 +162,7 @@ sub from_hash($class, $hashref, $f) {
 }
 
 # Concatenates a list of Seq into a single Seq
+# Seq->concat : List<Seq<'a>> -> Seq<'a>
 sub concat($class, @seqs) {
     my $count = @seqs;
 
@@ -173,6 +177,7 @@ sub concat($class, @seqs) {
 #- Methods
 #    functions operating on Seq and returning another Seq
 
+# append : Seq<'a> -> Seq<'a> -> Seq<'a>
 sub append($seqA, $seqB) {
     from_sub('Seq', sub {
         my $exhaustedA = 0;
@@ -259,8 +264,8 @@ sub bind($seq, $f) {
 }
 
 # flatten : Seq<Seq<'a>> -> Seq<'a>
-sub flatten($iter) {
-    return bind($iter, \&id);
+sub flatten($seq) {
+    return bind($seq, \&id);
 }
 
 # flatten_array : Seq<Array<'a>> -> Seq<'a>
@@ -292,8 +297,8 @@ sub join($seqA, $seqB, $predicate) {
 # Expects a sequence of tuples. For example what join returns.
 # Provides a merging function to combine 'a and 'b into something new 'c
 # merge : Seq<'a * 'b> -> ('a -> 'b -> 'c) -> Seq<'c>
-sub merge($iter, $merge) {
-    bind($iter, sub($tuple) {
+sub merge($seq, $merge) {
+    bind($seq, sub($tuple) {
         return wrap(Seq => $merge->($tuple->[0], $tuple->[1]));
     });
 }
@@ -306,7 +311,7 @@ sub merge($iter, $merge) {
 # new hashname { id => 'some_id' }
 #
 # or an array of names that should be picked: [qw/id name/]
-sub select($iter, $mapA, $mapB) {
+sub select($seq, $mapA, $mapB) {
     # Transforms the different inputs a user can give into a
     # hash and an array containing the keys
     state $gen_input = sub($mapping) {
@@ -345,7 +350,7 @@ sub select($iter, $mapA, $mapB) {
     my $caseA = $gen_input->($mapA);
     my $caseB = $gen_input->($mapB);
 
-    merge($iter, sub($a, $b) {
+    merge($seq, sub($a, $b) {
         my %new_hash;
 
         # Merge keys from $seqA
@@ -385,9 +390,9 @@ sub select($iter, $mapA, $mapB) {
 }
 
 # combines map and filter
-sub choose($iter, $chooser) {
+sub choose($seq, $chooser) {
     from_sub('Seq', sub {
-        my $it = $iter->();
+        my $it = $seq->();
         my ($x, $optional);
         return sub {
             while ( defined($x = $it->()) ) {
@@ -399,13 +404,13 @@ sub choose($iter, $chooser) {
     });
 }
 
-sub mapi($iter, $f) {
-    return indexed($iter)->map($f);
+sub mapi($seq, $f) {
+    return indexed($seq)->map($f);
 }
 
-sub filter($iter, $predicate) {
+sub filter($seq, $predicate) {
     from_sub('Seq', sub {
-        my $it = $iter->();
+        my $it = $seq->();
         my $x;
         return sub {
             while ( defined($x = $it->()) ) {
@@ -416,9 +421,9 @@ sub filter($iter, $predicate) {
     });
 }
 
-sub take($iter, $amount) {
+sub take($seq, $amount) {
     from_sub('Seq', sub {
-        my $i             = $iter->();
+        my $i             = $seq->();
         my $returnedSoFar = 0;
         my $x;
         return sub {
@@ -428,9 +433,9 @@ sub take($iter, $amount) {
     });
 }
 
-sub skip($iter, $amount) {
+sub skip($seq, $amount) {
     from_sub('Seq', sub {
-        my $it = $iter->();
+        my $it = $seq->();
         my $count = 0;
         return sub {
             while ( $count++ < $amount ) {
@@ -441,16 +446,16 @@ sub skip($iter, $amount) {
     });
 }
 
-sub indexed($iter) {
+sub indexed($seq) {
     my $index = 0;
-    return $iter->map(sub($x) {
+    return $seq->map(sub($x) {
         return [$index++, $x];
     });
 }
 
-sub distinct_by($iter, $f) {
+sub distinct_by($seq, $f) {
     from_sub('Seq', sub {
-        my $it = $iter->();
+        my $it = $seq->();
         my %seen;
         my $x;
         return sub {
@@ -469,8 +474,8 @@ sub distinct_by($iter, $f) {
 # remove duplicates - it uses a hash to remember seen items
 # so it only works good when Seq contains Strings or Numbers.
 # Use distinct_by for other data.
-sub distinct($iter) {
-    return distinct_by($iter, \&id);
+sub distinct($seq) {
+    return distinct_by($seq, \&id);
 }
 
 # TODO: Instead of fsts and snds provide a function to pick the index of an array.
@@ -506,8 +511,8 @@ sub zip($seqA, $seqB) {
 #    functions that have side-effects or produce side-effects. Those are
 #    immediately executed, usually consuming all elements of Seq at once.
 
-sub iter($iter, $f) {
-    my $it = $iter->();
+sub iter($seq, $f) {
+    my $it = $seq->();
     my $x;
     while ( defined($x = $it->()) ) {
         $f->($x);
@@ -520,18 +525,18 @@ sub iter($iter, $f) {
 # all elements of a sequence.
 #
 # $seq->do(sub($x) { print Dumper($x) })->...
-sub do($iter, $f) {
-    my $it = $iter->();
+sub do($seq, $f) {
+    my $it = $seq->();
     my $x;
     while ( defined($x = $it->()) ) {
         $f->($x);
     }
-    return $iter;
+    return $seq;
 }
 
-sub rev($iter) {
+sub rev($seq) {
     from_sub('Seq', sub {
-        my @list = to_list($iter);
+        my @list = to_list($seq);
         return sub {
             pop @list;
         };
@@ -740,8 +745,8 @@ sub max_str_by($seq, $key, $default) {
     }) // $default;
 }
 
-sub str_join($iter, $sep) {
-    return CORE::join($sep, to_list($iter));
+sub str_join($seq, $sep) {
+    return CORE::join($sep, to_list($seq));
 }
 
 # Build a hash by providing a keying function. Later elements
