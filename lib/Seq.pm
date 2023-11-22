@@ -677,7 +677,7 @@ sub to_hash($iter, $get_key) {
 
 # Build a hash by providing a keying function. Values
 # are put into arrays to allow key with multiple values.
-sub group_by($iter, $get_key) {
+sub to_hash_of_array($iter, $get_key) {
     my %hash;
     iter($iter, sub($x) {
         push @{ $hash{$get_key->($x)} }, $x;

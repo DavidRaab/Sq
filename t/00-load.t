@@ -226,17 +226,17 @@ is(
         field 7 => "awesome";
         end;
     },
-    'group_by');
+    'to_hash');
 
 is(
-    Seq->wrap(qw/Hello World you are awesome/)->group_by(sub($value) { length($value) }),
+    Seq->wrap(qw/Hello World you are awesome/)->to_hash_of_array(sub($value) { length($value) }),
     hash {
         field 5 => array { item "Hello";   item "World" };
         field 3 => array { item "you";     item "are"   };
         field 7 => array { item "awesome";              };
         end;
     },
-    'group_by_duplicates');
+    'to_hash_of_array');
 
 is(Seq->wrap(1,1,2,3,1,4,5,4,3,2,6)->distinct->to_array, [1..6],              'distinct 1');
 is(Seq->wrap(1,2,3,2,23,123,4,12,2)->distinct->to_array, [1,2,3,23,123,4,12], 'distinct 2');
