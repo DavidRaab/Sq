@@ -462,4 +462,11 @@ is(
     ],
     'to_array_of_array');
 
+is($range->any (sub($x) { $x < 1   }), 0, 'any value smaller 0');
+is($range->any (sub($x) { $x < 2   }), 1, 'any value smaller 1');
+is($range->all (sub($x) { $x < 1   }), 0, 'all values smaller 1');
+is($range->all (sub($x) { $x < 11  }), 1, 'all values smaller 1');
+is($range->none(sub($x) { $x > 1   }), 0, 'none value greater 1');
+is($range->none(sub($x) { $x > 10  }), 1, 'none value greater 10');
+
 done_testing;

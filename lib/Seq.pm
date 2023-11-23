@@ -51,7 +51,7 @@ sub assign :prototype(&) {
 
 #-----------------------------------------------------------------------------#
 # CONSTRUCTORS                                                                #
-#                    Functions that create  sequences                         #
+#                    Functions that create sequences                          #
 #-----------------------------------------------------------------------------#
 
 # creates a sequence from a subroutine
@@ -820,6 +820,36 @@ sub find($seq, $default, $predicate) {
         return $x if $predicate->($x);
     }
     return $default;
+}
+
+# any : Seq<'a> -> ('a -> bool) -> bool
+sub any($seq, $predicate) {
+    my $it = $seq->();
+    my $x;
+    while ( defined($x = $it->()) ) {
+        return 1 if $predicate->($x);
+    }
+    return 0;
+}
+
+# all : Seq<'a> -> ('a -> bool) -> bool
+sub all($seq, $predicate) {
+    my $it = $seq->();
+    my $x;
+    while ( defined($x = $it->()) ) {
+        return 0 if not $predicate->($x);
+    }
+    return 1;
+}
+
+# none : Seq<'a> -> ('a -> bool) -> bool
+sub none($seq, $predicate) {
+    my $it = $seq->();
+    my $x;
+    while ( defined($x = $it->()) ) {
+        return 0 if $predicate->($x);
+    }
+    return 1;
 }
 
 1;
