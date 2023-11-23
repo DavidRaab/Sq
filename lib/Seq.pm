@@ -652,8 +652,10 @@ sub fold($seq, $state, $folder) {
     return $state;
 }
 
-# Same as fold. But when you mutate 'State and return 'State from
-# the lambda. You can use this function instead.
+# Same as fold. But when you want to mutate 'State and return 'State from
+# the lambda you can use this function instead. Is faster and creates
+# less garbage. Works best when $state is directely created with
+# the fold_mut call. Otherwise can have serious issues.
 #
 # fold : Seq<'a> -> 'State -> ('State -> 'a -> 'State) -> 'State
 sub fold_mut($seq, $state, $folder) {
@@ -673,12 +675,16 @@ sub reduce($seq, $reducer, $default) {
     return fold(skip($seq, 1), first($seq, $default), $reducer);
 }
 
+# Returns first element of seq or default
+#
 # first : Seq<'a> -> 'a -> 'a
 sub first($seq, $default) {
     my $first = $seq->()();
     return defined $first ? $first : $default;
 }
 
+# Returns last element of seq or default
+#
 # last : Seq<'a> -> 'a -> 'a
 sub last($seq, $default) {
     my $last;
