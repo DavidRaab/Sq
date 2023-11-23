@@ -5,7 +5,6 @@ lib/Design/FoldMut.pod
 lib/Design/MinMax.pod
 lib/Design/Wrap.md
 lib/Design/Wrap.pod
-lib/Examples/ReadingFromFile.md
 lib/Examples/ReadingFromFile.pod
 lib/Manual.md
 lib/Manual.pod
