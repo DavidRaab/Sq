@@ -12,13 +12,13 @@ use Sub::Exporter -setup => {
 };
 
 # TODO:
-#       cache, chain, any, all, none
+#       cache, chain
 #       regex_match, regex_replace
 #       foldBack, average, average_by,
 #       pairwise, windowed, transpose, chunk_by_size, unzip
 #       transpose, intesperse, slice
 #       minmax, minmax_by,
-#       scan, mapFold, except/exclude, pick
+#       scan, mapFold, except/exclude
 #       takeWhile, skipWhile, splitInto
 #     ? contains, firstIndex, mapX, on
 #
@@ -605,7 +605,6 @@ sub group_fold($seq, $get_state, $get_key, $folder) {
 }
 
 
-
 #-----------------------------------------------------------------------------#
 # SIDE-EFFECTS                                                                #
 #    functions that have side-effects or produce side-effects. Those are      #
@@ -850,6 +849,17 @@ sub none($seq, $predicate) {
         return 0 if $predicate->($x);
     }
     return 1;
+}
+
+# pick : Seq<'a> -> ('a -> option<'b>) -> 'b
+sub pick($seq, $default, $chooser) {
+    my $it = $seq->();
+    my $x;
+    while ( defined($x = $it->()) ) {
+        my $optional = $chooser->($x);
+        return $optional if defined $optional;
+    }
+    return $default;
 }
 
 1;

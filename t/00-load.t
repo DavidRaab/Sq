@@ -469,4 +469,21 @@ is($range->all (sub($x) { $x < 11  }), 1, 'all values smaller 1');
 is($range->none(sub($x) { $x > 1   }), 0, 'none value greater 1');
 is($range->none(sub($x) { $x > 10  }), 1, 'none value greater 10');
 
+is(
+    $range->pick(undef, sub($x) { $x*$x > 1000 ? $x*$x : undef }),
+    undef,
+    'pick squared element that is greater 1000');
+is(
+    $range->pick("NO", sub($x) { $x*$x > 1000 ? $x*$x : undef }),
+    "NO",
+    'pick squared element that is greater 1000');
+is(
+    $range->pick(undef, sub($x) { $x*$x > 50 ? $x*$x : undef }),
+    64,
+    'pick squared element that is greater 50');
+is(
+    $range->pick("NO", sub($x) { $x*$x > 50 ? $x*$x : undef }),
+    64,
+    'pick squared element that is greater 50');
+
 done_testing;
