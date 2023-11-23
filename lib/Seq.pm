@@ -11,12 +11,16 @@ use Sub::Exporter -setup => {
     ],
 };
 
-# TODO: contains?, firstIndex?, mapX, cache
-#       interspers, slice, unzip, foldBack, any,
-#       forall, none, average, average_by,
-#       pairwise, windowed, transpose, item, chunk_by_size,
-#       one, minmax, minmax_by,
+# TODO:
+#       cache, chain, any, all, none
 #       regex_match, regex_replace
+#       foldBack, average, average_by,
+#       pairwise, windowed, transpose, chunk_by_size, unzip
+#       transpose, intesperse, slice
+#       minmax, minmax_by,
+#       scan, mapFold, except/exclude, pick
+#       takeWhile, skipWhile, splitInto
+#     ? contains, firstIndex, mapX, on
 #
 # + ways to do regexes on strings
 # + using this module to scan file-system
@@ -43,8 +47,12 @@ sub assign :prototype(&) {
     return $_[0]->();
 }
 
-#- Constructurs
-#    Those are functions that create Seq types
+
+
+#-----------------------------------------------------------------------------#
+# CONSTRUCTORS                                                                #
+#                    Functions that create  sequences                         #
+#-----------------------------------------------------------------------------#
 
 # creates a sequence from a subroutine
 sub from_sub($class, $f) {
@@ -182,8 +190,12 @@ sub concat($class, @seqs) {
     return List::Util::reduce { append($a, $b) } @seqs;
 }
 
-#- Methods
-#    functions operating on Seq and returning another Seq
+
+
+#----------------------------------------------------------------------------#
+# METHODS                                                                    #
+#          functions operating on Seq and returning another Seq              #
+#----------------------------------------------------------------------------#
 
 # append : Seq<'a> -> Seq<'a> -> Seq<'a>
 sub append($seqA, $seqB) {
@@ -515,30 +527,6 @@ sub zip($seqA, $seqB) {
     });
 }
 
-#- Side-Effects
-#    functions that have side-effects or produce side-effects. Those are
-#    immediately executed, usually consuming all elements of Seq at once.
-
-# iter : Seq<'a> -> ('a -> unit) -> unit
-sub iter($seq, $f) {
-    my $it = $seq->();
-    my $x;
-    $f->($x) while defined($x = $it->());
-    return;
-}
-
-# Similar to iter(). But returns the $seq as-is.
-# Useful for doing something between a chain. For example printing
-# all elements of a sequence.
-#
-# $seq->do(sub($x) { print Dumper($x) })->...
-sub do($seq, $f) {
-    my $it = $seq->();
-    my $x;
-    $f->($x) while defined($x = $it->());
-    return $seq;
-}
-
 # rev : Seq<'a> -> Seq<'a>
 sub rev($seq) {
     from_sub('Seq', sub {
@@ -548,6 +536,7 @@ sub rev($seq) {
         };
     });
 }
+
 
 # sort : Seq<'a> -> ('a -> 'a -> int) -> Seq<'a>
 sub sort($seq, $comparer) {
@@ -615,8 +604,40 @@ sub group_fold($seq, $get_state, $get_key, $folder) {
     });
 }
 
-#- Converter
-#    Those are functions converting Seq to none Seq types
+
+
+#-----------------------------------------------------------------------------#
+# SIDE-EFFECTS                                                                #
+#    functions that have side-effects or produce side-effects. Those are      #
+#    immediately executed, usually consuming all elements of Seq at once.     #
+#-----------------------------------------------------------------------------#
+
+# iter : Seq<'a> -> ('a -> unit) -> unit
+sub iter($seq, $f) {
+    my $it = $seq->();
+    my $x;
+    $f->($x) while defined($x = $it->());
+    return;
+}
+
+# Similar to iter(). But returns the $seq as-is.
+# Useful for doing something between a chain. For example printing
+# all elements of a sequence.
+#
+# $seq->do(sub($x) { print Dumper($x) })->...
+sub do($seq, $f) {
+    my $it = $seq->();
+    my $x;
+    $f->($x) while defined($x = $it->());
+    return $seq;
+}
+
+
+
+#----------------------------------------------------------------------#
+# CONVERTER                                                            #
+#         Those are functions converting Seq to none Seq types         #
+#----------------------------------------------------------------------#
 
 # fold is like a foreach-loop. You iterate through all items generating
 # a new 'State. The $folder is passed the latest
