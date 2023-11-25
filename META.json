@@ -35,7 +35,7 @@
    "provides" : {
       "Seq" : {
          "file" : "lib/Seq.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "unstable",
@@ -44,6 +44,6 @@
          "http://www.opensource.org/licenses/mit-license.php"
       ]
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }
