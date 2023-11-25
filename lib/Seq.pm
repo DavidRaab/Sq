@@ -616,6 +616,11 @@ sub group_fold($seq, $get_state, $get_key, $folder) {
     });
 }
 
+# cache : Seq<'a> -> Seq<'a>
+sub cache($seq) {
+    return $seq;
+}
+
 
 #-----------------------------------------------------------------------------#
 # SIDE-EFFECTS                                                                #
