@@ -45,4 +45,29 @@ is($calls,                44, '$calls now 44');
 is($cache->to_array, [1..10], 'call cached range again');
 is($calls,                44, '$calls stay at 44');
 
+
+#--- Test cache with sort
+
+# sort is an expensive call. But still, in normal operation on a sequence
+# you expect that it always sorts again. Especially when it operates on
+# mutable state. You want the latest updated data. But when this is not
+# needed, you cache the result after a sort().
+
+my @data = (3,10,67,123,21,2,6,8578,34);
+
+# genereates a sequence from mutable data storage. when @data changes
+# $sorted will see latest values, while the cached variant dont update anymore
+my $sorted       = Seq->from_array(\@data)->sort(sub($x,$y) { $x <=> $y });
+my $sorted_cache = $sorted->cache;
+
+is($sorted->to_array,       $sorted_cache->to_array,      'must be the same');
+is($sorted->to_array,       [2,3,6,10,21,34,67,123,8578], 'check sorted');
+is($sorted_cache->to_array, [2,3,6,10,21,34,67,123,8578], 'check sorted cache');
+
+# add value to mutable array
+push @data, 42;
+
+is($sorted->to_array,       [2,3,6,10,21,34,42,67,123,8578], 'sorted sees updated value');
+is($sorted_cache->to_array, [2,3,6,10,21,34,67,123,8578],    'but sorted_cache stays the same');
+
 done_testing;
