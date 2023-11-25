@@ -14,7 +14,7 @@ my $double  = sub($x)    { $x * 2      };
 my $square  = sub($x)    { $x * $x     };
 my $is_even = sub($x)    { $x % 2 == 0 };
 
-#----------
+#---------- Check if cache really caches the iterator
 
 my $calls  = 0;
 my $fromto = sub($start, $stop) {
@@ -30,19 +30,19 @@ my $fromto = sub($start, $stop) {
 my $range = $fromto->(1,10);
 my $cache = $range->cache;
 
-is($calls,                 0, 'calls start at 0');
+is($calls,                11, '$calls at 11 because cache executed $range once');
 is($range->to_array, [1..10], 'generate range');
-is($calls,                11, '$calls now 11');
-is($range->to_array, [1..10], 'generate range again');
 is($calls,                22, '$calls now 22');
-
-is($cache->to_array, [1..10], 'cache same result');
-is($calls,                22, 'but calls did not get called anymore');
-
-is($range->to_array, [1..10], 'But $range increases again');
+is($range->to_array, [1..10], 'generate range again');
 is($calls,                33, '$calls now 33');
 
+is($cache->to_array, [1..10], 'cache same result');
+is($calls,                33, 'but calls did not get called anymore');
+
+is($range->to_array, [1..10], 'But $range increases again');
+is($calls,                44, '$calls now 44');
+
 is($cache->to_array, [1..10], 'call cached range again');
-is($calls,                22, '$calls stay at 33');
+is($calls,                44, '$calls stay at 44');
 
 done_testing;

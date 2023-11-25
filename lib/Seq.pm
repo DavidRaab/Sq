@@ -618,7 +618,15 @@ sub group_fold($seq, $get_state, $get_key, $folder) {
 
 # cache : Seq<'a> -> Seq<'a>
 sub cache($seq) {
-    return $seq;
+    my $array = to_array($seq);
+    my $count = $array->@*;
+
+    from_sub(Seq => sub {
+        my $current = 0;
+        return sub {
+            return $array->[$current++];
+        }
+    });
 }
 
 
