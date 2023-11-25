@@ -45,7 +45,7 @@ is($calls,                33, 'but calls did not get called anymore');
 is($range->to_array, [1..10], 'But $range increases again');
 is($calls,                44, '$calls now 44');
 
-is($cache->to_array, [1..10], 'call cached range again');
+is($cache->to_array, [1..10], 'check cache once again');
 is($calls,                44, '$calls stay at 44');
 
 
