@@ -30,6 +30,9 @@ my $fromto = sub($start, $stop) {
 my $range = $fromto->(1,10);
 my $cache = $range->cache;
 
+# there are 11 calls to the iterator. 10 calls to get 10 values.
+# And the 11 call returns undef
+
 is($calls,                11, '$calls at 11 because cache executed $range once');
 is($range->to_array, [1..10], 'generate range');
 is($calls,                22, '$calls now 22');
