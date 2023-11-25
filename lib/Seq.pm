@@ -13,7 +13,7 @@ use Sub::Exporter -setup => {
 
 # TODO:
 #       chain
-#       regex_match, regex_replace
+#       regex_replace
 #       extract(predicate, predicate)
 #       foldBack, average, average_by,
 #       pairwise, windowed, transpose, chunk_by_size, unzip
