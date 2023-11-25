@@ -31,9 +31,10 @@ $usage->die if $opt->help;
 # get the maximum id from test-files so far
 my $maximum_id =
     Seq
-    ->wrap(   path('t')->children )
-    ->map(    sub($x) { $x->basename })
-    ->choose( sub($x) { $x =~ m/\A(\d+) .* \.t\z/xms ? $1 : undef } )
+    ->wrap( path('t')->children )
+    ->map(  sub($x) { $x->basename })
+    ->regex_match( qr/\A(\d+) .* \.t\z/xms, [1])
+    ->fsts
     ->max(0);
 
 # Load DATA into array
