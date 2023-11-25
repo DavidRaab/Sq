@@ -16,7 +16,7 @@ use Sub::Exporter -setup => {
 #       regex_replace
 #       extract(predicate, predicate)
 #       foldBack, average, average_by,
-#       pairwise, windowed, transpose, chunk_by_size, unzip
+#       pairwise, transpose, chunk_by_size, unzip
 #       transpose, intesperse, slice
 #       minmax, minmax_by,
 #       scan, mapFold, except/exclude
@@ -670,6 +670,27 @@ sub regex_match($seq, $regex, $picks) {
                 return \@matches;
             }
             goto NEXT_LINE;
+        }
+    });
+}
+
+# TODO: Really Seq<Array<'a>> as return value? Seq<Seq<'a>> instead?
+# windowed : Seq<'a> -> int -> Seq<Array<'a>>
+sub windowed($seq, $window_size) {
+    return empty('Seq') if $window_size <= 0;
+    from_sub(Seq => sub {
+        my $array      = to_array($seq);
+        my $last_index = @$array - ($window_size-1);
+        my $index      = 0;
+
+        return sub {
+            return undef if $index >= $last_index;
+            my @return = ( $array->[$index] );
+            for my $i ( 1 .. ($window_size-1) ) {
+                push @return, $array->[$index+$i];
+            }
+            $index++;
+            return \@return;
         }
     });
 }
