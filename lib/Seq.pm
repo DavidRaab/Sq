@@ -409,7 +409,7 @@ sub select($seq, $mapA, $mapB) {
     });
 }
 
-# combines map and filter
+# choose : Seq<'a> -> ('a -> option<'b>) -> Seq<'b>
 sub choose($seq, $chooser) {
     from_sub('Seq', sub {
         my $it = $seq->();
@@ -424,10 +424,12 @@ sub choose($seq, $chooser) {
     });
 }
 
+# mapi : Seq<'a> -> (int -> 'a -> 'b) -> Seq<'b>
 sub mapi($seq, $f) {
     return Seq::map(indexed($seq), $f);
 }
 
+# filter : Seq<'a> -> ('a -> bool) -> Seq<'a>
 sub filter($seq, $predicate) {
     from_sub('Seq', sub {
         my $it = $seq->();
@@ -441,6 +443,7 @@ sub filter($seq, $predicate) {
     });
 }
 
+# take : Seq<'a> -> int -> Seq<'a>
 sub take($seq, $amount) {
     from_sub('Seq', sub {
         my $i             = $seq->();
@@ -453,6 +456,7 @@ sub take($seq, $amount) {
     });
 }
 
+# skip : Seq<'a> -> int -> Seq<'a>
 sub skip($seq, $amount) {
     from_sub('Seq', sub {
         my $it = $seq->();
@@ -466,6 +470,7 @@ sub skip($seq, $amount) {
     });
 }
 
+# indexed : Seq<'a> -> Seq<int * 'a>
 sub indexed($seq) {
     my $index = 0;
     return Seq::map($seq, sub($x) {
@@ -473,8 +478,9 @@ sub indexed($seq) {
     });
 }
 
+# distinct_by : Seq<'a> -> ('a -> 'Key) -> Seq<'a>
 sub distinct_by($seq, $f) {
-    from_sub('Seq', sub {
+    from_sub(Seq => sub {
         my $it = $seq->();
         my %seen;
         my $x;
@@ -494,6 +500,8 @@ sub distinct_by($seq, $f) {
 # remove duplicates - it uses a hash to remember seen items
 # so it only works good when Seq contains Strings or Numbers.
 # Use distinct_by for other data.
+#
+# distinct : Seq<'a> -> Seq<'a>
 sub distinct($seq) {
     return distinct_by($seq, \&id);
 }
@@ -502,15 +510,19 @@ sub distinct($seq) {
 #       Maybe even a function to pick and re-order multiple elements
 #         Like: ->pick([3,1,5])
 
+# fsts : Seq<'a * 'b> -> Seq<'a>
 sub fsts($seq) {
     return Seq::map($seq, sub ($x) { $x->[0] });
 }
 
+# snds : Seq<'a * 'b> -> Seq<'b>
 sub snds($seq) {
     return Seq::map($seq, sub ($x) { $x->[1] });
 }
 
 # TODO: zip can handle a list of sequences
+#
+# zip : Seq<'a> -> Seq<'b> -> Seq<'a * 'b>
 sub zip($seqA, $seqB) {
     from_sub('Seq', sub {
         my $itA = $seqA->();
@@ -624,6 +636,8 @@ sub iter($seq, $f) {
 # all elements of a sequence.
 #
 # $seq->do(sub($x) { print Dumper($x) })->...
+#
+# do : Seq<'a> -> ('a -> unit) -> Seq<'a>
 sub do($seq, $f) {
     my $it = $seq->();
     my $x;
@@ -653,11 +667,11 @@ sub fold($seq, $state, $folder) {
 }
 
 # Same as fold. But when you want to mutate 'State and return 'State from
-# the lambda you can use this function instead. Is faster and creates
+# the lambda you can use this function instead. Its faster and creates
 # less garbage. Works best when $state is directely created with
 # the fold_mut call. Otherwise can have serious issues.
 #
-# fold : Seq<'a> -> 'State -> ('State -> 'a -> 'State) -> 'State
+# fold_mut : Seq<'a> -> 'State -> ('State -> 'a -> 'State) -> 'State
 sub fold_mut($seq, $state, $folder) {
     iter($seq, sub($x) {
         $folder->($state, $x);
@@ -725,10 +739,13 @@ sub sum_by($seq, $f) {
 
 # returns the min value or undef on empty sequence
 # min value is compared with numerical <
+#
+# min : Seq<float> -> float -> float
 sub min($seq, $default) {
     min_by($seq, \&id, $default);
 }
 
+# min_by : Seq<a> -> ('a -> float) -> float -> float
 sub min_by($seq, $key, $default) {
     return fold($seq, undef, sub($min, $x) {
         my $value = $key->($x);
@@ -738,12 +755,15 @@ sub min_by($seq, $key, $default) {
     }) // $default;
 }
 
-# returns the min value or undef on empty sequence
+# returns the min value or $default on empty sequence
 # min value is compared using lt
+#
+# min_str : Seq<string> -> string -> string
 sub min_str($seq, $default) {
     min_str_by($seq, \&id, $default);
 }
 
+# min_str_by : Seq<'a> -> ('a -> string) -> string -> 'a
 sub min_str_by($seq, $key, $default) {
     return fold($seq, undef, sub($min, $x) {
         my $value = $key->($x);
@@ -753,11 +773,14 @@ sub min_str_by($seq, $key, $default) {
     }) // $default;
 }
 
-# returns the max value or undef when sequence is empty
+# returns the max value or $default when sequence is empty
+#
+# max : Seq<float> -> float -> float
 sub max($seq, $default) {
     max_by($seq, \&id, $default);
 }
 
+# max_by : Seq<'a> -> ('a -> float) -> float -> float
 sub max_by($seq, $key, $default) {
     return fold($seq, undef, sub($max, $x) {
         my $value = $key->($x);
@@ -767,10 +790,12 @@ sub max_by($seq, $key, $default) {
     }) // $default;
 }
 
+# max_str : Seq<string> -> string -> string
 sub max_str($seq, $default) {
     max_str_by($seq, \&id, $default);
 }
 
+# max_str_by : Seq<'a> -> ('a -> string) -> string -> string
 sub max_str_by($seq, $key, $default) {
     return fold($seq, undef, sub($max, $x) {
         my $value = $key->($x);
@@ -780,12 +805,15 @@ sub max_str_by($seq, $key, $default) {
     }) // $default;
 }
 
+# str_join : Seq<string> -> string -> string
 sub str_join($seq, $sep) {
     return CORE::join($sep, to_list($seq));
 }
 
 # Build a hash by providing a keying function. Later elements
 # in the sequence overwrite previous one.
+#
+# to_hash : Seq<'a> -> ('a -> 'Key) -> Hash<'Key * 'a>
 sub to_hash($seq, $get_key) {
     my %hash;
     iter($seq, sub($x) {
