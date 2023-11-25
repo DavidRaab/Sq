@@ -630,6 +630,50 @@ sub cache($seq) {
     });
 }
 
+# regex_match : Seq<string> -> Regex -> Array<int> -> Seq<Array<string>>
+sub regex_match($seq, $regex, $picks) {
+    from_sub(Seq => sub {
+        my $it = $seq->();
+        return sub {
+            NEXT_LINE:
+            my $str = $it->();
+            return undef if not defined $str;
+
+            if ( $str =~ $regex ) {
+                my @matches;
+                for my $i ( @$picks ) {
+                    if    ( $i ==  0 ) { push @matches,  $0 }
+                    elsif ( $i ==  1 ) { push @matches,  $1 }
+                    elsif ( $i ==  2 ) { push @matches,  $2 }
+                    elsif ( $i ==  3 ) { push @matches,  $3 }
+                    elsif ( $i ==  4 ) { push @matches,  $4 }
+                    elsif ( $i ==  5 ) { push @matches,  $5 }
+                    elsif ( $i ==  6 ) { push @matches,  $6 }
+                    elsif ( $i ==  7 ) { push @matches,  $7 }
+                    elsif ( $i ==  8 ) { push @matches,  $8 }
+                    elsif ( $i ==  9 ) { push @matches,  $9 }
+                    elsif ( $i == 10 ) { push @matches, $10 }
+                    elsif ( $i == 11 ) { push @matches, $11 }
+                    elsif ( $i == 12 ) { push @matches, $12 }
+                    elsif ( $i == 13 ) { push @matches, $13 }
+                    elsif ( $i == 14 ) { push @matches, $14 }
+                    elsif ( $i == 15 ) { push @matches, $15 }
+                    elsif ( $i == 16 ) { push @matches, $16 }
+                    elsif ( $i == 17 ) { push @matches, $17 }
+                    elsif ( $i == 18 ) { push @matches, $18 }
+                    elsif ( $i == 19 ) { push @matches, $19 }
+                    elsif ( $i == 20 ) { push @matches, $20 }
+                    else {
+                        warn "regex_match can only handle picks from 0-20\n";
+                    }
+                }
+                return \@matches;
+            }
+            goto NEXT_LINE;
+        }
+    });
+}
+
 
 #-----------------------------------------------------------------------------#
 # SIDE-EFFECTS                                                                #

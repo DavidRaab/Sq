@@ -486,4 +486,44 @@ is(
     64,
     'pick squared element that is greater 50');
 
+# regex_match
+{
+    my $lines = Seq->wrap(
+        '2023-11-25T15:10:00',
+        '2023-11-20T10:05:29',
+        'xxxx-xx-xxT00:00:00',
+        '1900-01-01T00:00:01',
+        '12345678901234567890',
+    );
+
+    my $matches = $lines->regex_match(qr/
+        \A
+            (\d\d\d\d) - (\d\d) - (\d\d)  # Date
+        T                                 # T
+            (\d\d) : (\d\d) : (\d\d)      # Time
+        \z/xms, [3,2,1,4,5,6]);
+
+    is(
+        $matches->to_array,
+        [
+            [qw/25 11 2023 15 10 00/],
+            [qw/20 11 2023 10 05 29/],
+            [qw/01 01 1900 00 00 01/],
+        ],
+        'regex_match');
+
+    is(
+        $lines->regex_match(qr/\A
+            (.)(.)(.)(.)
+            (.)(.)(.)(.)
+            (.)(.)(.)(.)
+            (.)(.)(.)(.)
+            (.)(.)(.)(.)
+        \z/xms, [1..20])->to_array,
+        [
+            [1 .. 9, 0, 1 .. 9, 0],
+        ],
+        'check 20 matches');
+}
+
 done_testing;
