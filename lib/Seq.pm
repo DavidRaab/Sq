@@ -12,7 +12,7 @@ use Sub::Exporter -setup => {
 };
 
 # TODO:
-#       cache, chain
+#       chain
 #       regex_match, regex_replace
 #       foldBack, average, average_by,
 #       pairwise, windowed, transpose, chunk_by_size, unzip
