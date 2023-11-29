@@ -745,6 +745,29 @@ sub intersperse($seq, $sep) {
     });
 }
 
+# repeats a sequence to infinity
+sub infinity($seq) {
+    from_sub(Seq => sub {
+        my $it = $seq->();
+        my $x  = $it->();
+        return sub {
+            if ( defined $x ) {
+                my $tmp = $x;
+                $x = $it->();
+                if ( not defined $x ) {
+                    $it = $seq->();
+                    $x  = $it->();
+                }
+                return $tmp;
+            }
+            else {
+                return undef;
+            }
+        }
+    });
+}
+
+
 
 #-----------------------------------------------------------------------------#
 # SIDE-EFFECTS                                                                #
