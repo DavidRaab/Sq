@@ -17,7 +17,7 @@ use Sub::Exporter -setup => {
 #       extract(predicate, predicate)
 #       foldBack, average, average_by,
 #       pairwise, transpose, chunk_by_size, unzip
-#       transpose, intesperse, slice
+#       transpose, slice
 #       minmax, minmax_by,
 #       scan, mapFold, except/exclude
 #       takeWhile, skipWhile, splitInto
@@ -767,6 +767,30 @@ sub infinity($seq) {
     });
 }
 
+
+sub repeat($seq, $count) {
+    from_sub(Seq => sub {
+        my $count = $count;
+        my $it    = $seq->();
+        my $x     = $it->();
+        return sub {
+            return undef if $count <= 0;
+            if ( defined $x ) {
+                my $tmp = $x;
+                $x = $it->();
+                if ( not defined $x ) {
+                    $count--;
+                    $it = $seq->();
+                    $x  = $it->();
+                }
+                return $tmp;
+            }
+            else {
+                return undef;
+            }
+        }
+    });
+}
 
 
 #-----------------------------------------------------------------------------#

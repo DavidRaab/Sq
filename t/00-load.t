@@ -557,28 +557,21 @@ is(Seq->always(5)->take(0) ->to_array, [],         'always 2');
 is(Seq->always(5)->take(1) ->to_array, [5],        'always 3');
 is(Seq->always(5)->take(10)->to_array, [(5) x 10], 'always 4');
 
-is(Seq->wrap(5)->infinity->take(0)->to_array, [],          'infinity 1');
-is(Seq->wrap(5)->infinity->take(1)->to_array, [5],         'infinity 2');
-is(Seq->wrap(5)->infinity->take(5)->to_array, [5,5,5,5,5], 'infinity 3');
+is(Seq->wrap(5)    ->infinity->take(0) ->to_array, [],                    'infinity 1');
+is(Seq->wrap(5)    ->infinity->take(1) ->to_array, [5],                   'infinity 2');
+is(Seq->wrap(5)    ->infinity->take(5) ->to_array, [5,5,5,5,5],           'infinity 3');
+is(Seq->wrap(1,2,3)->infinity->take(3) ->to_array, [1,2,3],               'infinity 4');
+is(Seq->wrap(1,2,3)->infinity->take(6) ->to_array, [1,2,3,1,2,3],         'infinity 5');
+is(Seq->wrap(1,2,3)->infinity->take(9) ->to_array, [1,2,3,1,2,3,1,2,3],   'infinity 6');
+is(Seq->wrap(1,2,3)->infinity->take(10)->to_array, [1,2,3,1,2,3,1,2,3,1], 'infinity 7');
 
-is(
-    Seq->wrap(1,2,3)->infinity->take(3)->to_array,
-    [1,2,3],
-    'infinity 4');
 
-is(
-    Seq->wrap(1,2,3)->infinity->take(6)->to_array,
-    [1,2,3,1,2,3],
-    'infinity 5');
+is(Seq->wrap(5)    ->repeat(-1)->to_array, [],            'repeat 1');
+is(Seq->wrap(5)    ->repeat(0) ->to_array, [],            'repeat 2');
+is(Seq->wrap(5)    ->repeat(1) ->to_array, [5],           'repeat 3');
+is(Seq->wrap(5)    ->repeat(5) ->to_array, [5,5,5,5,5],   'repeat 4');
+is(Seq->wrap(1,2,3)->repeat(2) ->to_array, [1,2,3,1,2,3], 'repeat 5');
+is(Seq->wrap(1,2,3)->repeat(3) ->to_array, [(1,2,3) x 3], 'repeat 6');
 
-is(
-    Seq->wrap(1,2,3)->infinity->take(9)->to_array,
-    [1,2,3,1,2,3,1,2,3],
-    'infinity 6');
-
-is(
-    Seq->wrap(1,2,3)->infinity->take(10)->to_array,
-    [1,2,3,1,2,3,1,2,3,1],
-    'infinity 7');
 
 done_testing;
