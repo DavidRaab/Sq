@@ -746,6 +746,8 @@ sub intersperse($seq, $sep) {
 }
 
 # repeats a sequence to infinity
+#
+# infinity : Seq<'a> -> Seq<'a>
 sub infinity($seq) {
     from_sub(Seq => sub {
         my $it = $seq->();
@@ -767,7 +769,9 @@ sub infinity($seq) {
     });
 }
 
-
+# Repeats a whole sequence a given amount
+#
+# repeat : Seq<'a> -> Seq<'a>
 sub repeat($seq, $count) {
     from_sub(Seq => sub {
         my $count = $count;
