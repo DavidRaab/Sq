@@ -95,6 +95,14 @@ is($range->sum, $range->rev->sum, 'sum 2');
 }
 
 is(
+    Seq::zip(
+        Seq->range(0, 1_000_000),
+        Seq->wrap(qw/A B C D E F/),
+    )->to_array,
+    Seq->wrap(qw/A B C D E F/)->indexed->to_array,
+    'indexed');
+
+is(
     $range->take(3)->indexed->to_array,
     [[0,1], [1,2], [2,3]],
     'take->indexed');
@@ -572,6 +580,5 @@ is(Seq->wrap(5)    ->repeat(1) ->to_array, [5],           'repeat 3');
 is(Seq->wrap(5)    ->repeat(5) ->to_array, [5,5,5,5,5],   'repeat 4');
 is(Seq->wrap(1,2,3)->repeat(2) ->to_array, [1,2,3,1,2,3], 'repeat 5');
 is(Seq->wrap(1,2,3)->repeat(3) ->to_array, [(1,2,3) x 3], 'repeat 6');
-
 
 done_testing;
