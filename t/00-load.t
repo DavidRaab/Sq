@@ -614,6 +614,26 @@ is(
         [2,'A'],[1,'B'],[2,'C'],[1,'D'],[2,'E'],
         [1,'A'],[2,'B'],
     ],
-    'zip no inifinites');
+    'zip on infinities');
+
+is(
+    Seq::zip(
+        $range->infinity,
+        $range->rev->infinity,
+    )->take(15)->to_array,
+    [
+        [1,10],[2,9],[3,8],[4,7],[5,6],[6,5],[7,4],[8,3],[9,2],[10,1],
+        [1,10],[2,9],[3,8],[4,7],[5,6],
+    ],
+    'zip on ifinity with reverse');
+
+is(
+    Seq::zip(
+        $range->infinity,
+        $range->rev->infinity,
+    )->take(15)->map(sub($tuple) { fst($tuple) + snd($tuple) })->to_array,
+
+    Seq->always(11)->take(15)->to_array,
+    'zip,infinity,rev,take,map,always');
 
 done_testing;
