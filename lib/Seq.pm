@@ -695,6 +695,56 @@ sub windowed($seq, $window_size) {
     });
 }
 
+# puts a value between all other elements
+#
+# intersperse : Seq<'a> -> 'a -> Seq<'a>
+sub intersperse($seq, $sep) {
+    from_sub(Seq => sub() {
+        my $it = $seq->();
+        my $x  = $it->();
+        my $y  = $it->();
+
+        # 0 = return $x, and advance $it forward
+        # 1 = return $sep
+        # 2 = return $x, and finish
+        # 3 = finish
+        my $state; {
+            if ( defined $x ) {
+                if ( defined $y ) {
+                    $state = 0;
+                }
+                else {
+                    $state = 2;
+                }
+            }
+            else {
+                $state = 3;
+            }
+        }
+        return sub {
+            if ( $state == 0 ) {
+                my $ret = $x;
+                $x      = $y;
+                $y      = $it->();
+                $state  = 1;
+                return $ret;
+            }
+            elsif ( $state == 1 ) {
+                $state = defined $y ? 0 : 2;
+                return $sep;
+            }
+            elsif ( $state == 2 ) {
+                $state = 3;
+                return $x;
+            }
+            else {
+                return undef;
+            }
+        }
+    });
+}
+
+
 
 #-----------------------------------------------------------------------------#
 # SIDE-EFFECTS                                                                #

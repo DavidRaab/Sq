@@ -543,4 +543,9 @@ is(
 is($range->windowed(10)->to_array, [ [1,2,3,4,5,6,7,8,9,10] ], 'windowed 10');
 is($range->windowed(11)->to_array, Seq->empty->to_array,       'windowed 11');
 
+is(Seq->wrap()     ->intersperse(0)->to_array, [],          'intersperse 1');
+is(Seq->wrap(1)    ->intersperse(0)->to_array, [1],         'intersperse 2');
+is(Seq->wrap(1,2)  ->intersperse(0)->to_array, [1,0,2],     'intersperse 3');
+is(Seq->wrap(1,2,3)->intersperse(0)->to_array, [1,0,2,0,3], 'intersperse 4');
+
 done_testing;
