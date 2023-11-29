@@ -710,12 +710,7 @@ sub intersperse($seq, $sep) {
         # 3 = finish
         my $state; {
             if ( defined $x ) {
-                if ( defined $y ) {
-                    $state = 0;
-                }
-                else {
-                    $state = 2;
-                }
+                $state = defined $y ? 0 : 2;
             }
             else {
                 $state = 3;

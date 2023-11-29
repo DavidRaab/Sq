@@ -547,5 +547,9 @@ is(Seq->wrap()     ->intersperse(0)->to_array, [],          'intersperse 1');
 is(Seq->wrap(1)    ->intersperse(0)->to_array, [1],         'intersperse 2');
 is(Seq->wrap(1,2)  ->intersperse(0)->to_array, [1,0,2],     'intersperse 3');
 is(Seq->wrap(1,2,3)->intersperse(0)->to_array, [1,0,2,0,3], 'intersperse 4');
+is(
+    Seq->range(1,10)->intersperse(0)->to_array,
+    [1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10],
+    'intersperse 5');
 
 done_testing;
