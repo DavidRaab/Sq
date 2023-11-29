@@ -72,12 +72,18 @@ sub from_sub($class, $f) {
     }, 'Seq');
 }
 
-# always an empty sequence
-sub empty($class) {
-    return from_sub('Seq', sub {
-        return sub { undef };
+# always return $x
+sub always($class, $x) {
+    return from_sub(Seq => sub {
+        return sub { return $x }
     });
 }
+
+# empty sequence
+sub empty($class) {
+    return always(Seq => undef);
+}
+
 
 # TODO: When $state is a reference. Same handling as in fold?
 #
@@ -738,7 +744,6 @@ sub intersperse($seq, $sep) {
         }
     });
 }
-
 
 
 #-----------------------------------------------------------------------------#

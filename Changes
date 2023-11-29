@@ -1,7 +1,8 @@
 Revision history for Seq
 
 0.xxx   xxxxx
-        * Added: sort_by, any, all, none, pick, cache, regex_match, windowed
+        * Added: sort_by, any, all, none, pick, cache, regex_match, windowed,
+                 intersperse, always
         * Renamed (min|max)_by_str -> (min|max)_str_by
 
 0.005   2023-11-22

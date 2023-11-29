@@ -552,4 +552,9 @@ is(
     [1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10],
     'intersperse 5');
 
+is(Seq->always(5)->take(-1)->to_array, [],         'always 1');
+is(Seq->always(5)->take(0) ->to_array, [],         'always 2');
+is(Seq->always(5)->take(1) ->to_array, [5],        'always 3');
+is(Seq->always(5)->take(10)->to_array, [(5) x 10], 'always 4');
+
 done_testing;
