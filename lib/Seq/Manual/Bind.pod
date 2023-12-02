@@ -1,0 +1,16 @@
+package Seq::Manual::Bind;
+
+=head1 Bind
+
+Bind is a very powerful function. You can do a lot with it. But instead
+of doing explanations of Monads and all the mathematical (bullshit) that
+seems to make stuff more complicated, it is best to just see
+how to use the function instead.
+
+And compare it to similar code that you would have written without
+C<bind>. Or in that case compare it to code written in a lazy vs non-lazy
+way.
+
+=cut
+
+1;
