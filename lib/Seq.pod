@@ -20,15 +20,16 @@ The advantage is that you have a high-level API with map, filter, fold and so
 on. It combines all the functionality you see from map, grep, List::Util, ...
 
 But it does it lazily instead of computing everything at once. Thus it can
-provide immidiat results (when possible), use less memory. Sometimes even
-saving computation time.
+provide immidiat results (when possible) and/or use less memory. Sometimes even
+saving computation time. It can work with infinity sequences and really large
+inputs.
+
+Everything that is an iterator can potentially used with this API. This
+includes file-handles, sockets, pipes and whatever you can think of.
 
 Once you have defined a sequence. You can execute the sequence as often you
-want on whatever data you give it.
-
-You never use the iterators directly. As a sequence generates iterators when
-needed, you always can execute a sequence as often as you want. From its usage
-it looks like an immutable iterator.
+want on whatever data you give it. From its usage it looks like an
+immutable iterator.
 
     # always represents the range from 1 to 100.
     my $range = Seq->range(1,100);
@@ -73,14 +74,22 @@ I have written more documentation. The API is not fully stable at the moment.
     # get the maximum id from test-files so far
     my $maximum_id =
         Seq
-        ->wrap(   path('t')->children )
-        ->map(    sub($x) { $x->basename })
-        ->choose( sub($x) { $x =~ m/\A(\d+) .* \.t\z/xms ? $1 : undef } )
-        ->max;
+        # get all files from 't' folder
+        ->wrap( path('t')->children )
+        # get basename of each file
+        ->map(  sub($x) { $x->basename })
+        # extract all numbers from test files. returns matches as array
+        ->regex_match( qr/\A(\d+) .* \.t\z/xms, [1])
+        # get the first entry of each array (there is only one)
+        ->fsts
+        # get the maximum number, or -1 if sequence is empty
+        ->max(-1);
 
 =head1 CONCEPT
 
 Describe CONSTRUCTORS, METHODS (Find another name), CONVERTERS.
+
+BUILD, TRANSFORM, COMBINE, QUERY,
 
 =head1 EXPORT
 

@@ -35,7 +35,7 @@ my $maximum_id =
     ->map(  sub($x) { $x->basename })
     ->regex_match( qr/\A(\d+) .* \.t\z/xms, [1])
     ->fsts
-    ->max(0);
+    ->max(-1);
 
 # Load DATA into array
 my @content = <DATA>;
