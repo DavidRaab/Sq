@@ -1,5 +1,5 @@
 ---
-abstract: 'A lazy sequence implementation'
+abstract: 'The Sq language'
 author:
   - 'David Raab <davidraab83@gmail.com>'
 build_requires:
@@ -14,10 +14,15 @@ license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
-name: Seq
+name: Sq
 provides:
+  Measure:
+    file: lib/Core/Measure.pm
   Seq:
-    file: lib/Seq.pm
+    file: lib/Collections/Seq.pm
+    version: '0.006'
+  Sq:
+    file: lib/Sq.pm
     version: '0.006'
 requires:
   Carp: '0'

@@ -1,5 +1,5 @@
 {
-   "abstract" : "A lazy sequence implementation",
+   "abstract" : "The Sq language",
    "author" : [
       "David Raab <davidraab83@gmail.com>"
    ],
@@ -12,7 +12,7 @@
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : 2
    },
-   "name" : "Seq",
+   "name" : "Sq",
    "prereqs" : {
       "configure" : {
          "requires" : {
@@ -33,12 +33,19 @@
       }
    },
    "provides" : {
+      "Measure" : {
+         "file" : "lib/Core/Measure.pm"
+      },
       "Seq" : {
-         "file" : "lib/Seq.pm",
+         "file" : "lib/Collections/Seq.pm",
+         "version" : "0.006"
+      },
+      "Sq" : {
+         "file" : "lib/Sq.pm",
          "version" : "0.006"
       }
    },
-   "release_status" : "unstable",
+   "release_status" : "stable",
    "resources" : {
       "license" : [
          "http://www.opensource.org/licenses/mit-license.php"
