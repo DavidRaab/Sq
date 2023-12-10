@@ -1,0 +1,49 @@
+{
+   "abstract" : "A lazy sequence implementation",
+   "author" : [
+      "David Raab <davidraab83@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Seq",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "List::Util" : "0",
+            "Path::Tiny" : "0",
+            "Test2::V0" : "0.000156"
+         }
+      }
+   },
+   "provides" : {
+      "Seq" : {
+         "file" : "lib/Seq.pm",
+         "version" : "0.006"
+      }
+   },
+   "release_status" : "unstable",
+   "resources" : {
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ]
+   },
+   "version" : "0.006",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

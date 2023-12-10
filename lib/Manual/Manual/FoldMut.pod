@@ -1,0 +1,5 @@
+=head1 FoldMut
+
+Describe when to use fold_mut over fold and the problem that
+can occur using fold_mut
+

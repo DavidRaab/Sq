@@ -1,0 +1,29 @@
+
+=head1 Seq::Manual
+
+This is an overview about the different Documentation
+
+
+=head2 INTRO
+
+Maybe
+
+
+=head2 EXAMPLES
+
+Coming SOON
+
+
+=head2 OTHER
+
+
+=head3 Seq::Manual::FromSub
+
+An in-depth tutorial on how to use Seq->fromSub to create your own
+constructor functions and make other Perl Code / Modules work with
+Seq.
+
+
+=head2 DESIGN
+
+Coming SOON
