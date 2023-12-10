@@ -90,7 +90,7 @@
 ^MANIFEST\.SKIP
 
 # Avoid archives of this distribution
-\bSeq-[\d\.\_]+
+\bSq-[\d\.\_]+
 
 # avoid own script-file
 ^new_test.pl$

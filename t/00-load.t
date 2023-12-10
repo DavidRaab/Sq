@@ -1,7 +1,7 @@
 #!perl
 use 5.036;
 use List::Util qw(reduce);
-use Seq qw/id fst snd/;
+use Sq;
 use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end bag float U/;
 # use DDP;
 

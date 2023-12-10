@@ -17,13 +17,15 @@ meta-spec:
 name: Sq
 provides:
   Measure:
-    file: lib/Core/Measure.pm
+    file: lib/Sq/Core/Measure.pm
   Seq:
-    file: lib/Collections/Seq.pm
+    file: lib/Sq/Collections/Seq.pm
     version: '0.006'
   Sq:
     file: lib/Sq.pm
     version: '0.006'
+  Sq::Io:
+    file: lib/Sq/Io.pm
 requires:
   Carp: '0'
 resources:
