@@ -20,7 +20,6 @@ provides:
     file: lib/Sq/Core/Measure.pm
   Seq:
     file: lib/Sq/Collections/Seq.pm
-    version: '0.006'
   Sq:
     file: lib/Sq.pm
     version: '0.006'
@@ -28,6 +27,7 @@ provides:
     file: lib/Sq/Io.pm
 requires:
   Carp: '0'
+  Sub::Exporter: '0'
 resources:
   license: http://www.opensource.org/licenses/mit-license.php
 version: '0.006'

@@ -21,7 +21,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0"
+            "Carp" : "0",
+            "Sub::Exporter" : "0"
          }
       },
       "test" : {
@@ -37,8 +38,7 @@
          "file" : "lib/Sq/Core/Measure.pm"
       },
       "Seq" : {
-         "file" : "lib/Sq/Collections/Seq.pm",
-         "version" : "0.006"
+         "file" : "lib/Sq/Collections/Seq.pm"
       },
       "Sq" : {
          "file" : "lib/Sq.pm",

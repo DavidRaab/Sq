@@ -1,6 +1,6 @@
 #!perl
 use 5.036;
-use Seq qw(id fst snd key);
+use Sq;
 use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end bag float U/;
 use FindBin qw($Bin);
 use Path::Tiny;
