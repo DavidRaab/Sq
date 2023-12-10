@@ -1,15 +1,9 @@
 package Seq;
 use 5.036;
-our $VERSION = '0.006';
 use subs 'bind', 'join', 'select', 'last', 'sort';
 use Scalar::Util;
 use List::Util;
 use Carp;
-use Sub::Exporter -setup => {
-    exports => [
-        qw(id fst snd key assign),
-    ],
-};
 
 # TODO:
 #       chain
@@ -31,24 +25,6 @@ use Sub::Exporter -setup => {
 # o Error checking through another module that adds signature type check through AOP
 # o Maybe DU, Record fist-class support when i implement them.
 # o good way to also implement async with it?
-
-# Important functions used in FP code. So adding them.
-sub id  :prototype($) { return $_[0]    }
-sub fst :prototype($) { return $_[0][0] }
-sub snd :prototype($) { return $_[0][1] }
-
-# a helper to create a function for selecting a hash-key
-sub key :prototype($) {
-    my $name = $_[0];
-    return sub($hash) { return $hash->{$name} };
-}
-
-# allows writing a code block to create a value
-sub assign :prototype(&) {
-    return $_[0]->();
-}
-
-
 
 #-----------------------------------------------------------------------------#
 # CONSTRUCTORS                                                                #
@@ -292,7 +268,7 @@ sub bind($seq, $f) {
 
 # flatten : Seq<Seq<'a>> -> Seq<'a>
 sub flatten($seq) {
-    return bind($seq, \&id);
+    return bind($seq, \&Sq::id);
 }
 
 # flatten_array : Seq<Array<'a>> -> Seq<'a>
@@ -510,7 +486,7 @@ sub distinct_by($seq, $f) {
 #
 # distinct : Seq<'a> -> Seq<'a>
 sub distinct($seq) {
-    return distinct_by($seq, \&id);
+    return distinct_by($seq, \&Sq::id);
 }
 
 # TODO: Instead of fsts and snds provide a function to pick the index of an array.
@@ -922,7 +898,7 @@ sub sum_by($seq, $f) {
 #
 # min : Seq<float> -> float -> float
 sub min($seq, $default) {
-    min_by($seq, \&id, $default);
+    min_by($seq, \&Sq::id, $default);
 }
 
 # min_by : Seq<a> -> ('a -> float) -> float -> float
@@ -940,7 +916,7 @@ sub min_by($seq, $key, $default) {
 #
 # min_str : Seq<string> -> string -> string
 sub min_str($seq, $default) {
-    min_str_by($seq, \&id, $default);
+    min_str_by($seq, \&Sq::id, $default);
 }
 
 # min_str_by : Seq<'a> -> ('a -> string) -> string -> 'a
@@ -957,7 +933,7 @@ sub min_str_by($seq, $key, $default) {
 #
 # max : Seq<float> -> float -> float
 sub max($seq, $default) {
-    max_by($seq, \&id, $default);
+    max_by($seq, \&Sq::id, $default);
 }
 
 # max_by : Seq<'a> -> ('a -> float) -> float -> float
@@ -972,7 +948,7 @@ sub max_by($seq, $key, $default) {
 
 # max_str : Seq<string> -> string -> string
 sub max_str($seq, $default) {
-    max_str_by($seq, \&id, $default);
+    max_str_by($seq, \&Sq::id, $default);
 }
 
 # max_str_by : Seq<'a> -> ('a -> string) -> string -> string

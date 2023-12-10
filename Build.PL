@@ -11,13 +11,14 @@ my $builder = Module::Build->new(
     configure_requires => {
         'Module::Build' => '0.4004',
     },
+    requires => {
+        'Sub::Exporter' => '0',
+        'Carp'          => '0',
+    },
     test_requires => {
         'Test2::V0'  => '0.000156',
         'Path::Tiny' => '0',
         'List::Util' => '0',
-    },
-    requires => {
-        'Carp' => '0',
     },
     add_to_cleanup => [ 'Sq-*' ],
 );
