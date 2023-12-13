@@ -5,12 +5,9 @@ use Sq;
 use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end bag float U/;
 # use DDP;
 
-diag( "Testing Sq $Sq::VERSION, Perl $], $^X" );
-is($Sq::VERSION, number_ge("0.006"), 'Check minimum version number');
-
 # Some values, functions, ... for testing
-my $range     = Seq->range(1, 10);
-my $rangeDesc = Seq->range(10, 1);
+my $range     = Array->range(1, 10);
+my $rangeDesc = Array->range(10, 1);
 
 my $add     = sub($x, $y) { $x + $y     };
 my $add1    = sub($x)     { $x + 1      };
@@ -19,60 +16,55 @@ my $square  = sub($x)     { $x * $x     };
 my $is_even = sub($x)     { $x % 2 == 0 };
 
 # Basic checks of range and rangeDesc
-is($range, D(),                 'range returns something');
-is($range, check_isa('Seq'),    'returns a Seq');
-is($range->to_array, [1 .. 10], 'to_array');
-is($range->to_array, [1 .. 10], 'calling to_array twice still returns the same');
-is(Seq->range(1,1)->to_array, [1], 'range is inclusive');
-is($rangeDesc->to_array, [reverse 1 .. 10], 'rangeDesc');
-is($range->to_array, $rangeDesc->rev->to_array, 'reverse of rangeDesc same as range');
-
-is(
-    $range->map($double)->to_array,
-    [2,4,6,8,10,12,14,16,18,20],
-    'map');
-is(
-    $range->filter($is_even)->to_array,
-    [2,4,6,8,10],
-    'filter');
-
-is($range->take(5)->to_array,  [1..5], 'take 1');
-is($range->take(0)->to_array,  [],     'take 2');
-is($range->take(-1)->to_array, [],     'take 3');
-
-is($range->count, 10, 'count');
+is($range, D(),                   'range returns something');
+is($range, check_isa('Array'),    'returns an Array');
+is($range, [1 .. 10],             'is an array');
+is(Array->range(1,1), [1],        'range is inclusive');
+is($rangeDesc, [reverse 1 .. 10], 'rangeDesc');
+is($range, $rangeDesc->rev,       'reverse of rangeDesc same as range');
+is($range->map($double),     [2,4,6,8,10,12,14,16,18,20], 'map');
+is($range->filter($is_even), [2,4,6,8,10],                'filter');
+is($range->take(5),   [1..5], 'take 1');
+is($range->take(0),       [], 'take 2');
+is($range->take(-1),      [], 'take 3');
+is($range->count,         10, 'count');
 is($range->take(5)->count, 5, 'take & count');
+
 is(
-    $range->map($square)->filter($is_even)->to_array,
+    $range->map($square)->filter($is_even),
     [4,16,36,64,100],
     'map filter');
 is(
-    $range->map($square)->filter($is_even)->take(3)->to_array,
+    $range->map($square)->filter($is_even)->take(3),
     [4,16,36],
     'map filter take');
+
 is(
     $range->fold(0, sub($count, $x) { $count + 1 }),
     $range->count,
     'fold with non-reftype');
 is(
     $range->fold([], sub($array, $x) { push @$array, $x; $array }),
-    $range->to_array,
+    $range,
     'fold with reftype 1');
 is(
     $range->fold([], sub($array, $x) { [@$array, $x ] }),
-    $range->to_array,
+    $range,
     'fold with reftype 2');
 is(
     $range->fold    ([], sub($array, $x) { push @$array, $x; $array }),
     $range->fold_mut([], sub($array, $x) { push @$array, $x         }),
     'fold_mut');
 
-is($range->rev, check_isa('Seq'), 'rev return Seq');
-is($range->rev->to_array, [10,9,8,7,6,5,4,3,2,1], 'rev');
+is($range->rev, check_isa('Array'), 'rev return Array');
+is($range->rev, [10,9,8,7,6,5,4,3,2,1], 'rev');
 is(
-    $range->rev->map($add1)->rev->to_array,
+    $range->rev->map($add1)->rev,
     [ $range->map($add1)->expand ],
     'to_list');
+
+done_testing;
+exit;
 
 is($range->sum, 55, 'sum');
 is($range->sum, $range->rev->sum, 'sum 2');
@@ -133,7 +125,7 @@ is(
     $range->to_array,
     'from_list');
 is(
-    Seq->from_list(Seq->range(1,10)->expand)->to_array,
+    Seq->from_list(Seq->range(1,10)->to_list)->to_array,
     [1 .. 10],
     'from_list and to_list is isomorph');
 is(

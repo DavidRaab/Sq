@@ -6,6 +6,7 @@ use List::Util;
 use Carp;
 
 # TODO:
+#       Find another name for 'from_list'
 #       chain
 #       regex_replace
 #       extract(predicate, predicate)
@@ -63,7 +64,7 @@ sub empty($class) {
 
 # TODO: When $state is a reference. Same handling as in fold?
 #
-# Seq->unfold : 'State -> ('State -> Option<list<'a,'State>>) -> Seq<'a>
+# Seq->unfold : 'State -> ('State -> Option<ListContext<'a,'State>>) -> Seq<'a>
 sub unfold($class, $state, $f) {
     from_sub('Seq', sub {
         # IMPORTANT: Perl signatures are aliases. As we assign
@@ -827,7 +828,7 @@ sub fold($seq, $state, $folder) {
 # less garbage. Works best when $state is directely created with
 # the fold_mut call. Otherwise can have serious issues.
 #
-# fold_mut : Seq<'a> -> 'State -> ('State -> 'a -> 'State) -> 'State
+# fold_mut : Seq<'a> -> 'State -> ('State -> 'a -> unit) -> 'State
 sub fold_mut($seq, $state, $folder) {
     iter($seq, sub($x) {
         $folder->($state, $x);
@@ -870,7 +871,10 @@ sub to_array($seq) {
     return fold_mut($seq, [], $folder);
 }
 
-sub to_list($seq) {
+# Turns a Sequence into
+#
+# expand : Seq<'a> -> ListContext<'a>
+sub expand($seq) {
     return @{ to_array($seq) };
 }
 
@@ -963,7 +967,7 @@ sub max_str_by($seq, $key, $default) {
 
 # str_join : Seq<string> -> string -> string
 sub str_join($seq, $sep) {
-    return CORE::join($sep, to_list($seq));
+    return CORE::join($sep, expand($seq));
 }
 
 # Build a hash by providing a keying function. Later elements

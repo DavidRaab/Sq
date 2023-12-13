@@ -12,6 +12,7 @@ use Sub::Exporter -setup => {
 
 # Load Seq Module -- available under 'Seq'
 use Sq::Collections::Seq;
+use Sq::Collections::Array;
 
 # Important functions used in FP code. So adding them.
 sub id  :prototype($) { return $_[0]    }
