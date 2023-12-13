@@ -3,12 +3,13 @@ use Module::Build;
 Module::Build->VERSION('0.4004');
 
 my $builder = Module::Build->new(
-    module_name         => 'Sq',
-    license             => 'mit',
-    dist_author         => q{David Raab <davidraab83@gmail.com>},
-    dist_version_from   => 'lib/Sq.pm',
-    release_status      => 'stable',
-    configure_requires => {
+    module_name          => 'Sq',
+    license              => 'mit',
+    dist_author          => q{David Raab <davidraab83@gmail.com>},
+    dist_version_from    => 'lib/Sq.pm',
+    release_status       => 'stable',
+    recursive_test_files => 1,
+    configure_requires   => {
         'Module::Build' => '0.4004',
     },
     requires => {

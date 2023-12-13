@@ -9,6 +9,8 @@ use Sub::Exporter -setup => {
         default => [qw(id fst snd key assign)],
     },
 };
+
+# Load Seq Module -- available under 'Seq'
 use Sq::Collections::Seq;
 
 # Important functions used in FP code. So adding them.
