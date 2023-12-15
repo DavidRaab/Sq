@@ -805,20 +805,34 @@ sub iteri($seq, $f) {
 #
 # do : Seq<'a> -> ('a -> unit) -> Seq<'a>
 sub do($seq, $f) {
-    my $it = $seq->();
-    my $x;
-    $f->($x) while defined($x = $it->());
-    return $seq;
+    return from_sub(Seq => sub {
+        my $it = $seq->();
+        my $x;
+
+        return sub {
+            if ( defined($x = $it->()) ) {
+                $f->($x);
+                return $x;
+            }
+            return undef;
+        }
+    });
 }
 
 # Same as do() but also provides an index
 sub doi($seq, $f) {
-    my $it        = $seq->();
-    my ($idx, $x) = (0, undef);
-    while ( defined($x = $it->()) ) {
-        $f->($idx++, $x);
-    }
-    return $seq;
+    return from_sub(Seq => sub {
+        my $it        = $seq->();
+        my ($idx, $x) = (0, undef);
+
+        return sub {
+            if ( defined($x = $it->()) ) {
+                $f->($idx++, $x);
+                return $x;
+            }
+            return undef;
+        }
+    });
 }
 
 
