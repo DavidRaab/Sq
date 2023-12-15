@@ -1,18 +1,20 @@
 package Sq;
 use 5.036;
 our $VERSION = '0.006';
+use Scalar::Util ();
 use Sub::Exporter -setup => {
     exports => [
-        qw(id fst snd key assign),
+        qw(id fst snd key assign is_str is_num),
     ],
     groups => {
-        default => [qw(id fst snd key assign)],
+        default => [qw(id fst snd key assign is_str is_num)],
     },
 };
 
 # Load Seq Module -- available under 'Seq'
 use Sq::Collections::Seq;
 use Sq::Collections::Array;
+use Sq::Io;
 
 # Important functions used in FP code. So adding them.
 sub id  :prototype($) { return $_[0]    }
@@ -29,6 +31,17 @@ sub key :prototype($) {
 sub assign :prototype(&) {
     return $_[0]->();
 }
+
+sub is_str :prototype($) {
+    return ref $_[0] eq '' ? 1 : 0;
+}
+
+sub is_num :prototype($) {
+    return Scalar::Util::looks_like_number($_[0]);
+}
+
+# Access to Sq::Io
+sub io($class) { return 'Sq::Io' }
 
 1;
 

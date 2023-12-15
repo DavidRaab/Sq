@@ -788,6 +788,15 @@ sub iter($seq, $f) {
     return;
 }
 
+sub iteri($seq, $f) {
+    my $it        = $seq->();
+    my ($idx, $x) = (0, undef);
+    while ( defined($x = $it->()) ) {
+        $f->($idx++, $x);
+    }
+    return;
+}
+
 # Similar to iter(). But returns the $seq as-is.
 # Useful for doing something between a chain. For example printing
 # all elements of a sequence.
@@ -802,6 +811,15 @@ sub do($seq, $f) {
     return $seq;
 }
 
+# Same as do() but also provides an index
+sub doi($seq, $f) {
+    my $it        = $seq->();
+    my ($idx, $x) = (0, undef);
+    while ( defined($x = $it->()) ) {
+        $f->($idx++, $x);
+    }
+    return $seq;
+}
 
 
 #----------------------------------------------------------------------#
@@ -853,6 +871,8 @@ sub first($seq, $default) {
     my $first = $seq->()();
     return defined $first ? $first : $default;
 }
+
+# TODO: first_match / last_match
 
 # Returns last element of seq or default
 #
@@ -968,6 +988,12 @@ sub max_str_by($seq, $key, $default) {
 # str_join : Seq<string> -> string -> string
 sub str_join($seq, $sep) {
     return CORE::join($sep, expand($seq));
+}
+
+sub str_split($seq, $regex) {
+    return Seq::map($seq, sub($line) {
+        [ split $regex, $line ]
+    });
 }
 
 # Build a hash by providing a keying function. Later elements
