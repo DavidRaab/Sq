@@ -3,7 +3,7 @@ use v5.36;
 use open ':std', ':encoding(UTF-8)';
 use Data::Printer;
 use Getopt::Long::Descriptive;
-use Seq;
+use Sq;
 
 my ($opt, $usage) = describe_options(
     'Usage: %c %o',
