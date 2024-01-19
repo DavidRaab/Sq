@@ -1,9 +1,10 @@
 package Seq;
 use 5.036;
 use subs 'bind', 'join', 'select', 'last', 'sort';
-use Scalar::Util;
-use List::Util;
-use Carp;
+use Scalar::Util ();
+use List::Util ();
+use Carp ();
+use Sq::Collections::Array;
 
 # TODO:
 #       Find another name for 'from_list'
@@ -437,6 +438,20 @@ sub take($seq, $amount) {
             return $i->() if $returnedSoFar++ < $amount;
             return undef;
         }
+    });
+}
+
+# Generates a new sequence as long predicate returns a truish value.
+#
+# take_while : Seq<'a> -> ('a -> bool) -> Seq<'a>
+sub take_while($seq, $predicate) {
+    from_sub('Seq', sub {
+        my $it = $seq->();
+        return sub {
+            my $value = $it->();
+            return $value if $predicate->($value);
+            return undef;
+        };
     });
 }
 

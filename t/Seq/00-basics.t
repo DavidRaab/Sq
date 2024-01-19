@@ -638,4 +638,22 @@ is(
     Seq->always(11)->take(15)->to_array,
     'zip,infinity,rev,take,map,always');
 
+is(
+    Seq
+    ->wrap(1, 3, 20, -40, 20, 12, 100, 5, 20)
+    ->take_while(sub($x) { $x < 100 })
+    ->to_array,
+    [1,3,20,-40,20,12],
+    'take_while 1'
+);
+
+is(
+    Seq
+    ->wrap(1, 3, 20, -40, 20, 12, 100, 5, 20)
+    ->take_while(sub($x) { $x > 100 })
+    ->to_array,
+    [],
+    'take_while 2'
+);
+
 done_testing;
