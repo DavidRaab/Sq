@@ -1,6 +1,6 @@
 package Seq;
 use 5.036;
-use subs 'bind', 'join', 'select', 'last', 'sort';
+use subs 'bind', 'join', 'select', 'last', 'sort', 'foreach';
 use Scalar::Util ();
 use List::Util ();
 use Carp ();
@@ -16,7 +16,7 @@ use Sq::Collections::Array;
 #       transpose, slice
 #       minmax, minmax_by,
 #       scan, mapFold, except/exclude
-#       takeWhile, skipWhile, splitInto
+#       splitInto
 #     ? contains, firstIndex, mapX, on
 #
 # + ways to do regexes on strings
@@ -826,6 +826,11 @@ sub iter($seq, $f) {
     my $x;
     $f->($x) while defined($x = $it->());
     return;
+}
+
+# same as iter just another name
+sub foreach($seq, $f) {
+    iter($seq, $f);
 }
 
 sub iteri($seq, $f) {

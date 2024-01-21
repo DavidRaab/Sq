@@ -674,4 +674,11 @@ is(
     'skip_while 2'
 );
 
+{ # iter & foreach
+    my @iter;    $range->iter(   sub($x) { push @iter,    $x });
+    my @foreach; $range->foreach(sub($x) { push @foreach, $x });
+
+    is(\@iter, \@foreach, 'iter same as foreach');
+}
+
 done_testing;

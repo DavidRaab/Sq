@@ -21,11 +21,10 @@ my $primes =
     ->unfold(2, sub($x){ $x, $x+1   })
     ->filter(sub($x) { is_prime($x) });
 
-
 print "Primes smaller 10_000\n";
 $primes
 ->take_while(sub($x) { $x < 10_000 })
-->iter(sub ($prime) {
+->foreach(sub ($prime) {
     print $prime, " ";
 });
 print "\n";
