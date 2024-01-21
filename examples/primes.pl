@@ -14,7 +14,8 @@ my ($opt, $usage) = describe_options(
 $usage->die if $opt->help;
 
 # "Theoretical" finite sequence of prime numbers
-# "theoretical" because we have only have 64 bit float
+# "theoretical" because we only have 64 bit float
+# We could use Math::BigInt for bigger numbers (but its slower)
 my $primes =
     Seq
     ->unfold(2, sub($x){ $x, $x+1   })
@@ -24,7 +25,7 @@ my $primes =
 print "Primes smaller 10_000\n";
 $primes
 ->take_while(sub($x) { $x < 10_000 })
-->iter(sub($prime) {
+->iter(sub ($prime) {
     print $prime, " ";
 });
 print "\n";
