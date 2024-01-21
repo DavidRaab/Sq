@@ -656,4 +656,22 @@ is(
     'take_while 2'
 );
 
+is(
+    Seq
+    ->wrap(1, 3, 20, -40, 20, 12, 100, 5, 20)
+    ->skip_while(sub($x) { $x < 100 })
+    ->to_array,
+    [100, 5, 20],
+    'skip_while 1'
+);
+
+is(
+    Seq
+    ->wrap(1, 3, 20, -40, 20, 12, 100, 5, 20)
+    ->skip_while(sub($x) { $x > 100 })
+    ->to_array,
+    [1,3,20,-40,20,12,100,5,20],
+    'skip_while 2'
+);
+
 done_testing;

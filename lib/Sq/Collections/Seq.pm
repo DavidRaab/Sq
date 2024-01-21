@@ -469,6 +469,31 @@ sub skip($seq, $amount) {
     });
 }
 
+# Generates a new sequence by skipping all values at the begging as long $predicate
+# returns a truish value. After that, returns all values as-is.
+#
+# skip_while : Seq<'a> -> ('a -> bool) -> Seq<'a>
+sub skip_while($seq, $predicate) {
+    from_sub('Seq', sub {
+        my $it = $seq->();
+        my $first;
+        while (1) {
+            $first = $it->();
+            last if not ($predicate->($first))
+        }
+        return sub {
+            if ( defined $first ) {
+                my $x = $first;
+                undef $first;
+                return $x;
+            }
+            else {
+                return $it->();
+            }
+        }
+    });
+}
+
 # indexed : Seq<'a> -> Seq<int * 'a>
 sub indexed($seq) {
     my $index = 0;
