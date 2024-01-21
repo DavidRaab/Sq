@@ -828,7 +828,7 @@ sub iter($seq, $f) {
     return;
 }
 
-# same as iter just another name
+# same as iter
 sub foreach($seq, $f) {
     iter($seq, $f);
 }
@@ -837,9 +837,14 @@ sub iteri($seq, $f) {
     my $it        = $seq->();
     my ($idx, $x) = (0, undef);
     while ( defined($x = $it->()) ) {
-        $f->($idx++, $x);
+        $f->($x, $idx++);
     }
     return;
+}
+
+# same as iteri
+sub foreachi($seq, $f) {
+    iteri($seq, $f);
 }
 
 # Similar to iter(). But returns the $seq as-is.
