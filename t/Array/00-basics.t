@@ -321,40 +321,40 @@ is($range->find(undef, sub($x) { $x > 5  }),     6, 'find 1');
 is($range->find(undef, sub($x) { $x > 10 }), undef, 'find 2');
 is($range->find(0,     sub($x) { $x > 10 }),     0, 'find 3');
 
-done_testing;
-exit;
-
 is(
-    $range->bind(sub($x) { Seq->wrap($x) })->to_array,
+    $range->bind(sub($x) { Array->wrap($x) }),
     [1 .. 10],
     'bind - somehow like id');
 
 is(
-    Seq->wrap(
-        Seq->wrap(1,1),
-        Seq->wrap(2,3,5,8,13),
-    )->flatten->to_array,
+    Array->wrap(
+        Array->wrap(1,1),
+        Array->wrap(2,3,5,8,13),
+    )->flatten,
     [1,1,2,3,5,8,13],
-    'flatten - flattens a seq of seq');
+    'flatten - flattens an array of array');
 
-is(Seq->wrap([1,1], [1,2])->to_array, [[1,1],[1,2]], 'wrap with arrays');
-is(Seq->wrap([1,1])       ->to_array, [[1,1]],       'wrap with array');
-is(Seq->from_array([1,1]) ->to_array, [1,1],         'from_array vs. wrap');
+is(Array->wrap([1,1], [1,2]), [[1,1],[1,2]], 'wrap with arrays');
+is(Array->wrap([1,1])       , [[1,1]],       'wrap with array');
+is(Array->from_array([1,1]) , [1,1],         'from_array vs. wrap');
 
-is($range->reduce($add, undef),      55, 'reduce');
-is(Seq->empty->reduce($add, undef), U(), 'reduce on empty 1');
-is(Seq->empty->reduce($add, 0),       0, 'reduce on empty 2');
-is(Seq->wrap(1)->reduce($add, 0),     1, 'reduce on single element');
+is($range->reduce(undef, $add),        55, 'reduce');
+is(Array->empty->reduce(undef, $add), U(), 'reduce on empty 1');
+is(Array->empty->reduce(0, $add),       0, 'reduce on empty 2');
+is(Array->wrap(1)->reduce(0, $add),     1, 'reduce on single element');
 
-is(Seq->empty->first(undef), U(), 'first on empty is undef');
-is(Seq->empty->first(0),       0, 'first with default value');
-is($range->first(-1),          1, 'first on non empty without default');
-is($range->first(0),           1, 'first on non empty with default');
+is(Array->empty->first(undef), U(), 'first on empty is undef');
+is(Array->empty->first(0),       0, 'first with default value');
+is($range->first(-1),            1, 'first on non empty without default');
+is($range->first(0),             1, 'first on non empty with default');
 
-is(Seq->empty->last(undef),   U(), 'last on empty is undef');
-is(Seq->empty->last(0),         0, 'last with default value');
+is(Array->empty->last(undef), U(), 'last on empty is undef');
+is(Array->empty->last(0),       0, 'last with default value');
 is($range->last(undef),        10, 'last on non empty without default');
 is($range->last(0),            10, 'last on non empty with default');
+
+done_testing;
+exit;
 
 is(
     Seq->wrap(1,5,-3,10,9,-2)->sort(sub($x,$y) { $x <=> $y })->to_array,

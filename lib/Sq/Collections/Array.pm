@@ -90,6 +90,18 @@ sub from_array($class, $xs) {
 #           functions operating on Seq and returning another Seq              #
 #-----------------------------------------------------------------------------#
 
+sub bind($array, $f) {
+    my @new;
+    for my $x ( @$array ) {
+        push @new, @{ $f->($x) };
+    }
+    return bless(\@new, 'Array');
+}
+
+sub flatten($array) {
+    return bind($array, \&Sq::id);
+}
+
 # append : Array<'a> -> Array<'a> -> Array<'a>
 sub append($array1, $array2) {
     return bless([@$array1, @$array2], 'Array');
@@ -217,6 +229,16 @@ sub zip($array1, $array2) {
 # CONVERTER                                                                   #
 #         Those are functions converting Array to none Array types            #
 #-----------------------------------------------------------------------------#
+
+sub reduce($array, $default, $f) {
+    return $default    if @$array == 0;
+    return $array->[0] if @$array == 1;
+    my $init = $array->[0];
+    for (my $idx=1; $idx < @$array; $idx++) {
+        $init = $f->($init, $array->[$idx]);
+    }
+    return $init;
+}
 
 sub sum($array) {
     my $sum = 0;
