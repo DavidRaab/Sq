@@ -344,10 +344,10 @@ is(Seq->wrap([1,1], [1,2])->to_array, [[1,1],[1,2]], 'wrap with arrays');
 is(Seq->wrap([1,1])       ->to_array, [[1,1]],       'wrap with array');
 is(Seq->from_array([1,1]) ->to_array, [1,1],         'from_array vs. wrap');
 
-is($range->reduce($add, undef),      55, 'reduce');
-is(Seq->empty->reduce($add, undef), U(), 'reduce on empty 1');
-is(Seq->empty->reduce($add, 0),       0, 'reduce on empty 2');
-is(Seq->wrap(1)->reduce($add, 0),     1, 'reduce on single element');
+is($range->reduce(undef, $add),      55, 'reduce');
+is(Seq->empty->reduce(undef, $add), U(), 'reduce on empty 1');
+is(Seq->empty->reduce(0, $add),       0, 'reduce on empty 2');
+is(Seq->wrap(1)->reduce(0, $add),     1, 'reduce on single element');
 
 is(Seq->empty->first(undef), U(), 'first on empty is undef');
 is(Seq->empty->first(0),       0, 'first with default value');

@@ -926,7 +926,7 @@ sub fold_mut($seq, $state, $folder) {
 # with one item to work properly. It is encouraged to use `fold`
 # instead.
 # reduce: Seq<'a> -> ('a -> 'a -> 'a) -> 'a
-sub reduce($seq, $reducer, $default) {
+sub reduce($seq, $default, $reducer) {
     return fold(skip($seq, 1), first($seq, $default), $reducer);
 }
 
