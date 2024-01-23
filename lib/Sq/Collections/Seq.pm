@@ -129,12 +129,6 @@ sub wrap($class, @xs) {
     }, 'Seq');
 }
 
-# turns a list into a Seq - alias to wrap
-# Seq->from_list : List<'a> -> Seq<'a>
-sub from_list($class, @xs) {
-    return wrap(Seq => @xs);
-}
-
 # turns an arrayref into a seq
 # Seq->from_array : Array<'a> -> Seq<'a>
 sub from_array($class, $xs) {

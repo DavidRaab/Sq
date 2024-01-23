@@ -128,28 +128,27 @@ like(
     Seq->concat->to_array,
     Seq->empty->to_array,
     'concat on zero is empty');
+
 is(
-    Seq->from_list(1 .. 10)->to_array,
-    $range->to_array,
-    'from_list');
-is(
-    Seq->from_list(Seq->range(1,10)->expand)->to_array,
+    Seq->wrap(Seq->range(1,10)->expand)->to_array,
     [1 .. 10],
-    'from_list and to_list is isomorph');
+    'expand and wrap is isomorph');
+
 is(
-    Seq->from_list(1..5)->append(
-        Seq->from_list(6..10)
+    Seq->wrap(1..5)->append(
+        Seq->wrap(6..10)
     )->to_array,
     Seq->concat(
-        Seq->from_list(1..3),
-        Seq->from_list(4..6),
-        Seq->from_list(7..10),
+        Seq->wrap(1..3),
+        Seq->wrap(4..6),
+        Seq->wrap(7..10),
     )->to_array,
     'append vs. concat');
 is(
     Seq->empty->append(Seq->range(1,5))->append(Seq->range(6,10))->to_array,
     $range->to_array,
     'append on empty');
+
 is(
     Seq->concat(
         Seq->empty,
@@ -160,12 +159,12 @@ is(
         Seq->wrap("Hello"),
         Seq->empty
     )->to_array,
-    Seq->from_list(1..5, 10..12, "Hello")->to_array,
+    Seq->wrap(1..5, 10..12, "Hello")->to_array,
     'concat with empties');
 is(
     Seq->from_array([1..10])->to_array,
-    Seq->from_list(1..10)->to_array,
-    'from_array and from_list');
+    Seq->wrap(1..10)->to_array,
+    'from_array and wrap');
 is(
     Seq->unfold(10, sub($state) {
         if ( $state > 0 ) {
@@ -177,14 +176,6 @@ is(
     })->to_array,
     Seq->range(1,10)->rev->to_array,
     'unfold');
-is(
-    Seq->wrap(1,2,3)->to_array,
-    Seq->from_list(1,2,3)->to_array,
-    'from_list is an alias to wrap');
-is(
-    Seq->wrap->to_array,
-    Seq->from_list->to_array,
-    'wrap and from_list without arguments is the same');
 is(
     Seq->wrap->to_array,
     Seq->empty->to_array,
