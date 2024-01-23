@@ -54,12 +54,7 @@ sub from_array($class, $xs) {
 
 # rev : Array<'a> -> Array<'a>
 sub rev($array) {
-    my @array;
-    my $idx  = $array->$#*;
-    while ( $idx >= 0 ) {
-        push @array, $array->[$idx--];
-    }
-    return bless(\@array, 'Array');
+    return bless([reverse @$array], 'Array');
 }
 
 # map : Array<'a> -> ('a -> 'b) -> Array<'b>
