@@ -225,4 +225,13 @@ sub to_hash($array, $mapper) {
     return \%hash;
 }
 
+sub to_hash_of_array($array, $mapper) {
+    my %hash;
+    for my $x ( @$array ) {
+        my ($key, $value) = $mapper->($x);
+        push @{$hash{$key}}, $value;
+    }
+    return \%hash;
+}
+
 1;

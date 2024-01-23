@@ -250,7 +250,7 @@ is(
     'to_hash 2');
 
 is(
-    Seq->wrap(qw/Hello World you are awesome/)->to_hash_of_array(sub($value) { length($value) }),
+    Seq->wrap(qw/Hello World you are awesome/)->to_hash_of_array(sub($x) { length $x => $x }),
     hash {
         field 5 => array { item "Hello";   item "World" };
         field 3 => array { item "you";     item "are"   };

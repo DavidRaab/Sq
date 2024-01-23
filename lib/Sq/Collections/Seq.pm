@@ -1054,8 +1054,8 @@ sub str_split($seq, $regex) {
     });
 }
 
-# Build a hash by providing a mapping function returning a key, value pair
-# for an entry
+# Build a hash by providing a mapping function returning a key/value pair.
+# Later keys overwrite prrevious ones.
 #
 # to_hash : Seq<'a> -> ('a -> 'Key) -> Hash<'Key * 'a>
 sub to_hash($seq, $mapper) {
@@ -1067,14 +1067,16 @@ sub to_hash($seq, $mapper) {
     return \%hash;
 }
 
-# Build a hash by providing a keying function. Values
-# are put into arrays to allow key with multiple values.
+# Build a hash by applying a mapping function to a value to create a
+# key/value pair. The value of the hash is always an array providing
+# all values for the same key
 #
 # to_hash_of_array: Seq<'a> -> ('a -> 'Key) -> Hash<'Key, Array<'a>>
-sub to_hash_of_array($seq, $get_key) {
+sub to_hash_of_array($seq, $mapper) {
     my %hash;
     iter($seq, sub($x) {
-        push @{ $hash{$get_key->($x)} }, $x;
+        my ($key, $value) = $mapper->($x);
+        push @{$hash{$key}}, $value;
     });
     return \%hash;
 }

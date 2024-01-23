@@ -242,11 +242,8 @@ is(
     },
     'to_hash 2');
 
-done_testing;
-exit;
-
 is(
-    Seq->wrap(qw/Hello World you are awesome/)->to_hash_of_array(sub($value) { length($value) }),
+    Array->wrap(qw/Hello World you are awesome/)->to_hash_of_array(sub($x) { length $x => $x }),
     hash {
         field 5 => array { item "Hello";   item "World" };
         field 3 => array { item "you";     item "are"   };
@@ -254,6 +251,9 @@ is(
         end;
     },
     'to_hash_of_array');
+
+done_testing;
+exit;
 
 is(Seq->wrap(1,1,2,3,1,4,5,4,3,2,6)->distinct->to_array, [1..6],              'distinct 1');
 is(Seq->wrap(1,2,3,2,23,123,4,12,2)->distinct->to_array, [1,2,3,23,123,4,12], 'distinct 2');
