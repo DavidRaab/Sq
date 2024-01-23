@@ -285,8 +285,8 @@ is(Seq->wrap(1,2,3,2,23,123,4,12,2)->distinct->to_array, [1,2,3,23,123,4,12], 'd
 }
 
 is(
-    Seq->wrap(qw/A B C D E F/)->mapi(\&id)->to_array,
-    [[0,'A'], [1,'B'], [2,'C'], [3,'D'], [4, 'E'], [5, 'F']],
+    Seq->wrap(qw/A B C D E F/)->mapi(sub($x,$i) { [$x,$i] })->to_array,
+    [[A => 0], [B => 1], [C => 2], [D => 3], [E => 4], [F => 5]],
     'mapi');
 
 is(Seq->init( 0,  sub($idx) { $idx })->to_array, [], 'init with count 0');

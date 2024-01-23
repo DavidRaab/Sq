@@ -403,9 +403,17 @@ sub choose($seq, $chooser) {
     });
 }
 
-# mapi : Seq<'a> -> (int -> 'a -> 'b) -> Seq<'b>
+# mapi : Seq<'a> -> ('a -> int -> 'b) -> Seq<'b>
 sub mapi($seq, $f) {
-    return Seq::map(indexed($seq), $f);
+    from_sub(Seq => sub {
+        my $it  = $seq->();
+        my $idx = 0;
+        return sub {
+            my $x = $it->();
+            return undef if not defined $x;
+            return $f->($x, $idx++);
+        }
+    });
 }
 
 # filter : Seq<'a> -> ('a -> bool) -> Seq<'a>
