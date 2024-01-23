@@ -283,46 +283,46 @@ is(
     [[A => 0], [B => 1], [C => 2], [D => 3], [E => 4], [F => 5]],
     'mapi');
 
-done_testing;
-exit;
-
-is(Seq->init( 0,  sub($idx) { $idx })->to_array, [], 'init with count 0');
-is(Seq->init(-1,  sub($idx) { $idx })->to_array, [], 'init with count -1');
-is(Seq->init(-10, sub($idx) { $idx })->to_array, [], 'init with count -10');
-is(Seq->range_step(1,1,1)->to_array, [1], 'range_step with 1,1,1');
+is(Array->init( 0,  sub($idx) { $idx }), [], 'init with count 0');
+is(Array->init(-1,  sub($idx) { $idx }), [], 'init with count -1');
+is(Array->init(-10, sub($idx) { $idx }), [], 'init with count -10');
+is(Array->range_step(1,1,1), [1], 'range_step with 1,1,1');
 is(
-    Seq->range_step(0,0.1,1)->to_array,
+    Array->range_step(0,0.1,1),
     array {
         for (my $f=0.0; $f <= 1.0; $f+=0.1) {
             item float $f;
         }
     },
     'range_step with 0,0.1,1');
+
 like(
-    dies { Seq->range_step(0,0,1)->to_array },
+    dies { Array->range_step(0,0,1) },
     qr/^\$step is 0/,
     'range_step dies with step size of zero');
 
 is(
-    $range->map($square)->filter($is_even)->to_array,
+    $range->map($square)->filter($is_even),
     $range->choose(sub($x) {
         my $s = $x * $x;
         $s % 2 == 0 ? $s : undef
-    })->to_array,
+    }),
     'choose same as map->filter');
 
 is(
     $range->choose(sub($x) {
         my $s = $x * $x;
         $s % 2 == 0 ? $s : undef
-    })->to_array,
+    }),
     [grep { $_ % 2 == 0 } map { $_ * $_ } 1 .. 10],
-    'Non Lazy Perl implementation of choose');
-
+    'Perl implementation of choose');
 
 is($range->find(undef, sub($x) { $x > 5  }),     6, 'find 1');
 is($range->find(undef, sub($x) { $x > 10 }), undef, 'find 2');
 is($range->find(0,     sub($x) { $x > 10 }),     0, 'find 3');
+
+done_testing;
+exit;
 
 is(
     $range->bind(sub($x) { Seq->wrap($x) })->to_array,

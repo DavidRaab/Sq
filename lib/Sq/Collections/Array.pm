@@ -1,9 +1,9 @@
 package Array;
 use 5.036;
 use subs 'bind', 'join', 'select', 'last', 'sort';
-use Scalar::Util;
-use List::Util;
-use Carp;
+use Scalar::Util ();
+use List::Util ();
+use Carp ();
 
 #-----------------------------------------------------------------------------#
 # CONSTRUCTORS                                                                #
@@ -56,6 +56,8 @@ sub unfold($class, $state, $f) {
 
 # Array->range_step : float -> float -> float -> Array<float>
 sub range_step($class, $start, $step, $stop) {
+    Carp::croak '$step is 0. Will run forever.' if $step == 0;
+
     # Ascending Order
     if ( $start <= $stop ) {
         return unfold('Array', $start, sub($current) {
@@ -109,6 +111,17 @@ sub mapi($array, $f) {
     my $idx = 0;
     for my $x ( @$array ) {
         push @new, $f->($x, $idx++);
+    }
+    return bless(\@new, 'Array');
+}
+
+sub choose($array, $f) {
+    my @new;
+    for my $x ( @$array ) {
+        my $value = $f->($x);
+        if ( defined $value ) {
+            push @new, $value;
+        }
     }
     return bless(\@new, 'Array');
 }
@@ -266,6 +279,13 @@ sub distinct_by($array, $get_key) {
         }
     }
     return bless(\@new, 'Array');
+}
+
+sub find($array, $default, $predicate) {
+    for my $x ( @$array ) {
+        return $x if $predicate->($x);
+    }
+    return $default;
 }
 
 1;
