@@ -1054,14 +1054,15 @@ sub str_split($seq, $regex) {
     });
 }
 
-# Build a hash by providing a keying function. Later elements
-# in the sequence overwrite previous one.
+# Build a hash by providing a mapping function returning a key, value pair
+# for an entry
 #
 # to_hash : Seq<'a> -> ('a -> 'Key) -> Hash<'Key * 'a>
-sub to_hash($seq, $get_key) {
+sub to_hash($seq, $mapper) {
     my %hash;
     iter($seq, sub($x) {
-        $hash{$get_key->($x)} = $x;
+        my ($key, $value) = $mapper->($x);
+        $hash{$key} = $value;
     });
     return \%hash;
 }

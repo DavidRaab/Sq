@@ -228,14 +228,26 @@ is(
     'str_join');
 
 is(
-    Seq->wrap(qw/Hello World you are awesome/)->to_hash(sub($value) { length($value) }),
+    Seq->wrap(qw/Hello World you are awesome/)->to_hash(sub($x) { length $x => $x }),
     hash {
         field 5 => "World";
         field 3 => "are";
         field 7 => "awesome";
         end;
     },
-    'to_hash');
+    'to_hash 1');
+
+is(
+    Seq->wrap(qw/Hello World you are awesome/)->to_hash(sub($x) { $x => length $x }),
+    hash {
+        field "Hello"   => 5;
+        field "World"   => 5;
+        field "you"     => 3;
+        field "are"     => 3;
+        field "awesome" => 7;
+        end;
+    },
+    'to_hash 2');
 
 is(
     Seq->wrap(qw/Hello World you are awesome/)->to_hash_of_array(sub($value) { length($value) }),
