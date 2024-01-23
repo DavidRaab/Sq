@@ -455,8 +455,18 @@ is(
     [],
     'zip 5');
 
-done_testing;
-exit;
+is(
+    Array->wrap(
+        Array->wrap(1,2,3),
+        Array->wrap(4,5,6),
+        Array->wrap(7,8,9),
+    ),
+    [
+        [1,2,3],
+        [4,5,6],
+        [7,8,9],
+    ],
+    'Is array of array');
 
 is(
     Array->wrap(
@@ -469,7 +479,10 @@ is(
         [4,5,6],
         [7,8,9],
     ],
-    'to_array_of_array');
+    'to_array_of_array is noop');
+
+done_testing;
+exit;
 
 is($range->any (sub($x) { $x < 1   }), 0, 'any value smaller 0');
 is($range->any (sub($x) { $x < 2   }), 1, 'any value smaller 1');

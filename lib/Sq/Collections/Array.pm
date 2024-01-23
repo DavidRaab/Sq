@@ -251,6 +251,10 @@ sub snds($array) {
     return bless(\@new, 'Array');
 }
 
+sub to_array_of_array($array) {
+    return $array;
+}
+
 #-----------------------------------------------------------------------------#
 # SIDE-EFFECTS                                                                #
 #    functions that have side-effects or produce side-effects. Those are      #
