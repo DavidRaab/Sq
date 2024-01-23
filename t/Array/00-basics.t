@@ -329,7 +329,8 @@ is(
 is(
     Array->wrap(
         Array->wrap(1,1),
-        Array->wrap(2,3,5,8,13),
+        [2,3],
+        Array->wrap(5,8,13),
     )->flatten,
     [1,1,2,3,5,8,13],
     'flatten - flattens an array of array');
