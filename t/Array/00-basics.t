@@ -354,22 +354,19 @@ is(Array->empty->last(0),       0, 'last with default value');
 is($range->last(undef),        10, 'last on non empty without default');
 is($range->last(0),            10, 'last on non empty with default');
 
-done_testing;
-exit;
-
 is(
-    Seq->wrap(1,5,-3,10,9,-2)->sort(sub($x,$y) { $x <=> $y })->to_array,
+    Array->wrap(1,5,-3,10,9,-2)->sort(sub($x,$y) { $x <=> $y }),
     [-3,-2,1,5,9,10],
     'sort 1');
 
 is(
-    Seq->wrap(qw/B b c A a C/)->sort(sub($x,$y) { $x cmp $y })->to_array,
+    Array->wrap(qw/B b c A a C/)->sort(sub($x,$y) { $x cmp $y }),
     [qw/A B C a b c/],
     'sort 2');
 
 # Schwartzian Transformation
 {
-    my $data = Seq->wrap(
+    my $data = Array->wrap(
         { id => 1, char => 'W' },
         { id => 4, char => 'L' },
         { id => 5, char => 'D' },
@@ -378,7 +375,7 @@ is(
     );
 
     is(
-        $data->sort_by(sub($x,$y) { $x <=> $y }, sub($x) { $x->{id} })->to_array,
+        $data->sort_by(sub($x,$y) { $x <=> $y }, sub($x) { $x->{id} }),
         [
             { id => 1, char => 'W' },
             { id => 2, char => 'O' },
@@ -389,7 +386,7 @@ is(
         'sort_by 1');
 
     is(
-        $data->sort_by(sub($x,$y) { $x cmp $y }, sub($x) { $x->{char} })->to_array,
+        $data->sort_by(sub($x,$y) { $x cmp $y }, sub($x) { $x->{char} }),
         [
             { id => 5, char => 'D' },
             { id => 4, char => 'L' },
@@ -403,68 +400,69 @@ is(
         $data
         ->map (sub($x)    { [$x->{id} ,  $x     ] })
         ->sort(sub($x,$y) {  $x->[0] <=> $y->[0]  })
-        ->map (sub($x)    {  $x->[1]              })
-        ->to_array,
+        ->map (sub($x)    {  $x->[1]              }),
 
-        $data->sort_by(sub($x,$y) { $x <=> $y }, sub($x) { $x->{id} })->to_array,
+        $data->sort_by(sub($x,$y) { $x <=> $y }, sub($x) { $x->{id} }),
         'sort_by 3');
 }
 
-
-my $fs = Seq->wrap([1,"Hi"],[2,"Foo"],[3,"Bar"],[4,"Mug"]);
-is($fs->fsts->to_array, [1,2,3,4],            'fsts');
-is($fs->snds->to_array, [qw/Hi Foo Bar Mug/], 'snds');
+my $fs = Array->wrap([1,"Hi"],[2,"Foo"],[3,"Bar"],[4,"Mug"]);
+is($fs->fsts, [1,2,3,4],            'fsts');
+is($fs->snds, [qw/Hi Foo Bar Mug/], 'snds');
 
 is(
-    Seq->wrap([1,2,3], [4,5,6], [7,8,9])->flatten_array->to_array,
+    Array->wrap([1,2,3], [4,5,6], [7,8,9])->flatten,
     [1..9],
-    'flatten_array');
+    'flatten');
 
 is(
-    Seq::zip(
-        Seq->range(1,6),
-        Seq->wrap(qw(A B C D E F))
-    )->to_array,
+    Array::zip(
+        Array->range(1,6),
+        Array->wrap(qw(A B C D E F))
+    ),
     [[qw/1 A/],[qw/2 B/],[qw/3 C/],[qw/4 D/],[qw/5 E/],[qw/6 F/]],
     'zip 1');
 
 is(
-    Seq::zip(
-        Seq->range(1,3),
-        Seq->wrap(qw(A B C D E F))
-    )->to_array,
+    Array::zip(
+        Array->range(1,3),
+        Array->wrap(qw(A B C D E F))
+    ),
     [[qw/1 A/],[qw/2 B/],[qw/3 C/]],
     'zip 2');
 
 is(
-    Seq::zip(
-        Seq->range(1,6),
-        Seq->wrap(qw(A B C D))
-    )->to_array,
+    Array::zip(
+        Array->range(1,6),
+        Array->wrap(qw(A B C D))
+    ),
     [[qw/1 A/],[qw/2 B/],[qw/3 C/],[qw/4 D/]],
     'zip 3');
 
 is(
-    Seq::zip(
-        Seq->empty,
-        Seq->wrap(qw(A B C D E F))
-    )->to_array,
+    Array::zip(
+        Array->empty,
+        Array->wrap(qw(A B C D E F))
+    ),
     [],
     'zip 4');
 
 is(
-    Seq::zip(
-        Seq->range(1,6),
-        Seq->empty,
-    )->to_array,
+    Array::zip(
+        Array->range(1,6),
+        Array->empty,
+    ),
     [],
     'zip 5');
 
+done_testing;
+exit;
+
 is(
-    Seq->wrap(
-        Seq->wrap(1,2,3),
-        Seq->wrap(4,5,6),
-        Seq->wrap(7,8,9),
+    Array->wrap(
+        Array->wrap(1,2,3),
+        Array->wrap(4,5,6),
+        Array->wrap(7,8,9),
     )->to_array_of_array,
     [
         [1,2,3],

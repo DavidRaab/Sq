@@ -219,6 +219,38 @@ sub zip($array1, $array2) {
     return bless(\@new, 'Array');
 }
 
+sub sort($array, $comparer) {
+    local ($a, $b);
+    my @sorted = CORE::sort { $comparer->($a, $b) } @$array;
+    return bless(\@sorted, 'Array');
+}
+
+sub sort_by($array, $comparer, $get_key) {
+    local ($a, $b, $_);
+    my @sorted =
+        CORE::map  { $_->[1] }
+        CORE::sort { $comparer->($a->[0], $b->[0]) }
+        CORE::map  { [$get_key->($_), $_] }
+            @$array;
+    return bless(\@sorted, 'Array');
+}
+
+sub fsts($array) {
+    my @new;
+    for my $x ( @$array ) {
+        push @new, $x->[0];
+    }
+    return bless(\@new, 'Array');
+}
+
+sub snds($array) {
+    my @new;
+    for my $x ( @$array ) {
+        push @new, $x->[1];
+    }
+    return bless(\@new, 'Array');
+}
+
 #-----------------------------------------------------------------------------#
 # SIDE-EFFECTS                                                                #
 #    functions that have side-effects or produce side-effects. Those are      #
