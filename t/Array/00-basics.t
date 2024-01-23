@@ -252,15 +252,13 @@ is(
     },
     'to_hash_of_array');
 
-done_testing;
-exit;
-
-is(Seq->wrap(1,1,2,3,1,4,5,4,3,2,6)->distinct->to_array, [1..6],              'distinct 1');
-is(Seq->wrap(1,2,3,2,23,123,4,12,2)->distinct->to_array, [1,2,3,23,123,4,12], 'distinct 2');
+is(Array->wrap(1,1,2,3,1,4,5,4,3,2,6)->distinct, [1..6],              'distinct 1');
+is(Array->wrap(1,2,3,2,23,123,4,12,2)->distinct, [1,2,3,23,123,4,12], 'distinct 2');
+is(Array::distinct([1,2,3,2,23,123,4,12,2]),     [1,2,3,23,123,4,12], 'distinct 3');
 
 # distinct_by tests
 {
-    my $data = Seq->wrap(
+    my $data = Array->wrap(
         {id => 1, name => "Foo"},
         {id => 2, name => "Bar"},
         {id => 3, name => "Baz"},
@@ -271,7 +269,7 @@ is(Seq->wrap(1,2,3,2,23,123,4,12,2)->distinct->to_array, [1,2,3,23,123,4,12], 'd
     is($data->distinct->count, 4, 'still 4 as HashRefs are always unequal');
     is($data->distinct_by(sub($x) { $x->{id} })->count, 3, 'one element less');
     is(
-        $data->distinct_by(sub($x) { $x->{id} })->to_array,
+        $data->distinct_by(sub($x) { $x->{id} }),
         [
             {id => 1, name => "Foo"},
             {id => 2, name => "Bar"},
@@ -281,9 +279,12 @@ is(Seq->wrap(1,2,3,2,23,123,4,12,2)->distinct->to_array, [1,2,3,23,123,4,12], 'd
 }
 
 is(
-    Seq->wrap(qw/A B C D E F/)->mapi(\&id)->to_array,
-    [[0,'A'], [1,'B'], [2,'C'], [3,'D'], [4, 'E'], [5, 'F']],
+    Array->wrap(qw/A B C D E F/)->mapi(sub($x,$i) { [$x,$i] }),
+    [[A => 0], [B => 1], [C => 2], [D => 3], [E => 4], [F => 5]],
     'mapi');
+
+done_testing;
+exit;
 
 is(Seq->init( 0,  sub($idx) { $idx })->to_array, [], 'init with count 0');
 is(Seq->init(-1,  sub($idx) { $idx })->to_array, [], 'init with count -1');

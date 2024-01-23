@@ -104,6 +104,15 @@ sub map($array, $f) {
     return bless([map { $f->($_) } @$array], 'Array');
 }
 
+sub mapi($array, $f) {
+    my @new;
+    my $idx = 0;
+    for my $x ( @$array ) {
+        push @new, $f->($x, $idx++);
+    }
+    return bless(\@new, 'Array');
+}
+
 # filter : Array<'a> -> ('a -> bool) -> Array<'a>
 sub filter($array, $predicate) {
     local $_;
@@ -232,6 +241,31 @@ sub to_hash_of_array($array, $mapper) {
         push @{$hash{$key}}, $value;
     }
     return \%hash;
+}
+
+sub distinct($array) {
+    my %seen;
+    my @new;
+    for my $value ( @$array ) {
+        if ( not exists $seen{$value} ) {
+            push @new, $value;
+            $seen{$value} = 1;
+        }
+    }
+    return bless(\@new, 'Array');
+}
+
+sub distinct_by($array, $get_key) {
+    my %seen;
+    my @new;
+    for my $value ( @$array ) {
+        my $key = $get_key->($value);
+        if ( not exists $seen{$key} ) {
+            push @new, $value;
+            $seen{$key} = 1;
+        }
+    }
+    return bless(\@new, 'Array');
 }
 
 1;
