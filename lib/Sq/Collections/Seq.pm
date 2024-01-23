@@ -599,7 +599,8 @@ sub sort_by($seq, $comparer, $get_key) {
         my @sorted =
             CORE::map  { $_->[1] }
             CORE::sort { $comparer->($a->[0], $b->[0]) }
-            CORE::map  { [$get_key->($_), $_] } @$array;
+            CORE::map  { [$get_key->($_), $_] }
+                @$array;
 
         return sub {
             return $sorted[$idx++];
