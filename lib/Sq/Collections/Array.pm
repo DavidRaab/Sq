@@ -5,8 +5,38 @@ use Scalar::Util;
 use List::Util;
 use Carp;
 
-sub empty {
-    return [];
+#-----------------------------------------------------------------------------#
+# CONSTRUCTORS                                                                #
+#                    Functions that create sequences                          #
+#-----------------------------------------------------------------------------#
+
+sub empty($class) {
+    return bless([], 'Array')
+}
+
+# wraps all function arguments into Array. Stops at first undef
+sub wrap($class, @array) {
+    my @copy;
+    for my $x ( @array ) {
+        last if not defined $x;
+        push @copy, $x;
+    }
+    return bless(\@copy, 'Array');
+}
+
+# concatenate arrays into a flattened array
+sub concat($class, @arrays) {
+    my @new;
+    for my $array ( @arrays ) {
+        push @new, @$array;
+    }
+    return bless(\@new, 'Array');
+}
+
+# Creates an Array with $count by passing the index to a function creating
+# the current element
+sub init($class, $count, $f) {
+    return bless([map { $f->($_) } 0 .. ($count-1)], 'Array');
 }
 
 # Array->unfold : 'State -> ('State -> Option<ListContext<'a, 'State>>) -> Array<'a>
@@ -52,6 +82,17 @@ sub from_array($class, $xs) {
     return bless($xs, 'Array');
 }
 
+
+#-----------------------------------------------------------------------------#
+# METHODS                                                                     #
+#           functions operating on Seq and returning another Seq              #
+#-----------------------------------------------------------------------------#
+
+# append : Array<'a> -> Array<'a> -> Array<'a>
+sub append($array1, $array2) {
+    return bless([@$array1, @$array2], 'Array');
+}
+
 # rev : Array<'a> -> Array<'a>
 sub rev($array) {
     return bless([reverse @$array], 'Array');
@@ -69,11 +110,17 @@ sub filter($array, $predicate) {
     return bless([grep { $predicate->($_) } @$array], 'Array');
 }
 
+sub skip($array, $amount) {
+    return bless([$array->@[$amount .. $array->$#*]], 'Array');
+}
+
 # take : Array<'a> -> Array<'a>
 sub take($array, $amount) {
     my @array;
     for (my $idx=0; $idx < $amount; $idx++ ) {
-        push @array, $array->[$idx];
+        my $x = $array->[$idx];
+        last if !defined $x;
+        push @array, $x;
     }
     return bless(\@array, 'Array');
 }
@@ -112,6 +159,70 @@ sub first($array, $default) {
 sub last($array, $default) {
     return $default if @$array == 0;
     return $array->[-1];
+}
+
+# adds index to an array
+sub indexed($array) {
+    my $idx = 0;
+    my @new;
+    for my $x ( @$array ) {
+        push @new, [$idx++, $x];
+    }
+    return bless(\@new, 'Array');
+}
+
+# zip : Array<'a> -> Array<'b> -> Array<'a * 'b>
+sub zip($array1, $array2) {
+    my @new;
+    my $idx = 0;
+    while (1) {
+        my $x = $array1->[$idx];
+        my $y = $array2->[$idx];
+        last if !defined($x) or !defined($y);
+        $idx++;
+        push @new, [$x,$y];
+    }
+    return bless(\@new, 'Array');
+}
+
+#-----------------------------------------------------------------------------#
+# SIDE-EFFECTS                                                                #
+#    functions that have side-effects or produce side-effects. Those are      #
+#    immediately executed, usually consuming all elements of Seq at once.     #
+#-----------------------------------------------------------------------------#
+
+#-----------------------------------------------------------------------------#
+# CONVERTER                                                                   #
+#         Those are functions converting Array to none Array types            #
+#-----------------------------------------------------------------------------#
+
+sub sum($array) {
+    my $sum = 0;
+    for my $x ( @$array ) {
+        $sum += $x;
+    }
+    return $sum;
+}
+
+sub sum_by($array, $mapper) {
+    my $sum = 0;
+    for my $x ( @$array ) {
+        $sum += $mapper->($x);
+    }
+    return $sum;
+}
+
+sub str_join($array, $sep) {
+    return join($sep, @$array);
+}
+
+sub to_hash($array, $mapper) {
+    my %hash;
+    for my $x ( @$array ) {
+        my ($key, $value) = $mapper->($x);
+        $hash{$key} = $value;
+    }
+    return \%hash;
 }
 
 1;

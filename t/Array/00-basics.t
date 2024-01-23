@@ -63,9 +63,6 @@ is(
     [ $range->map($add1)->expand ],
     'to_list');
 
-done_testing;
-exit;
-
 is($range->sum, 55, 'sum');
 is($range->sum, $range->rev->sum, 'sum 2');
 
@@ -73,170 +70,180 @@ is($range->sum, $range->rev->sum, 'sum 2');
 {
     # Currently on undef it aborts, should it just skip the undef and return
     # the values from 1 to 6?
-    is(Seq->wrap(1,2,3,undef,4,5,6)->to_array, [1..3], 'wrap containing an undef');
+    is(Array->wrap(1,2,3,undef,4,5,6), [1..3], 'wrap containing an undef');
 
-    is(Seq->wrap(5)->to_array, [5], 'wrap');
+    is(Array->wrap(5), [5], 'wrap');
     is(
-        Seq->wrap(5)->append(Seq->wrap(10))->to_array,
+        Array->wrap(5)->append(Array->wrap(10)),
         [5, 10],
         'wrap and append');
     is(
-        Seq->range(1,5)->append(Seq->range(6,10))->to_array,
-        Seq->range(1,10)->to_array,
+        Array->range(1,5)->append(Array->range(6,10)),
+        Array->range(1,10),
         'append two ranges');
-    is(Seq->range_step(1, 2, 10)->to_array, [ 1,3,5,7,9], '1 .. 10 step 2');
-    is(Seq->range_step(10, 2, 1)->to_array, [10,8,6,4,2], '10 .. 1 step 2');
+    is(Array->range_step(1, 2, 10), [ 1,3,5,7,9], '1 .. 10 step 2');
+    is(Array->range_step(10, 2, 1), [10,8,6,4,2], '10 .. 1 step 2');
 }
 
 is(
-    Seq::zip(
-        Seq->range(0, 1_000_000),
-        Seq->wrap(qw/A B C D E F/),
-    )->to_array,
-    Seq->wrap(qw/A B C D E F/)->indexed->to_array,
+    Array::zip(
+        Array->range(0, 1_000_000),
+        Array->wrap(qw/A B C D E F/),
+    ),
+    Array->wrap(qw/A B C D E F/)->indexed,
     'indexed');
 
 is(
-    $range->take(3)->indexed->to_array,
+    $range->take(3)->indexed,
     [[0,1], [1,2], [2,3]],
     'take->indexed');
+
+
 is(
-    Seq->init(10, \&id)->map($add1)->to_array,
-    $range->to_array,
+    Array->init(10, \&id)->map($add1),
+    $range,
     'init->map');
+
 is(
-    Seq->range(1,10)->indexed->to_array,
-    Seq->init(10, sub($idx) { [$idx, $idx+1] })->to_array,
+    Array->range(1,10)->indexed,
+    Array->init(10, sub($idx) { [$idx, $idx+1] }),
     'range->indexed vs. init');
+
 is(
-    (reduce { $a->append($b) } map { Seq->wrap($_) } 1 .. 10)->to_array,
-    $range->to_array,
+    (reduce { $a->append($b) } map { Array->wrap($_) } 1 .. 10),
+    $range,
     'append a list of wrapped values');
 is(
-    Seq->concat(map { Seq->wrap($_) } 1 .. 10)->to_array,
-    $range->to_array,
+    Array->concat(map { Array->wrap($_) } 1 .. 10),
+    $range,
     'concat');
+
 like(
-    Seq->concat->to_array,
-    Seq->empty->to_array,
+    Array->concat, Array->empty,
     'concat on zero is empty');
+
 is(
-    Seq->from_list(1 .. 10)->to_array,
-    $range->to_array,
-    'from_list');
-is(
-    Seq->from_list(Seq->range(1,10)->to_list)->to_array,
+    Array->wrap(Array->range(1,10)->expand),
     [1 .. 10],
-    'from_list and to_list is isomorph');
+    'expand');
+
 is(
-    Seq->from_list(1..5)->append(
-        Seq->from_list(6..10)
-    )->to_array,
-    Seq->concat(
-        Seq->from_list(1..3),
-        Seq->from_list(4..6),
-        Seq->from_list(7..10),
-    )->to_array,
+    Array->wrap(1..5)->append(
+        Array->wrap(6..10)
+    ),
+    Array->concat(
+        Array->wrap(1..3),
+        Array->wrap(4..6),
+        Array->wrap(7..10),
+    ),
     'append vs. concat');
+
 is(
-    Seq->empty->append(Seq->range(1,5))->append(Seq->range(6,10))->to_array,
-    $range->to_array,
+    Array->empty->append(Array->range(1,5))->append(Array->range(6,10)),
+    $range,
     'append on empty');
 is(
-    Seq->concat(
-        Seq->empty,
-        Seq->range(1,5),
-        Seq->empty,
-        Seq->range(10,12),
-        Seq->empty,
-        Seq->wrap("Hello"),
-        Seq->empty
-    )->to_array,
-    Seq->from_list(1..5, 10..12, "Hello")->to_array,
+    Array->concat(
+        Array->empty,
+        Array->range(1,5),
+        Array->empty,
+        Array->range(10,12),
+        Array->empty,
+        Array->wrap("Hello"),
+        Array->empty
+    ),
+    Array->wrap(1..5, 10..12, "Hello"),
     'concat with empties');
 is(
-    Seq->from_array([1..10])->to_array,
-    Seq->from_list(1..10)->to_array,
-    'from_array and from_list');
+    Array->from_array([1..10]),
+    Array->wrap(1..10),
+    'from_array and wrap');
 is(
-    Seq->unfold(10, sub($state) {
+    Array->unfold(10, sub($state) {
         if ( $state > 0 ) {
             return $state, $state-1;
         }
         else {
             return undef;
         }
-    })->to_array,
-    Seq->range(1,10)->rev->to_array,
+    }),
+    Array->range(1,10)->rev,
     'unfold');
+
 is(
-    Seq->wrap(1,2,3)->to_array,
-    Seq->from_list(1,2,3)->to_array,
-    'from_list is an alias to wrap');
-is(
-    Seq->wrap->to_array,
-    Seq->from_list->to_array,
-    'wrap and from_list without arguments is the same');
-is(
-    Seq->wrap->to_array,
-    Seq->empty->to_array,
+    Array->wrap, Array->empty,
     'wrap without arguments same as empty');
 
 # concat tests
 {
-    is(Seq->concat->to_array, [], 'Empty concat');
-    is(Seq->concat($range)->to_array, $range->to_array, 'concat with 1 element');
+    is(Array->concat, [], 'Empty concat');
+    is(Array->concat($range), $range, 'concat with 1 element');
     is(
-        Seq->concat(
-            Seq->range(1,5),
-            Seq->range(6,10),
-        )->to_array,
+        Array->concat(
+            Array->range(1,5),
+            Array->range(6,10),
+        ),
         [1..10],
         'concat with 2 elemets');
     is(
-        Seq->concat(
-            Seq->range(1,5),
-            Seq->range(6,10),
-            Seq->range(11,15),
-        )->to_array,
+        Array->concat(
+            Array->range(1,5),
+            Array->range(6,10),
+            Array->range(11,15),
+        ),
         [1..15],
         'concat with 3 elements');
 }
 
-is($range->skip(3)->take(3)->to_array,  [4,5,6], 'skip->take 1');
-is($range->skip(3)->take(10)->to_array, [4..10], 'skip->take 2');
-is($range->skip(10)->take(1)->to_array, [],      'skip->take 3');
+is($range->skip(3)->take(3),  [4,5,6], 'skip->take 1');
+is($range->skip(3)->take(10), [4..10], 'skip->take 2');
+is($range->skip(10)->take(1), [],      'skip->take 3');
 
-is($range->take(5)->skip(2)->to_array,  [3,4,5], 'take->skip 1');
-is($range->take(5)->skip(4)->to_array,  [5],     'take->skip 2');
-is($range->take(5)->skip(6)->to_array,  [],      'take->skip 2');
+is($range->take(5)->skip(2),  [3,4,5], 'take->skip 1');
+is($range->take(5)->skip(4),  [5],     'take->skip 2');
+is($range->take(5)->skip(6),  [],      'take->skip 2');
 
 is(
-    Seq->concat(
-        Seq->range(1,10),
-        Seq->range(10,1),
-    )->to_array,
-    Seq->concat(
+    Array->concat(
+        Array->range(1,10),
+        Array->range(10,1),
+    ),
+    Array->concat(
         $range,
         $range->rev
-    )->to_array,
+    ),
     'concat with rev');
 
-is(Seq->wrap([A => 1], [B => 2], [C => 3])->sum_by(\&snd), 6, 'sumBy');
+is(Array->wrap([A => 1], [B => 2], [C => 3])->sum_by(\&snd), 6, 'sumBy');
 is(
     Seq->wrap(qw/H e l l o W o r l d !/)->str_join('-'),
     "H-e-l-l-o-W-o-r-l-d-!",
     'str_join');
 
 is(
-    Seq->wrap(qw/Hello World you are awesome/)->to_hash(sub($value) { length($value) }),
+    Array->wrap(qw/Hello World you are awesome/)->to_hash(sub($x) { length $x => $x }),
     hash {
         field 5 => "World";
         field 3 => "are";
         field 7 => "awesome";
         end;
     },
-    'to_hash');
+    'to_hash 1');
+
+is(
+    Array->wrap(qw/Hello World you are awesome/)->to_hash(sub($x) { $x => length $x }),
+    hash {
+        field "Hello"   => 5;
+        field "World"   => 5;
+        field "you"     => 3;
+        field "are"     => 3;
+        field "awesome" => 7;
+        end;
+    },
+    'to_hash 2');
+
+done_testing;
+exit;
 
 is(
     Seq->wrap(qw/Hello World you are awesome/)->to_hash_of_array(sub($value) { length($value) }),
