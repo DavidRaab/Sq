@@ -337,6 +337,11 @@ sub intersperse($array, $value) {
     return bless(\@new, 'Array');
 }
 
+sub repeat($array, $count) {
+    return empty('Array') if $count <= 0;
+    return bless([(@$array) x $count], 'Array');
+}
+
 #-----------------------------------------------------------------------------#
 # SIDE-EFFECTS                                                                #
 #    functions that have side-effects or produce side-effects. Those are      #
