@@ -605,39 +605,84 @@ is(
     [ [1,'A'],[2,'B'],[1,'C'],[2,'D'] ],
     'repeat with zip 2');
 
-done_testing;
-exit;
-
 is(
-    Seq::zip(
-        Seq->wrap(1,2)->infinity,
-        Seq->wrap(qw/A B C D E/)->infinity,
-    )->take(12)->to_array,
+    Array::zip(
+        Array->wrap(1,2)->repeat(20),
+        Array->wrap(qw/A B C D E/)->repeat(20),
+    )->take(12),
     [
         [1,'A'],[2,'B'],[1,'C'],[2,'D'],[1,'E'],
         [2,'A'],[1,'B'],[2,'C'],[1,'D'],[2,'E'],
         [1,'A'],[2,'B'],
     ],
-    'zip on infinities');
+    'zip on repeat');
 
 is(
-    Seq::zip(
-        $range->infinity,
-        $range->rev->infinity,
-    )->take(15)->to_array,
+    Array::zip(
+        $range->repeat(10),
+        $range->rev->repeat(10),
+    )->take(15),
     [
         [1,10],[2,9],[3,8],[4,7],[5,6],[6,5],[7,4],[8,3],[9,2],[10,1],
         [1,10],[2,9],[3,8],[4,7],[5,6],
     ],
-    'zip on ifinity with reverse');
+    'zip on repeat with reverse');
 
 is(
-    Seq::zip(
-        $range->infinity,
-        $range->rev->infinity,
-    )->take(15)->map(sub($tuple) { fst($tuple) + snd($tuple) })->to_array,
+    Array::zip(
+        $range->repeat(10),
+        $range->rev->repeat(10),
+    )->take(15)->map(sub($tuple) { fst($tuple) + snd($tuple) }),
 
-    Seq->always(11)->take(15)->to_array,
+    Array->replicate(20, 11)->take(15),
     'zip,infinity,rev,take,map,always');
+
+is(
+    Array
+    ->wrap(1, 3, 20, -40, 20, 12, 100, 5, 20)
+    ->take_while(sub($x) { $x < 100 }),
+    [1,3,20,-40,20,12],
+    'take_while 1'
+);
+
+is(
+    Array
+    ->wrap(1, 3, 20, -40, 20, 12, 100, 5, 20)
+    ->take_while(sub($x) { $x > 100 }),
+    [],
+    'take_while 2'
+);
+
+is(
+    Array
+    ->wrap(1, 3, 20, -40, 20, 12, 100, 5, 20)
+    ->skip_while(sub($x) { $x < 100 }),
+    [100, 5, 20],
+    'skip_while 1'
+);
+
+is(
+    Array
+    ->wrap(1, 3, 20, -40, 20, 12, 100, 5, 20)
+    ->skip_while(sub($x) { $x > 100 }),
+    [1,3,20,-40,20,12,100,5,20],
+    'skip_while 2'
+);
+
+{ # iter & foreach
+    my @iter;    $range->iter(   sub($x) { push @iter,    $x });
+    my @foreach; $range->foreach(sub($x) { push @foreach, $x });
+
+    is(\@iter, [1..10],   'iter');
+    is(\@iter, \@foreach, 'iter same as foreach');
+}
+
+{ # iteri & foreachi
+    my @iteri;    $range->iteri(   sub($x,$i) { push @iteri,    [$i,$x] });
+    my @foreachi; $range->foreachi(sub($x,$i) { push @foreachi, [$i,$x] });
+
+    is(\@iteri, [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,7], [7,8], [8,9], [9,10]], 'iteri');
+    is(\@iteri, \@foreachi, 'iteri same as foreachi');
+}
 
 done_testing;

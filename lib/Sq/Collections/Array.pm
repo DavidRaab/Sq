@@ -346,11 +346,51 @@ sub repeat($array, $count) {
     return bless([(@$array) x $count], 'Array');
 }
 
+sub take_while($array, $predicate) {
+    my @new;
+    for my $x ( @$array ) {
+        last if not $predicate->($x);
+        push @new, $x;
+    }
+    return bless(\@new, 'Array');
+}
+
+sub skip_while($array, $predicate) {
+    my $index = 0;
+    for my $x ( @$array ) {
+        last if not $predicate->($x);
+        $index++;
+    }
+    return bless([$array->@[$index .. $array->$#*]], 'Array');
+}
+
 #-----------------------------------------------------------------------------#
 # SIDE-EFFECTS                                                                #
 #    functions that have side-effects or produce side-effects. Those are      #
 #    immediately executed, usually consuming all elements of Seq at once.     #
 #-----------------------------------------------------------------------------#
+
+sub iter($array, $f) {
+    for my $x ( @$array ) {
+        $f->($x);
+    }
+    return;
+}
+
+sub iteri($array, $f) {
+    for (my $i=0; $i < @$array; $i++) {
+        $f->($array->[$i], $i);
+    }
+    return;
+}
+
+sub foreach($array, $f) {
+    iter($array, $f);
+}
+
+sub foreachi($array, $f) {
+    iteri($array, $f);
+}
 
 #-----------------------------------------------------------------------------#
 # CONVERTER                                                                   #
