@@ -562,17 +562,18 @@ is(
 is($range->windowed(10), [ [1,2,3,4,5,6,7,8,9,10] ], 'windowed 10');
 is($range->windowed(11), [],                         'windowed 11');
 
+is(Array->wrap()     ->intersperse(0), [],              'intersperse 1');
+is(Array->wrap(1)    ->intersperse(0), [1],             'intersperse 2');
+is(Array->wrap(1,2)  ->intersperse(0), [1,0,2],         'intersperse 3');
+is(Array->wrap(1,2,3)->intersperse(0), [1,0,2,0,3],     'intersperse 4');
+is(Array->wrap(1..4) ->intersperse(0), [1,0,2,0,3,0,4], 'intersperse 5');
+is(
+    Array->range(1,10)->intersperse(0),
+    [1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10],
+    'intersperse 6');
+
 done_testing;
 exit;
-
-is(Seq->wrap()     ->intersperse(0)->to_array, [],          'intersperse 1');
-is(Seq->wrap(1)    ->intersperse(0)->to_array, [1],         'intersperse 2');
-is(Seq->wrap(1,2)  ->intersperse(0)->to_array, [1,0,2],     'intersperse 3');
-is(Seq->wrap(1,2,3)->intersperse(0)->to_array, [1,0,2,0,3], 'intersperse 4');
-is(
-    Seq->range(1,10)->intersperse(0)->to_array,
-    [1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10],
-    'intersperse 5');
 
 is(Seq->always(5)->take(-1)->to_array, [],         'always 1');
 is(Seq->always(5)->take(0) ->to_array, [],         'always 2');

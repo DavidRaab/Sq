@@ -314,6 +314,29 @@ sub windowed($array, $window_size) {
     return bless(\@new, 'Array');
 }
 
+sub intersperse($array, $value) {
+    return empty('Array')               if @$array == 0;
+    return bless([$array->[0]],'Array') if @$array == 1;
+
+    my @new   = $array->[0];
+    my $index = 1;
+    my $emit  = 1;
+
+    while (1) {
+        last if $index >= @$array;
+        if ( $emit ) {
+            push @new, $value;
+            $emit = 0;
+        }
+        else {
+            push @new, $array->[$index++];
+            $emit = 1;
+        }
+    }
+
+    return bless(\@new, 'Array');
+}
+
 #-----------------------------------------------------------------------------#
 # SIDE-EFFECTS                                                                #
 #    functions that have side-effects or produce side-effects. Those are      #
