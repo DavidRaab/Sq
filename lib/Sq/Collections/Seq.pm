@@ -62,6 +62,17 @@ sub empty($class) {
     return always(Seq => undef);
 }
 
+# replicates an $initial value $count times
+sub replicate($class, $count, $initial) {
+    from_sub(Seq => sub {
+        my $amount = 0;
+        return sub {
+            return undef if $amount++ >= $count;
+            return $initial;
+        }
+    });
+}
+
 
 # TODO: When $state is a reference. Same handling as in fold?
 #

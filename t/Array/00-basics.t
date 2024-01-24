@@ -579,32 +579,34 @@ is(Array->wrap(5)    ->repeat(5) , [5,5,5,5,5],   'repeat 4');
 is(Array->wrap(1,2,3)->repeat(2) , [1,2,3,1,2,3], 'repeat 5');
 is(Array->wrap(1,2,3)->repeat(3) , [(1,2,3) x 3], 'repeat 6');
 
-done_testing;
-exit;
+is(Array->replicate(10, 'A'), [('A') x 10], 'replicate');
 
 is(
-    Seq::zip(
-        Seq->always(1),
-        Seq->wrap(qw/A B C D E F/),
-    )->to_array,
+    Array::zip(
+        Array->replicate(10, 1),
+        Array->wrap(qw/A B C D E F/),
+    ),
     [ [1,'A'],[1,'B'],[1,'C'],[1,'D'],[1,'E'],[1,'F'] ],
-    'always with zip');
+    'replicate with zip');
 
 is(
-    Seq::zip(
-        Seq->wrap(1,2)->repeat(9),
-        Seq->wrap(qw/A B C D E F/),
-    )->to_array,
+    Array::zip(
+        Array->wrap(1,2)->repeat(9),
+        Array->wrap(qw/A B C D E F/),
+    ),
     [ [1,'A'],[2,'B'],[1,'C'],[2,'D'],[1,'E'],[2,'F'] ],
     'repeat with zip 1');
 
 is(
-    Seq::zip(
-        Seq->wrap(1,2)->repeat(2),
-        Seq->wrap(qw/A B C D E F/),
-    )->to_array,
+    Array::zip(
+        Array->wrap(1,2)->repeat(2),
+        Array->wrap(qw/A B C D E F/),
+    ),
     [ [1,'A'],[2,'B'],[1,'C'],[2,'D'] ],
     'repeat with zip 2');
+
+done_testing;
+exit;
 
 is(
     Seq::zip(

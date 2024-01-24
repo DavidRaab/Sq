@@ -585,6 +585,8 @@ is(Seq->wrap(5)    ->repeat(5) ->to_array, [5,5,5,5,5],   'repeat 4');
 is(Seq->wrap(1,2,3)->repeat(2) ->to_array, [1,2,3,1,2,3], 'repeat 5');
 is(Seq->wrap(1,2,3)->repeat(3) ->to_array, [(1,2,3) x 3], 'repeat 6');
 
+is(Seq->replicate(10, 'A')->to_array, [('A') x 10], 'replicate');
+
 is(
     Seq::zip(
         Seq->always(1),

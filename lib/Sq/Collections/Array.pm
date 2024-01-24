@@ -14,6 +14,10 @@ sub empty($class) {
     return bless([], 'Array')
 }
 
+sub replicate($class, $count, $initial) {
+    return bless([($initial) x $count], 'Array');
+}
+
 # wraps all function arguments into Array. Stops at first undef
 sub wrap($class, @array) {
     my @copy;
