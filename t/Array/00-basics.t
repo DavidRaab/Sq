@@ -488,9 +488,6 @@ is($range->all (sub($x) { $x < 11  }), 1, 'all values smaller 1');
 is($range->none(sub($x) { $x > 1   }), 0, 'none value greater 1');
 is($range->none(sub($x) { $x > 10  }), 1, 'none value greater 10');
 
-done_testing;
-exit;
-
 is(
     $range->pick(undef, sub($x) { $x*$x > 1000 ? $x*$x : undef }),
     undef,
@@ -547,6 +544,9 @@ is(
         ],
         'check 20 matches');
 }
+
+done_testing;
+exit;
 
 is( $range->windowed(-1)->to_array, Seq->empty->to_array,   'windowed -1');
 is( $range->windowed(0) ->to_array, Seq->empty->to_array,   'windowed 0');
