@@ -216,7 +216,7 @@ is(
 
 is(Array->wrap([A => 1], [B => 2], [C => 3])->sum_by(\&snd), 6, 'sumBy');
 is(
-    Seq->wrap(qw/H e l l o W o r l d !/)->str_join('-'),
+    Array->wrap(qw/H e l l o W o r l d !/)->str_join('-'),
     "H-e-l-l-o-W-o-r-l-d-!",
     'str_join');
 
@@ -507,7 +507,7 @@ is(
 
 # regex_match
 {
-    my $lines = Seq->wrap(
+    my $lines = Array->wrap(
         '2023-11-25T15:10:00',
         '2023-11-20T10:05:29',
         'xxxx-xx-xxT00:00:00',
@@ -523,7 +523,7 @@ is(
         \z/xms, [3,2,1,4,5,6]);
 
     is(
-        $matches->to_array,
+        $matches,
         [
             [qw/25 11 2023 15 10 00/],
             [qw/20 11 2023 10 05 29/],
@@ -538,7 +538,7 @@ is(
             (.)(.)(.)(.)
             (.)(.)(.)(.)
             (.)(.)(.)(.)
-        \z/xms, [1..20])->to_array,
+        \z/xms, [1..20]),
         [
             [1 .. 9, 0, 1 .. 9, 0],
         ],

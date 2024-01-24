@@ -330,7 +330,7 @@ sub sum_by($array, $mapper) {
 }
 
 sub str_join($array, $sep) {
-    return join($sep, @$array);
+    return CORE::join($sep, @$array);
 }
 
 sub to_hash($array, $mapper) {
