@@ -346,4 +346,25 @@ sub find($array, $default, $predicate) {
     return $default;
 }
 
+sub any($array, $predicate) {
+    for my $x ( @$array ) {
+        return 1 if $predicate->($x);
+    }
+    return 0;
+}
+
+sub all($array, $predicate) {
+    for my $x ( @$array ) {
+        return 0 if not $predicate->($x);
+    }
+    return 1;
+}
+
+sub none($array, $predicate) {
+    for my $x ( @$array ) {
+        return 0 if $predicate->($x);
+    }
+    return 1;
+}
+
 1;
