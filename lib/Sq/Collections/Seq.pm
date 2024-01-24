@@ -705,18 +705,13 @@ sub regex_match($seq, $regex, $picks) {
 sub windowed($seq, $window_size) {
     return empty('Seq') if $window_size <= 0;
     from_sub(Seq => sub {
-        my $array      = to_array($seq);
-        my $last_index = @$array - ($window_size-1);
+        my $array      = Array::windowed(to_array($seq), $window_size);
+        my $last_index = scalar @$array;
         my $index      = 0;
 
         return sub {
             return undef if $index >= $last_index;
-            my @return = ( $array->[$index] );
-            for my $i ( 1 .. ($window_size-1) ) {
-                push @return, $array->[$index+$i];
-            }
-            $index++;
-            return \@return;
+            return $array->[$index++];
         }
     });
 }
@@ -955,7 +950,8 @@ sub last($seq, $default) {
 # to_array : Seq<'a> -> Array<'a>
 sub to_array($seq) {
     state $folder = sub($array, $x) { push @$array, $x };
-    return fold_mut($seq, [], $folder);
+    my $array = fold_mut($seq, [], $folder);
+    return bless($array, 'Array');
 }
 
 # Turns a Sequence into
