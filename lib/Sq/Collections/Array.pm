@@ -302,6 +302,18 @@ sub regex_match($array, $regex, $picks) {
     return bless(\@new, 'Array');
 }
 
+sub windowed($array, $window_size) {
+    return empty('Array') if $window_size <= 0;
+
+    my $length     = $window_size - 1;
+    my $last_index = @$array - $length;
+    my @new;
+    for (my $index=0; $index < $last_index; $index++) {
+        push @new, [$array->@[$index .. ($index + $length)]];
+    }
+    return bless(\@new, 'Array');
+}
+
 #-----------------------------------------------------------------------------#
 # SIDE-EFFECTS                                                                #
 #    functions that have side-effects or produce side-effects. Those are      #
