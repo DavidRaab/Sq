@@ -180,21 +180,6 @@ sub fold_mut($array, $state, $folder) {
     return $state;
 }
 
-# Expands an array into its values
-sub expand($array) {
-    return @$array;
-}
-
-sub first($array, $default) {
-    return $default if @$array == 0;
-    return $array->[0];
-}
-
-sub last($array, $default) {
-    return $default if @$array == 0;
-    return $array->[-1];
-}
-
 # adds index to an array
 sub indexed($array) {
     my $idx = 0;
@@ -255,6 +240,31 @@ sub to_array_of_array($array) {
     return $array;
 }
 
+sub distinct($array) {
+    my %seen;
+    my @new;
+    for my $value ( @$array ) {
+        if ( not exists $seen{$value} ) {
+            push @new, $value;
+            $seen{$value} = 1;
+        }
+    }
+    return bless(\@new, 'Array');
+}
+
+sub distinct_by($array, $get_key) {
+    my %seen;
+    my @new;
+    for my $value ( @$array ) {
+        my $key = $get_key->($value);
+        if ( not exists $seen{$key} ) {
+            push @new, $value;
+            $seen{$key} = 1;
+        }
+    }
+    return bless(\@new, 'Array');
+}
+
 sub regex_match($array, $regex, $picks) {
     my @new;
     for my $str ( @$array ) {
@@ -303,6 +313,21 @@ sub regex_match($array, $regex, $picks) {
 #         Those are functions converting Array to none Array types            #
 #-----------------------------------------------------------------------------#
 
+# Expands an array into its values
+sub expand($array) {
+    return @$array;
+}
+
+sub first($array, $default) {
+    return $default if @$array == 0;
+    return $array->[0];
+}
+
+sub last($array, $default) {
+    return $default if @$array == 0;
+    return $array->[-1];
+}
+
 sub reduce($array, $default, $f) {
     return $default    if @$array == 0;
     return $array->[0] if @$array == 1;
@@ -349,31 +374,6 @@ sub to_hash_of_array($array, $mapper) {
         push @{$hash{$key}}, $value;
     }
     return \%hash;
-}
-
-sub distinct($array) {
-    my %seen;
-    my @new;
-    for my $value ( @$array ) {
-        if ( not exists $seen{$value} ) {
-            push @new, $value;
-            $seen{$value} = 1;
-        }
-    }
-    return bless(\@new, 'Array');
-}
-
-sub distinct_by($array, $get_key) {
-    my %seen;
-    my @new;
-    for my $value ( @$array ) {
-        my $key = $get_key->($value);
-        if ( not exists $seen{$key} ) {
-            push @new, $value;
-            $seen{$key} = 1;
-        }
-    }
-    return bless(\@new, 'Array');
 }
 
 sub find($array, $default, $predicate) {
