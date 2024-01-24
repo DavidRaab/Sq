@@ -19,8 +19,8 @@ my $is_even = sub($x) { $x % 2 == 0 };
 my $range = Seq->range(1, 10);
 my $query = $range->map($square)->filter($is_even);
 
-# you could use to_list to get a list and iterate over it.
-for my $x ( $query->to_list ) {
+# you could use expand to get a list and iterate over it.
+for my $x ( $query->expand ) {
     say $x;
 }
 
@@ -30,7 +30,7 @@ for my $x ( $query->to_list ) {
 # Like printing the values.
 
 # In this case you write
-$query->do(sub($x) {
+$query->iter(sub($x) {
     say $x;
 });
 
@@ -45,18 +45,23 @@ $query->do(sub($x) {
 
 local $| = 1;
 
+# This can crash your computer
+=pod
+
 print "Showing 100 Mio dots ...\n";
-for my $x ( Seq->range(1, 100_000_000)->to_list ) {
+for my $x ( Seq->range(1, 100_000_000)->expand ) {
     print ".";
 }
 print "\n";
+
+=cut
 
 # The above code needs about 30 seconds to start printing dots
 # and consumes up to 7 GiB of ram. As a list with 100 Mio elements must
 # be created
 
 print "Showing 100 Mio dots ...\n";
-Seq->range(1, 100_000_000)->do(sub($x) {
+Seq->range(1, 100_000_000)->iter(sub($x) {
     print ".";
 });
 print "\n";
