@@ -104,6 +104,21 @@ sub map($list, $f) {
     });
 }
 
+sub filter($list, $predicate) {
+    return unfold(List => $list, sub($list) {
+        NEXT:
+        return undef if is_empty($list);
+        my $head = head($list);
+        if ( $predicate->($head) ) {
+            return $head, tail($list);
+        }
+        else {
+            $list = tail($list);
+            goto NEXT;
+        }
+    });
+}
+
 #-----------------------------------------------------------------------------#
 # SIDE-EFFECTS                                                                #
 #    functions that have side-effects or produce side-effects. Those are      #

@@ -22,7 +22,9 @@ is($range->is_empty, 0,   '$range not empty');
 is(List->cons(1, List->cons(2, List->empty)), [1, [2, []]], 'List->cons');
 is(List->range(1,3), [1, [2, [3, []]]], 'List->range(1,3)');
 is($range->head, 1, 'head');
+is($range->head, List::head($range), 'List::head');
 is(List->range(1,3)->tail, [2, [3,[]]], 'tail');
+is(List->range(1,3)->tail, List::tail(List->range(1,3)), 'List::tail');
 
 # Basic checks of range and rangeDesc
 is($range, D(),                 'range returns something');
@@ -37,13 +39,13 @@ is(
     $range->map($double)->to_array,
     [2,4,6,8,10,12,14,16,18,20],
     'map');
-
-done_testing;
-exit;
 is(
     $range->filter($is_even)->to_array,
     [2,4,6,8,10],
     'filter');
+
+done_testing;
+exit;
 
 is($range->take(5)->to_array,  [1..5], 'take 1');
 is($range->take(0)->to_array,  [],     'take 2');
