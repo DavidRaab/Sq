@@ -5,9 +5,6 @@ use Sq;
 use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end bag float U/;
 # use DDP;
 
-diag( "Testing Sq $Sq::VERSION, Perl $], $^X" );
-is($Sq::VERSION, number_ge("0.006"), 'Check minimum version number');
-
 # Some values, functions, ... for testing
 my $range     = List->range(1, 10);
 my $rangeDesc = List->range(10, 1);
