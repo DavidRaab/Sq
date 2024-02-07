@@ -33,13 +33,13 @@ is(List->range(1,1)->to_array, [1], 'range is inclusive');
 is($rangeDesc->to_array, [reverse 1 .. 10], 'rangeDesc');
 is($range->to_array, $rangeDesc->rev->to_array, 'reverse of rangeDesc same as range');
 
-done_testing;
-exit;
-
 is(
     $range->map($double)->to_array,
     [2,4,6,8,10,12,14,16,18,20],
     'map');
+
+done_testing;
+exit;
 is(
     $range->filter($is_even)->to_array,
     [2,4,6,8,10],

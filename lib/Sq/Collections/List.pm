@@ -1,6 +1,6 @@
 package List;
 use 5.036;
-use subs 'bind', 'join', 'select', 'last', 'sort';
+use subs 'bind', 'join', 'select', 'last', 'sort', 'map';
 use Scalar::Util ();
 use List::Util ();
 use Carp ();
@@ -95,6 +95,13 @@ sub rev($list) {
         return cons(List => $x, $state);
     };
     return fold($list, empty('List'), $folder);
+}
+
+sub map($list, $f) {
+    return unfold(List => $list, sub($list) {
+        return undef if is_empty($list);
+        return $f->(head($list)), tail($list);
+    });
 }
 
 #-----------------------------------------------------------------------------#
