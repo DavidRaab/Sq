@@ -85,27 +85,27 @@ is(
 is($range->sum, 55, 'sum');
 is($range->sum, $range->rev->sum, 'sum 2');
 
-done_testing;
-exit;
-
 # Checking wrap & rangeStep
 {
     # Currently on undef it aborts, should it just skip the undef and return
     # the values from 1 to 6?
-    is(Seq->wrap(1,2,3,undef,4,5,6)->to_array, [1..3], 'wrap containing an undef');
+    is(List->wrap(1,2,3,undef,4,5,6)->to_array, [1..3], 'wrap containing an undef');
 
-    is(Seq->wrap(5)->to_array, [5], 'wrap');
+    is(List->wrap(5)->to_array, [5], 'wrap');
     is(
-        Seq->wrap(5)->append(Seq->wrap(10))->to_array,
+        List->wrap(5)->append(List->wrap(10))->to_array,
         [5, 10],
         'wrap and append');
     is(
-        Seq->range(1,5)->append(Seq->range(6,10))->to_array,
-        Seq->range(1,10)->to_array,
+        List->range(1,5)->append(List->range(6,10))->to_array,
+        List->range(1,10)->to_array,
         'append two ranges');
-    is(Seq->range_step(1, 2, 10)->to_array, [ 1,3,5,7,9], '1 .. 10 step 2');
-    is(Seq->range_step(10, 2, 1)->to_array, [10,8,6,4,2], '10 .. 1 step 2');
+    is(List->range_step(1, 2, 10)->to_array, [ 1,3,5,7,9], '1 .. 10 step 2');
+    is(List->range_step(10, 2, 1)->to_array, [10,8,6,4,2], '10 .. 1 step 2');
 }
+
+done_testing;
+exit;
 
 is(
     Seq::zip(

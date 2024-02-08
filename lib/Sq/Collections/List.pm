@@ -44,6 +44,15 @@ sub unfold($class, $state, $f) {
     return $list;
 }
 
+sub wrap($class, @xs) {
+    my $count = @xs;
+    return unfold('List', 0, sub($i) {
+        my $x = $xs[$i];
+        return undef if $i >= $count || (not defined $x);
+        return $x, $i+1;
+    });
+}
+
 # List->range_step : float -> float -> float -> Array<float>
 sub range_step($class, $start, $step, $stop) {
     Carp::croak '$step is 0. Will run forever.' if $step == 0;
@@ -74,7 +83,6 @@ sub range($class, $start, $stop) {
 #           functions operating on Seq and returning another Seq              #
 #-----------------------------------------------------------------------------#
 
-
 sub fold($list, $state, $folder) {
     my $xs = $list;
     my $s  = $state;
@@ -93,6 +101,31 @@ sub fold_mut($list, $state, $folder) {
         $xs = tail($xs);
     }
     return $s;
+}
+
+sub fold_back($list, $state, $folder) {
+    my $l = $list;
+
+    # First build a stack from list
+    my @stack;
+    while ( not is_empty($l) ) {
+        push @stack, $l->[0];
+        $l = $l->[1];
+    }
+
+    # build new state by pop every element from stack
+    my $s = $state;
+    while ( my $x = pop @stack ) {
+        $s = $folder->($s, $x);
+    }
+
+    return $s;
+}
+
+sub append($listA, $listB) {
+    return fold_back($listA, $listB, sub($list, $x) {
+        cons('List', $x, $list);
+    });
 }
 
 sub rev($list) {
