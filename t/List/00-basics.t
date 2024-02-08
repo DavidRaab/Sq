@@ -104,6 +104,16 @@ is($range->sum, $range->rev->sum, 'sum 2');
     is(List->range_step(10, 2, 1)->to_array, [10,8,6,4,2], '10 .. 1 step 2');
 }
 
+is(
+    $range->fold(List->empty, sub($l, $x) { List->cons($x, $l) }),
+    $range->rev,
+    'fold');
+
+is(
+    $range->fold_back(List->empty, sub($l, $x) { List->cons($x*2, $l) }),
+    $range->map(sub($x) { $x * 2 }),
+    'fold_back');
+
 done_testing;
 exit;
 
