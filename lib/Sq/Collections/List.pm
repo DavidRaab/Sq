@@ -20,6 +20,16 @@ sub is_empty($list) {
     return 0;
 }
 
+# This is a special function that allows to constructs List in a mutable
+# way. You are supposed to pass it an empty cell (end of list) and an $x.
+# It will add $x to the end of the list, create a new empty and return it.
+my $mut_append = sub($list, $x) {
+    my $new    = empty('List');
+    $list->[0] = $x;
+    $list->[1] = $new;
+    return $new;
+};
+
 #-----------------------------------------------------------------------------#
 # CONSTRUCTORS                                                                #
 #                    Functions that create lists                              #
@@ -28,20 +38,15 @@ sub is_empty($list) {
 # List->unfold : 'State -> ('State -> Option<ListContext<'a, 'State>>) -> List<'a>
 sub unfold($class, $state, $f) {
     my $s    = $state;
-    my $list = empty('List');
-    my $tail = $list;
+    my $new  = empty('List');
+    my $tail = $new;
 
     my $x;
     while (1) {
         ($x, $s) = $f->($s);
-        goto RETURN if not defined($x);
-        $tail->[0] = $x;
-        $tail->[1] = empty('List');
-        $tail      = $tail->[1];
+        return $new if not defined($x);
+        $tail = $mut_append->($tail, $x);
     }
-
-    RETURN:
-    return $list;
 }
 
 sub wrap($class, @xs) {
@@ -150,23 +155,15 @@ sub map($list, $f) {
 }
 
 sub map2($listA, $listB, $f) {
-    my $la   = $listA;
-    my $lb   = $listB;
-    my $new  = empty('List');
-    my $tail = $new;
+    my ($la, $lb) = ($listA, $listB);
+    my $new       = empty('List');
+    my $tail      = $new;
 
-    NEXT:
-    return $new if is_empty($la) || is_empty($lb);
-    my $ha = head($la);
-    my $hb = head($lb);
-
-    $tail->[0] = $f->($ha, $hb);
-    $tail->[1] = empty('List');
-    $tail      = $tail->[1];
-
-    $la = tail($la);
-    $lb = tail($lb);
-    goto NEXT;
+    while (1) {
+        return $new if is_empty($la) || is_empty($lb);
+        $tail = $mut_append->($tail, $f->(head($la), head($lb)));
+        ($la, $lb) = (tail($la), tail($lb));
+    }
 }
 
 # bind : list<'a> -> ('a -> list<'b>) -> list<'b>
@@ -181,11 +178,8 @@ sub bind($list, $f) {
     my $xs   = $f->($head);
 
     while ( not is_empty($xs) ) {
-        my $x = head($xs);
-        $tail->[0] = $x;
-        $tail->[1] = empty('List');
-        $tail      = $tail->[1];
-        $xs        = tail($xs);
+        $tail = $mut_append->($tail, head($xs));
+        $xs   = tail($xs);
     }
 
     $list = tail($list);
@@ -193,18 +187,16 @@ sub bind($list, $f) {
 }
 
 sub filter($list, $predicate) {
-    return unfold(List => $list, sub($list) {
-        NEXT:
-        return undef if is_empty($list);
-        my $head = head($list);
-        if ( $predicate->($head) ) {
-            return $head, tail($list);
-        }
-        else {
-            $list = tail($list);
-            goto NEXT;
+    my $new  = empty('List');
+    my $tail = $new;
+
+    iter($list, sub($x) {
+        if ( $predicate->($x) ) {
+            $tail = $mut_append->($tail, $x);
         }
     });
+
+    return $new;
 }
 
 sub take($list, $amount) {
@@ -232,6 +224,15 @@ sub indexed($list) {
 #    functions that have side-effects or produce side-effects. Those are      #
 #    immediately executed                                                     #
 #-----------------------------------------------------------------------------#
+
+sub iter($list, $f) {
+    my $l = $list;
+    while ( not is_empty($l) ) {
+        $f->(head($l));
+        $l = tail($l);
+    }
+    return;
+}
 
 #-----------------------------------------------------------------------------#
 # CONVERTER                                                                   #
