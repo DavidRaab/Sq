@@ -114,21 +114,21 @@ is(
     $range->map(sub($x) { $x * 2 }),
     'fold_back');
 
-done_testing;
-exit;
-
 is(
-    Seq::zip(
-        Seq->range(0, 1_000_000),
-        Seq->wrap(qw/A B C D E F/),
+    List::zip(
+        List->range(0, 100),
+        List->wrap(qw/A B C D E F/),
     )->to_array,
-    Seq->wrap(qw/A B C D E F/)->indexed->to_array,
+    List->wrap(qw/A B C D E F/)->indexed->to_array,
     'indexed');
 
 is(
     $range->take(3)->indexed->to_array,
     [[0,1], [1,2], [2,3]],
     'take->indexed');
+
+done_testing;
+exit;
 is(
     Seq->init(10, \&id)->map($add1)->to_array,
     $range->to_array,

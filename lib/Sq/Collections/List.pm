@@ -142,6 +142,26 @@ sub map($list, $f) {
     });
 }
 
+sub map2($listA, $listB, $f) {
+    my $la   = $listA;
+    my $lb   = $listB;
+    my $new  = empty('List');
+    my $tail = $new;
+
+    NEXT:
+    return $new if is_empty($la) || is_empty($lb);
+    my $ha = head($la);
+    my $hb = head($lb);
+
+    $tail->[0] = $f->($ha, $hb);
+    $tail->[1] = empty('List');
+    $tail      = $tail->[1];
+
+    $la = tail($la);
+    $lb = tail($lb);
+    goto NEXT;
+}
+
 # bind : list<'a> -> ('a -> list<'b>) -> list<'b>
 sub bind($list, $f) {
     my $new  = empty('List');
@@ -189,6 +209,15 @@ sub take($list, $amount) {
         $l = tail($l);
         return $head, ($amount-1);
     });
+}
+
+sub zip($listA, $listB) {
+    return map2($listA, $listB, sub($x,$y) { [$x,$y] });
+}
+
+sub indexed($list) {
+    my $idx = 0;
+    return List::map($list, sub($x) { [$idx++, $x] });
 }
 
 #-----------------------------------------------------------------------------#
