@@ -72,7 +72,7 @@ is($range->rev->to_array, [10,9,8,7,6,5,4,3,2,1], 'rev');
 is(
     $range->rev->map($add1)->rev->to_array,
     [ $range->map($add1)->expand ],
-    'to_list');
+    'expand');
 
 is($range->sum, 55, 'sum');
 is($range->sum, $range->rev->sum, 'sum 2');
