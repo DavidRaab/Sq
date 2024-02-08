@@ -138,50 +138,47 @@ is(
     (reduce { $a->append($b) } map { List->wrap($_) } 1 .. 10)->to_array,
     $range->to_array,
     'append a list of wrapped values');
-
-done_testing;
-exit;
 is(
-    Seq->concat(map { Seq->wrap($_) } 1 .. 10)->to_array,
+    List->concat(map { List->wrap($_) } 1 .. 10)->to_array,
     $range->to_array,
     'concat');
 like(
-    Seq->concat->to_array,
-    Seq->empty->to_array,
+    List->concat->to_array,
+    List->empty->to_array,
     'concat on zero is empty');
-
 is(
-    Seq->wrap(Seq->range(1,10)->expand)->to_array,
+    List->wrap(Seq->range(1,10)->expand)->to_array,
     [1 .. 10],
     'expand and wrap is isomorph');
-
 is(
-    Seq->wrap(1..5)->append(
-        Seq->wrap(6..10)
+    List->wrap(1..5)->append(
+        List->wrap(6..10)
     )->to_array,
-    Seq->concat(
-        Seq->wrap(1..3),
-        Seq->wrap(4..6),
-        Seq->wrap(7..10),
+    List->concat(
+        List->wrap(1..3),
+        List->wrap(4..6),
+        List->wrap(7..10),
     )->to_array,
     'append vs. concat');
 is(
-    Seq->empty->append(Seq->range(1,5))->append(Seq->range(6,10))->to_array,
+    List->empty->append(List->range(1,5))->append(List->range(6,10))->to_array,
     $range->to_array,
     'append on empty');
-
 is(
-    Seq->concat(
-        Seq->empty,
-        Seq->range(1,5),
-        Seq->empty,
-        Seq->range(10,12),
-        Seq->empty,
-        Seq->wrap("Hello"),
-        Seq->empty
+    List->concat(
+        List->empty,
+        List->range(1,5),
+        List->empty,
+        List->range(10,12),
+        List->empty,
+        List->wrap("Hello"),
+        List->empty
     )->to_array,
-    Seq->wrap(1..5, 10..12, "Hello")->to_array,
+    List->wrap(1..5, 10..12, "Hello")->to_array,
     'concat with empties');
+
+done_testing;
+exit;
 is(
     Seq->from_array([1..10])->to_array,
     Seq->wrap(1..10)->to_array,

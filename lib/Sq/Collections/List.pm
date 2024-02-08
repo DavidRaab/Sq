@@ -90,6 +90,19 @@ sub range($class, $start, $stop) {
     return range_step('List', $start, 1, $stop);
 }
 
+sub concat($class, @lists) {
+    my $new  = empty('List');
+    my $tail = $new;
+
+    for my $list ( @lists ) {
+        iter($list, sub($x) {
+            $tail = $mut_append->($tail, $x);
+        });
+    }
+
+    return $new;
+}
+
 #-----------------------------------------------------------------------------#
 # METHODS                                                                     #
 #           functions operating on List and returning another List            #
