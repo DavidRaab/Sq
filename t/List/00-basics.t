@@ -176,15 +176,12 @@ is(
     )->to_array,
     List->wrap(1..5, 10..12, "Hello")->to_array,
     'concat with empties');
-
-done_testing;
-exit;
 is(
-    Seq->from_array([1..10])->to_array,
-    Seq->wrap(1..10)->to_array,
+    List->from_array([1..10])->to_array,
+    List->wrap(1..10)->to_array,
     'from_array and wrap');
 is(
-    Seq->unfold(10, sub($state) {
+    List->unfold(10, sub($state) {
         if ( $state > 0 ) {
             return $state, $state-1;
         }
@@ -192,33 +189,36 @@ is(
             return undef;
         }
     })->to_array,
-    Seq->range(1,10)->rev->to_array,
+    List->range(1,10)->rev->to_array,
     'unfold');
 is(
-    Seq->wrap->to_array,
-    Seq->empty->to_array,
+    List->wrap->to_array,
+    List->empty->to_array,
     'wrap without arguments same as empty');
 
 # concat tests
 {
-    is(Seq->concat->to_array, [], 'Empty concat');
-    is(Seq->concat($range)->to_array, $range->to_array, 'concat with 1 element');
+    is(List->concat->to_array, [], 'Empty concat');
+    is(List->concat($range)->to_array, $range->to_array, 'concat with 1 element');
     is(
-        Seq->concat(
-            Seq->range(1,5),
-            Seq->range(6,10),
+        List->concat(
+            List->range(1,5),
+            List->range(6,10),
         )->to_array,
         [1..10],
         'concat with 2 elemets');
     is(
-        Seq->concat(
-            Seq->range(1,5),
-            Seq->range(6,10),
-            Seq->range(11,15),
+        List->concat(
+            List->range(1,5),
+            List->range(6,10),
+            List->range(11,15),
         )->to_array,
         [1..15],
         'concat with 3 elements');
 }
+
+done_testing;
+exit;
 
 is($range->skip(3)->take(3)->to_array,  [4,5,6], 'skip->take 1');
 is($range->skip(3)->take(10)->to_array, [4..10], 'skip->take 2');

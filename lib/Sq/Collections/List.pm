@@ -103,6 +103,17 @@ sub concat($class, @lists) {
     return $new;
 }
 
+sub from_array($class, $array) {
+    my $new  = empty('List');
+    my $tail = $new;
+
+    for my $x ( @$array ) {
+        $tail = $mut_append->($tail, $x);
+    }
+
+    return $new;
+}
+
 #-----------------------------------------------------------------------------#
 # METHODS                                                                     #
 #           functions operating on List and returning another List            #
