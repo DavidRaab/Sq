@@ -22,7 +22,7 @@ sub is_empty($list) {
 
 #-----------------------------------------------------------------------------#
 # CONSTRUCTORS                                                                #
-#                    Functions that create sequences                          #
+#                    Functions that create lists                              #
 #-----------------------------------------------------------------------------#
 
 # List->unfold : 'State -> ('State -> Option<ListContext<'a, 'State>>) -> List<'a>
@@ -87,7 +87,7 @@ sub range($class, $start, $stop) {
 
 #-----------------------------------------------------------------------------#
 # METHODS                                                                     #
-#           functions operating on Seq and returning another Seq              #
+#           functions operating on List and returning another List            #
 #-----------------------------------------------------------------------------#
 
 sub fold($list, $state, $folder) {
@@ -230,12 +230,12 @@ sub indexed($list) {
 #-----------------------------------------------------------------------------#
 # SIDE-EFFECTS                                                                #
 #    functions that have side-effects or produce side-effects. Those are      #
-#    immediately executed, usually consuming all elements of Seq at once.     #
+#    immediately executed                                                     #
 #-----------------------------------------------------------------------------#
 
 #-----------------------------------------------------------------------------#
 # CONVERTER                                                                   #
-#         Those are functions converting Array to none Array types            #
+#         Those are functions converting List to none List types              #
 #-----------------------------------------------------------------------------#
 
 sub to_array($list) {
