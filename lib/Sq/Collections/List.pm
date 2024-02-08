@@ -6,12 +6,24 @@ use List::Util ();
 use Carp ();
 
 #-----------------------------------------------------------------------------#
+# BASICS                                                                      #
+#           Basic functions that form the List Data-Structure                 #
+#-----------------------------------------------------------------------------#
+
+sub empty($class)              { bless([],             'List') }
+sub cons($class, $head, $tail) { bless([$head, $tail], 'List') }
+sub head($list)                { $list->[0]                    }
+sub tail($list)                { $list->[1]                    }
+
+sub is_empty($list) {
+    return 1 if Scalar::Util::reftype $list eq 'ARRAY' && @$list == 0;
+    return 0;
+}
+
+#-----------------------------------------------------------------------------#
 # CONSTRUCTORS                                                                #
 #                    Functions that create sequences                          #
 #-----------------------------------------------------------------------------#
-
-sub empty($class)              { return bless([],             'List') }
-sub cons($class, $head, $tail) { return bless([$head, $tail], 'List') }
 
 # List->unfold : 'State -> ('State -> Option<ListContext<'a, 'State>>) -> List<'a>
 sub unfold($class, $state, $f) {
@@ -62,13 +74,6 @@ sub range($class, $start, $stop) {
 #           functions operating on Seq and returning another Seq              #
 #-----------------------------------------------------------------------------#
 
-sub head($list) { return $list->[0] }
-sub tail($list) { return $list->[1] }
-
-sub is_empty($list) {
-    return 1 if Scalar::Util::reftype $list eq 'ARRAY' && @$list == 0;
-    return 0;
-}
 
 sub fold($list, $state, $folder) {
     my $xs = $list;
@@ -104,6 +109,29 @@ sub map($list, $f) {
     });
 }
 
+# bind : list<'a> -> ('a -> list<'b>) -> list<'b>
+sub bind($list, $f) {
+    my $new  = empty('List');
+    my $tail = $new;
+
+    NEXT:
+    return $new if is_empty($list);
+
+    my $head = head($list);
+    my $xs   = $f->($head);
+
+    while ( not is_empty($xs) ) {
+        my $x = head($xs);
+        $tail->[0] = $x;
+        $tail->[1] = empty('List');
+        $tail      = $tail->[1];
+        $xs        = tail($xs);
+    }
+
+    $list = tail($list);
+    goto NEXT;
+}
+
 sub filter($list, $predicate) {
     return unfold(List => $list, sub($list) {
         NEXT:
@@ -116,6 +144,17 @@ sub filter($list, $predicate) {
             $list = tail($list);
             goto NEXT;
         }
+    });
+}
+
+sub take($list, $amount) {
+    my $l = $list;
+    return unfold(List => $amount, sub($amount) {
+        return undef if ($amount <= 0) || is_empty($l);
+
+        my $head = head($l);
+        $l = tail($l);
+        return $head, ($amount-1);
     });
 }
 
@@ -135,6 +174,18 @@ sub to_array($list) {
         push @$state, $x;
     };
     return fold_mut($list, [], $folder);
+}
+
+sub expand($list) {
+    return @{ to_array($list) };
+}
+
+sub count($list) {
+    return fold($list, 0, sub($state, $x) { $state+1 });
+}
+
+sub sum($list) {
+    return fold($list, 0, sub($state, $x) { $state+$x });
 }
 
 1;

@@ -44,9 +44,6 @@ is(
     [2,4,6,8,10],
     'filter');
 
-done_testing;
-exit;
-
 is($range->take(5)->to_array,  [1..5], 'take 1');
 is($range->take(0)->to_array,  [],     'take 2');
 is($range->take(-1)->to_array, [],     'take 3');
@@ -78,15 +75,18 @@ is(
     $range->fold_mut([], sub($array, $x) { push @$array, $x         }),
     'fold_mut');
 
-is($range->rev, check_isa('Seq'), 'rev return Seq');
+is($range->rev, check_isa('List'), 'rev return List');
 is($range->rev->to_array, [10,9,8,7,6,5,4,3,2,1], 'rev');
 is(
     $range->rev->map($add1)->rev->to_array,
     [ $range->map($add1)->expand ],
-    'to_list');
+    'expand');
 
 is($range->sum, 55, 'sum');
 is($range->sum, $range->rev->sum, 'sum 2');
+
+done_testing;
+exit;
 
 # Checking wrap & rangeStep
 {
