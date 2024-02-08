@@ -126,11 +126,8 @@ is(
     $range->take(3)->indexed->to_array,
     [[0,1], [1,2], [2,3]],
     'take->indexed');
-
-done_testing;
-exit;
 is(
-    Seq->init(10, \&id)->map($add1)->to_array,
+    List->init(10, \&id)->map($add1)->to_array,
     $range->to_array,
     'init->map');
 is(
@@ -138,9 +135,12 @@ is(
     Seq->init(10, sub($idx) { [$idx, $idx+1] })->to_array,
     'range->indexed vs. init');
 is(
-    (reduce { $a->append($b) } map { Seq->wrap($_) } 1 .. 10)->to_array,
+    (reduce { $a->append($b) } map { List->wrap($_) } 1 .. 10)->to_array,
     $range->to_array,
     'append a list of wrapped values');
+
+done_testing;
+exit;
 is(
     Seq->concat(map { Seq->wrap($_) } 1 .. 10)->to_array,
     $range->to_array,

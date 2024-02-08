@@ -53,6 +53,13 @@ sub wrap($class, @xs) {
     });
 }
 
+sub init($class, $amount, $gen) {
+    return unfold('List', 0, sub($idx) {
+        return undef if $idx >= $amount;
+        return $gen->($idx), $idx+1;
+    });
+}
+
 # List->range_step : float -> float -> float -> Array<float>
 sub range_step($class, $start, $step, $stop) {
     Carp::croak '$step is 0. Will run forever.' if $step == 0;
