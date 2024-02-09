@@ -514,12 +514,9 @@ is(
     64,
     'pick squared element that is greater 50');
 
-done_testing;
-exit;
-
 # regex_match
 {
-    my $lines = Seq->wrap(
+    my $lines = List->wrap(
         '2023-11-25T15:10:00',
         '2023-11-20T10:05:29',
         'xxxx-xx-xxT00:00:00',
@@ -556,6 +553,9 @@ exit;
         ],
         'check 20 matches');
 }
+
+done_testing;
+exit;
 
 is( $range->windowed(-1)->to_array, Seq->empty->to_array,   'windowed -1');
 is( $range->windowed(0) ->to_array, Seq->empty->to_array,   'windowed 0');
