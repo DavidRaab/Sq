@@ -217,27 +217,27 @@ is(
         'concat with 3 elements');
 }
 
-done_testing;
-exit;
-
-is($range->skip(3)->take(3)->to_array,  [4,5,6], 'skip->take 1');
-is($range->skip(3)->take(10)->to_array, [4..10], 'skip->take 2');
-is($range->skip(10)->take(1)->to_array, [],      'skip->take 3');
+is($range->skip( 3)->take( 3)->to_array, [4,5,6], 'skip->take 1');
+is($range->skip( 3)->take(10)->to_array, [4..10], 'skip->take 2');
+is($range->skip(10)->take( 1)->to_array, [],      'skip->take 3');
 
 is($range->take(5)->skip(2)->to_array,  [3,4,5], 'take->skip 1');
 is($range->take(5)->skip(4)->to_array,  [5],     'take->skip 2');
 is($range->take(5)->skip(6)->to_array,  [],      'take->skip 2');
 
 is(
-    Seq->concat(
-        Seq->range(1,10),
-        Seq->range(10,1),
+    List->concat(
+        List->range(1,10),
+        List->range(10,1),
     )->to_array,
-    Seq->concat(
+    List->concat(
         $range,
         $range->rev
     )->to_array,
     'concat with rev');
+
+done_testing;
+exit;
 
 is(Seq->wrap([A => 1], [B => 2], [C => 3])->sum_by(\&snd), 6, 'sumBy');
 is(

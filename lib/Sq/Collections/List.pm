@@ -234,6 +234,15 @@ sub take($list, $amount) {
     });
 }
 
+sub skip($list, $amount) {
+    my $l = $list;
+    while ( $amount-- > 0 ) {
+        return $l if is_empty($l);
+        $l = tail($l);
+    }
+    return $l;
+}
+
 sub zip($listA, $listB) {
     return map2($listA, $listB, sub($x,$y) { [$x,$y] });
 }
