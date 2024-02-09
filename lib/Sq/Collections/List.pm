@@ -25,7 +25,7 @@ sub is_empty($list) {
 # way. You are supposed to pass it an empty cell (end of list) and an $x.
 # It will add $x to the end of the list, create a new empty and return it.
 my $mut_append = sub($list, $x) {
-    my $new    = empty('List');
+    my $new    = bless([], 'List');
     $list->[0] = $x;
     $list->[1] = $new;
     return $new;
@@ -160,15 +160,12 @@ sub fold_back($list, $state, $folder) {
 }
 
 sub append($listA, $listB) {
-    return fold_back($listA, $listB, sub($list, $x) {
-        cons('List', $x, $list);
-    });
+    state $folder = sub($list, $x) { cons('List', $x, $list) };
+    return fold_back($listA, $listB, $folder);
 }
 
 sub rev($list) {
-    state $folder = sub($state, $x) {
-        return cons(List => $x, $state);
-    };
+    state $folder = sub($state, $x) { cons(List => $x, $state) };
     return fold($list, empty('List'), $folder);
 }
 
@@ -218,19 +215,16 @@ sub bind($list, $f) {
     my $new  = empty('List');
     my $tail = $new;
 
-    NEXT:
-    return $new if is_empty($list);
+    while (1) {
+        return $new if is_empty($list);
 
-    my $head = head($list);
-    my $xs   = $f->($head);
-
-    while ( not is_empty($xs) ) {
-        $tail = $mut_append->($tail, head($xs));
-        $xs   = tail($xs);
+        my $xs = $f->(head($list));
+        while ( not is_empty($xs) ) {
+            $tail = $mut_append->($tail, head($xs));
+            $xs   = tail($xs);
+        }
+        $list = tail($list);
     }
-
-    $list = tail($list);
-    goto NEXT;
 }
 
 sub flatten($list) {
@@ -370,9 +364,7 @@ sub reduce($list, $default, $reducer) {
 }
 
 sub to_array($list) {
-    state $folder = sub($state, $x) {
-        push @$state, $x;
-    };
+    state $folder = sub($state, $x) { push @$state, $x };
     return fold_mut($list, [], $folder);
 }
 
@@ -381,11 +373,13 @@ sub expand($list) {
 }
 
 sub count($list) {
-    return fold($list, 0, sub($state, $x) { $state + 1 });
+    state $folder = sub($state, $x) { $state + 1 };
+    return fold($list, 0, $folder);
 }
 
 sub sum($list) {
-    return fold($list, 0, sub($state, $x) { $state + $x });
+    state $folder = sub($state, $x) { $state + $x };
+    return fold($list, 0, $folder);
 }
 
 sub sum_by($list, $f) {
@@ -438,11 +432,9 @@ sub last($list, $default) {
 
 sub to_array_of_array($lol) {
     my @array;
-
     iter($lol, sub($list) {
         push @array, to_array($list);
     });
-
     return \@array;
 }
 
