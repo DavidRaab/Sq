@@ -554,11 +554,8 @@ is(
         'check 20 matches');
 }
 
-done_testing;
-exit;
-
-is( $range->windowed(-1)->to_array, Seq->empty->to_array,   'windowed -1');
-is( $range->windowed(0) ->to_array, Seq->empty->to_array,   'windowed 0');
+is( $range->windowed(-1)->to_array, [],                     'windowed -1');
+is( $range->windowed(0) ->to_array, [],                     'windowed 0');
 is( $range->windowed(1) ->to_array, [map { [$_] } 1 .. 10], 'windowed 1');
 is(
     $range->windowed(2)->to_array,
@@ -572,7 +569,10 @@ is(
     'windowed 5');
 
 is($range->windowed(10)->to_array, [ [1,2,3,4,5,6,7,8,9,10] ], 'windowed 10');
-is($range->windowed(11)->to_array, Seq->empty->to_array,       'windowed 11');
+is($range->windowed(11)->to_array, []                        , 'windowed 11');
+
+done_testing;
+exit;
 
 is(Seq->wrap()     ->intersperse(0)->to_array, [],          'intersperse 1');
 is(Seq->wrap(1)    ->intersperse(0)->to_array, [1],         'intersperse 2');

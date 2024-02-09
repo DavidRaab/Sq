@@ -329,6 +329,21 @@ sub flatten_array($list) {
     return $new;
 }
 
+sub windowed($list, $window_size) {
+    my $new  = empty('List');
+    my $tail = $new;
+    return $new if is_empty($list) || $window_size <= 0;
+
+    my $array = to_array($list);
+    my $length     = $window_size - 1;
+    my $last_index = @$array - $length;
+    for (my $index=0; $index < $last_index; $index++) {
+        my $window = [$array->@[$index .. ($index + $length)]];
+        $tail = $mut_append->($tail, $window);
+    }
+    return $new;
+}
+
 #-----------------------------------------------------------------------------#
 # SIDE-EFFECTS                                                                #
 #    functions that have side-effects or produce side-effects. Those are      #
