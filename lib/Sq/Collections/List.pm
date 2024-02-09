@@ -393,6 +393,49 @@ sub repeat($list, $amount) {
     return $new;
 }
 
+sub take_while($list, $predicate) {
+    my $new  = empty('List');
+    my $tail = $new;
+
+    my $l = $list;
+    while ( not is_empty($l) ) {
+        my $x = head($l);
+        if ( $predicate->($x) ) {
+            $tail = $mut_append->($tail, $x);
+        }
+        else {
+            last;
+        }
+        $l = tail($l);
+    }
+
+    return $new;
+}
+
+sub skip_while($list, $predicate) {
+    my $new  = empty('List');
+    my $tail = $new;
+
+    my $l = $list;
+    # first skip as long $predicate return true
+    while ( not is_empty($l) ) {
+        if ( $predicate->(head($l)) ) {
+            $l = tail($l);
+        }
+        else {
+            last;
+        }
+    }
+
+    # append all remaining items to $new
+    while ( not is_empty($l) ) {
+        $tail = $mut_append->($tail, head($l));
+        $l = tail($l);
+    }
+
+    return $new;
+}
+
 #-----------------------------------------------------------------------------#
 # SIDE-EFFECTS                                                                #
 #    functions that have side-effects or produce side-effects. Those are      #
@@ -405,6 +448,26 @@ sub iter($list, $f) {
         $f->(head($l));
         $l = tail($l);
     }
+    return;
+}
+
+sub foreach($list, $f) {
+    iter($list, $f);
+    return;
+}
+
+sub iteri($list, $f) {
+    my $idx = 0;
+    my $l   = $list;
+    while ( not is_empty($l) ) {
+        $f->(head($l), $idx++);
+        $l = tail($l);
+    }
+    return;
+}
+
+sub foreachi($list, $f) {
+    iteri($list, $f);
     return;
 }
 

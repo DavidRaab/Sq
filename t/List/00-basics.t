@@ -645,9 +645,6 @@ is(
     Seq->replicate(50, 11)->take(15)->to_array,
     'zip,infinity,rev,take,map,always');
 
-done_testing;
-exit;
-
 is(
     List
     ->wrap(1, 3, 20, -40, 20, 12, 100, 5, 20)
@@ -658,7 +655,7 @@ is(
 );
 
 is(
-    Seq
+    List
     ->wrap(1, 3, 20, -40, 20, 12, 100, 5, 20)
     ->take_while(sub($x) { $x > 100 })
     ->to_array,
@@ -667,7 +664,7 @@ is(
 );
 
 is(
-    Seq
+    List
     ->wrap(1, 3, 20, -40, 20, 12, 100, 5, 20)
     ->skip_while(sub($x) { $x < 100 })
     ->to_array,
@@ -676,7 +673,7 @@ is(
 );
 
 is(
-    Seq
+    List
     ->wrap(1, 3, 20, -40, 20, 12, 100, 5, 20)
     ->skip_while(sub($x) { $x > 100 })
     ->to_array,
