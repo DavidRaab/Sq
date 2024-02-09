@@ -571,98 +571,85 @@ is(
 is($range->windowed(10)->to_array, [ [1,2,3,4,5,6,7,8,9,10] ], 'windowed 10');
 is($range->windowed(11)->to_array, []                        , 'windowed 11');
 
-done_testing;
-exit;
-
-is(Seq->wrap()     ->intersperse(0)->to_array, [],          'intersperse 1');
-is(Seq->wrap(1)    ->intersperse(0)->to_array, [1],         'intersperse 2');
-is(Seq->wrap(1,2)  ->intersperse(0)->to_array, [1,0,2],     'intersperse 3');
-is(Seq->wrap(1,2,3)->intersperse(0)->to_array, [1,0,2,0,3], 'intersperse 4');
+is(List->wrap()     ->intersperse(0)->to_array, [],          'intersperse 1');
+is(List->wrap(1)    ->intersperse(0)->to_array, [1],         'intersperse 2');
+is(List->wrap(1,2)  ->intersperse(0)->to_array, [1,0,2],     'intersperse 3');
+is(List->wrap(1,2,3)->intersperse(0)->to_array, [1,0,2,0,3], 'intersperse 4');
 is(
-    Seq->range(1,10)->intersperse(0)->to_array,
+    List->range(1,10)->intersperse(0)->to_array,
     [1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10],
     'intersperse 5');
 
-is(Seq->always(5)->take(-1)->to_array, [],         'always 1');
-is(Seq->always(5)->take(0) ->to_array, [],         'always 2');
-is(Seq->always(5)->take(1) ->to_array, [5],        'always 3');
-is(Seq->always(5)->take(10)->to_array, [(5) x 10], 'always 4');
+is(List->wrap(5)    ->repeat(-1)->to_array, [],            'repeat 1');
+is(List->wrap(5)    ->repeat(0) ->to_array, [],            'repeat 2');
+is(List->wrap(5)    ->repeat(1) ->to_array, [5],           'repeat 3');
+is(List->wrap(5)    ->repeat(5) ->to_array, [5,5,5,5,5],   'repeat 4');
+is(List->wrap(1,2,3)->repeat(2) ->to_array, [1,2,3,1,2,3], 'repeat 5');
+is(List->wrap(1,2,3)->repeat(3) ->to_array, [(1,2,3) x 3], 'repeat 6');
 
-is(Seq->wrap(5)    ->infinity->take(0) ->to_array, [],                    'infinity 1');
-is(Seq->wrap(5)    ->infinity->take(1) ->to_array, [5],                   'infinity 2');
-is(Seq->wrap(5)    ->infinity->take(5) ->to_array, [5,5,5,5,5],           'infinity 3');
-is(Seq->wrap(1,2,3)->infinity->take(3) ->to_array, [1,2,3],               'infinity 4');
-is(Seq->wrap(1,2,3)->infinity->take(6) ->to_array, [1,2,3,1,2,3],         'infinity 5');
-is(Seq->wrap(1,2,3)->infinity->take(9) ->to_array, [1,2,3,1,2,3,1,2,3],   'infinity 6');
-is(Seq->wrap(1,2,3)->infinity->take(10)->to_array, [1,2,3,1,2,3,1,2,3,1], 'infinity 7');
-
-is(Seq->wrap(5)    ->repeat(-1)->to_array, [],            'repeat 1');
-is(Seq->wrap(5)    ->repeat(0) ->to_array, [],            'repeat 2');
-is(Seq->wrap(5)    ->repeat(1) ->to_array, [5],           'repeat 3');
-is(Seq->wrap(5)    ->repeat(5) ->to_array, [5,5,5,5,5],   'repeat 4');
-is(Seq->wrap(1,2,3)->repeat(2) ->to_array, [1,2,3,1,2,3], 'repeat 5');
-is(Seq->wrap(1,2,3)->repeat(3) ->to_array, [(1,2,3) x 3], 'repeat 6');
-
-is(Seq->replicate(10, 'A')->to_array, [('A') x 10], 'replicate');
+is(List->replicate(10, 'A')->to_array, [('A') x 10], 'replicate');
 
 is(
-    Seq::zip(
-        Seq->always(1),
-        Seq->wrap(qw/A B C D E F/),
+    List::zip(
+        List->replicate(100, 1),
+        List->wrap(qw/A B C D E F/),
     )->to_array,
     [ [1,'A'],[1,'B'],[1,'C'],[1,'D'],[1,'E'],[1,'F'] ],
-    'always with zip');
+    'replicate with zip');
 
 is(
-    Seq::zip(
-        Seq->wrap(1,2)->repeat(9),
-        Seq->wrap(qw/A B C D E F/),
+    List::zip(
+        List->wrap(1,2)->repeat(9),
+        List->wrap(qw/A B C D E F/),
     )->to_array,
     [ [1,'A'],[2,'B'],[1,'C'],[2,'D'],[1,'E'],[2,'F'] ],
     'repeat with zip 1');
 
 is(
-    Seq::zip(
-        Seq->wrap(1,2)->repeat(2),
-        Seq->wrap(qw/A B C D E F/),
+    List::zip(
+        List->wrap(1,2)->repeat(2),
+        List->wrap(qw/A B C D E F/),
     )->to_array,
     [ [1,'A'],[2,'B'],[1,'C'],[2,'D'] ],
     'repeat with zip 2');
 
 is(
-    Seq::zip(
-        Seq->wrap(1,2)->infinity,
-        Seq->wrap(qw/A B C D E/)->infinity,
+    List::zip(
+        List->wrap(1,2)->repeat(10),
+        List->wrap(qw/A B C D E/)->repeat(10),
     )->take(12)->to_array,
     [
         [1,'A'],[2,'B'],[1,'C'],[2,'D'],[1,'E'],
         [2,'A'],[1,'B'],[2,'C'],[1,'D'],[2,'E'],
         [1,'A'],[2,'B'],
     ],
-    'zip on infinities');
+    'zip on repeat');
 
 is(
-    Seq::zip(
-        $range->infinity,
-        $range->rev->infinity,
+    List::zip(
+        $range->repeat(10),
+        $range->rev->repeat(10),
     )->take(15)->to_array,
     [
         [1,10],[2,9],[3,8],[4,7],[5,6],[6,5],[7,4],[8,3],[9,2],[10,1],
         [1,10],[2,9],[3,8],[4,7],[5,6],
     ],
-    'zip on ifinity with reverse');
+    'zip on repeat with reverse');
 
 is(
-    Seq::zip(
-        $range->infinity,
-        $range->rev->infinity,
+    List::zip(
+        $range->repeat(10),
+        $range->rev->repeat(10),
     )->take(15)->map(sub($tuple) { fst($tuple) + snd($tuple) })->to_array,
 
-    Seq->always(11)->take(15)->to_array,
+    Seq->replicate(50, 11)->take(15)->to_array,
     'zip,infinity,rev,take,map,always');
 
+done_testing;
+exit;
+
 is(
-    Seq
+    List
     ->wrap(1, 3, 20, -40, 20, 12, 100, 5, 20)
     ->take_while(sub($x) { $x < 100 })
     ->to_array,

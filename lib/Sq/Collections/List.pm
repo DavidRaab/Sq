@@ -115,6 +115,18 @@ sub from_array($class, $array) {
     return $new;
 }
 
+sub replicate($class, $count, $value) {
+    my $new  = empty('List');
+    my $tail = $new;
+
+    for ( 1 .. $count ) {
+
+        $tail = $mut_append->($tail, $value);
+    }
+
+    return $new;
+}
+
 #-----------------------------------------------------------------------------#
 # METHODS                                                                     #
 #           functions operating on List and returning another List            #
@@ -341,6 +353,43 @@ sub windowed($list, $window_size) {
         my $window = [$array->@[$index .. ($index + $length)]];
         $tail = $mut_append->($tail, $window);
     }
+    return $new;
+}
+
+sub intersperse($list, $value) {
+    return empty('List')             if is_empty($list);
+    return wrap('List', head($list)) if is_empty(tail($list));
+
+    my $new   = wrap('List', head($list));
+    my $tail  = $new->[1];
+
+    my $l     = tail($list);
+    my $emit  = 1;
+    while ( not is_empty($l) ) {
+        if ( $emit ) {
+            $tail = $mut_append->($tail, $value);
+            $emit = 0;
+        }
+        else {
+            $tail = $mut_append->($tail, head($l));
+            $emit = 1;
+            $l = tail($l);
+        }
+    }
+
+    return $new;
+}
+
+sub repeat($list, $amount) {
+    my $new  = empty('List');
+    my $tail = $new;
+
+    for ( 1 .. $amount ) {
+        iter($list, sub($x) {
+            $tail = $mut_append->($tail, $x);
+        });
+    }
+
     return $new;
 }
 
