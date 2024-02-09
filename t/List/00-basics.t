@@ -490,9 +490,6 @@ is(
     ],
     'to_array_of_array');
 
-done_testing;
-exit;
-
 is($range->any (sub($x) { $x < 1   }), 0, 'any value smaller 0');
 is($range->any (sub($x) { $x < 2   }), 1, 'any value smaller 1');
 is($range->all (sub($x) { $x < 1   }), 0, 'all values smaller 1');
@@ -516,6 +513,9 @@ is(
     $range->pick("NO", sub($x) { $x*$x > 50 ? $x*$x : undef }),
     64,
     'pick squared element that is greater 50');
+
+done_testing;
+exit;
 
 # regex_match
 {

@@ -438,4 +438,47 @@ sub to_array_of_array($lol) {
     return \@array;
 }
 
+sub any($list, $predicate) {
+    my $l = $list;
+    while ( not is_empty($l) ) {
+        if ( $predicate->(head($l)) ) {
+            return 1;
+        }
+        $l = tail($l);
+    }
+    return 0;
+}
+
+sub all($list, $predicate) {
+    my $l = $list;
+    while ( not is_empty($l) ) {
+        if ( not $predicate->(head($l)) ) {
+            return 0;
+        }
+        $l = tail($l);
+    }
+    return 1;
+}
+
+sub none($list, $predicate) {
+    my $l = $list;
+    while ( not is_empty($l) ) {
+        if ( $predicate->(head($l)) ) {
+            return 0;
+        }
+        $l = tail($l);
+    }
+    return 1;
+}
+
+sub pick($list, $default, $picker) {
+    my $l = $list;
+    while ( not is_empty($l) ) {
+        my $x = $picker->(head($l));
+        return $x if defined $x;
+        $l = tail($l);
+    }
+    return $default;
+}
+
 1;
