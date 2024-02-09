@@ -1,6 +1,6 @@
 package Array;
 use 5.036;
-use subs 'bind', 'join', 'select', 'last', 'sort';
+use subs 'bind', 'join', 'select', 'last', 'sort', 'map', 'foreach';
 use Scalar::Util ();
 use List::Util ();
 use Carp ();
