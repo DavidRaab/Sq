@@ -4,6 +4,7 @@ use subs 'bind', 'join', 'select', 'last', 'sort', 'map';
 use Scalar::Util ();
 use List::Util ();
 use Carp ();
+use Sq::Collections::Array;
 
 #-----------------------------------------------------------------------------#
 # BASICS                                                                      #
@@ -178,6 +179,14 @@ sub map($list, $f) {
     });
 }
 
+sub mapi($list, $f) {
+    my $idx = 0;
+    return unfold(List => $list, sub($list) {
+        return undef if is_empty($list);
+        return $f->(head($list), $idx++), tail($list);
+    });
+}
+
 sub map2($listA, $listB, $f) {
     my ($la, $lb) = ($listA, $listB);
     my $new       = empty('List');
@@ -188,6 +197,20 @@ sub map2($listA, $listB, $f) {
         $tail = $mut_append->($tail, $f->(head($la), head($lb)));
         ($la, $lb) = (tail($la), tail($lb));
     }
+}
+
+sub choose($list, $chooser) {
+    my $new  = empty('List');
+    my $tail = $new;
+
+    iter($list, sub($x) {
+        my $y = $chooser->($x);
+        if ( defined $y ) {
+            $tail = $mut_append->($tail, $y);
+        }
+    });
+
+    return $new;
 }
 
 # bind : list<'a> -> ('a -> list<'b>) -> list<'b>
@@ -208,6 +231,19 @@ sub bind($list, $f) {
 
     $list = tail($list);
     goto NEXT;
+}
+
+sub flatten($list) {
+    my $new  = empty('List');
+    my $tail = $new;
+
+    iter($list, sub($l) {
+        iter($l, sub($x) {
+            $tail = $mut_append->($tail, $x);
+        });
+    });
+
+    return $new;
 }
 
 sub filter($list, $predicate) {
@@ -252,6 +288,53 @@ sub indexed($list) {
     return List::map($list, sub($x) { [$idx++, $x] });
 }
 
+sub distinct_by($list, $mapper) {
+    my $new  = empty('List');
+    my $tail = $new;
+    my %seen;
+    iter($list, sub($x) {
+        my $key = $mapper->($x);
+        if ( not exists $seen{$key} ) {
+            $seen{$key} = 1;
+            $tail = $mut_append->($tail, $x);
+        }
+    });
+    return $new;
+}
+
+sub distinct($list) {
+    return distinct_by($list, sub($x) { $x });
+}
+
+sub sort($list, $comparer) {
+    return from_array('List', Array::sort(to_array($list), $comparer));
+}
+
+sub sort_by($list, $comparer, $get_key) {
+    return from_array('List', Array::sort_by(to_array($list), $comparer, $get_key));
+}
+
+sub fsts($list) {
+    return List::map($list, sub($tuple) { $tuple->[0] });
+}
+
+sub snds($list) {
+    return List::map($list, sub($tuple) { $tuple->[1] });
+}
+
+sub flatten_array($list) {
+    my $new  = empty('List');
+    my $tail = $new;
+
+    iter($list, sub($array) {
+        for my $x ( @$array ) {
+            $tail = $mut_append->($tail, $x);
+        }
+    });
+
+    return $new;
+}
+
 #-----------------------------------------------------------------------------#
 # SIDE-EFFECTS                                                                #
 #    functions that have side-effects or produce side-effects. Those are      #
@@ -272,6 +355,20 @@ sub iter($list, $f) {
 #         Those are functions converting List to none List types              #
 #-----------------------------------------------------------------------------#
 
+sub reduce($list, $default, $reducer) {
+    # return $default if $list is empty
+    return $default if is_empty($list);
+    my $state = head($list);
+    my $l     = tail($list);
+    # return first element if $list only contains one element
+    return $state if is_empty($l);
+    # otherwise reduce
+    iter($l, sub($x) {
+        $state = $reducer->($state, $x);
+    });
+    return $state;
+}
+
 sub to_array($list) {
     state $folder = sub($state, $x) {
         push @$state, $x;
@@ -284,11 +381,69 @@ sub expand($list) {
 }
 
 sub count($list) {
-    return fold($list, 0, sub($state, $x) { $state+1 });
+    return fold($list, 0, sub($state, $x) { $state + 1 });
 }
 
 sub sum($list) {
-    return fold($list, 0, sub($state, $x) { $state+$x });
+    return fold($list, 0, sub($state, $x) { $state + $x });
+}
+
+sub sum_by($list, $f) {
+    return fold($list, 0, sub($state, $x) { $state + $f->($x) });
+}
+
+sub str_join($list, $sep) {
+    return CORE::join($sep, expand($list));
+}
+
+sub to_hash($list, $mapper) {
+    return fold_mut($list, {}, sub($hash, $x) {
+        my ($key, $value) = $mapper->($x);
+        $hash->{$key} = $value;
+    });
+}
+
+sub to_hash_of_array($list, $mapper) {
+    return fold_mut($list, {}, sub($hash, $x) {
+        my ($key, $value) = $mapper->($x);
+        push $hash->{$key}->@*, $value;
+    });
+}
+
+sub find($list, $default, $predicate) {
+    my $l = $list;
+    while ( not is_empty($l) ) {
+        my $x = head($l);
+        if ( $predicate->($x) ) {
+            return $x;
+        }
+        $l = tail($l);
+    }
+    return $default;
+}
+
+sub first($list, $default) {
+    return $default if is_empty($list);
+    return head($list);
+}
+
+sub last($list, $default) {
+    return $default if is_empty($list);
+    my $last;
+    iter($list, sub($x) {
+        $last = $x;
+    });
+    return $last;
+}
+
+sub to_array_of_array($lol) {
+    my @array;
+
+    iter($lol, sub($list) {
+        push @array, to_array($list);
+    });
+
+    return \@array;
 }
 
 1;

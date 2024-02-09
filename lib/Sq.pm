@@ -12,9 +12,9 @@ use Sub::Exporter -setup => {
 };
 
 # Load Seq Module -- available under 'Seq'
-use Sq::Collections::Seq;
 use Sq::Collections::Array;
 use Sq::Collections::List;
+use Sq::Collections::Seq;
 use Sq::Io;
 
 # Important functions used in FP code. So adding them.

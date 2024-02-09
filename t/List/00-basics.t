@@ -236,17 +236,14 @@ is(
     )->to_array,
     'concat with rev');
 
-done_testing;
-exit;
-
-is(Seq->wrap([A => 1], [B => 2], [C => 3])->sum_by(\&snd), 6, 'sumBy');
+is(List->wrap([A => 1], [B => 2], [C => 3])->sum_by(\&snd), 6, 'sumBy');
 is(
-    Seq->wrap(qw/H e l l o W o r l d !/)->str_join('-'),
+    List->wrap(qw/H e l l o W o r l d !/)->str_join('-'),
     "H-e-l-l-o-W-o-r-l-d-!",
     'str_join');
 
 is(
-    Seq->wrap(qw/Hello World you are awesome/)->to_hash(sub($x) { length $x => $x }),
+    List->wrap(qw/Hello World you are awesome/)->to_hash(sub($x) { length $x => $x }),
     hash {
         field 5 => "World";
         field 3 => "are";
@@ -256,7 +253,7 @@ is(
     'to_hash 1');
 
 is(
-    Seq->wrap(qw/Hello World you are awesome/)->to_hash(sub($x) { $x => length $x }),
+    List->wrap(qw/Hello World you are awesome/)->to_hash(sub($x) { $x => length $x }),
     hash {
         field "Hello"   => 5;
         field "World"   => 5;
@@ -268,7 +265,7 @@ is(
     'to_hash 2');
 
 is(
-    Seq->wrap(qw/Hello World you are awesome/)->to_hash_of_array(sub($x) { length $x => $x }),
+    List->wrap(qw/Hello World you are awesome/)->to_hash_of_array(sub($x) { length $x => $x }),
     hash {
         field 5 => array { item "Hello";   item "World" };
         field 3 => array { item "you";     item "are"   };
@@ -277,12 +274,12 @@ is(
     },
     'to_hash_of_array');
 
-is(Seq->wrap(1,1,2,3,1,4,5,4,3,2,6)->distinct->to_array, [1..6],              'distinct 1');
-is(Seq->wrap(1,2,3,2,23,123,4,12,2)->distinct->to_array, [1,2,3,23,123,4,12], 'distinct 2');
+is(List->wrap(1,1,2,3,1,4,5,4,3,2,6)->distinct->to_array, [1..6],              'distinct 1');
+is(List->wrap(1,2,3,2,23,123,4,12,2)->distinct->to_array, [1,2,3,23,123,4,12], 'distinct 2');
 
 # distinct_by tests
 {
-    my $data = Seq->wrap(
+    my $data = List->wrap(
         {id => 1, name => "Foo"},
         {id => 2, name => "Bar"},
         {id => 3, name => "Baz"},
@@ -303,16 +300,16 @@ is(Seq->wrap(1,2,3,2,23,123,4,12,2)->distinct->to_array, [1,2,3,23,123,4,12], 'd
 }
 
 is(
-    Seq->wrap(qw/A B C D E F/)->mapi(sub($x,$i) { [$x,$i] })->to_array,
+    List->wrap(qw/A B C D E F/)->mapi(sub($x,$i) { [$x,$i] })->to_array,
     [[A => 0], [B => 1], [C => 2], [D => 3], [E => 4], [F => 5]],
     'mapi');
 
-is(Seq->init( 0,  sub($idx) { $idx })->to_array, [], 'init with count 0');
-is(Seq->init(-1,  sub($idx) { $idx })->to_array, [], 'init with count -1');
-is(Seq->init(-10, sub($idx) { $idx })->to_array, [], 'init with count -10');
-is(Seq->range_step(1,1,1)->to_array, [1], 'range_step with 1,1,1');
+is(List->init( 0,  sub($idx) { $idx })->to_array, [], 'init with count 0');
+is(List->init(-1,  sub($idx) { $idx })->to_array, [], 'init with count -1');
+is(List->init(-10, sub($idx) { $idx })->to_array, [], 'init with count -10');
+is(List->range_step(1,1,1)->to_array, [1], 'range_step with 1,1,1');
 is(
-    Seq->range_step(0,0.1,1)->to_array,
+    List->range_step(0,0.1,1)->to_array,
     array {
         for (my $f=0.0; $f <= 1.0; $f+=0.1) {
             item float $f;
@@ -320,7 +317,7 @@ is(
     },
     'range_step with 0,0.1,1');
 like(
-    dies { Seq->range_step(0,0,1)->to_array },
+    dies { List->range_step(0,0,1)->to_array },
     qr/^\$step is 0/,
     'range_step dies with step size of zero');
 
@@ -346,50 +343,50 @@ is($range->find(undef, sub($x) { $x > 10 }), undef, 'find 2');
 is($range->find(0,     sub($x) { $x > 10 }),     0, 'find 3');
 
 is(
-    $range->bind(sub($x) { Seq->wrap($x) })->to_array,
+    $range->bind(sub($x) { List->wrap($x) })->to_array,
     [1 .. 10],
     'bind - somehow like id');
 
 is(
-    Seq->wrap(
-        Seq->wrap(1,1),
-        Seq->wrap(2,3,5,8,13),
+    List->wrap(
+        List->wrap(1,1),
+        List->wrap(2,3,5,8,13),
     )->flatten->to_array,
     [1,1,2,3,5,8,13],
     'flatten - flattens a seq of seq');
 
-is(Seq->wrap([1,1], [1,2])->to_array, [[1,1],[1,2]], 'wrap with arrays');
-is(Seq->wrap([1,1])       ->to_array, [[1,1]],       'wrap with array');
-is(Seq->from_array([1,1]) ->to_array, [1,1],         'from_array vs. wrap');
+is(List->wrap([1,1], [1,2])->to_array, [[1,1],[1,2]], 'wrap with arrays');
+is(List->wrap([1,1])       ->to_array, [[1,1]],       'wrap with array');
+is(List->from_array([1,1]) ->to_array, [1,1],         'from_array vs. wrap');
 
-is($range->reduce(undef, $add),      55, 'reduce');
-is(Seq->empty->reduce(undef, $add), U(), 'reduce on empty 1');
-is(Seq->empty->reduce(0, $add),       0, 'reduce on empty 2');
-is(Seq->wrap(1)->reduce(0, $add),     1, 'reduce on single element');
+is($range->reduce(undef, $add),       55, 'reduce');
+is(List->empty->reduce(undef, $add), U(), 'reduce on empty 1');
+is(List->empty->reduce(0, $add),       0, 'reduce on empty 2');
+is(List->wrap(1)->reduce(0, $add),     1, 'reduce on single element');
 
-is(Seq->empty->first(undef), U(), 'first on empty is undef');
-is(Seq->empty->first(0),       0, 'first with default value');
-is($range->first(-1),          1, 'first on non empty without default');
-is($range->first(0),           1, 'first on non empty with default');
+is(List->empty->first(undef), U(), 'first on empty is undef');
+is(List->empty->first(0),       0, 'first with default value');
+is($range->first(-1),           1, 'first on non empty without default');
+is($range->first(0),            1, 'first on non empty with default');
 
-is(Seq->empty->last(undef),   U(), 'last on empty is undef');
-is(Seq->empty->last(0),         0, 'last with default value');
+is(List->empty->last(undef),  U(), 'last on empty is undef');
+is(List->empty->last(0),        0, 'last with default value');
 is($range->last(undef),        10, 'last on non empty without default');
 is($range->last(0),            10, 'last on non empty with default');
 
 is(
-    Seq->wrap(1,5,-3,10,9,-2)->sort(sub($x,$y) { $x <=> $y })->to_array,
+    List->wrap(1,5,-3,10,9,-2)->sort(sub($x,$y) { $x <=> $y })->to_array,
     [-3,-2,1,5,9,10],
     'sort 1');
 
 is(
-    Seq->wrap(qw/B b c A a C/)->sort(sub($x,$y) { $x cmp $y })->to_array,
+    List->wrap(qw/B b c A a C/)->sort(sub($x,$y) { $x cmp $y })->to_array,
     [qw/A B C a b c/],
     'sort 2');
 
 # Schwartzian Transformation
 {
-    my $data = Seq->wrap(
+    my $data = List->wrap(
         { id => 1, char => 'W' },
         { id => 4, char => 'L' },
         { id => 5, char => 'D' },
@@ -431,60 +428,60 @@ is(
 }
 
 
-my $fs = Seq->wrap([1,"Hi"],[2,"Foo"],[3,"Bar"],[4,"Mug"]);
+my $fs = List->wrap([1,"Hi"],[2,"Foo"],[3,"Bar"],[4,"Mug"]);
 is($fs->fsts->to_array, [1,2,3,4],            'fsts');
 is($fs->snds->to_array, [qw/Hi Foo Bar Mug/], 'snds');
 
 is(
-    Seq->wrap([1,2,3], [4,5,6], [7,8,9])->flatten_array->to_array,
+    List->wrap([1,2,3], [4,5,6], [7,8,9])->flatten_array->to_array,
     [1..9],
     'flatten_array');
 
 is(
-    Seq::zip(
-        Seq->range(1,6),
-        Seq->wrap(qw(A B C D E F))
+    List::zip(
+        List->range(1,6),
+        List->wrap(qw(A B C D E F))
     )->to_array,
     [[qw/1 A/],[qw/2 B/],[qw/3 C/],[qw/4 D/],[qw/5 E/],[qw/6 F/]],
     'zip 1');
 
 is(
-    Seq::zip(
-        Seq->range(1,3),
-        Seq->wrap(qw(A B C D E F))
+    List::zip(
+        List->range(1,3),
+        List->wrap(qw(A B C D E F))
     )->to_array,
     [[qw/1 A/],[qw/2 B/],[qw/3 C/]],
     'zip 2');
 
 is(
-    Seq::zip(
-        Seq->range(1,6),
-        Seq->wrap(qw(A B C D))
+    List::zip(
+        List->range(1,6),
+        List->wrap(qw(A B C D))
     )->to_array,
     [[qw/1 A/],[qw/2 B/],[qw/3 C/],[qw/4 D/]],
     'zip 3');
 
 is(
-    Seq::zip(
-        Seq->empty,
-        Seq->wrap(qw(A B C D E F))
+    List::zip(
+        List->empty,
+        List->wrap(qw(A B C D E F))
     )->to_array,
     [],
     'zip 4');
 
 is(
-    Seq::zip(
-        Seq->range(1,6),
-        Seq->empty,
+    List::zip(
+        List->range(1,6),
+        List->empty,
     )->to_array,
     [],
     'zip 5');
 
 is(
-    Seq->wrap(
-        Seq->wrap(1,2,3),
-        Seq->wrap(4,5,6),
-        Seq->wrap(7,8,9),
+    List->wrap(
+        List->wrap(1,2,3),
+        List->wrap(4,5,6),
+        List->wrap(7,8,9),
     )->to_array_of_array,
     [
         [1,2,3],
@@ -492,6 +489,9 @@ is(
         [7,8,9],
     ],
     'to_array_of_array');
+
+done_testing;
+exit;
 
 is($range->any (sub($x) { $x < 1   }), 0, 'any value smaller 0');
 is($range->any (sub($x) { $x < 2   }), 1, 'any value smaller 1');
