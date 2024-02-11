@@ -17,8 +17,7 @@ sub head($list)                { $list->[0]                    }
 sub tail($list)                { $list->[1]                    }
 
 sub is_empty($list) {
-    return 1 if Scalar::Util::reftype $list eq 'ARRAY' && @$list == 0;
-    return 0;
+    return @$list == 0 ? 1 : 0;
 }
 
 # This is a special function that allows to constructs List in a mutable
@@ -46,7 +45,10 @@ sub unfold($class, $state, $f) {
     while (1) {
         ($x, $s) = $f->($s);
         return $new if not defined($x);
-        $tail = $mut_append->($tail, $x);
+        my $empty  = bless([], 'List');
+        $tail->[0] = $x;
+        $tail->[1] = $empty;
+        $tail      = $empty;
     }
 }
 
@@ -120,7 +122,6 @@ sub replicate($class, $count, $value) {
     my $tail = $new;
 
     for ( 1 .. $count ) {
-
         $tail = $mut_append->($tail, $value);
     }
 
@@ -135,9 +136,9 @@ sub replicate($class, $count, $value) {
 sub fold($list, $state, $folder) {
     my $xs = $list;
     my $s  = $state;
-    while ( not is_empty($xs) ) {
-        $s  = $folder->($s, head($xs));
-        $xs = tail($xs);
+    while ( @$xs != 0 ) {
+        $s  = $folder->($s, $xs->[0]);
+        $xs = $xs->[1];
     }
     return $s;
 }
@@ -145,9 +146,9 @@ sub fold($list, $state, $folder) {
 sub fold_mut($list, $state, $folder) {
     my $xs = $list;
     my $s  = $state;
-    while ( not is_empty($xs) ) {
-        $folder->($s, head($xs));
-        $xs = tail($xs);
+    while ( @$xs != 0 ) {
+        $folder->($s, $xs->[0]);
+        $xs = $xs->[1];
     }
     return $s;
 }
@@ -157,14 +158,16 @@ sub fold_back($list, $state, $folder) {
 
     # First build a stack from list
     my @stack;
-    while ( not is_empty($l) ) {
+    my $x;
+    while ( @$l != 0 ) {
         push @stack, $l->[0];
         $l = $l->[1];
     }
+    @stack = reverse @stack;
 
-    # build new state by pop every element from stack
+    # build new state
     my $s = $state;
-    while ( my $x = pop @stack ) {
+    for my $x ( @stack ) {
         $s = $folder->($s, $x);
     }
 
@@ -182,18 +185,32 @@ sub rev($list) {
 }
 
 sub map($list, $f) {
-    return unfold(List => $list, sub($list) {
-        return undef if is_empty($list);
-        return $f->(head($list)), tail($list);
-    });
+    my $new  = List::empty('List');
+    my $tail = $new;
+    my $empty;
+    while ( @$list != 0 ) {
+        $empty     = bless([], 'List');
+        $tail->[0] = $f->( $list->[0] );
+        $tail->[1] = $empty;
+        $tail      = $empty;
+        $list      = $list->[1];
+    }
+    return $new;
 }
 
 sub mapi($list, $f) {
-    my $idx = 0;
-    return unfold(List => $list, sub($list) {
-        return undef if is_empty($list);
-        return $f->(head($list), $idx++), tail($list);
-    });
+    my $idx  = 0;
+    my $new  = List::empty('List');
+    my $tail = $new;
+    my $empty;
+    while ( @$list != 0 ) {
+        $empty     = bless([], 'List');
+        $tail->[0] = $f->( $list->[0], $idx++ );
+        $tail->[1] = $empty;
+        $tail      = $empty;
+        $list      = $list->[1];
+    }
+    return $new;
 }
 
 sub map2($listA, $listB, $f) {
@@ -228,10 +245,10 @@ sub bind($list, $f) {
     my $tail = $new;
 
     while (1) {
-        return $new if is_empty($list);
+        return $new if @$list == 0;
 
         my $xs = $f->(head($list));
-        while ( not is_empty($xs) ) {
+        while ( @$xs != 0 ) {
             $tail = $mut_append->($tail, head($xs));
             $xs   = tail($xs);
         }
@@ -444,7 +461,7 @@ sub skip_while($list, $predicate) {
 
 sub iter($list, $f) {
     my $l = $list;
-    while ( not is_empty($l) ) {
+    while ( @$l != 0 ) {
         $f->(head($l));
         $l = tail($l);
     }
@@ -459,7 +476,7 @@ sub foreach($list, $f) {
 sub iteri($list, $f) {
     my $idx = 0;
     my $l   = $list;
-    while ( not is_empty($l) ) {
+    while ( @$l != 0 ) {
         $f->(head($l), $idx++);
         $l = tail($l);
     }

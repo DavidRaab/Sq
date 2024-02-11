@@ -230,8 +230,9 @@ sub map_v5($list, $f) {
 sub map_v6($list, $f) {
     my $new  = List::empty('List');
     my $tail = $new;
+    my $empty;
     while ( @$list != 0 ) {
-        my $empty = bless([], 'List');
+        $empty     = bless([], 'List');
         $tail->[0] = $f->( $list->[0] );
         $tail->[1] = $empty;
         $tail      = $empty;
