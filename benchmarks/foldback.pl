@@ -269,10 +269,30 @@ sub map_v10($list, $f) {
     });
 }
 
+# CPS - Continuation-Passing-Style - usually slowest but added for completeness
+sub map_v11($list, $f) {
+    my $cont = sub($x) { return $x };
+
+    my $l = $list;
+    while ( @$l != 0 ) {
+        my $x    = $l->[0];
+        my $tail = $cont;
+
+        $cont = sub($rest) {
+            my $cell = bless([$f->($x), $rest], 'List');
+            return $tail->($cell);
+        };
+
+        $l = $l->[1];
+    }
+
+    return $cont->(bless([], 'List'));
+}
+
 # Testing if implementations are correct
 my $tl = List->range(1,10);
 my $double = sub($x) { $x * 2 };
-for my $func ( qw/map_v1 map_v2 map_v3 map_v4 map_v5 map_v6 map_v7 map_v8 map_v9 map_v10/ ) {
+for my $func ( qw/map_v1 map_v2 map_v3 map_v4 map_v5 map_v6 map_v7 map_v8 map_v9 map_v10 map_v11/ ) {
     no strict 'refs';
     is($tl->map($double), *{$func}->($tl, $double), $func);
 }
@@ -298,5 +318,6 @@ cmpthese(-1, {
     'map_v4' => sub { my $xs = map_v4($list, $double) },
     'map_v5' => sub { my $xs = map_v5($list, $double) },
     'map_v6' => sub { my $xs = map_v6($list, $double) },
+    'map_v11' => sub { my $xs = map_v11($list, $double) },
 });
 
