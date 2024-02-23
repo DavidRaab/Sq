@@ -6,13 +6,19 @@ use List::Util ();
 use Carp ();
 use DDP;
 
-sub new($class) {
-    return bless({
+sub new($class, @xs) {
+    my $queue = bless({
         start => 0,
         stop  => 0,
-        count => 16,
         data  => [(undef) x 16],
     }, 'Queue');
+
+    $queue->add(@xs);
+    return $queue;
+}
+
+sub capacity($self) {
+    return scalar @{ $self->{data} };
 }
 
 sub count($self) {
@@ -30,18 +36,21 @@ sub count($self) {
 sub add_one($self, $x) {
     my ($start, $stop) = ( $self->{start}, $self->{stop} );
 
-    # double size and copy to new array when count is not enough
-    raise($self) if count($self) == $self->{count};
+    # double size and copy to new array when capacity is not enough
+    raise($self) if count($self) == $self->capacity;
 
+    # on empty queue
     if ( $start == $stop ) {
         $self->{data}[0] = $x;
         $self->{start}   = 0;
         $self->{stop}    = 1;
     }
-    if ( $start < $stop ) {
+    # when still ordered and queue can be read from start to stop
+    elsif ( $start < $stop ) {
         $self->{data}[$stop] = $x;
         $self->{stop}++;
     }
+    # when queue starts somewhere in the middle and continues at 0
     else {
 
     }
@@ -70,17 +79,15 @@ sub remove($self) {
 }
 
 sub raise($self) {
-    my $new_count = $self->{count} * 2;
-    my @new_data  = (undef) x $new_count;
-    my $idx = 0;
+    my @new_data = (undef) x ( $self->capacity * 2 );
+    my $idx      = 0;
     iter($self, sub($x) {
         $new_data[$idx++] = $x;
     });
-    $self->{count} = $new_count;
     $self->{start} = 0;
     $self->{stop}  = $idx;
     $self->{data}  = \@new_data;
-    return $self;
+    return;
 }
 
 sub iter($self, $f) {
@@ -105,6 +112,11 @@ sub iter($self, $f) {
     return;
 }
 
+sub foreach($self, $f) {
+    iter($self, $f);
+    return;
+}
+
 sub iteri($self, $f) {
     my $idx = 0;
     iter($self, sub($x) {
@@ -113,9 +125,13 @@ sub iteri($self, $f) {
     return;
 }
 
+sub foreachi($self, $f) {
+    iteri($self, $f);
+    return;
+}
+
 sub to_array($self) {
-    my @array;
-    iter($self, sub($x) {
+    my @array; iter($self, sub($x) {
         push @array, $x;
     });
     return bless(\@array, 'Array');
