@@ -10,6 +10,7 @@ sub new($class, @xs) {
     my $queue = bless({
         start => 0,
         stop  => 0,
+        count => 0,
         data  => [(undef) x 16],
     }, 'Queue');
 
@@ -17,43 +18,43 @@ sub new($class, @xs) {
     return $queue;
 }
 
-sub capacity($self) {
-    return scalar @{ $self->{data} };
-}
-
-sub count($self) {
-    my ($start, $stop) = ( $self->{start}, $self->{stop} );
-    if ( $start < $stop ) {
-        return $stop - $start;
-    }
-    elsif ( $start == $stop ) {
-        return 0;
-    }
-    else {
-    }
-}
+# simple getters
+sub capacity($self) { return scalar $self->{data}->@* }
+sub count($self)    { return        $self->{count}    }
 
 sub add_one($self, $x) {
-    my ($start, $stop) = ( $self->{start}, $self->{stop} );
-
     # double size and copy to new array when capacity is not enough
-    raise($self) if count($self) == $self->capacity;
+    raise($self) if count($self) == capacity($self);
+
+    my ($start, $stop) = ( $self->{start}, $self->{stop} );
+    my $capacity = capacity($self);
 
     # on empty queue
-    if ( $start == $stop ) {
+    if ( $self->{count} == 0 ) {
         $self->{data}[0] = $x;
         $self->{start}   = 0;
         $self->{stop}    = 1;
     }
     # when still ordered and queue can be read from start to stop
     elsif ( $start < $stop ) {
+        # when capacity is enough, but $stop reached end of storage array
+        # then we need to wrap around and save item at index 0
+        if ( $stop == $capacity ) {
+            $self->{data}[0] = $x;
+            $self->{stop}    = 1;
+        }
+        else {
+            $self->{data}[$stop] = $x;
+            $self->{stop}++;
+        }
+    }
+    # when queue starts somewhere in the middle wraps around and continues at 0
+    else {
         $self->{data}[$stop] = $x;
         $self->{stop}++;
     }
-    # when queue starts somewhere in the middle and continues at 0
-    else {
 
-    }
+    $self->{count}++;
     return $self;
 }
 
@@ -65,16 +66,26 @@ sub add($self, @xs) {
 sub remove($self) {
     my ($start, $stop) = ( $self->{start}, $self->{stop} );
 
-    if ( $start < $stop ) {
+    if ( $self->{count} > 0 ) {
+        # element to return
         my $x = $self->{data}[$start];
+
+        # delete element in storage
         $self->{data}[$start] = undef;
-        $self->{start}++;
+        $self->{count}--;
+
+        # $start must be either increased or set to 0
+        if ( $start == capacity($self) ) {
+            $self->{start} = 0;
+        }
+        else {
+            $self->{start}++;
+        }
+
         return $x;
     }
-    elsif ( $start == $stop ) {
-        return;
-    }
     else {
+        return;
     }
 }
 

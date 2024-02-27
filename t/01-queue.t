@@ -97,13 +97,10 @@ my $is_even = sub($x)    { $x % 2 == 0 };
 
     is($queue->count, 10, 'count must be 10');
     is($queue->capacity, 16, 'capacity 16');
-    # p $queue;
 
     $queue->add(17 .. 22);
     is($queue->count, 16, 'count must be 16');
     is($queue->capacity, 16, 'capacity stays the same');
-
-    # p $queue;
 }
 
 done_testing;
