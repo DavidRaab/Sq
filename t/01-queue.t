@@ -89,18 +89,56 @@ my $is_even = sub($x)    { $x % 2 == 0 };
     is(\@a, \@b, 'iteri & foreachi');
 }
 
+# checks count & capacity
+sub check_cc($queue, $count, $capacity, $msg) {
+    is($queue->count,    $count,    sprintf('%s: count must be %d', $msg, $count));
+    is($queue->capacity, $capacity, sprintf('%s: capacity must be %d', $msg, $capacity));
+}
+
 {
     my $queue = Queue->new(1..16);
 
     is($queue->to_array, [1..16], 'new queue');
     $queue->remove for 1 .. 6;
-
-    is($queue->count, 10, 'count must be 10');
-    is($queue->capacity, 16, 'capacity 16');
+    check_cc($queue, 10, 16, 'AAA');
 
     $queue->add(17 .. 22);
-    is($queue->count, 16, 'count must be 16');
-    is($queue->capacity, 16, 'capacity stays the same');
+    check_cc($queue, 16, 16, 'AAB');
+
+    $queue->add(23);
+    check_cc($queue, 17, 32, 'AAC');
+
+    $queue->add(24 .. 32);
+    check_cc($queue, 26, 32, 'AAD');
+
+    my @three = $queue->remove(3);
+    is(\@three, [7,8,9], 'first three elements');
+    check_cc($queue, 23, 32, 'AAE');
+
+    my @two = $queue->remove(2);
+    $queue->add(33 .. 36);
+    is(\@two, [10,11], 'first two');
+    check_cc($queue, 25, 32, 'ABA');
+
+    @two = $queue->remove(2);
+    $queue->add(37 .. 40);
+    is(\@two, [12,13], 'first two');
+    check_cc($queue, 27, 32, 'ABB');
+
+    @two = $queue->remove(2);
+    $queue->add(41 .. 44);
+    is(\@two, [14,15], 'first two');
+    check_cc($queue, 29, 32, 'ABC');
+
+    @two = $queue->remove(2);
+    $queue->add(45 .. 48);
+    is(\@two, [16,17], 'first two');
+    check_cc($queue, 31, 32, 'ABD');
+
+    @two = $queue->remove(2);
+    $queue->add(49 .. 52);
+    is(\@two, [18,19], 'first two');
+    check_cc($queue, 33, 64, 'ABE');
 }
 
 done_testing;

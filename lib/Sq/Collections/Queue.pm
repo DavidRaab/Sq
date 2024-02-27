@@ -63,7 +63,7 @@ sub add($self, @xs) {
     return $self;
 }
 
-sub remove($self) {
+sub remove_one($self) {
     my ($start, $stop) = ( $self->{start}, $self->{stop} );
 
     if ( $self->{count} > 0 ) {
@@ -89,6 +89,22 @@ sub remove($self) {
     }
 }
 
+sub remove($self, $amount = 1) {
+    if ( $amount == 1 ) {
+        return remove_one($self);
+    }
+    elsif ( $amount <= 1 ) {
+        return;
+    }
+    else {
+        my @data;
+        for ( 1 .. $amount ) {
+            push @data, remove_one($self);
+        }
+        return @data;
+    }
+}
+
 sub raise($self) {
     my @new_data = (undef) x ( $self->capacity * 2 );
     my $idx      = 0;
@@ -103,13 +119,13 @@ sub raise($self) {
 
 sub iter($self, $f) {
     my ($start, $stop) = ( $self->{start}, $self->{stop} );
-    if ( $start < $stop ) {
+    if ( $self->{count} == 0 ) {
+        # empty queue; do nothing
+    }
+    elsif ( $start < $stop ) {
         for (my $idx=$start; $idx < $stop; $idx++) {
             $f->( $self->{data}[$idx] );
         }
-    }
-    elsif ( $start == $stop ) {
-        # empty queue; do nothing
     }
     else {
         my $end = $self->{data}->$#*;
