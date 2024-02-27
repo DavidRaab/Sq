@@ -1,10 +1,6 @@
 package Queue;
 use 5.036;
 use subs 'foreach';
-use Scalar::Util ();
-use List::Util ();
-use Carp ();
-use DDP;
 
 sub new($class, @xs) {
     my $queue = bless({
@@ -64,45 +60,37 @@ sub add($self, @xs) {
 }
 
 sub remove_one($self) {
+    # nothing to remove when empty
+    return if $self->{count} <= 0;
+
+    # element to return
     my ($start, $stop) = ( $self->{start}, $self->{stop} );
+    my $x = $self->{data}[$start];
 
-    if ( $self->{count} > 0 ) {
-        # element to return
-        my $x = $self->{data}[$start];
+    # delete element in storage
+    $self->{data}[$start] = undef;
+    $self->{count}--;
 
-        # delete element in storage
-        $self->{data}[$start] = undef;
-        $self->{count}--;
-
-        # $start must be either increased or set to 0
-        if ( $start == capacity($self) ) {
-            $self->{start} = 0;
-        }
-        else {
-            $self->{start}++;
-        }
-
-        return $x;
+    # $start must be either increased or set to 0
+    if ( $start == capacity($self) ) {
+        $self->{start} = 0;
     }
     else {
-        return;
+        $self->{start}++;
     }
+
+    return $x;
 }
 
 sub remove($self, $amount = 1) {
-    if ( $amount == 1 ) {
-        return remove_one($self);
+    return remove_one($self) if $amount == 1;
+    return                   if $amount <= 1;
+
+    my @data;
+    for ( 1 .. $amount ) {
+        push @data, remove_one($self);
     }
-    elsif ( $amount <= 1 ) {
-        return;
-    }
-    else {
-        my @data;
-        for ( 1 .. $amount ) {
-            push @data, remove_one($self);
-        }
-        return @data;
-    }
+    return @data;
 }
 
 sub raise($self) {
@@ -118,11 +106,10 @@ sub raise($self) {
 }
 
 sub iter($self, $f) {
+    return if $self->{count} == 0;
     my ($start, $stop) = ( $self->{start}, $self->{stop} );
-    if ( $self->{count} == 0 ) {
-        # empty queue; do nothing
-    }
-    elsif ( $start < $stop ) {
+
+    if ( $start < $stop ) {
         for (my $idx=$start; $idx < $stop; $idx++) {
             $f->( $self->{data}[$idx] );
         }
