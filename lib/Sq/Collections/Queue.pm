@@ -85,12 +85,7 @@ sub remove_one($self) {
 sub remove($self, $amount = 1) {
     return remove_one($self) if $amount == 1;
     return                   if $amount <= 1;
-
-    my @data;
-    for ( 1 .. $amount ) {
-        push @data, remove_one($self);
-    }
-    return @data;
+    return map { remove_one($self) } 1 .. $amount;
 }
 
 sub raise($self) {
