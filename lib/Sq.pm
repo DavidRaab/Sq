@@ -12,6 +12,7 @@ use Sub::Exporter -setup => {
 };
 
 # Load Seq Module -- available under 'Seq'
+use Sq::Collections::Hash;
 use Sq::Collections::Array;
 use Sq::Collections::Queue;
 use Sq::Collections::List;

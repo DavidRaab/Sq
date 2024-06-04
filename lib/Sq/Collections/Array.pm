@@ -88,6 +88,7 @@ sub from_array($class, $xs) {
     return bless($xs, 'Array');
 }
 
+# TODO: Maybe add "bless" as alias to "from_array" or other name as "bless"
 
 #-----------------------------------------------------------------------------#
 # METHODS                                                                     #
