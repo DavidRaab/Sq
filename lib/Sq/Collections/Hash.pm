@@ -1,9 +1,59 @@
 package Hash;
 use 5.036;
-use subs 'bless', 'map', 'foreach';
+use Carp ();
+use subs 'keys', 'values', 'bless', 'map', 'foreach';
 
-sub bless($class, $hash) {
-    return CORE::bless($hash, 'Hash');
+sub empty($class) {
+    return CORE::bless({}, 'Hash');
+}
+
+sub new {
+    my $class = shift;
+    if ( @_ == 0 ) {
+        return empty('Hash');
+    }
+    elsif ( @_ == 1 ) {
+        if ( ref $_[0] eq 'HASH' ) {
+            return CORE::bless($_[0], 'Hash');
+        }
+        else {
+            Carp::croak("When Hash->new() is called with one argument, it must be a hash");
+        }
+    }
+    else {
+        if ( @_ % 2 == 0 ) {
+            return CORE::bless({@_}, 'Hash');
+        }
+        else {
+            Carp::croak("When Hash->new() is called with more than one argument, it must be an even number of arguments.");
+        }
+    }
+}
+
+sub bless {
+    return new(@_);
+}
+
+# Adds (mutates) a hash by adding key, value
+sub add($hash, @kvs) {
+    if ( @kvs % 2 == 0 ) {
+        my $count = @kvs;
+        for (my $idx=0; $idx < $count; $idx+=2) {
+            $hash->{ $kvs[$idx] } = $kvs[$idx+1];
+        }
+        return;
+    }
+    else {
+        Carp::croak("Hash->add expects an even number of arguments.");
+    }
+}
+
+sub keys($hash) {
+    return CORE::bless([CORE::keys %$hash], 'Array');
+}
+
+sub values($hash) {
+    return CORE::bless([CORE::values %$hash], 'Array');
 }
 
 sub map($hash, $f) {
@@ -12,7 +62,7 @@ sub map($hash, $f) {
         my ($k, $v) = $f->($key, $value);
         $new{$k} = $v;
     }
-    return \%new;
+    return CORE::bless(\%new, 'Hash');
 }
 
 sub filter($hash, $predicate) {
@@ -22,7 +72,7 @@ sub filter($hash, $predicate) {
             $new{$key} = $value;
         }
     }
-    return \%new;
+    return CORE::bless(\%new, 'Hash');
 }
 
 sub fold($hash, $state, $f) {
@@ -33,7 +83,7 @@ sub fold($hash, $state, $f) {
 }
 
 sub count($hash) {
-    return scalar keys %$hash;
+    return scalar (CORE::keys %$hash);
 }
 
 1;
