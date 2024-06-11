@@ -4,6 +4,7 @@ use Carp ();
 use subs 'keys', 'values', 'bless', 'map', 'foreach';
 
 # TODO: equal, eual_values, is_disjoint
+#       change, push
 
 sub empty($) {
     return CORE::bless({}, 'Hash');
@@ -156,6 +157,26 @@ sub is_subset_of($hash, $other) {
         return 0 if not exists $other->{$key}
     }
     return 1;
+}
+
+sub get($hash, $key, $default) {
+    return $hash->{$key} // $default;
+}
+
+sub set($hash, $key, $value) {
+    $hash->{$key} = $value;
+    return;
+}
+
+# considers $key as an array and pushes a value onto it
+sub push($hash, $key, $value) {
+    if ( exists $hash->{$key} ) {
+        push $hash->{$key}->@*, $value;
+    }
+    else {
+        $hash->{$key} = Array->new($value);
+    }
+    return;
 }
 
 1;

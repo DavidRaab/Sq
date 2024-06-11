@@ -210,4 +210,32 @@ is(Hash->new({})->is_empty,                                      1, 'is_empty 7'
 is(Hash::difference({foo => 1}, {foo => 1})->is_empty,           1, 'is_empty 8');
 is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9');
 
+# get, set
+{
+    my $h = Hash->new(foo => 1, bar => 2, baz => 3);
+    is($h->get("foo", 0), 1, 'get 1');
+    is($h->get("bar", 0), 2, 'get 2');
+    is($h->get("baz", 0), 3, 'get 3');
+    is($h->get("maz", 0), 0, 'get 4');
+
+    $h->set(bar => 4);
+    is($h->get("bar", 0), 4, 'set');
+}
+
+# push
+{
+    my $h = Hash->new;
+    $h->push(foo => 1);
+    $h->push(foo => 2);
+    $h->push(foo => 3);
+    $h->push(bar => 1);
+    $h->push(bar => 2);
+
+    is(
+        $h,
+        { foo => [1,2,3], bar => [1,2] },
+        'push'
+    );
+}
+
 done_testing;
