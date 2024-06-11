@@ -1,6 +1,6 @@
 package Array;
 use 5.036;
-use subs 'bind', 'join', 'select', 'last', 'sort', 'map', 'foreach';
+use subs 'bind', 'join', 'select', 'last', 'sort', 'map', 'foreach', 'bless';
 use Scalar::Util ();
 use List::Util ();
 use Carp ();
@@ -10,12 +10,29 @@ use Carp ();
 #                    Functions that create sequences                          #
 #-----------------------------------------------------------------------------#
 
+sub new {
+    my $class = shift;
+    if ( @_ == 0 ) {
+        return empty('Array');
+    }
+    elsif ( @_ == 1 ) {
+        if ( ref $_[0] eq 'ARRAY' ) {
+            return CORE::bless($_[0], 'Array');
+        }
+    }
+    return CORE::bless([@_], 'Array')
+}
+
+sub bless {
+    return new(@_);
+}
+
 sub empty($class) {
-    return bless([], 'Array')
+    return CORE::bless([], 'Array')
 }
 
 sub replicate($class, $count, $initial) {
-    return bless([($initial) x $count], 'Array');
+    return CORE::bless([($initial) x $count], 'Array');
 }
 
 # wraps all function arguments into Array. Stops at first undef
@@ -25,7 +42,7 @@ sub wrap($class, @array) {
         last if not defined $x;
         push @copy, $x;
     }
-    return bless(\@copy, 'Array');
+    return CORE::bless(\@copy, 'Array');
 }
 
 # concatenate arrays into a flattened array
@@ -34,13 +51,13 @@ sub concat($class, @arrays) {
     for my $array ( @arrays ) {
         push @new, @$array;
     }
-    return bless(\@new, 'Array');
+    return CORE::bless(\@new, 'Array');
 }
 
 # Creates an Array with $count by passing the index to a function creating
 # the current element
 sub init($class, $count, $f) {
-    return bless([map { $f->($_) } 0 .. ($count-1)], 'Array');
+    return CORE::bless([map { $f->($_) } 0 .. ($count-1)], 'Array');
 }
 
 # Array->unfold : 'State -> ('State -> Option<ListContext<'a, 'State>>) -> Array<'a>
@@ -55,7 +72,7 @@ sub unfold($class, $state, $f) {
         push @array, $x;
     }
 
-    return bless(\@array, 'Array');
+    return CORE::bless(\@array, 'Array');
 }
 
 # Array->range_step : float -> float -> float -> Array<float>
@@ -85,7 +102,7 @@ sub range($class, $start, $stop) {
 
 # Array->from_array : Array<'a> -> Array<'a>
 sub from_array($class, $xs) {
-    return bless($xs, 'Array');
+    return CORE::bless($xs, 'Array');
 }
 
 # TODO: Maybe add "bless" as alias to "from_array" or other name as "bless"
@@ -100,7 +117,7 @@ sub bind($array, $f) {
     for my $x ( @$array ) {
         push @new, @{ $f->($x) };
     }
-    return bless(\@new, 'Array');
+    return CORE::bless(\@new, 'Array');
 }
 
 sub flatten($array) {
@@ -109,18 +126,18 @@ sub flatten($array) {
 
 # append : Array<'a> -> Array<'a> -> Array<'a>
 sub append($array1, $array2) {
-    return bless([@$array1, @$array2], 'Array');
+    return CORE::bless([@$array1, @$array2], 'Array');
 }
 
 # rev : Array<'a> -> Array<'a>
 sub rev($array) {
-    return bless([reverse @$array], 'Array');
+    return CORE::bless([reverse @$array], 'Array');
 }
 
 # map : Array<'a> -> ('a -> 'b) -> Array<'b>
 sub map($array, $f) {
     local $_;
-    return bless([map { $f->($_) } @$array], 'Array');
+    return CORE::bless([map { $f->($_) } @$array], 'Array');
 }
 
 sub mapi($array, $f) {
@@ -129,7 +146,7 @@ sub mapi($array, $f) {
     for my $x ( @$array ) {
         push @new, $f->($x, $idx++);
     }
-    return bless(\@new, 'Array');
+    return CORE::bless(\@new, 'Array');
 }
 
 sub choose($array, $f) {
@@ -140,17 +157,17 @@ sub choose($array, $f) {
             push @new, $value;
         }
     }
-    return bless(\@new, 'Array');
+    return CORE::bless(\@new, 'Array');
 }
 
 # filter : Array<'a> -> ('a -> bool) -> Array<'a>
 sub filter($array, $predicate) {
     local $_;
-    return bless([grep { $predicate->($_) } @$array], 'Array');
+    return CORE::bless([grep { $predicate->($_) } @$array], 'Array');
 }
 
 sub skip($array, $amount) {
-    return bless([$array->@[$amount .. $array->$#*]], 'Array');
+    return CORE::bless([$array->@[$amount .. $array->$#*]], 'Array');
 }
 
 # take : Array<'a> -> Array<'a>
@@ -161,7 +178,7 @@ sub take($array, $amount) {
         last if !defined $x;
         push @array, $x;
     }
-    return bless(\@array, 'Array');
+    return CORE::bless(\@array, 'Array');
 }
 
 # count : Array<'a> -> int
@@ -192,7 +209,7 @@ sub indexed($array) {
     for my $x ( @$array ) {
         push @new, [$idx++, $x];
     }
-    return bless(\@new, 'Array');
+    return CORE::bless(\@new, 'Array');
 }
 
 # zip : Array<'a> -> Array<'b> -> Array<'a * 'b>
@@ -206,13 +223,13 @@ sub zip($array1, $array2) {
         $idx++;
         push @new, [$x,$y];
     }
-    return bless(\@new, 'Array');
+    return CORE::bless(\@new, 'Array');
 }
 
 sub sort($array, $comparer) {
     local ($a, $b);
     my @sorted = CORE::sort { $comparer->($a, $b) } @$array;
-    return bless(\@sorted, 'Array');
+    return CORE::bless(\@sorted, 'Array');
 }
 
 sub sort_by($array, $comparer, $get_key) {
@@ -222,7 +239,7 @@ sub sort_by($array, $comparer, $get_key) {
         CORE::sort { $comparer->($a->[0], $b->[0]) }
         CORE::map  { [$get_key->($_), $_] }
             @$array;
-    return bless(\@sorted, 'Array');
+    return CORE::bless(\@sorted, 'Array');
 }
 
 sub fsts($array) {
@@ -230,7 +247,7 @@ sub fsts($array) {
     for my $x ( @$array ) {
         push @new, $x->[0];
     }
-    return bless(\@new, 'Array');
+    return CORE::bless(\@new, 'Array');
 }
 
 sub snds($array) {
@@ -238,7 +255,7 @@ sub snds($array) {
     for my $x ( @$array ) {
         push @new, $x->[1];
     }
-    return bless(\@new, 'Array');
+    return CORE::bless(\@new, 'Array');
 }
 
 sub to_array_of_array($array) {
@@ -254,7 +271,7 @@ sub distinct($array) {
             $seen{$value} = 1;
         }
     }
-    return bless(\@new, 'Array');
+    return CORE::bless(\@new, 'Array');
 }
 
 sub distinct_by($array, $get_key) {
@@ -267,7 +284,7 @@ sub distinct_by($array, $get_key) {
             $seen{$key} = 1;
         }
     }
-    return bless(\@new, 'Array');
+    return CORE::bless(\@new, 'Array');
 }
 
 sub regex_match($array, $regex, $picks) {
@@ -304,7 +321,7 @@ sub regex_match($array, $regex, $picks) {
             push @new, \@matches;
         }
     }
-    return bless(\@new, 'Array');
+    return CORE::bless(\@new, 'Array');
 }
 
 sub windowed($array, $window_size) {
@@ -316,12 +333,12 @@ sub windowed($array, $window_size) {
     for (my $index=0; $index < $last_index; $index++) {
         push @new, [$array->@[$index .. ($index + $length)]];
     }
-    return bless(\@new, 'Array');
+    return CORE::bless(\@new, 'Array');
 }
 
 sub intersperse($array, $value) {
     return empty('Array')               if @$array == 0;
-    return bless([$array->[0]],'Array') if @$array == 1;
+    return CORE::bless([$array->[0]],'Array') if @$array == 1;
 
     my @new   = $array->[0];
     my $index = 1;
@@ -339,12 +356,12 @@ sub intersperse($array, $value) {
         }
     }
 
-    return bless(\@new, 'Array');
+    return CORE::bless(\@new, 'Array');
 }
 
 sub repeat($array, $count) {
     return empty('Array') if $count <= 0;
-    return bless([(@$array) x $count], 'Array');
+    return CORE::bless([(@$array) x $count], 'Array');
 }
 
 sub take_while($array, $predicate) {
@@ -353,7 +370,7 @@ sub take_while($array, $predicate) {
         last if not $predicate->($x);
         push @new, $x;
     }
-    return bless(\@new, 'Array');
+    return CORE::bless(\@new, 'Array');
 }
 
 sub skip_while($array, $predicate) {
@@ -362,7 +379,7 @@ sub skip_while($array, $predicate) {
         last if not $predicate->($x);
         $index++;
     }
-    return bless([$array->@[$index .. $array->$#*]], 'Array');
+    return CORE::bless([$array->@[$index .. $array->$#*]], 'Array');
 }
 
 #-----------------------------------------------------------------------------#
