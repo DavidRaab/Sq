@@ -3,7 +3,9 @@ use 5.036;
 use Carp ();
 use subs 'keys', 'values', 'bless', 'map', 'foreach';
 
-sub empty($class) {
+# TODO: equal, eual_values, is_disjoint
+
+sub empty($) {
     return CORE::bless({}, 'Hash');
 }
 
@@ -84,6 +86,76 @@ sub fold($hash, $state, $f) {
 
 sub count($hash) {
     return scalar (CORE::keys %$hash);
+}
+
+sub is_empty($hash) {
+    return count($hash) == 0 ? 1 : 0;
+}
+
+# union of two hashes, a function decides which value should be picked
+# if key exists in both hashes.
+sub union($hash, $other, $f) {
+    my %new;
+    my %seen;
+    while ( my ($key, $value) = each %$hash ) {
+        if ( exists $other->{$key} ) {
+            $seen{$key} = 1;
+            $new{$key}  = $f->($value, $other->{$key});
+        }
+        else {
+            $new{$key} = $value;
+        }
+    }
+    while ( my ($key, $value) = each %$other ) {
+        if ( not $seen{$key} ) {
+            $new{$key} = $value;
+        }
+    }
+    return CORE::bless(\%new, 'Hash');
+}
+
+# Like union but value in second hash overwrites the first one
+sub append($hash, $other) {
+    state $second = sub($,$y) { return $y };
+    return union($hash, $other, $second);
+}
+
+sub intersection($hash, $other, $f) {
+    my %new;
+    while ( my ($key, $value) = each %$hash ) {
+        if ( exists $other->{$key} ) {
+            $new{$key} = $f->($value, $other->{$key});
+        }
+    }
+    return CORE::bless(\%new, 'Hash');
+}
+
+sub difference($hash, $other) {
+    my %new;
+    while ( my ($key, $value) = each %$hash ) {
+        if ( not exists $other->{$key} ) {
+            $new{$key} = $value;
+        }
+    }
+    return CORE::bless(\%new, 'Hash');
+}
+
+sub concat($hash, @others) {
+    my %new;
+    for my $hash ( $hash, @others ) {
+        while ( my ($key, $value) = each %$hash ) {
+            $new{$key} = $value;
+        }
+    }
+    return CORE::bless(\%new, 'Hash');
+}
+
+# checks if all keys in $hash exists in $other
+sub is_subset_of($hash, $other) {
+    for my $key ( CORE::keys %$hash ) {
+        return 0 if not exists $other->{$key}
+    }
+    return 1;
 }
 
 1;

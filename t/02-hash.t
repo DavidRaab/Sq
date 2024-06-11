@@ -119,4 +119,95 @@ is($data->fold(1, sub($state, $k, $v) { $state + $v }), 17, 'fold 2');
 
 is($data->count, 3, 'count');
 
+# union, append, intersection, difference
+{
+    my $h = Hash->new(foo => 1, bar => 2);
+    my $i = Hash->new(bar => 3, baz => 4);
+
+    is(
+        $h->union($i, sub($v1, $v2) { $v1 + $v2 }),
+        { foo => 1, bar => 5, baz => 4 },
+        'union'
+    );
+
+    is(
+        $h->append($i),
+        { foo => 1, bar => 3, baz => 4 },
+        'append'
+    );
+
+    is(
+        $h->intersection($i, sub($x,$y) { [$x,$y] }),
+        { bar => [2,3] },
+        'intersection'
+    );
+
+    is(
+        $h->difference($i),
+        { foo => 1 },
+        'difference'
+    );
+}
+
+# concat
+{
+    # as constructor
+    is(
+        Hash::concat(
+            { foo => 1, bar => 2, t => 0 },
+            { bar => 3, baz => 4 },
+            { maz => 5, foo => 6 },
+            { kaz => 7, baz => 8 },
+        ),
+        { foo => 6, bar => 3, baz => 8, maz => 5, kaz => 7, t => 0 },
+        'concat 1'
+    );
+
+    # as method call
+    is(
+        Hash->new({ foo => 1, bar => 2, t => 0 })->concat(
+            { bar => 3, baz => 4 },
+            { maz => 5, foo => 6 },
+            { kaz => 7, baz => 8 },
+        ),
+        { foo => 6, bar => 3, baz => 8, maz => 5, kaz => 7, t => 0 },
+        'concat 2'
+    );
+}
+
+is(
+    Hash->new({ foo => 1 })->is_subset_of({ foo => 1, bar => 2 }),
+    1,
+    'is_subset_of 1'
+);
+
+is(
+    Hash::is_subset_of(
+        { foo => 1           },
+        { foo => 1, bar => 2 }
+    ),
+    1,
+    'is_subset_of 2'
+);
+
+is(
+    Hash::is_subset_of(
+        { foo => 1           },
+        { bar => 1, baz => 2 }
+    ),
+    0,
+    'is_subset_of 3'
+);
+
+my $tuple = sub($x,$y) { [$x,$y] };
+is(Hash::difference({}, { foo => 1 })->is_empty,                 1, 'is_empty 1');
+is(Hash::intersection({foo => 1}, {bar => 2}, $tuple)->is_empty, 1, 'is_empty 2');
+is(Hash::union({}, {}, $tuple)->is_empty,                        1, 'is_empty 3');
+is(Hash::append({}, {})->is_empty,                               1, 'is_empty 4');
+is(Hash->empty->is_empty,                                        1, 'is_empty 5');
+is(Hash->new->is_empty,                                          1, 'is_empty 6');
+is(Hash->new({})->is_empty,                                      1, 'is_empty 7');
+is(Hash::difference({foo => 1}, {foo => 1})->is_empty,           1, 'is_empty 8');
+is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9');
+
 done_testing;
