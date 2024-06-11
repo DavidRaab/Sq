@@ -20,44 +20,44 @@ my $by_num = sub($x, $y) { $x <=> $y };
 
 # new & bless
 {
-    for my $method ( qw/new bless/ ) {
-        # passing a hashref
-        my $d = Hash->$method({foo => 1, bar => 2});
-        is($d, $ishash,              $method . ' $d is Hash');
-        is($d, {foo => 1, bar => 2}, $method . ' content of $d');
 
-        # blessing an existing ref
-        my $d2 = {foo => 1, bar => 2};
-        is(blessed($d2), undef, $method . ' not blessed');
-        Hash->$method($d2);
-        is($d2, $ishash,              $method . ' $d2 now blessed');
-        is($d2, {foo => 1, bar => 2}, $method . ' content of $d2');
+    # passing a hashref
+    my $d = Hash->bless({foo => 1, bar => 2});
+    is($d, $ishash,              'bless');
+    is($d, {foo => 1, bar => 2}, 'content of $d');
 
-        # $method without arguments
-        my $d3 = Hash->$method;
-        $d3->add(foo => 1);
-        is($d3, $ishash,    $method . ' $d3 is Hash');
-        is($d3, {foo => 1}, $method . ' content of $d3');
+    # blessing an existing ref
+    my $d2 = {foo => 1, bar => 2};
+    is(blessed($d2), undef, ' not blessed');
+    Hash->bless($d2);
+    is($d2, $ishash,              '$d2 now blessed');
+    is($d2, {foo => 1, bar => 2}, 'content of $d2');
 
-        # $method with many arguments
-        my $d4 = Hash->$method(foo => 1, bar => 2);
-        is($d4, $ishash,              $method . ' $d4 is Hash');
-        is($d4, {foo => 1, bar => 2}, $method . ' content of $d4');
+    # new without arguments
+    my $d3 = Hash->new;
+    $d3->set(foo => 1);
+    is($d3, $ishash,    '$d3 is Hash');
+    is($d3, {foo => 1}, 'content of $d3');
 
-        # one argument - not hashref
-        like(
-            dies { Hash->$method("foo") },
-            qr/\AWhen Hash\-\>new/,
-            'one argument not hashref dies'
-        );
+    # new with many arguments
+    my $d4 = Hash->new(foo => 1, bar => 2);
+    is($d4, $ishash,              '$d4 is Hash');
+    is($d4, {foo => 1, bar => 2}, 'content of $d4');
 
-        # $method with uneven arguments
-        like(
-            dies { Hash->$method(foo => 1, "bar") },
-            qr/\AWhen Hash\-\>new/,
-            'uneven arguments dies'
-        );
-    }
+    # one argument - not hashref
+    like(
+        dies { Hash->bless("foo") },
+        qr/\AHash\-\>bless/,
+        'one argument not hashref dies'
+    );
+
+    # new with uneven arguments
+    like(
+        dies { Hash->new(foo => 1, "bar") },
+        qr/\AHash\-\>new/,
+        'uneven arguments dies'
+    );
+
 }
 
 # empty
@@ -67,25 +67,25 @@ my $by_num = sub($x, $y) { $x <=> $y };
     is(Hash->new, Hash->empty, 'new() same as empty');
 }
 
-# add
+# set
 {
     my $h = Hash->empty;
 
-    $h->add(foo => 1);
+    $h->set(foo => 1);
     is($h, {foo => 1}, 'content of $h 1');
 
-    $h->add(bar => 2, baz => 3);
+    $h->set(bar => 2, baz => 3);
     is($h, {foo => 1, bar => 2, baz => 3}, 'content of $h 2');
 
     like(
-        dies { $h->add(maz => 1, "raz") },
-        qr/\AHash\-\>add/,
-        'Hash->add with uneven arguments dies.'
+        dies { $h->set(maz => 1, "raz") },
+        qr/\AHash\-\>set/,
+        'Hash->set with uneven arguments dies.'
     );
 
 }
 
-my $data = Hash->new({
+my $data = Hash->bless({
     foo => 1,
     bar => 10,
     baz => 5,
@@ -165,7 +165,7 @@ is($data->count, 3, 'count');
 
     # as method call
     is(
-        Hash->new({ foo => 1, bar => 2, t => 0 })->concat(
+        Hash->new(foo => 1, bar => 2, t => 0)->concat(
             { bar => 3, baz => 4 },
             { maz => 5, foo => 6 },
             { kaz => 7, baz => 8 },
@@ -176,7 +176,7 @@ is($data->count, 3, 'count');
 }
 
 is(
-    Hash->new({ foo => 1 })->is_subset_of({ foo => 1, bar => 2 }),
+    Hash->new(foo => 1)->is_subset_of({ foo => 1, bar => 2 }),
     1,
     'is_subset_of 1'
 );
@@ -206,20 +206,24 @@ is(Hash::union({}, {}, $tuple)->is_empty,                        1, 'is_empty 3'
 is(Hash::append({}, {})->is_empty,                               1, 'is_empty 4');
 is(Hash->empty->is_empty,                                        1, 'is_empty 5');
 is(Hash->new->is_empty,                                          1, 'is_empty 6');
-is(Hash->new({})->is_empty,                                      1, 'is_empty 7');
+is(Hash->bless({})->is_empty,                                    1, 'is_empty 7');
 is(Hash::difference({foo => 1}, {foo => 1})->is_empty,           1, 'is_empty 8');
 is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9');
 
-# get, set
+# get, set, extract
 {
     my $h = Hash->new(foo => 1, bar => 2, baz => 3);
-    is($h->get("foo", 0), 1, 'get 1');
+    is($h->get(foo => 0), 1, 'get 1');
     is($h->get("bar", 0), 2, 'get 2');
     is($h->get("baz", 0), 3, 'get 3');
     is($h->get("maz", 0), 0, 'get 4');
 
+    # set
     $h->set(bar => 4);
     is($h->get("bar", 0), 4, 'set');
+
+    # extract
+    is($h->extract(0, qw/foo latz bar/), [1, 0, 4], 'extract');
 }
 
 # push
@@ -231,11 +235,27 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     $h->push(bar => 1);
     $h->push(bar => 2);
 
-    is(
-        $h,
-        { foo => [1,2,3], bar => [1,2] },
-        'push'
-    );
+    is($h, { foo => [1,2,3], bar => [1,2] }, 'push 1');
+
+    $h->push(foo => 4, 5);
+    $h->push(baz => 9, 10);
+
+    is($h, {foo => [1..5], bar => [1,2], baz => [9,10]}, 'push 2');
+}
+
+# push 2
+{
+    my $h = Hash->new;
+
+    $h->push(foo => [1,2,3]);
+    is($h, {foo => [[1,2,3]]}, 'push2 1');
+
+    $h->push(foo => [1,2,3]);
+    is($h, {foo => [[1,2,3],[1,2,3]]}, 'push2 2');
+
+    my $h2 = Hash->new;
+    $h2->push(foo => [1,2,3],[1,2,3]);
+    is($h2, {foo => [[1,2,3], [1,2,3]]}, 'push2 3');
 }
 
 done_testing;

@@ -15,6 +15,23 @@ my $double  = sub($x)     { $x * 2      };
 my $square  = sub($x)     { $x * $x     };
 my $is_even = sub($x)     { $x % 2 == 0 };
 
+# checks new & bless
+{
+    my $a = Array->new(1,2,3);
+    is($a, check_isa('Array'), 'new');
+    is($a, [1,2,3],            'new content');
+
+    my $b = Array->bless([1,2,3]);
+    is($b, check_isa('Array'), 'bless');
+    is($b, [1,2,3],            'bless content');
+
+    like(
+        dies { Array->bless(1) },
+        qr/\AArray->bless\(\$aref\) must be called with arrayref/,
+        'bless without arrayref dies'
+    );
+}
+
 # Basic checks of range and rangeDesc
 is($range, D(),                   'range returns something');
 is($range, check_isa('Array'),    'returns an Array');

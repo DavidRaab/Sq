@@ -10,44 +10,19 @@ sub empty($) {
     return CORE::bless({}, 'Hash');
 }
 
-sub new {
-    my $class = shift;
-    if ( @_ == 0 ) {
-        return empty('Hash');
-    }
-    elsif ( @_ == 1 ) {
-        if ( ref $_[0] eq 'HASH' ) {
-            return CORE::bless($_[0], 'Hash');
-        }
-        else {
-            Carp::croak("When Hash->new() is called with one argument, it must be a hash");
-        }
-    }
-    else {
-        if ( @_ % 2 == 0 ) {
-            return CORE::bless({@_}, 'Hash');
-        }
-        else {
-            Carp::croak("When Hash->new() is called with more than one argument, it must be an even number of arguments.");
-        }
-    }
+sub new($class, @args) {
+    Carp::croak("Hash->new() must be called with even-sized list.")
+        if @args % 2 == 1;
+
+    return CORE::bless({@args}, 'Hash');
 }
 
-sub bless {
-    return new(@_);
-}
-
-# Adds (mutates) a hash by adding key, value
-sub add($hash, @kvs) {
-    if ( @kvs % 2 == 0 ) {
-        my $count = @kvs;
-        for (my $idx=0; $idx < $count; $idx+=2) {
-            $hash->{ $kvs[$idx] } = $kvs[$idx+1];
-        }
-        return;
+sub bless($class, $href) {
+    if ( ref $href eq 'HASH' ) {
+        return CORE::bless($href, 'Hash');
     }
     else {
-        Carp::croak("Hash->add expects an even number of arguments.");
+        Carp::croak('Hash->bless($href) must be called with hashref.');
     }
 }
 
@@ -159,22 +134,41 @@ sub is_subset_of($hash, $other) {
     return 1;
 }
 
-sub get($hash, $key, $default) {
+# returns a single entry
+sub get($hash, $key, $default, @keys) {
     return $hash->{$key} // $default;
 }
 
-sub set($hash, $key, $value) {
-    $hash->{$key} = $value;
+# fetches many entries and returns it as an array, uses default value
+# when entry does not exists in hash
+sub extract($hash, $default, @keys) {
+    my $array = Array->new;
+    for my $key ( @keys ) {
+        push @$array, ($hash->{$key} // $default);
+    }
+    return $array;
+}
+
+sub set($hash, @kvs) {
+    if ( @kvs % 2 == 0 ) {
+        my $count = @kvs;
+        for (my $idx=0; $idx < $count; $idx+=2) {
+            $hash->{ $kvs[$idx] } = $kvs[$idx+1];
+        }
+    }
+    else {
+        Carp::croak("Hash->set expects an even number of arguments.");
+    }
     return;
 }
 
 # considers $key as an array and pushes a value onto it
-sub push($hash, $key, $value) {
+sub push($hash, $key, $value, @values) {
     if ( exists $hash->{$key} ) {
-        push $hash->{$key}->@*, $value;
+        push $hash->{$key}->@*, $value, @values;
     }
     else {
-        $hash->{$key} = Array->new($value);
+        $hash->{$key} = Array->new($value, @values);
     }
     return;
 }

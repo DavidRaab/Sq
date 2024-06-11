@@ -10,22 +10,6 @@ use Carp ();
 #                    Functions that create sequences                          #
 #-----------------------------------------------------------------------------#
 
-sub new {
-    my $class = shift;
-    if ( @_ == 0 ) {
-        return empty('Array');
-    }
-    elsif ( @_ == 1 ) {
-        if ( ref $_[0] eq 'ARRAY' ) {
-            return CORE::bless($_[0], 'Array');
-        }
-    }
-    return CORE::bless([@_], 'Array')
-}
-
-sub bless {
-    return new(@_);
-}
 
 sub empty($class) {
     return CORE::bless([], 'Array')
@@ -35,14 +19,28 @@ sub replicate($class, $count, $initial) {
     return CORE::bless([($initial) x $count], 'Array');
 }
 
-# wraps all function arguments into Array. Stops at first undef
-sub wrap($class, @array) {
+# creates new array, stops at first undef
+sub new($class, @array) {
     my @copy;
     for my $x ( @array ) {
         last if not defined $x;
         push @copy, $x;
     }
     return CORE::bless(\@copy, 'Array');
+}
+
+sub bless($class, $ref) {
+    if ( ref $ref eq 'ARRAY' ) {
+        return CORE::bless($ref, 'Array');
+    }
+    else {
+        Carp::croak('Array->bless($aref) must be called with arrayref.');
+    }
+}
+
+# wraps all function arguments into Array. Stops at first undef
+sub wrap {
+    return new(@_);
 }
 
 # concatenate arrays into a flattened array
