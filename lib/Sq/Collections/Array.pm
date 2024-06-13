@@ -390,6 +390,14 @@ sub skip_while($array, $predicate) {
     return CORE::bless([$array->@[$index .. $array->$#*]], 'Array');
 }
 
+sub group_by($array, $get_key) {
+    my $new = Hash->new;
+    for my $x ( @$array ) {
+        $new->push($get_key->($x), $x);
+    }
+    return $new;
+}
+
 #-----------------------------------------------------------------------------#
 # SIDE-EFFECTS                                                                #
 #    functions that have side-effects or produce side-effects. Those are      #
