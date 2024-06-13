@@ -1,7 +1,7 @@
 package Hash;
 use 5.036;
 use Carp ();
-use subs 'keys', 'values', 'bless', 'map', 'foreach';
+use subs 'bind', 'keys', 'values', 'bless', 'map', 'foreach';
 
 # TODO: equal, eual_values, is_disjoint
 #       change, push
@@ -84,6 +84,17 @@ sub union($hash, $other, $f) {
     }
     while ( my ($key, $value) = each %$other ) {
         if ( not $seen{$key} ) {
+            $new{$key} = $value;
+        }
+    }
+    return CORE::bless(\%new, 'Hash');
+}
+
+sub bind($hash, $f) {
+    my %new;
+    while ( my ($key, $value) = each %$hash ) {
+        my $tmp_hash = $f->($key, $value);
+        while ( my ($key, $value) = each %$tmp_hash ) {
             $new{$key} = $value;
         }
     }
@@ -177,7 +188,7 @@ sub with($hash, @kvs) {
 # considers $key as an array and pushes a value onto it
 sub push($hash, $key, $value, @values) {
     if ( exists $hash->{$key} ) {
-        push $hash->{$key}->@*, $value, @values;
+        CORE::push $hash->{$key}->@*, $value, @values;
     }
     else {
         $hash->{$key} = Array->new($value, @values);
@@ -190,6 +201,20 @@ sub change($hash, $key, $f, @kfs) {
     my %kfs = ($key, $f, @kfs);
     while ( my ($key, $f) = each %kfs ) {
         $hash->{$key} = $f->($hash->{$key});
+    }
+    return;
+}
+
+sub iter($hash, $f) {
+    while ( my ($key, $value) = each %$hash ) {
+        $f->($key, $value);
+    }
+    return;
+}
+
+sub foreach($hash, $f) {
+    while ( my ($key, $value) = each %$hash ) {
+        $f->($key, $value);
     }
     return;
 }

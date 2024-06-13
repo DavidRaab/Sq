@@ -332,4 +332,85 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     is($h->values->sort_num, [1..4],        'values sorted');
 }
 
+# iter
+{
+    my $h = Hash->new(foo => 1, bar => 2, maz => 3);
+
+    my $key;
+    my $sum = 0;
+    $h->iter(sub($k,$v) {
+        $key .= $k;
+        $sum += $v;
+    });
+
+    is($sum, 6, 'iter 1');
+
+    # as a hash has random order, we don't know which key gets appended
+    # in which order. The regex just lists all possible combinations that
+    # are possible and checks for it
+    my $key_re = qr/
+        \A
+        foobarmaz | foomazbar |
+        barfoomaz | barmazfoo |
+        mazfoobar | mazbarfoo
+        \z
+    /xms;
+
+    like($key, $key_re, 'iter 2');
+}
+
+# bind
+{
+    my $h = Hash->new(
+        foo => {
+            name => 'test',
+            no   => 1,
+        },
+        bar => {
+            name => 'hello',
+            no   => 2,
+        },
+    );
+
+    my $i = $h->bind(sub($key, $value){
+        my ($name, $no) = ($value->{name}, $value->{no});
+        return {
+            $key . '_name' => $name,
+            $key . '_no'   => $no,
+        }
+    });
+
+    is(
+        $i,
+        {
+            foo_name => 'test',
+            foo_no   => 1,
+            bar_name => 'hello',
+            bar_no   => 2.
+        },
+        'bind'
+    );
+}
+
+# to_array / from_array
+{
+    my $h = Hash->new(foo => 1, bar => 2, baz => 3);
+    my $a =
+        $h
+        ->to_array(sub($k,$v) { [$k,$v] })
+        ->sort(sub($x,$y) { $x->[0] cmp $y->[0] });
+
+    is($a, [["bar",2],["baz",3],["foo",1]], 'to_array');
+
+    my $j = Hash->from_array($a, sub($i,$v) {
+        return $v->[0], $v->[1];
+    });
+    is($j, $h, 'from_array 1');
+
+    my $k = Hash->from_array($a, sub($i,$v) {
+        return $i, $v;
+    });
+    is($k, {0 => [bar=>2], 1 => [baz=>3], 2 => [foo=>1]}, 'from_array 2');
+}
+
 done_testing;
