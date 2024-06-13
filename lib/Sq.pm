@@ -17,6 +17,8 @@ use Sq::Collections::Array;
 use Sq::Collections::Queue;
 use Sq::Collections::List;
 use Sq::Collections::Seq;
+# provides to_* from_* functions for different packages
+use Sq::Collections::Glue;
 use Sq::Io;
 
 # Important functions used in FP code. So adding them.
