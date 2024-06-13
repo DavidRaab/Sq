@@ -135,7 +135,7 @@ sub is_subset_of($hash, $other) {
 }
 
 # returns a single entry
-sub get($hash, $key, $default, @keys) {
+sub get($hash, $key, $default) {
     return $hash->{$key} // $default;
 }
 
@@ -162,6 +162,18 @@ sub set($hash, @kvs) {
     return;
 }
 
+# creates a shallow copy
+sub copy($hash) {
+    return CORE::bless({%$hash}, 'Hash');
+}
+
+# Like 'set' but makes a shallow copy and returns a new Hash instead of mutating
+sub with($hash, @kvs) {
+    my $new = copy($hash);
+    set($new, @kvs);
+    return $new;
+}
+
 # considers $key as an array and pushes a value onto it
 sub push($hash, $key, $value, @values) {
     if ( exists $hash->{$key} ) {
@@ -169,6 +181,15 @@ sub push($hash, $key, $value, @values) {
     }
     else {
         $hash->{$key} = Array->new($value, @values);
+    }
+    return;
+}
+
+# reads key and pass it to function, return value replaces original value
+sub change($hash, $key, $f, @kfs) {
+    my %kfs = ($key, $f, @kfs);
+    while ( my ($key, $f) = each %kfs ) {
+        $hash->{$key} = $f->($hash->{$key});
     }
     return;
 }

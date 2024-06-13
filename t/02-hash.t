@@ -258,4 +258,78 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     is($h2, {foo => [[1,2,3], [1,2,3]]}, 'push2 3');
 }
 
+# change
+{
+    my $h = Hash->new(
+        foo => [1,2,3],
+        bar => [4,5,6],
+        baz => "string",
+    );
+
+    $h->change(
+        foo => sub($value) { Array::sum($value) }
+    );
+
+    is($h, { foo => 6, bar => [4,5,6], baz => "string" }, 'change 1');
+
+    $h->change(
+        bar => sub($value) { Array::fold($value, 1, sub($s,$x) { $s * $x }) },
+        baz => sub($value) { length $value },
+    );
+
+    is($h, { foo => 6, bar => 120, baz => 6 }, 'change 2');
+}
+
+# with
+{
+    my $h = Hash->new(foo => 1);
+    my $i = $h->with(foo => 2, bar => 3);
+    my $j = $h->with(bar => 2);
+    my $k = $i->with(maz => 4);
+    my $l = $k->with(bar => 2, ratatat => 1);
+
+    is($h, {foo => 1},                                   'with 1');
+    is($i, {foo => 2, bar => 3},                         'with 2');
+    is($j, {foo => 1, bar => 2},                         'with 3');
+    is($k, {foo => 2, bar => 3, maz => 4},               'with 4');
+    is($l, {foo => 2, bar => 2, maz => 4, ratatat => 1}, 'with 5');
+}
+
+# copy
+{
+    my $h = Hash->new(foo => 2);
+    my $i = $h->copy;
+
+    $h->set(foo => 1);
+
+    is($h, {foo => 1}, 'copy 1');
+    is($i, {foo => 2}, 'copy 2');
+}
+
+# with - with mutable values
+{
+    # because with() only makes shallow copies (yet - maybe change that?)
+    # values that are references stay the same across copies
+
+    my $h = Hash->new(foo => 1, bar => [1,2,3]);
+    my $i = $h->with(foo => 2);
+    $h->push(bar => 4);
+
+    is($h, {foo => 1, bar => [1..4]}, 'with mutable 1');
+    is($i, {foo => 2, bar => [1..4]}, 'with mutable 2');
+
+    my $aref = $h->get(bar => []);
+    push @$aref, 5;
+
+    is($h, {foo => 1, bar => [1..5]}, 'with mutable 3');
+    is($i, {foo => 2, bar => [1..5]}, 'with mutable 4');
+}
+
+# check if some functions return blessed Array
+{
+    my $h = Hash->new(c => 3, a => 1, d => 4, b => 2);
+    is($h->keys->sort_str,   [qw/a b c d/], 'keys sorted');
+    is($h->values->sort_num, [1..4],        'values sorted');
+}
+
 done_testing;
