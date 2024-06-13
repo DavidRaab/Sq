@@ -43,31 +43,25 @@ my @data = (
 # group_by
 {
     my $grouped = Seq->from_array(\@data)->group_by(key 'id');
+    is($grouped, check_isa('Hash'), 'group_by return Hash');
     is($grouped->count, 3, '3 elements');
 
-    # turn seq of seq into AoA
-    my $data =
-        $grouped
-        ->map(sub($group) { $group->to_array })
-        ->sort(sub($x,$y) { $x->[0]{id} <=> $y->[0]{id} })
-        ->to_array;
-
     is(
-        $data,
-        [
-            [
+        $grouped,
+        {
+            1 => [
                 { id => 1, name => 'David', tag => 'WoW'   },
                 { id => 1, name => 'David', tag => 'How'   },
                 { id => 1, name => 'David', tag => 'Super' },
             ],
-            [
+            2 => [
                 { id => 2, name => 'Alex', tag => 'Mega' },
                 { id => 2, name => 'Alex', tag => 'Huhu' },
             ],
-            [
+            3 => [
                 { id => 3, name => 'Bob', tag => 'Toll' },
             ]
-        ],
+        },
         'group_by');
 }
 

@@ -619,17 +619,13 @@ sub sort_by($seq, $comparer, $get_key) {
     });
 }
 
-# group_by : Seq<'a> -> ('a -> 'Key) -> Seq<Seq<'a>>
+# group_by : Seq<'a> -> ('a -> 'Key) -> Hash<'Key,Array<'a>>
 sub group_by($seq, $get_key) {
-    my %group;
+    my $new = Hash->new;
     iter($seq, sub($a) {
-        my $key = $get_key->($a);
-        push $group{$key}->@*, $a;
+        $new->push($get_key->($a), $a);
     });
-
-    return from_hash('Seq', \%group, sub($key, $value) {
-        return from_array('Seq', $value);
-    });
+    return $new;
 }
 
 # group_fold :
@@ -1075,12 +1071,12 @@ sub str_split($seq, $regex) {
 #
 # to_hash : Seq<'a> -> ('a -> 'Key) -> Hash<'Key * 'a>
 sub to_hash($seq, $mapper) {
-    my %hash;
+    my $hash = Hash->new;
     iter($seq, sub($x) {
         my ($key, $value) = $mapper->($x);
-        $hash{$key} = $value;
+        $hash->{$key} = $value;
     });
-    return \%hash;
+    return $hash;
 }
 
 # Build a hash by applying a mapping function to a value to create a
@@ -1089,21 +1085,21 @@ sub to_hash($seq, $mapper) {
 #
 # to_hash_of_array: Seq<'a> -> ('a -> 'Key) -> Hash<'Key, Array<'a>>
 sub to_hash_of_array($seq, $mapper) {
-    my %hash;
+    my $hash = Hash->new;
     iter($seq, sub($x) {
         my ($key, $value) = $mapper->($x);
-        push @{$hash{$key}}, $value;
+        Hash::push($hash, $key, $value);
     });
-    return \%hash;
+    return $hash;
 }
 
 # to_array_of_array : Seq<Seq<'a>> -> Array<Array<'a>>
 sub to_array_of_array($seq) {
-    my @outer;
+    my $outer = Array->new;
     iter($seq, sub($inner) {
-        push @outer, to_array($inner);
+        push @$outer, to_array($inner);
     });
-    return \@outer;
+    return $outer;
 }
 
 # returns first element for which the given $predicate returns true
