@@ -19,7 +19,7 @@ my $is_even = sub($x)    { $x % 2 == 0 };
 
 # Helpers
 sub new_hash() {
-    return sub() { return {} };
+    return sub() { return Hash->new };
 }
 
 sub by_num() {
@@ -72,9 +72,13 @@ my @data = (
             new_hash(),
             key 'id',
             sub($hash, $entry) {
-                $hash->{id}   = $entry->{id};
-                $hash->{name} = $entry->{name};
-                push $hash->{tags}->@*, $entry->{tag};
+                # this will execute multiple times for each entry, but the
+                # values are the same in the example data.
+                $hash->set(
+                    id   => $entry->{id},
+                    name => $entry->{name}
+                );
+                $hash->push(tags => $entry->{tag});
                 return $hash;
             }
         )
