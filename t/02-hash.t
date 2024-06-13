@@ -413,4 +413,43 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     is($k, {0 => [bar=>2], 1 => [baz=>3], 2 => [foo=>1]}, 'from_array 2');
 }
 
+# equal
+{
+    my $h = Hash->new(foo => 1);
+    my $i = Hash->new(foo => 1);
+
+    ok($h->equal($i), 'equal');
+    ok(!$h->equal($i->with(test => 1)), 'not equal');
+
+    # set a shared array
+    my $shared = [1,2,3];
+    $h->set(array => $shared);
+    $i->set(array => $shared);
+    ok($h->equal($i), 'equal because same reference');
+
+    # replace a shared array, but same data
+    $i->set(array => [1,2,3]);
+    ok(!$h->equal($i), 'no recursive comparision yet');
+
+    # same keys, but different data
+    $h->set(array => "foo");
+    $i->set(array => "foo");
+    ok($h->equal($i), 'same again');
+
+    # one has one more key
+    $h->set(new => 1);
+    ok(!$h->equal($i), 'not equal because $h has one more key');
+
+    # delete additional keys
+    $h->delete(qw/array new/);
+    $i->delete('array');
+    ok($h->equal($i), 'same after delete');
+
+    # comparing with plain hash
+    ok($h->equal({foo => 1}), 'equal perl hash');
+
+    # two perl hashes
+    ok(Hash::equal({foo => 1}, {foo => 1}), 'two perl hashes');
+}
+
 done_testing;

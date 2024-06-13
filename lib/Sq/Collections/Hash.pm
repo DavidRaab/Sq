@@ -1,7 +1,7 @@
 package Hash;
 use 5.036;
 use Carp ();
-use subs 'bind', 'keys', 'values', 'bless', 'map', 'foreach';
+use subs 'bind', 'keys', 'values', 'bless', 'map', 'foreach', 'delete';
 
 # TODO: equal, eual_values, is_disjoint
 #       change, push
@@ -217,6 +217,25 @@ sub foreach($hash, $f) {
         $f->($key, $value);
     }
     return;
+}
+
+sub delete($hash, $key, @keys) {
+    for my $key ( $key, @keys ) {
+        CORE::delete $hash->{$key};
+    }
+    return;
+}
+
+# TODO: shallow at the moment. Maybe add recursion so Hash/HASH and Array/Array
+#       get compared deeply. All other references must be reference-equal
+sub equal($hash, $other) {
+    return 0 if ref $other ne 'Hash' && ref $other ne 'HASH';
+    return 0 if count($hash) != count($other);
+    for my $key ( CORE::keys %$hash ) {
+        return 0 if not exists $other->{$key};
+        return 0 if $hash->{$key} ne $other->{$key};
+    }
+    return 1;
 }
 
 1;
