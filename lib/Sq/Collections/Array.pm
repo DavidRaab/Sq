@@ -240,6 +240,16 @@ sub sort_by($array, $comparer, $get_key) {
     return CORE::bless(\@sorted, 'Array');
 }
 
+sub sort_num($array) {
+    state $comp = sub($x,$y) { $x <=> $y };
+    return Array::sort($array, $comp);
+}
+
+sub sort_str($array) {
+    state $comp = sub($x,$y) { $x cmp $y };
+    return Array::sort($array, $comp);
+}
+
 sub fsts($array) {
     my @new;
     for my $x ( @$array ) {

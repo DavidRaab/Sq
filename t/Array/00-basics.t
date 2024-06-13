@@ -702,4 +702,8 @@ is(
     is(\@iteri, \@foreachi, 'iteri same as foreachi');
 }
 
+# sort
+is(Array->new(qw/1 9 10 5/)->sort_str, [qw/1 10 5 9/], 'sort_str');
+is(Array->new(qw/1 9 10 5/)->sort_num, [1, 5, 9, 10],  'sort_num');
+
 done_testing;
