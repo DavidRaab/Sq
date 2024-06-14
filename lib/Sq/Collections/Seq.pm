@@ -623,7 +623,7 @@ sub sort_by($seq, $comparer, $get_key) {
 sub group_by($seq, $get_key) {
     my $new = Hash->new;
     iter($seq, sub($a) {
-        $new->push($get_key->($a), $a);
+        Hash::push($new, $get_key->($a), $a);
     });
     return $new;
 }
@@ -635,18 +635,19 @@ sub group_by($seq, $get_key) {
 #   -> ('State -> 'a -> 'State)
 #   -> Seq<'State>
 sub group_fold($seq, $get_state, $get_key, $folder) {
-    my %group;
+    my %storage;
     iter($seq, sub($a) {
         my $key = $get_key->($a);
-        push $group{$key}->@*, $a;
+        if ( exists $storage{$key} ) {
+            $storage{$key} = $folder->($storage{$key}, $a);
+        }
+        else {
+            $storage{$key} = $folder->($get_state->(), $a);
+        }
     });
 
-    return from_hash('Seq', \%group, sub($key, $array) {
-        my $state = $get_state->();
-        for my $a ( @$array ) {
-            $state = $folder->($state, $a);
-        }
-        return $state;
+    return from_hash('Seq', \%storage, sub($key, $value) {
+        return $value;
     });
 }
 
@@ -957,8 +958,7 @@ sub last($seq, $default) {
 # to_array : Seq<'a> -> Array<'a>
 sub to_array($seq) {
     state $folder = sub($array, $x) { push @$array, $x };
-    my $array = fold_mut($seq, [], $folder);
-    return bless($array, 'Array');
+    return fold_mut($seq, Array->new, $folder);
 }
 
 # Turns a Sequence into
