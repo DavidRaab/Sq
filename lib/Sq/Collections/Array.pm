@@ -390,31 +390,38 @@ sub skip_while($array, $predicate) {
     return CORE::bless([$array->@[$index .. $array->$#*]], 'Array');
 }
 
-sub group_by($array, $get_key) {
-    my $new = Hash->new;
-    for my $x ( @$array ) {
-        $new->push($get_key->($x), $x);
-    }
-    return $new;
-}
 
+# Combines grouping and folding in one operation. All elements of a sequence
+# are grouped together by a key. The $folder function than can combine
+# multiple elements of the same key. For the first element found for a
+# key the $get_state function is called to produce the initial value, otherwise
+# the existing value is used. Returns a Hash with the 'Key to 'State
+# mapping.
+#
 # Array<'a>
 # -> (unit -> 'State)
 # -> ('a -> 'Key)
 # -> ('State -> 'a -> 'State)
-# -> Array<'State>
+# -> Hash<'key, 'State>
 sub group_fold($array, $get_state, $get_key, $folder) {
-    my %storage;
+    my $new = Hash->new;
     for my $x ( @$array ) {
         my $key = $get_key->($x);
-        if ( exists $storage{$key} ) {
-            $storage{$key} = $folder->($storage{$key}, $x);
+        if ( exists $new->{$key} ) {
+            $new->{$key} = $folder->($new->{$key}, $x);
         }
         else {
-            $storage{$key} = $folder->($get_state->(), $x);
+            $new->{$key} = $folder->($get_state->(), $x);
         }
     }
-    return Array->new(values %storage);
+    return $new;
+}
+
+# Array<'a> -> ('a -> 'Key) -> Hash<'Key, Array<'a>>
+sub group_by($array, $get_key) {
+    state $new_array = sub()      { Array->new        };
+    state $folder    = sub($s,$x) { push(@$s, $x); $s };
+    return group_fold($array, $new_array, $get_key, $folder);
 }
 
 #-----------------------------------------------------------------------------#

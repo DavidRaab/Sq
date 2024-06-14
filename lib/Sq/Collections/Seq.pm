@@ -619,36 +619,31 @@ sub sort_by($seq, $comparer, $get_key) {
     });
 }
 
-# group_by : Seq<'a> -> ('a -> 'Key) -> Hash<'Key,Array<'a>>
-sub group_by($seq, $get_key) {
-    my $new = Hash->new;
-    iter($seq, sub($a) {
-        Hash::push($new, $get_key->($a), $a);
-    });
-    return $new;
-}
-
 # group_fold :
 #   Seq<'a>
 #   -> (unit -> 'State)
 #   -> ('a -> 'Key)
 #   -> ('State -> 'a -> 'State)
-#   -> Seq<'State>
+#   -> Hash<'Key,'State>
 sub group_fold($seq, $get_state, $get_key, $folder) {
-    my %storage;
+    my $new = Hash->new;
     iter($seq, sub($a) {
         my $key = $get_key->($a);
-        if ( exists $storage{$key} ) {
-            $storage{$key} = $folder->($storage{$key}, $a);
+        if ( exists $new->{$key} ) {
+            $new->{$key} = $folder->($new->{$key}, $a);
         }
         else {
-            $storage{$key} = $folder->($get_state->(), $a);
+            $new->{$key} = $folder->($get_state->(), $a);
         }
     });
+    return $new;
+}
 
-    return from_hash('Seq', \%storage, sub($key, $value) {
-        return $value;
-    });
+# group_by : Seq<'a> -> ('a -> 'Key) -> Hash<'Key,Array<'a>>
+sub group_by($seq, $get_key) {
+    state $new_array = sub()      { Array->new        };
+    state $folder    = sub($s,$x) { push(@$s, $x); $s };
+    return group_fold($seq, $new_array, $get_key, $folder);
 }
 
 # cache : Seq<'a> -> Seq<'a>

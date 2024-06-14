@@ -81,11 +81,31 @@ my $data = Array->new(
                 $hash->push(tags => $entry->{tag});
                 return $hash;
             }
-        )
-        ->sort(sub($x,$y) { $x->{id} <=> $y->{id} });
+        );
 
     is(
         $grouped,
+        {
+            1 => {
+                'id'   => 1,
+                'tags' => ['WoW','How','Super'],
+                'name' => 'David'
+            },
+            2 => {
+                'name' => 'Alex',
+                'id'   => 2,
+                'tags' => ['Mega', 'Huhu']
+            },
+            3 => {
+                'id'   => 3,
+                'tags' => ['Toll'],
+                'name' => 'Bob'
+            }
+        },
+        'group_fold');
+
+    is(
+        $grouped->values->sort(sub($x,$y) { $x->{id} <=> $y->{id} }),
         [
             {
                 'id'   => 1,
@@ -103,7 +123,7 @@ my $data = Array->new(
                 'name' => 'Bob'
             }
         ],
-        'group_fold');
+        'group_fold 2');
 }
 
 done_testing;
