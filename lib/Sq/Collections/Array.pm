@@ -398,6 +398,25 @@ sub group_by($array, $get_key) {
     return $new;
 }
 
+# Array<'a>
+# -> (unit -> 'State)
+# -> ('a -> 'Key)
+# -> ('State -> 'a -> 'State)
+# -> Array<'State>
+sub group_fold($array, $get_state, $get_key, $folder) {
+    my %storage;
+    for my $x ( @$array ) {
+        my $key = $get_key->($x);
+        if ( exists $storage{$key} ) {
+            $storage{$key} = $folder->($storage{$key}, $x);
+        }
+        else {
+            $storage{$key} = $folder->($get_state->(), $x);
+        }
+    }
+    return Array->new(values %storage);
+}
+
 #-----------------------------------------------------------------------------#
 # SIDE-EFFECTS                                                                #
 #    functions that have side-effects or produce side-effects. Those are      #

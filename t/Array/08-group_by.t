@@ -65,12 +65,10 @@ my $data = Array->new(
         'group_by');
 }
 
-=pod
-
 # group_fold
 {
     my $grouped =
-        Seq->from_array(\@data)->group_fold(
+        $data->group_fold(
             new_hash(),
             key 'id',
             sub($hash, $entry) {
@@ -87,7 +85,7 @@ my $data = Array->new(
         ->sort(sub($x,$y) { $x->{id} <=> $y->{id} });
 
     is(
-        $grouped->to_array,
+        $grouped,
         [
             {
                 'id'   => 1,
@@ -107,7 +105,5 @@ my $data = Array->new(
         ],
         'group_fold');
 }
-
-=cut
 
 done_testing;
