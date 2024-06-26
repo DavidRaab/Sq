@@ -56,14 +56,14 @@ sub find($hash, $default, $predicate) {
 
 # Like find. But $mapping must return an "optional". Any other value than undef
 # that $mapping returns is immediately returned. If $mapping never returns
-# any other value than undef, then $default is returned.
+# any other value than undef, then undef is returned.
 # choose is like ->find()->map() combined
-sub choose($hash, $default, $mapping) {
+sub choose($hash, $mapping) {
     for my $k ( CORE::keys %$hash ) {
         my $x = $mapping->($k,$hash->{$k});
         return $x if defined $x;
     }
-    return $default;
+    return undef;
 }
 
 sub filter($hash, $predicate) {

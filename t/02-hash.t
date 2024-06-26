@@ -461,24 +461,34 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     );
 
     is(
-        [ $data->find([], sub($k,$v){ return $k >= 10 ? 1 : 0 }) ],
+        [ $data->find("not found", sub($k,$v){ return $k >= 10 ? 1 : 0 }) ],
         [ 10 => 'baz' ],
         'find baz');
 
     is(
-        [ $data->find([], sub($k,$v){ return $k < 2 ? 1 : 0 }) ],
+        [ $data->find("not found", sub($k,$v){ return $k < 2 ? 1 : 0 }) ],
         [ 1 => 'foo' ],
         'find foo');
 
     is(
-        $data->choose([], sub($k,$v){ return $k >= 10 ? [$k,$v] : undef}),
+        [ $data->find("not found", sub($k,$v){ return $k > 100 ? 1 : 0 }) ],
+        ["not found"],
+        'not found');
+
+    is(
+        $data->choose(sub($k,$v){ return $k >= 10 ? [$k,$v] : undef}),
         [10 => 'baz'],
         'choose baz');
 
     is(
-        $data->choose([], sub($k,$v){ return $k < 2 ? [$k,$v] : undef}),
+        $data->choose(sub($k,$v){ return $k < 2 ? [$k,$v] : undef}),
         [ 1 => 'foo' ],
         'choose foo');
+
+    is(
+        $data->choose(sub($k,$v){ return $k > 100 ? [$k,$v] : undef}),
+        undef,
+        'choose did not found anything');
 }
 
 done_testing;
