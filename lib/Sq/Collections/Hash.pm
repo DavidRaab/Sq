@@ -91,8 +91,10 @@ sub is_empty($hash) {
     return count($hash) == 0 ? 1 : 0;
 }
 
-# union of two hashes, a function decides which value should be picked
-# if key exists in both hashes.
+# union of two hashes,
+# a function decides which value should be picked if key exists in both hashes.
+#
+# union is like adding two hashes
 sub union($hash, $other, $f) {
     my %new;
     my %seen;
@@ -130,6 +132,7 @@ sub append($hash, $other) {
     return union($hash, $other, $second);
 }
 
+# returns a new hash only containg keys that appear in both hashes
 sub intersection($hash, $other, $f) {
     my %new;
     while ( my ($key, $value) = each %$hash ) {
@@ -140,6 +143,10 @@ sub intersection($hash, $other, $f) {
     return CORE::bless(\%new, 'Hash');
 }
 
+# Only returns hash entries that appear in $hash but not in $other.
+# Like subtraction it removes all entries in $hash that appear in $other
+#
+# Hash<'a,'b> -> Hash<'a,'b> -> Hash<'a,'b>
 sub difference($hash, $other) {
     my %new;
     while ( my ($key, $value) = each %$hash ) {
