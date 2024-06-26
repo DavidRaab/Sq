@@ -502,13 +502,28 @@ sub str_join($array, $sep) {
     return CORE::join($sep, @$array);
 }
 
+# Array<'a> -> ('a -> ('Key,'Value)) -> Hash<'Key, 'Value>
 sub to_hash($array, $mapper) {
     my %hash;
     for my $x ( @$array ) {
         my ($key, $value) = $mapper->($x);
         $hash{$key} = $value;
     }
-    return \%hash;
+    return CORE::bless(\%hash, 'Hash');
+}
+
+# Similar to to_hash. But to_hash is more generic and can return a new
+# key,value for every array entry. While this just keeps all array
+# entries as-is, and just produce a key for every entry. If a value produces
+# the same 'Key it will overwrite previous entry.
+#
+# Array<'a> -> ('a -> 'Key) -> Hash<'Key, 'a>
+sub keyed_by($array, $get_key) {
+    my %hash;
+    for my $x ( @$array ) {
+        $hash{$get_key->($x)} = $x;
+    }
+    return CORE::bless(\%hash, 'Hash');
 }
 
 sub to_hash_of_array($array, $mapper) {
@@ -517,7 +532,7 @@ sub to_hash_of_array($array, $mapper) {
         my ($key, $value) = $mapper->($x);
         push @{$hash{$key}}, $value;
     }
-    return \%hash;
+    return CORE::bless(\%hash, 'Hash');
 }
 
 sub find($array, $default, $predicate) {

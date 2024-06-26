@@ -706,4 +706,34 @@ is(
 is(Array->new(qw/1 9 10 5/)->sort_str, [qw/1 10 5 9/], 'sort_str');
 is(Array->new(qw/1 9 10 5/)->sort_num, [1, 5, 9, 10],  'sort_num');
 
+# keyed_by
+{
+    my $data = Array->new(
+        {id => 1, name => "foo"},
+        {id => 2, name => "foo"},
+        {id => 3, name => "Whatever"},
+        {id => 4, name => "But not Lena"},
+    );
+
+    is(
+        $data->keyed_by(key 'id'),
+        {
+            1 => {id => 1, name => "foo"},
+            2 => {id => 2, name => "foo"},
+            3 => {id => 3, name => "Whatever"},
+            4 => {id => 4, name => "But not Lena"},
+        },
+        'keyed_by');
+
+    is(
+        $data->keyed_by(key 'name')->count,
+        3,
+        'keyed_by name only has 3 entries');
+
+    is(
+        $data->keyed_by(key 'name')->values->map(key 'name')->sort_str,
+        $data->distinct_by(key 'name')->map(key 'name')->sort_str,
+        'keyed_by->values is like distinct_by');
+}
+
 done_testing;
