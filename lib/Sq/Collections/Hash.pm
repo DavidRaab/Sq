@@ -43,6 +43,29 @@ sub map($hash, $f) {
     return CORE::bless(\%new, 'Hash');
 }
 
+# Returns the first key,value that matches a predicate, otherwise returns $default.
+sub find($hash, $default, $predicate) {
+    # BUG: using each causes problems as not going through all
+    #      all elements does not reset the internal iterator
+    for my $k ( CORE::keys %$hash ) {
+        my $v = $hash->{$k};
+        return $k,$v if $predicate->($k,$v);
+    }
+    return $default;
+}
+
+# Like find. But $mapping must return an "optional". Any other value than undef
+# that $mapping returns is immediately returned. If $mapping never returns
+# any other value than undef, then $default is returned.
+# choose is like ->find()->map() combined
+sub choose($hash, $default, $mapping) {
+    for my $k ( CORE::keys %$hash ) {
+        my $x = $mapping->($k,$hash->{$k});
+        return $x if defined $x;
+    }
+    return $default;
+}
+
 sub filter($hash, $predicate) {
     my %new;
     while ( my ($key, $value) = each %$hash ) {

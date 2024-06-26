@@ -452,4 +452,33 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     ok(Hash::equal({foo => 1}, {foo => 1}), 'two perl hashes');
 }
 
+# find
+{
+    my $data = Hash->new(
+        1  => 'foo',
+        2  => 'bar',
+        10 => 'baz',
+    );
+
+    is(
+        [ $data->find([], sub($k,$v){ return $k >= 10 ? 1 : 0 }) ],
+        [ 10 => 'baz' ],
+        'find baz');
+
+    is(
+        [ $data->find([], sub($k,$v){ return $k < 2 ? 1 : 0 }) ],
+        [ 1 => 'foo' ],
+        'find foo');
+
+    is(
+        $data->choose([], sub($k,$v){ return $k >= 10 ? [$k,$v] : undef}),
+        [10 => 'baz'],
+        'choose baz');
+
+    is(
+        $data->choose([], sub($k,$v){ return $k < 2 ? [$k,$v] : undef}),
+        [ 1 => 'foo' ],
+        'choose foo');
+}
+
 done_testing;
