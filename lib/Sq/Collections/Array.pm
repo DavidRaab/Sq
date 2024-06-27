@@ -251,6 +251,26 @@ sub sort_str($array) {
     return Array::sort($array, $comp);
 }
 
+# Sorts an array of hashes by just providing the key to be used. Keys
+# are string compared.
+#
+# Array<Hash<'Key,'a>> -> 'Key -> Array<Hash<'Key,'a>>
+sub sort_hash_str($array, $key) {
+    return Array::sort($array, sub($x,$y) {
+        $x->{$key} cmp $y->{$key}
+    });
+}
+
+# Sorts an array of hashes by just providing the key to be used. Keys
+# are number compared.
+#
+# Array<Hash<'Key,'a>> -> 'Key -> Array<Hash<'Key,'a>>
+sub sort_hash_num($array, $key) {
+    return Array::sort($array, sub($x,$y) {
+        $x->{$key} <=> $y->{$key}
+    });
+}
+
 sub fsts($array) {
     my @new;
     for my $x ( @$array ) {

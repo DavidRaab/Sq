@@ -736,4 +736,44 @@ is(Array->new(qw/1 9 10 5/)->sort_num, [1, 5, 9, 10],  'sort_num');
         'keyed_by->values is like distinct_by');
 }
 
+# sort_hash_*
+{
+    my $data = Array->new(
+        Hash->new(id => 2,  name => 'B'),
+        Hash->new(id => 3,  name => 'A'),
+        Hash->new(id => 1,  name => 'C'),
+        Hash->new(id => 10, name => 'J'),
+    );
+
+    is(
+        $data->sort_hash_str('name'),
+        [
+            {id =>  3, name => 'A'},
+            {id =>  2, name => 'B'},
+            {id =>  1, name => 'C'},
+            {id => 10, name => 'J'}
+        ],
+        'sort_hash_str name');
+
+    is(
+        $data->sort_hash_str('id'),
+        [
+            {id =>  1, name => 'C'},
+            {id => 10, name => 'J'},
+            {id =>  2, name => 'B'},
+            {id =>  3, name => 'A'},
+        ],
+        'sort_hash_str id');
+
+    is(
+        $data->sort_hash_num('id'),
+        [
+            {id =>  1, name => 'C'},
+            {id =>  2, name => 'B'},
+            {id =>  3, name => 'A'},
+            {id => 10, name => 'J'},
+        ],
+        'sort_hash_num id');
+}
+
 done_testing;
