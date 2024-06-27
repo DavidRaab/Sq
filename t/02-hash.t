@@ -476,19 +476,19 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
         'not found');
 
     is(
-        $data->choose(sub($k,$v){ return $k >= 10 ? [$k,$v] : undef}),
+        $data->pick(sub($k,$v){ return $k >= 10 ? [$k,$v] : undef}),
         [10 => 'baz'],
-        'choose baz');
+        'pick baz');
 
     is(
-        $data->choose(sub($k,$v){ return $k < 2 ? [$k,$v] : undef}),
+        $data->pick(sub($k,$v){ return $k < 2 ? [$k,$v] : undef}),
         [ 1 => 'foo' ],
-        'choose foo');
+        'pick foo');
 
     is(
-        $data->choose(sub($k,$v){ return $k > 100 ? [$k,$v] : undef}),
+        $data->pick(sub($k,$v){ return $k > 100 ? [$k,$v] : undef}),
         undef,
-        'choose did not found anything');
+        'pick did not found anything');
 }
 
 done_testing;
