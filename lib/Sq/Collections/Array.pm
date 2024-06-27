@@ -147,6 +147,7 @@ sub mapi($array, $f) {
     return CORE::bless(\@new, 'Array');
 }
 
+# Like filter->map in one operation
 sub choose($array, $f) {
     my @new;
     for my $x ( @$array ) {
@@ -270,6 +271,14 @@ sub to_array_of_array($array) {
     return $array;
 }
 
+# Returns an array with distinct values. Only works properly when
+# array entries can be turned into strings. Under the hood a hash is used
+# to keep track of seen values. If used on objects other than string or numbers
+# it will properly not work correctly unless a string overload is defined.
+# If that is not the case use `distinct_by` to generate a unique key to
+# decide how entries are unique.
+#
+# Array<'a> -> Array<'a>
 sub distinct($array) {
     my %seen;
     my @new;
@@ -282,6 +291,10 @@ sub distinct($array) {
     return CORE::bless(\@new, 'Array');
 }
 
+# Only returns distinct values of an array. Distinct is decided by the
+# $get_key function that must return a unique string for deciding uniqueness
+#
+# Array<'a> -> ('a -> string) -> Array<'a>
 sub distinct_by($array, $get_key) {
     my %seen;
     my @new;
