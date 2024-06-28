@@ -306,6 +306,28 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     is($i, {foo => 2}, 'copy 2');
 }
 
+# copy with limited keys
+{
+    my $h = Hash->new(
+        foo => 1, bar => 2,
+        baz => 3, maz => 4,
+    );
+
+    is(
+        $h->copy(qw/foo bar/),
+        { foo => 1, bar => 2 },
+        'copy foo & bar');
+
+    is(
+        $h->copy(qw/foo baz/),
+        { foo => 1, baz => 3 },
+        'copy foo & baz');
+
+    is( $h->copy('maz'),
+        { maz => 4 },
+        'copy only maz');
+}
+
 # with - with mutable values
 {
     # because with() only makes shallow copies (yet - maybe change that?)

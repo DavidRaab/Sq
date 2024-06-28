@@ -206,8 +206,19 @@ sub set($hash, @kvs) {
 }
 
 # creates a shallow copy
-sub copy($hash) {
-    return CORE::bless({%$hash}, 'Hash');
+sub copy($hash, @keys) {
+    # copy the whole hash when no keys are defined
+    if ( @keys == 0 ) {
+        return CORE::bless({%$hash}, 'Hash');
+    }
+    # otherwise copy just the keys specified in new hash
+    else {
+        my $new = Hash->new;
+        for my $key ( @keys ) {
+            $new->{$key} = $hash->{$key};
+        }
+        return $new;
+    }
 }
 
 # Like 'set' but makes a shallow copy and returns a new Hash instead of mutating
