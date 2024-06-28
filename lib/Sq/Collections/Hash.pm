@@ -182,6 +182,8 @@ sub get($hash, $key, $default) {
 
 # fetches many entries and returns it as an array, uses default value
 # when entry does not exists in hash
+#
+# Hash<'a> -> 'a -> ListContext<'a> -> Array<'a>
 sub extract($hash, $default, @keys) {
     my $array = Array->new;
     for my $key ( @keys ) {
