@@ -269,6 +269,16 @@ sub delete($hash, $key, @keys) {
     return;
 }
 
+# check if $key exists and is defined, when this is the case it executes
+# $f with the value for some side-effects.
+sub on($hash, $key, $f) {
+    if ( exists $hash->{$key} ) {
+        my $value = $hash->{$key};
+        $f->($value) if defined $value;
+    }
+    return;
+}
+
 # TODO: shallow at the moment. Maybe add recursion so Hash/HASH and Array/Array
 #       get compared deeply. All other references must be reference-equal
 sub equal($hash, $other) {

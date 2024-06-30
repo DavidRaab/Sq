@@ -513,4 +513,46 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
         'pick did not found anything');
 }
 
+# on
+{
+    my $data = Hash->new(
+        foo => 1,
+        bar => Array->new(1..5),
+        baz => Array->new(
+            Hash->new(name => "one"),
+            Hash->new(name => "two"),
+        ),
+        raz => undef,
+    );
+
+    my $extract_foo;
+    $data->on(foo => sub($x) { $extract_foo = $x });
+    is($extract_foo, 1, 'on foo: is 1');
+
+    my $sum_bar;
+    $data->on(bar => sub($array) { $sum_bar = $array->sum });
+    is($sum_bar, 15, 'on bar: sum of array');
+
+    my $str_concat;
+    $data->on(baz => sub($array) {
+        $array->map(sub($hash) { $str_concat .= $hash->get('name',"") })
+    });
+
+    is(
+        $str_concat,
+        $data->{baz}->map(sub($h){ $h->get('name',"") })->str_join(""),
+        "on baz: string concat 1");
+    is(
+        $str_concat,
+        $data->{baz}->fold("", sub($str,$h) { $str .= $h->get('name',"") }),
+        "on baz: string concat 2");
+
+    my $calls = 0;
+    $data->on(maz => sub($x) { $calls = 1 });
+    is($calls, 0, 'on maz: lambda not called');
+
+    $data->on(raz => sub($x) { $calls = 1 });
+    is($calls, 0, 'on raz: lambda not called');
+}
+
 done_testing;
