@@ -279,6 +279,14 @@ sub on($hash, $key, $f) {
     return;
 }
 
+# checks if keys exists and are defined in hash
+sub has_keys($hash, $keys) {
+    for my $key ( @$keys ) {
+        return 0 if !exists $hash->{$key} || !defined $hash->{$key};
+    }
+    return 1;
+}
+
 # TODO: shallow at the moment. Maybe add recursion so Hash/HASH and Array/Array
 #       get compared deeply. All other references must be reference-equal
 sub equal($hash, $other) {
