@@ -280,8 +280,8 @@ sub on($hash, $key, $f) {
 }
 
 # checks if keys exists and are defined in hash
-sub has_keys($hash, $keys) {
-    for my $key ( @$keys ) {
+sub has_keys($hash, @keys) {
+    for my $key ( @keys ) {
         return 0 if !exists $hash->{$key} || !defined $hash->{$key};
     }
     return 1;

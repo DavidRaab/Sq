@@ -525,10 +525,10 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
         raz => undef,
     );
 
-    is($data->has_keys([qw/foo/]),             1, 'has_keys foo');
-    is($data->has_keys([qw/foo bar baz/]),     1, 'has_keys foo,bar,baz');
-    is($data->has_keys([qw/foo bar baz raz/]), 0, 'has_keys foo,bar,baz,raz');
-    is($data->has_keys([qw/foo bar maz/]),     0, 'has_keys foo,bar,maz');
+    is($data->has_keys(qw/foo/),             1, 'has_keys foo');
+    is($data->has_keys(qw/foo bar baz/),     1, 'has_keys foo,bar,baz');
+    is($data->has_keys(qw/foo bar baz raz/), 0, 'has_keys foo,bar,baz,raz');
+    is($data->has_keys(qw/foo bar maz/),     0, 'has_keys foo,bar,maz');
 
     my $extract_foo;
     $data->on(foo => sub($x) { $extract_foo = $x });
