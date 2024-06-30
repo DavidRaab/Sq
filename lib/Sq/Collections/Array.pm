@@ -559,6 +559,7 @@ sub keyed_by($array, $get_key) {
     return CORE::bless(\%hash, 'Hash');
 }
 
+# Array<'a> -> ('a -> ('Key,'Value)) -> Hash<'Key,'Value>
 sub to_hash_of_array($array, $mapper) {
     my %hash;
     for my $x ( @$array ) {
@@ -566,6 +567,16 @@ sub to_hash_of_array($array, $mapper) {
         push @{$hash{$key}}, $value;
     }
     return CORE::bless(\%hash, 'Hash');
+}
+
+# puts every array entry as a key, and counts appearances
+# Array<'a> -> Hash<'a,int>
+sub as_hash($array) {
+    my $new = Hash->new;
+    for my $key ( @$array ) {
+        $new->{$key}++;
+    }
+    return $new;
 }
 
 sub find($array, $default, $predicate) {

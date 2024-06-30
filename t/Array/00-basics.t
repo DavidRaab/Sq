@@ -776,4 +776,16 @@ is(Array->new(qw/1 9 10 5/)->sort_num, [1, 5, 9, 10],  'sort_num');
         'sort_hash_num id');
 }
 
+# as_hash
+is(
+    Array->new(qw/foo bar baz foo bar foo 1 2/)->as_hash,
+    {
+        foo => 3,
+        bar => 2,
+        baz => 1,
+        1   => 1,
+        2   => 1,
+    },
+    'as_hash');
+
 done_testing;
