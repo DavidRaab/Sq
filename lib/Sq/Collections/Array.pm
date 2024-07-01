@@ -10,9 +10,8 @@ use Carp ();
 #                    Functions that create sequences                          #
 #-----------------------------------------------------------------------------#
 
-
 sub empty($class) {
-    return CORE::bless([], 'Array')
+    return CORE::bless([], 'Array');
 }
 
 sub replicate($class, $count, $initial) {
