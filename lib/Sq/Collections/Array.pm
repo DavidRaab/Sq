@@ -107,7 +107,7 @@ sub from_array($class, $xs) {
 
 #-----------------------------------------------------------------------------#
 # METHODS                                                                     #
-#           functions operating on Seq and returning another Seq              #
+#           functions operating on Array and returning another Array          #
 #-----------------------------------------------------------------------------#
 
 sub bind($array, $f) {
@@ -287,6 +287,7 @@ sub snds($array) {
     return CORE::bless(\@new, 'Array');
 }
 
+# Does nothing. It is just here for API compatibility with Seq::to_array_of_array
 sub to_array_of_array($array) {
     return $array;
 }
@@ -423,40 +424,6 @@ sub skip_while($array, $predicate) {
     return CORE::bless([$array->@[$index .. $array->$#*]], 'Array');
 }
 
-
-# Combines grouping and folding in one operation. All elements of a sequence
-# are grouped together by a key. The $folder function than can combine
-# multiple elements of the same key. For the first element found for a
-# key the $get_state function is called to produce the initial value, otherwise
-# the existing value is used. Returns a Hash with the 'Key to 'State
-# mapping.
-#
-# Array<'a>
-# -> (unit -> 'State)
-# -> ('a -> 'Key)
-# -> ('State -> 'a -> 'State)
-# -> Hash<'key, 'State>
-sub group_fold($array, $get_state, $get_key, $folder) {
-    my $new = Hash->new;
-    for my $x ( @$array ) {
-        my $key = $get_key->($x);
-        if ( exists $new->{$key} ) {
-            $new->{$key} = $folder->($new->{$key}, $x);
-        }
-        else {
-            $new->{$key} = $folder->($get_state->(), $x);
-        }
-    }
-    return $new;
-}
-
-# Array<'a> -> ('a -> 'Key) -> Hash<'Key, Array<'a>>
-sub group_by($array, $get_key) {
-    state $new_array = sub()      { Array->new        };
-    state $folder    = sub($s,$x) { push(@$s, $x); $s };
-    return group_fold($array, $new_array, $get_key, $folder);
-}
-
 #-----------------------------------------------------------------------------#
 # SIDE-EFFECTS                                                                #
 #    functions that have side-effects or produce side-effects. Those are      #
@@ -535,6 +502,35 @@ sub str_join($array, $sep) {
     return CORE::join($sep, @$array);
 }
 
+# Combines grouping and folding in one operation. All elements of a sequence
+# are grouped together by a key. The $folder function than can combine
+# multiple elements of the same key. For the first element found for a
+# key the $get_state function is called to produce the initial value, otherwise
+# the existing value is used. Returns a Hash with the 'Key to 'State
+# mapping.
+#
+# Array<'a>
+# -> (unit -> 'State)
+# -> ('a -> 'Key)
+# -> ('State -> 'a -> 'State)
+# -> Hash<'key, 'State>
+sub group_fold($array, $get_state, $get_key, $folder) {
+    my $new = Hash->new;
+    for my $x ( @$array ) {
+        my $key = $get_key->($x);
+        if ( exists $new->{$key} ) {
+            $new->{$key} = $folder->($new->{$key}, $x);
+        }
+        else {
+            $new->{$key} = $folder->($get_state->(), $x);
+        }
+    }
+    return $new;
+}
+
+# Applies $mapper function to each Array entry that return the new
+# 'Key,'Value to be used in a Hash.
+#
 # Array<'a> -> ('a -> ('Key,'Value)) -> Hash<'Key, 'Value>
 sub to_hash($array, $mapper) {
     my %hash;
@@ -545,10 +541,21 @@ sub to_hash($array, $mapper) {
     return CORE::bless(\%hash, 'Hash');
 }
 
-# Similar to to_hash. But to_hash is more generic and can return a new
-# key,value for every array entry. While this just keeps all array
-# entries as-is, and just produce a key for every entry. If a value produces
-# the same 'Key it will overwrite previous entry.
+# Like `to_hash` but instead of overwriting entries that produces the same
+# key, they are collected into an array.
+#
+# Array<'a> -> ('a -> ('Key,'Value)) -> Hash<'Key, Array<'Value>>
+sub to_hash_of_array($array, $mapper) {
+    my $hash = Hash->new;
+    for my $x ( @$array ) {
+        my ($key, $value) = $mapper->($x);
+        $hash->push($key, $value);
+    }
+    return $hash;
+}
+
+# Applies $get_key to each array entry and put the entry into a hash
+# under the key. Entries with the same key overrides previous ones.
 #
 # Array<'a> -> ('a -> 'Key) -> Hash<'Key, 'a>
 sub keyed_by($array, $get_key) {
@@ -559,17 +566,21 @@ sub keyed_by($array, $get_key) {
     return CORE::bless(\%hash, 'Hash');
 }
 
-# Array<'a> -> ('a -> ('Key,'Value)) -> Hash<'Key,'Value>
-sub to_hash_of_array($array, $mapper) {
-    my %hash;
+# Like `keyed_by` but instead of overriding it gathers an Array of all values
+# with the same 'Key.
+#
+# Array<'a> -> ('a -> 'Key) -> Hash<'Key, Array<'a>>
+sub group_by($array, $get_key) {
+    my $hash = Hash->new;
     for my $x ( @$array ) {
-        my ($key, $value) = $mapper->($x);
-        push @{$hash{$key}}, $value;
+        my $key = $get_key->($x);
+        $hash->push($key, $x);
     }
-    return CORE::bless(\%hash, 'Hash');
+    return $hash;
 }
 
-# puts every array entry as a key, and counts appearances
+# uses every array entry as a key in a hash, and counts appearances of each entry
+#
 # Array<'a> -> Hash<'a,int>
 sub as_hash($array) {
     my $new = Hash->new;

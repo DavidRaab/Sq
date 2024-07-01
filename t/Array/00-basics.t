@@ -261,11 +261,10 @@ is(
 
 is(
     Array->wrap(qw/Hello World you are awesome/)->to_hash_of_array(sub($x) { length $x => $x }),
-    hash {
-        field 5 => array { item "Hello";   item "World" };
-        field 3 => array { item "you";     item "are"   };
-        field 7 => array { item "awesome";              };
-        end;
+    {
+        3 => ["you",   "are"   ],
+        5 => ["Hello", "World" ],
+        7 => ["awesome"],
     },
     'to_hash_of_array');
 
