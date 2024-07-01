@@ -28,6 +28,11 @@ sub new($class, @array) {
     return CORE::bless(\@copy, 'Array');
 }
 
+# wraps all function arguments into Array. Stops at first undef
+sub wrap {
+    return new(@_);
+}
+
 sub bless($class, $ref) {
     if ( ref $ref eq 'ARRAY' ) {
         return CORE::bless($ref, 'Array');
@@ -37,9 +42,9 @@ sub bless($class, $ref) {
     }
 }
 
-# wraps all function arguments into Array. Stops at first undef
-sub wrap {
-    return new(@_);
+# Array->from_array : Array<'a> -> Array<'a>
+sub from_array($class, $xs) {
+    return CORE::bless($xs, 'Array');
 }
 
 # concatenate arrays into a flattened array
@@ -96,13 +101,6 @@ sub range_step($class, $start, $step, $stop) {
 sub range($class, $start, $stop) {
     return range_step('Array', $start, 1, $stop);
 }
-
-# Array->from_array : Array<'a> -> Array<'a>
-sub from_array($class, $xs) {
-    return CORE::bless($xs, 'Array');
-}
-
-# TODO: Maybe add "bless" as alias to "from_array" or other name as "bless"
 
 #-----------------------------------------------------------------------------#
 # METHODS                                                                     #
