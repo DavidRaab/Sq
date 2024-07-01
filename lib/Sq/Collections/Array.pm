@@ -623,4 +623,27 @@ sub pick($array, $default, $map) {
     return $default;
 }
 
+#-----------------------------------------------------------------------------#
+# MUTATION                                                                    #
+#         Those are functions mutating an array                               #
+#-----------------------------------------------------------------------------#
+
+sub push($array, @values) {
+    CORE::push(@$array, @values);
+    return;
+}
+
+sub pop($array) {
+    return CORE::pop @$array;
+}
+
+sub shift($array) {
+    return CORE::shift @$array;
+}
+
+sub unshift($array, @values) {
+    CORE::unshift @$array, @values;
+    return;
+}
+
 1;

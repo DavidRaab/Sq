@@ -787,4 +787,24 @@ is(
     },
     'as_hash');
 
+# mutation
+{
+    my $data = Array->range(1,5);
+    is($data, [1..5], 'mutation 1');
+
+    $data->push(6,7,8);
+    is($data, [1..8], 'mutation 2');
+
+    my $first = $data->shift;
+    is($first, 1, 'first element');
+    is($data, [2..8], 'mutation 3');
+
+    my $last = $data->pop;
+    is($last, 8, 'last element');
+    is($data, [2..7], 'mutation 4');
+
+    $data->unshift($first, $last);
+    is($data, [1,8,2..7], 'mutation 5');
+}
+
 done_testing;
