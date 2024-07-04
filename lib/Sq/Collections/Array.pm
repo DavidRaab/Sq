@@ -376,7 +376,7 @@ sub windowed($array, $window_size) {
 }
 
 sub intersperse($array, $value) {
-    return empty('Array')               if @$array == 0;
+    return empty('Array')                     if @$array == 0;
     return CORE::bless([$array->[0]],'Array') if @$array == 1;
 
     my @new   = $array->[0];
