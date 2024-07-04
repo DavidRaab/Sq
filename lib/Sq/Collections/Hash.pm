@@ -45,8 +45,10 @@ sub map($hash, $f) {
 
 # Returns the first key,value that matches a predicate, otherwise returns $default.
 sub find($hash, $default, $predicate) {
-    # BUG: using each causes problems as not going through all
-    #      all elements does not reset the internal iterator
+    # IMPORTANT:
+    # using 'each' causes a bug as not going through all elements does not
+    # reset the internal iterator. So calling `find` multiple times on the
+    # same hash leads to buggy behaviour.
     for my $k ( CORE::keys %$hash ) {
         my $v = $hash->{$k};
         return $k,$v if $predicate->($k,$v);
@@ -91,8 +93,31 @@ sub is_empty($hash) {
     return count($hash) == 0 ? 1 : 0;
 }
 
-# union of two hashes,
-# a function decides which value should be picked if key exists in both hashes.
+# Iterates through a hash and passes the key & value to a function. That
+# function is then expected to return another hash. All hashes are then
+# combined into a single hash.
+#
+# Hash<'a> -> ('a -> Hash<'b>) -> Hash<'b>
+sub bind($hash, $f) {
+    my %new;
+    while ( my ($key, $value) = each %$hash ) {
+        my $tmp_hash = $f->($key, $value);
+        while ( my ($key, $value) = each %$tmp_hash ) {
+            $new{$key} = $value;
+        }
+    }
+    return CORE::bless(\%new, 'Hash');
+}
+
+# appends a second hash onto the first hash, overwriting all keys that appear
+# in the first one.
+sub append($hash, $other) {
+    state $second = sub($,$y) { return $y };
+    return union($hash, $other, $second);
+}
+
+# union of two hashes, when a key exists in both hashes then both values
+# are passed to function $f that then return the value that should be used.
 #
 # union is like adding two hashes
 sub union($hash, $other, $f) {
@@ -113,23 +138,6 @@ sub union($hash, $other, $f) {
         }
     }
     return CORE::bless(\%new, 'Hash');
-}
-
-sub bind($hash, $f) {
-    my %new;
-    while ( my ($key, $value) = each %$hash ) {
-        my $tmp_hash = $f->($key, $value);
-        while ( my ($key, $value) = each %$tmp_hash ) {
-            $new{$key} = $value;
-        }
-    }
-    return CORE::bless(\%new, 'Hash');
-}
-
-# Like union but value in second hash overwrites the first one
-sub append($hash, $other) {
-    state $second = sub($,$y) { return $y };
-    return union($hash, $other, $second);
 }
 
 # returns a new hash only containg keys that appear in both hashes
@@ -192,19 +200,6 @@ sub extract($hash, $default, @keys) {
     return $array;
 }
 
-sub set($hash, @kvs) {
-    if ( @kvs % 2 == 0 ) {
-        my $count = @kvs;
-        for (my $idx=0; $idx < $count; $idx+=2) {
-            $hash->{ $kvs[$idx] } = $kvs[$idx+1];
-        }
-    }
-    else {
-        Carp::croak("Hash->set expects an even number of arguments.");
-    }
-    return;
-}
-
 # creates a shallow copy
 sub copy($hash, @keys) {
     # copy the whole hash when no keys are defined
@@ -221,62 +216,26 @@ sub copy($hash, @keys) {
     }
 }
 
-# Like 'set' but makes a shallow copy and returns a new Hash instead of mutating
+# like a 'set' but returns a new hash with the changes applied instead of
+# mutating the hash
 sub with($hash, @kvs) {
     my $new = copy($hash);
     set($new, @kvs);
     return $new;
 }
 
-# considers $key as an array and pushes a value onto it
-sub push($hash, $key, $value, @values) {
-    if ( exists $hash->{$key} ) {
-        CORE::push $hash->{$key}->@*, $value, @values;
-    }
-    else {
-        $hash->{$key} = Array->new($value, @values);
-    }
-    return;
-}
-
-# reads key and pass it to function, return value replaces original value
-sub change($hash, $key, $f, @kfs) {
-    my %kfs = ($key, $f, @kfs);
-    while ( my ($key, $f) = each %kfs ) {
-        $hash->{$key} = $f->($hash->{$key});
-    }
-    return;
-}
-
-sub iter($hash, $f) {
-    while ( my ($key, $value) = each %$hash ) {
-        $f->($key, $value);
-    }
-    return;
-}
-
-sub foreach($hash, $f) {
-    while ( my ($key, $value) = each %$hash ) {
-        $f->($key, $value);
-    }
-    return;
-}
-
-sub delete($hash, $key, @keys) {
-    for my $key ( $key, @keys ) {
-        CORE::delete $hash->{$key};
-    }
-    return;
-}
-
-# check if $key exists and is defined, when this is the case it executes
-# $f with the value for some side-effects.
-sub on($hash, $key, $f) {
-    if ( exists $hash->{$key} ) {
+# Returns a new hash by applying transform mapping functions for defined keys.
+sub withf($hash, @kfs) {
+    my %input = @kfs;
+    my $new = Hash->new;
+    for my $key ( CORE::keys %$hash ) {
         my $value = $hash->{$key};
-        $f->($value) if defined $value;
+        if ( defined $value ) {
+            my $f = $input{$key};
+            $new->{$key} = defined $f ? $f->($value) : $value;
+        }
     }
-    return;
+    return $new;
 }
 
 # checks if keys exists and are defined in hash
@@ -297,6 +256,83 @@ sub equal($hash, $other) {
         return 0 if $hash->{$key} ne $other->{$key};
     }
     return 1;
+}
+
+#
+# SIDE-EFFECTS
+#
+
+# check if $key exists and is defined, when this is the case it executes
+# $f with the value for some side-effects.
+sub on($hash, $key, $f) {
+    if ( exists $hash->{$key} ) {
+        my $value = $hash->{$key};
+        $f->($value) if defined $value;
+    }
+    return;
+}
+
+sub iter($hash, $f) {
+    while ( my ($key, $value) = each %$hash ) {
+        $f->($key, $value);
+    }
+    return;
+}
+
+sub foreach($hash, $f) {
+    while ( my ($key, $value) = each %$hash ) {
+        $f->($key, $value);
+    }
+    return;
+}
+
+#
+# MUTATION METHODS
+#
+
+# set overwrites each key with the specified values. key does not need
+# to exists before setting.
+sub set($hash, @kvs) {
+    if ( @kvs % 2 == 0 ) {
+        my $count = @kvs;
+        for (my $idx=0; $idx < $count; $idx+=2) {
+            $hash->{ $kvs[$idx] } = $kvs[$idx+1];
+        }
+    }
+    else {
+        Carp::croak("Hash->set expects an even number of arguments.");
+    }
+    return;
+}
+
+# similar to set as you set a key to a new value. But it reads the current
+# value of a key and passes it to a function that then returns the new value.
+sub change($hash, $key, $f, @kfs) {
+    my %kfs = ($key, $f, @kfs);
+    while ( my ($key, $f) = each %kfs ) {
+        my $value = $hash->{$key};
+        $hash->{$key} = $f->($value) if defined $value;
+    }
+    return;
+}
+
+# considers $key as an array and pushes a value onto it
+sub push($hash, $key, $value, @values) {
+    my $array = $hash->{$key};
+    if ( defined $array ) {
+        CORE::push @$array, $value, @values;
+    }
+    else {
+        $hash->{$key} = Array->new($value, @values);
+    }
+    return;
+}
+
+sub delete($hash, $key, @keys) {
+    for my $key ( $key, @keys ) {
+        CORE::delete $hash->{$key};
+    }
+    return;
 }
 
 1;

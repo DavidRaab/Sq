@@ -82,7 +82,6 @@ my $by_num = sub($x, $y) { $x <=> $y };
         qr/\AHash\-\>set/,
         'Hash->set with uneven arguments dies.'
     );
-
 }
 
 my $data = Hash->bless({
@@ -275,24 +274,31 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     $h->change(
         bar => sub($value) { Array::fold($value, 1, sub($s,$x) { $s * $x }) },
         baz => sub($value) { length $value },
+        xxx => sub($value) { $value + 1    },
     );
 
     is($h, { foo => 6, bar => 120, baz => 6 }, 'change 2');
 }
 
-# with
+# with & withf
 {
     my $h = Hash->new(foo => 1);
     my $i = $h->with(foo => 2, bar => 3);
     my $j = $h->with(bar => 2);
     my $k = $i->with(maz => 4);
     my $l = $k->with(bar => 2, ratatat => 1);
+    my $m = $l->withf(
+        bar => sub($x) { "x" x $x },
+        maz => sub($x) { $x + 1   },
+        xxx => sub($x) { $x + 1   },
+    );
 
-    is($h, {foo => 1},                                   'with 1');
-    is($i, {foo => 2, bar => 3},                         'with 2');
-    is($j, {foo => 1, bar => 2},                         'with 3');
-    is($k, {foo => 2, bar => 3, maz => 4},               'with 4');
-    is($l, {foo => 2, bar => 2, maz => 4, ratatat => 1}, 'with 5');
+    is($h, {foo => 1},                                      'with 1');
+    is($i, {foo => 2, bar => 3},                            'with 2');
+    is($j, {foo => 1, bar => 2},                            'with 3');
+    is($k, {foo => 2, bar => 3, maz => 4},                  'with 4');
+    is($l, {foo => 2, bar => 2, maz => 4, ratatat => 1},    'with 5');
+    is($m, {foo => 2, bar => "xx", maz => 5, ratatat => 1}, 'withf');
 }
 
 # copy
