@@ -25,9 +25,15 @@ and will never be done. This design is choosen for several reasons.
 
 =item *
 
-You always can use any Array created by the package itself how you
-are used to working with array references. You can use C<push> on it, just
-normally reference an index from it, or loop over it and so on.
+You always can use and threat an array created by this package like a normal
+Perl Array. Doing this is completely fine.
+
+    my $array = Array->new(1,2,3,4,5);
+    for my $x ( @$array ) {
+        ...
+    }
+
+    push @$array, 6, 7, 8;
 
 =item *
 
