@@ -198,6 +198,11 @@ is(
         'concat with 3 elements');
 }
 
+is($range->skip(0)->to_array,   [1..10], 'skip(0)');
+is($range->skip(-1)->to_array,  [1..10], 'skip(-1)');
+is($range->skip(-10)->to_array, [1..10], 'skip(-10)');
+is($range->skip(100)->to_array, []     , 'skip(100)');
+
 is($range->skip(3)->take(3)->to_array,  [4,5,6], 'skip->take 1');
 is($range->skip(3)->take(10)->to_array, [4..10], 'skip->take 2');
 is($range->skip(10)->take(1)->to_array, [],      'skip->take 3');

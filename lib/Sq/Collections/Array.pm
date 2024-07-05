@@ -163,6 +163,7 @@ sub filter($array, $predicate) {
 }
 
 sub skip($array, $amount) {
+    return CORE::bless([@$array], 'Array') if $amount <= 0;
     return CORE::bless([$array->@[$amount .. $array->$#*]], 'Array');
 }
 

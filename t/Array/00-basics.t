@@ -212,6 +212,11 @@ is(
         'concat with 3 elements');
 }
 
+is($range->skip(0),   [1..10], 'skip(0)');
+is($range->skip(-1),  [1..10], 'skip(-1)');
+is($range->skip(-10), [1..10], 'skip(-10)');
+is($range->skip(100), []     , 'skip(100)');
+
 is($range->skip(3)->take(3),  [4,5,6], 'skip->take 1');
 is($range->skip(3)->take(10), [4..10], 'skip->take 2');
 is($range->skip(10)->take(1), [],      'skip->take 3');
