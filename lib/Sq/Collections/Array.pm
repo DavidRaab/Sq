@@ -47,7 +47,6 @@ sub from_array($class, $xs) {
     return CORE::bless($xs, 'Array');
 }
 
-# concatenate arrays into a flattened array
 sub concat($class, @arrays) {
     my @new;
     for my $array ( @arrays ) {
@@ -56,8 +55,6 @@ sub concat($class, @arrays) {
     return CORE::bless(\@new, 'Array');
 }
 
-# Creates an Array with $count by passing the index to a function creating
-# the current element
 sub init($class, $count, $f) {
     return CORE::bless([map { $f->($_) } 0 .. ($count-1)], 'Array');
 }
@@ -144,7 +141,6 @@ sub mapi($array, $f) {
     return CORE::bless(\@new, 'Array');
 }
 
-# Like filter->map in one operation
 sub choose($array, $f) {
     my @new;
     for my $x ( @$array ) {
@@ -455,7 +451,6 @@ sub foreachi($array, $f) {
 #         Those are functions converting Array to none Array types            #
 #-----------------------------------------------------------------------------#
 
-# Expands an array into its values
 sub expand($array) {
     return @$array;
 }
@@ -526,9 +521,6 @@ sub group_fold($array, $get_state, $get_key, $folder) {
     return $new;
 }
 
-# Applies $mapper function to each Array entry that return the new
-# 'Key,'Value to be used in a Hash.
-#
 # Array<'a> -> ('a -> ('Key,'Value)) -> Hash<'Key, 'Value>
 sub to_hash($array, $mapper) {
     my %hash;
@@ -539,9 +531,6 @@ sub to_hash($array, $mapper) {
     return CORE::bless(\%hash, 'Hash');
 }
 
-# Like `to_hash` but instead of overwriting entries that produces the same
-# key, they are collected into an array.
-#
 # Array<'a> -> ('a -> ('Key,'Value)) -> Hash<'Key, Array<'Value>>
 sub to_hash_of_array($array, $mapper) {
     my $hash = Hash->new;
