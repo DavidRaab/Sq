@@ -67,8 +67,8 @@ behaviour that aborts on an C<undef>. This is to be align with the L<Sq::Collect
 data-structure that uses C<undef> to abort a sequence. But you anyway
 don't want to have C<undef> as values in an array.
 
-    my $numbers = Array->new(1,2,3,4,5);        // [1..5]
-    my $numbers = Array->new(1,2,3,undef,4,5,6) // [1,2,3]
+    my $numbers = Array->new(1,2,3,4,5);        # [1..5]
+    my $numbers = Array->new(1,2,3,undef,4,5,6) # [1,2,3]
 
 =head2 Array->wrap($x,$y,$z,...)
 
@@ -99,15 +99,15 @@ Same as C<< Array->bless >>
 
 Creates a new I<Array> that contains C<$value> C<$count> times.
 
-    my $xs = Array->replicate(5,"x"); // [qw/x x x x x/]
+    my $xs = Array->replicate(5,"x"); # [qw/x x x x x/]
 
 =head2 Array->range($start, $stop)
 
 Generates a new array from C<$start> to C<$stop> inclusive. It also supports
 counting downwards.
 
-    my $array = Array->range(1,10); // [1..10]
-    my $array = Array->range(10,1); // [10,9,8,7,6,5,4,3,2,1]
+    my $array = Array->range(1,10); # [1..10]
+    my $array = Array->range(10,1); # [10,9,8,7,6,5,4,3,2,1]
 
 =head2 Array->range_step($start, $step, $stop)
 
@@ -115,23 +115,23 @@ Like C<< Array->range >> but let's you specify a step. Both values
 are inclusive and also supports steps with floating-point. Consider
 floating-point inaccurassy.
 
-    my $array = Array->range(1,2,10)  // [1,3,5,7,9]
-    my $array = Array->range(10,2,1)  // [10,8,6,4,2]
-    my $array = Array->range(1,0.2,2) // [1,1.2,1.4,1.6,1.8,2]
-    my $array = Array->range(1,0.2,2) // [2,1.8,1.6,1.4,1.2,1]
+    my $array = Array->range(1,2,10)  # [1,3,5,7,9]
+    my $array = Array->range(10,2,1)  # [10,8,6,4,2]
+    my $array = Array->range(1,0.2,2) # [1,1.2,1.4,1.6,1.8,2]
+    my $array = Array->range(1,0.2,2) # [2,1.8,1.6,1.4,1.2,1]
 
 =head2 Array->concat(@arrays)
 
 Returns a new array with all arrays concatenated into a new one.
 
-    // [1,2,3,4,5,6,7,10,10,10]
+    # [1,2,3,4,5,6,7,10,10,10]
     my $array = Array->concat(
         [1,2,3,4],
         Array->new(5,6,7),
         Array->replicate(3, 10),
     )
 
-    // same as
+    # same as
     my $array = Array->range(1,7)->append([10,10,10]);
 
 =head2 Array->init($count, $f)
@@ -151,7 +151,7 @@ Generates a new Array by passing the function C<$f> the C<$state>. C<$f>
 then must return a value to be used in an array and the next state for the
 next call to C<$f>. This keeps on as long C<$f> returns a defined value.
 
-    // [1..99]
+    # [1..99]
     my $array = Array->unfold(1, sub($state) {
         if ( $state < 100 ) {
             return $state, $state+1;
@@ -194,7 +194,7 @@ can be implemented by C<unfold>. Everytime you use some kind of loop to generate
 a new array, you can potentially replace it by an C<unfold>. This is the
 functional way to generate data without relying on mutation of any variables.
 
-    // [1,1,2,3,5,8,13,21,34,55,89,144,233,377,610,987]
+    # [1,1,2,3,5,8,13,21,34,55,89,144,233,377,610,987]
     my $array =
         Array->concat(
             [1,1],
@@ -261,7 +261,7 @@ to the C<Array> module. You either must create C<[1..10]> with some constructor
 methods like C<< Array->new(1..10) >> or C<< Array->range(1,10) >> or add the
 blessing with C<< Array->bless >> or you just use the functional interface.
 
-    // All arrays represent an array [1..20]
+    # All arrays represent an array [1..20]
     my $array = Array::append([1..10], [11..20])
     my $array = Array->range(1,10)->append([11..20])
     my $array = Array->range(1,10)->append(Array->range(11,20))
@@ -270,39 +270,125 @@ blessing with C<< Array->bless >> or you just use the functional interface.
 But whatever you do. All methods will always return a blessed C<Array>
 reference. So you always can chain methods even if you started without any.
 
-    my $array = Array::append([1..10], [11..20])->rev // Array->range(20,1)
+    my $array = Array::append([1..10], [11..20])->rev # Array->range(20,1)
 
-=head2 $new = $array->append($array2)
+=head2 append($array1, $array2) : Array<'a> -> Array<'a> -> Array<'a>
 
-returns a $new array that has $array2 appended onto $array. C<append> only
+returns a $new array that has $array2 appended onto $array1. C<append> only
 works with two arrays (one argument in method-style). If you want to
 append multiple arrays together use C<< Array->concat >> instead.
 
-    my $array = Array->range(1,3)->append([4,5,6])->append([7,8,9]) // [1..9]
+    my $array = Array->range(1,3)->append([4,5,6])->append([7,8,9]) # [1..9]
 
     my $array = Array->concat(
         [1..3],
         [4,5,6],
-        [7,8,9],
+        Array->range(7,9),
     );
 
-=head2 rev
+=head2 rev($array) : Array<'a> -> Array<'a>
 
-=head2 bind
+returns a new array with all elements reversed
 
-=head2 flatten
+    # [5,4,3,2,1]
+    my $array = Array->range(1,5)->rev
 
-=head2 map
+=head2 bind($array, $f) : Array<'a> -> ('a -> Array<'b>) -> Array<'b>
 
-=head2 mapi
+Iterates through each element of an array and passes each element to the
+function C<$f>. C<$f> must then return another array. The results of all
+function calls are then concatenated into a single array.
 
-=head2 choose
+When you pass the same function C<$f> to C<map> and then C<flatten> you
+achieve the same result.
 
-=head2 filter
+    my $words = Array->new(qw/foo bar baz/);
+    # [qw/f o o b a r b a z/]
+    my $chars =
+        $words->bind(sub($word) {
+            return [split //, $word];
+        });
 
-=head2 skip
+=head2 flatten($array) : Array<Array<'a>> -> Array<'a>
 
-=head2 take
+Flattens an array of an array into a single array.
+
+    # [qw/f o o b a r b a z/]
+    my $chars = Array->new([qw/f o o/], [qw/b a r/], [qw/b a z/])->flatten;
+
+    # [qw/f o o b a r b a z/]
+    my $chars = Array::flatten([
+        [qw/f o o/],
+        [qw/b a r/],
+        [qw/b a z/],
+    ]);
+
+    # [qw/f o o b a r b a z/]
+    my $chars =
+        Array->new(qw/foo bar baz/)
+             ->map(sub($word) { [split //, $word] })
+             ->flatten;
+
+=head2 map($array, $f) : Array<'a> -> ('a -> 'b) -> Array<'b>
+
+Iterates through an array and passes each element to the function C<$f>. It
+constructs a new array with the result of the function call.
+
+    # [1, 4, 9, 16, 25]
+    my $squared = Array->range(1,5)->map(sub($x) { $x * $x });
+
+=head2 mapi($array, $f) : Array<'a> -> ('a -> int -> 'b) -> Array<'b>
+
+Same as C<map> but the function C<$f> additionally gets an index passed.
+
+    # [[0,"foo"], [1,"bar"], [2,"baz"]]
+    my $array =
+        Array->new(qw/foo bar baz/)
+        ->mapi(sub($x,$i) { [$i,$x] };
+
+=head2 filter($array, $predicate) : Array<'a> -> ('a -> bool) -> Array<'a>
+
+Iterates through each element of an array and passes it to the C<$predicate>
+function. When the C<$predicate> function returns a truish value then the value
+is returned in a new array. Works like the perl built-in C<grep>.
+
+    # [2,4,6,8,10]
+    my $evens =
+        Array->range(1,10)
+        ->filter(sub($x) { $x % 2 == 0 });
+
+=head2 choose($array, $mapping) : Array<'a> -> ('a -> Option<'b>) -> Array<'b>
+
+Combines C<map> and C<filter> into one function. Iterates through each element
+of an array and passes the value to the C<$mapping> function. Every defined
+value is put into the new array while undefined values are skipped.
+
+    # [4, 16, 36, 64, 100]
+    my $squared_and_even =
+        Array->range(1,10)
+        ->choose(sub($x) {
+            my $square = $x * $x;
+            return $square % 2 == 0 ? $square : undef;
+        });
+
+=head2 skip($array, $amount) : Array<'a> -> int -> Array<'a>
+
+skips C<$amount> entries of an array. Negative values or zero has no effect.
+Skipping more elements than the array has leds to an empty array. Always
+returns a new array, even in the case of passing it a zero or negative amount.
+
+    # [6,7,8,9,10]
+    my $array = Array->range(1,10)->skip(5);
+    # [1..10]
+    my $array = Array->range(1,10)->skip(-10);
+    # []
+    my $array = Array->range(1,10)->skip(100);
+
+=head2 take($array, $amount) : Array<'a> -> int -> Array<'a>
+
+Takes the first C<$amount> elements of an array and returns it as a new array.
+zero or negative elements return an empty array. Taking more elements as the
+array had just returns the whole array again.
 
 =head2 count
 
