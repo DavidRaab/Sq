@@ -388,13 +388,10 @@ returns a new array, even in the case of passing it a zero or negative amount.
 
 Takes the first C<$amount> elements of an array and returns it as a new array.
 zero or negative elements return an empty array. Taking more elements as the
-array had just returns the whole array again.
+array just returns the whole array again. Always returns a new array.
 
-=head2 count
-
-=head2 fold
-
-=head2 fold_mut
+    # [1,2,3,4,5]
+    my $five = Array->range(1,100)->take(5);
 
 =head2 indexed
 
@@ -438,25 +435,158 @@ array had just returns the whole array again.
 
 Converter are methods on an array that don't return C<Array>.
 
-=head2 expand
+=head2 count($array) : Array<'a> -> int
 
-=head2 first
+Returns the amount of elements in an array.
 
-=head2 last
+    # 3
+    my $count = Array->new(0,0,0)->count;
 
-=head2 reduce
+=head2 fold($array, $state, $f) : Array<'a> -> 'State -> ('State -> 'a -> 'State) -> 'State
 
-=head2 sum
+Iterates through each element of an array. On first iteration it passes C<$state>
+and the first element of the array to the function C<$f>. C<$f> then returns
+the next state that is passed with the second element of the array. This continues
+until all elements of an array are iterated. The last state of the last C<$f>
+function call is returned.
 
-=head2 sum_by
+When the array is empty C<$state> is immediately returned.
 
-=head2 str_join
+    # 55
+    my $sum = Array->range(1,10)->fold(0, sub($state,$x) { $state + $x });
+
+=head2 fold_mut
+
+TODO
+
+=head2 expand($array) : Array<'a> -> ListContext<'a>
+
+Expands an array into its values. Array is just an array-reference. Calling
+C<expand> is the same as writing C<@$array>.
+
+    # all are the same
+    for my $x ( $array->expand ) { ... }
+    for my $x ( $array->@* )     { ... }
+    for my $x ( @$array )        { ... }
+
+=head2 first($array, $default) : Array<'a> -> 'a -> 'a
+
+Returns the first element of an array or C<$default> if the array is empty.
+
+    # 10
+    my $first = Array->range(1,10)->rev->first(0);
+
+    # 100
+    my $first = Array->empty->first(100);
+
+=head2 last($array, $default) : Array<'a> -> 'a -> 'a
+
+Returns the last element of an array or C<$default> if the array is empty.
+
+    # 1
+    my $last = Array->range(1,10)->rev->last(0);
+
+    # 100
+    my $last = Array->empty->last(100);
+
+=head2 reduce($array, $default, $f) : Array<'a> -> 'a -> ('a -> 'a -> 'a) -> 'a
+
+The idea is to combine two values into one value. Two values are passed to C<$f>
+that combines the value into a new one. That new value is then passed with
+the third value of an array. Continues until all values are iterated and the
+last call to C<$f> is returned. When the array only has one value than this
+value is returned without C<$f> is ever being called. When the array is empty
+C<$default> is returned.
+
+C<reduce> is a lot like C<fold>. C<reduce> just omits the starting state,
+the idea usually is to combine something of the same type into just one value
+of the same type. But through the dynamic-typing nature of Perl we usually
+can exploit this behaviour and return something of any type. But still it usually
+has problems when the array is empty. Here i decided that the user must pass
+a C<$default> value. Typically a lot of other languages throw an exception in
+that case. But this doesn't help in writing good code that doesn't crash.
+
+Because of all of this I highly recommend to always use C<fold> instead.
+
+    # 55
+    my $sum = Array->range(1,10)->reduce(0, sub($x,$y) { $x + $y });
+
+    # 0
+    my $sum = Array->empty->reduce(0, sub($x,$y) { $x + $y });
+
+=head2 sum($array) : Array<Number> : Number
+
+Adds all numbers together in an array. Does no type-checking or something like
+that. If you have an array with other values than numbers then expect a lot of
+warnings and weird results.
+
+    # 55
+    my $sum = Array->range(1,10)->sum;
+
+=head2 sum_by($array, $f) : Array<'a> -> ('a -> Number) -> Number
+
+A lot like C<sum> but every value of an array is first passed to the function
+C<$f>. That function then can return a number that is used for adding. You
+could achive the same by calling C<< $array->map($f)->sum >> but this version
+is faster because it doesn't need to create an intermediate array.
+
+    my $value = sub($hash) { $hash->{value} };
+    my $data  = Array->new(
+        {id => 1, value => 5 },
+        {id => 2, value => 3 },
+        {id => 3, value => 7 },
+    );
+
+    # 15
+    my $sum = $data->sum_by($value);
+
+    # 15
+    my $sum = $data->map($value)->sum;
+
+=head2 str_join($array, $sep) : Array<string> -> string -> string
+
+concatenates an array of strings into a single string. The same as the
+perl built-in function C<join>.
+
+    # "1,2,3,4,5,6,7,8,9,10"
+    my $str = Array->range(1,10)->str_join(',');
 
 =head2 group_fold
 
-=head2 to_hash
+TODO
+
+=head2 to_hash($array, $mapper) : Array<'a> -> ('a -> 'Key * 'Value) -> Hash<'Key,'Value>
+
+Applies C<$mapper> function to each Array entry that return the new 'Key,
+'Value to be used in a Hash. When you return a 'Key that was already
+computed before you will overwrite the previous value.
+
+    # { 3 => "bar", 5 => "world", 1 => "a" }
+    my $hash = Array->new(qw/foo bar hello world a/)->to_hash(sub($x) {
+        length($x) => $x
+    });
+
+    # the above can be translated to
+    my $hash = {};
+    for my $x ( qw/foo bar hello world a/ ) {
+        $hash->{ length $x } = $x;
+    }
 
 =head2 to_hash_of_array
+
+Same as C<to_hash> but instead of overwriting previous values it collects
+all values of the same key into an array.
+
+    # { 3 => ["foo","bar"], 5 => ["hello", "world"], 1 => ["a"] }
+    my $hash = Array->new(qw/foo bar hello world a/)->to_hash_of_array(sub($x) {
+        length($x) => $x
+    });
+
+    # the above can be translated to
+    my $hash = {};
+    for my $x ( qw/foo bar hello world a/ ) {
+        push $hash->{ length $x }->@*, $x;
+    }
 
 =head2 keyed_by
 
