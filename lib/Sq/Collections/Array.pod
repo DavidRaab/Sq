@@ -459,6 +459,31 @@ When the array is empty C<$state> is immediately returned.
 
 TODO
 
+=head2 reduce($array, $default, $f) : Array<'a> -> 'a -> ('a -> 'a -> 'a) -> 'a
+
+The idea is to combine two values into one value. Two values are passed to C<$f>
+that combines the value into a new one. That new value is then passed with
+the third value of an array. Continues until all values are iterated and the
+last call to C<$f> is returned. When the array only has one value than this
+value is returned without C<$f> is ever being called. When the array is empty
+C<$default> is returned.
+
+C<reduce> is a lot like C<fold>. C<reduce> just omits the starting state,
+the idea usually is to combine something of the same type into just one value
+of the same type. But through the dynamic-typing nature of Perl we usually
+can exploit this behaviour and return something of any type. But still it usually
+has problems when the array is empty. Here i decided that the user must pass
+a C<$default> value. Typically a lot of other languages throw an exception in
+that case. But this doesn't help in writing good code that doesn't crash.
+
+Because of all of this I highly recommend to always use C<fold> instead.
+
+    # 55
+    my $sum = Array->range(1,10)->reduce(0, sub($x,$y) { $x + $y });
+
+    # 0
+    my $sum = Array->empty->reduce(0, sub($x,$y) { $x + $y });
+
 =head2 expand($array) : Array<'a> -> ListContext<'a>
 
 Expands an array into its values. Array is just an array-reference. Calling
@@ -488,31 +513,6 @@ Returns the last element of an array or C<$default> if the array is empty.
 
     # 100
     my $last = Array->empty->last(100);
-
-=head2 reduce($array, $default, $f) : Array<'a> -> 'a -> ('a -> 'a -> 'a) -> 'a
-
-The idea is to combine two values into one value. Two values are passed to C<$f>
-that combines the value into a new one. That new value is then passed with
-the third value of an array. Continues until all values are iterated and the
-last call to C<$f> is returned. When the array only has one value than this
-value is returned without C<$f> is ever being called. When the array is empty
-C<$default> is returned.
-
-C<reduce> is a lot like C<fold>. C<reduce> just omits the starting state,
-the idea usually is to combine something of the same type into just one value
-of the same type. But through the dynamic-typing nature of Perl we usually
-can exploit this behaviour and return something of any type. But still it usually
-has problems when the array is empty. Here i decided that the user must pass
-a C<$default> value. Typically a lot of other languages throw an exception in
-that case. But this doesn't help in writing good code that doesn't crash.
-
-Because of all of this I highly recommend to always use C<fold> instead.
-
-    # 55
-    my $sum = Array->range(1,10)->reduce(0, sub($x,$y) { $x + $y });
-
-    # 0
-    my $sum = Array->empty->reduce(0, sub($x,$y) { $x + $y });
 
 =head2 sum($array) : Array<Number> : Number
 
