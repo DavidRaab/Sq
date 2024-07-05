@@ -221,6 +221,11 @@ is($range->skip(3)->take(3),  [4,5,6], 'skip->take 1');
 is($range->skip(3)->take(10), [4..10], 'skip->take 2');
 is($range->skip(10)->take(1), [],      'skip->take 3');
 
+is($range->take(0),   [],      'take(0)');
+is($range->take(-1),  [],      'take(-1)');
+is($range->take(-10), [],      'take(-10)');
+is($range->take(100), [1..10], 'take(100)');
+
 is($range->take(5)->skip(2),  [3,4,5], 'take->skip 1');
 is($range->take(5)->skip(4),  [5],     'take->skip 2');
 is($range->take(5)->skip(6),  [],      'take->skip 2');

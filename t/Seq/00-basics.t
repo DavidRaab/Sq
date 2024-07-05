@@ -207,6 +207,11 @@ is($range->skip(3)->take(3)->to_array,  [4,5,6], 'skip->take 1');
 is($range->skip(3)->take(10)->to_array, [4..10], 'skip->take 2');
 is($range->skip(10)->take(1)->to_array, [],      'skip->take 3');
 
+is($range->take(0)->to_array,   [],      'take(0)');
+is($range->take(-1)->to_array,  [],      'take(-1)');
+is($range->take(-10)->to_array, [],      'take(-10)');
+is($range->take(100)->to_array, [1..10], 'take(100)');
+
 is($range->take(5)->skip(2)->to_array,  [3,4,5], 'take->skip 1');
 is($range->take(5)->skip(4)->to_array,  [5],     'take->skip 2');
 is($range->take(5)->skip(6)->to_array,  [],      'take->skip 2');
