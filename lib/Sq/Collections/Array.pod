@@ -393,7 +393,14 @@ array just returns the whole array again. Always returns a new array.
     # [1,2,3,4,5]
     my $five = Array->range(1,100)->take(5);
 
-=head2 indexed
+=head2 indexed($array) : Array<'a> -> Array<Array<int,'a>>
+
+Returns a new array where each element is put together with its index inside
+another array. Consider using C<mapi> or C<iteri> if they are more appropiated
+for whatever you wanna do.
+
+    # [[0,1], [1,2], [2,3], [3,4], [4,5]]
+    my $array = Array->range(1,5)->indexed;
 
 =head2 zip
 
@@ -572,7 +579,7 @@ computed before you will overwrite the previous value.
         $hash->{ length $x } = $x;
     }
 
-=head2 to_hash_of_array
+=head2 to_hash_of_array($array, $mapper) : Array<'a> -> ('a -> 'Key * 'Value) -> Hash<'Key,'Value>
 
 Same as C<to_hash> but instead of overwriting previous values it collects
 all values of the same key into an array.
@@ -606,27 +613,60 @@ all values of the same key into an array.
 
 =head1 MUTATION
 
-The following methods mutate the array instead of creating a new one as
-a result
+The following methods mutate the array instead of creating a new one.
 
-=head2 push
+=head2 push($array, @values) : Array<'a> -> ... -> unit
 
-=head2 pop
+Adds elements to the end of the array. Same as perl built-in C<push>.
 
-=head2 shift
+    $array->push(1,2,3);
 
-=head2 unshift
+=head2 pop($array) : Array<'a> -> 'a
+
+Removes the last element from the array and returns it. Same as perl built-in C<pop>
+
+    my $last = $array->pop;
+
+=head2 shift($array) : Array<'a> -> 'a
+
+Removes the first element from the array and returns it. Same as perl built-in C<shift>
+
+    my $first = $array->shift;
+
+=head2 unshift($array, @values) : Array<'a> -> ... -> unit
+
+Adds elements to the front of an array. Same as perl built-in C<unshift>.
+
+    my $array = Array->new(1,2,3,4,5);
+    $array->unshift(qw/a b c/);
+
+    # ['a','b','c',1,2,3,4,5]
 
 =head1 SIDE-Effects
 
 The following methods have no return value and exists for various kind
 of doing side-effects.
 
-=head2 iter
+=head2 iter($array, $f) : Array<'a> -> ('a -> unit)
 
-=head2 iteri
+Iterates through an array and passes each element to the provided function
+that does some kind of side-effect.
 
-=head2 foreach
+    # prints all numbers from 1 to 100
+    Array->range(1,100)->iter(sub($x) { say $x });
 
-=head2 foreachi
+=head2 iteri($array, $f) : Array<'a> -> ('a -> int -> unit)
 
+Iterates through an array and passes each element inlcuding the index to the
+provided function that does some kind of side-effect.
+
+    # prints: 0 => 1, 1 => 2, 2 => 3 ...
+    Array->range(1,100)->iter(sub($x,$i) { printf "%d => %d\n", $i, $x });
+
+=head2 foreach($array, $f) : Array<'a> -> ('a -> unit)
+
+Same as C<iter>, just an alias.
+
+=head2 foreachi($array, $f) : Array<'a> -> ('a -> int -> unit)
+
+Same as C<iteri>, just an alias.
