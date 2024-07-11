@@ -418,6 +418,19 @@ sub skip_while($array, $predicate) {
     return CORE::bless([$array->@[$index .. $array->$#*]], 'Array');
 }
 
+sub slice($array, $pos, $length) {
+    return CORE::bless([], 'Array') if $length <= 0;
+    return CORE::bless([], 'Array') if $pos > @$array;
+
+    my $start = $pos < 0 ? @$array + $pos : $pos;
+    my $end   = $start+$length < @$array ? $start+$length : @$array;
+    my $new = new('Array');
+    for (my $idx=$start; $idx < $end; $idx++) {
+        push @$new, $array->[$idx];
+    }
+    return $new;
+}
+
 #-----------------------------------------------------------------------------#
 # SIDE-EFFECTS                                                                #
 #    functions that have side-effects or produce side-effects. Those are      #

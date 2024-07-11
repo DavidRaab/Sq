@@ -817,4 +817,23 @@ is(
     is($data, [1,8,2..7], 'mutation 5');
 }
 
+# slice
+{
+    # index: 0 1 2 3 4 5 6 7 8 9
+    # data:   1 2 3 4 5 6 7 8 9 10
+    my $data = Array->range(1,10);
+    is($data->slice(0,3),   [1,2,3],      'slice at beginning');
+    is($data->slice(1,3),   [2,3,4],      'slice skipping first');
+    is($data->slice(20,10), [],           'slice empty');
+    is($data->slice(5,100), [6,7,8,9,10], 'slice to the end');
+    is($data->slice(3,3),   [4,5,6],      'slice of 3');
+    is($data->slice(9,1),   [10],         'slice at end');
+    is($data->slice(9,10),  [10],         'slice at end');
+    is($data->slice(10,1),  [],           'slice out of bound');
+    is($data->slice(0,0),   [],           'slice with zero length');
+    is($data->slice(0,-10), [],           'slice with negative length');
+    is($data->slice(-3,3),  [8,9,10],     'slice with negative position');
+    is($data->slice(1,3), $data->skip(1)->take(3), 'slice is like skip->take');
+}
+
 done_testing;
