@@ -632,7 +632,10 @@ sub pick($array, $default, $map) {
 #-----------------------------------------------------------------------------#
 
 sub push($array, @values) {
-    CORE::push(@$array, @values);
+    for my $x ( @values ) {
+        return if !defined $x;
+        CORE::push(@$array, $x);
+    }
     return;
 }
 
@@ -645,7 +648,14 @@ sub shift($array) {
 }
 
 sub unshift($array, @values) {
-    CORE::unshift @$array, @values;
+    # we need to built a new array, otherwise typical unshift order
+    # is not preserved
+    my @unshift;
+    for my $x ( @values ) {
+        last if !defined $x;
+        CORE::push @unshift, $x;
+    }
+    CORE::unshift @$array, @unshift;
     return;
 }
 

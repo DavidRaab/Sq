@@ -815,6 +815,21 @@ is(
 
     $data->unshift($first, $last);
     is($data, [1,8,2..7], 'mutation 5');
+
+    # push/unshift does undef checking
+    $data->push(undef);
+    is($data, [1,8,2..7], 'no undef at end');
+
+    $data->unshift(undef);
+    is($data, [1,8,2..7], 'no undef at start');
+
+    # push that contains undef
+    $data->push(11,12,undef,13);
+    is($data, [1,8,2..7,11,12], 'only pushes values up to first undef');
+
+    # unshift that contains undef
+    $data->unshift(15,16,undef,17);
+    is($data, [15,16,1,8,2..7,11,12], 'unshift only up to first undef');
 }
 
 # slice
