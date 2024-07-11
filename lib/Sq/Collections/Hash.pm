@@ -316,12 +316,28 @@ sub change($hash, $key, $f, @kfs) {
     return;
 }
 
-# considers $key as an array and pushes a value onto it
+# threats $key as an array and pushes a value onto it
+# when it doesn't exists it creates an array, or if it is something
+# different it turns it into an array.
 sub push($hash, $key, $value, @values) {
-    my $array = $hash->{$key};
-    if ( defined $array ) {
-        CORE::push @$array, $value, @values;
+    my $v = $hash->{$key};
+    if ( defined $v ) {
+        my $ref = ref $v;
+        # if Array we just push onto it
+        if ( $ref eq 'Array' ) {
+            CORE::push @$v, $value, @values;
+        }
+        # if perl plain array addition Array blessing is added.
+        elsif ( $ref eq 'ARRAY' ) {
+            Array->bless($v);
+            CORE::push @$v, $value, @values;
+        }
+        # otherwise we "upgrade" element to an array
+        else {
+            $hash->{$key} = Array->new($v, $value, @values);
+        }
     }
+    # when not exists/undef, we create array
     else {
         $hash->{$key} = Array->new($value, @values);
     }

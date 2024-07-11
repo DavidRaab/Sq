@@ -240,6 +240,29 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     $h->push(baz => 9, 10);
 
     is($h, {foo => [1..5], bar => [1,2], baz => [9,10]}, 'push 2');
+
+    # testing with plain perl array or Array
+    my $t1 = Hash->new(id => 1, tags => ['foo']);
+    my $t2 = Hash->new(id => 2, tags => Array->new('foo'));
+
+    $t1->push(tags => 'bar');
+    $t2->push(tags => 'bar');
+
+    is($t1, {id => 1, tags => [qw/foo bar/]}, 'push onto plain perl array');
+    is($t2, {id => 2, tags => [qw/foo bar/]}, 'push onto Sq Array');
+    is($t1->{tags}, check_isa('Array'), 'pushin on perl plain array adds blessing');
+
+    # testing "upgrade"
+    my $data = Hash->new(
+        id   => 1,
+        tags => 'one',
+    );
+    $data->push(tags => 'two');
+
+    is($data, {
+        id => 1,
+        tags => ['one', 'two'],
+    }, 'pushing on not array, turns it into an array');
 }
 
 # push 2
