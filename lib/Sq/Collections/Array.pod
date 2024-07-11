@@ -332,10 +332,28 @@ Flattens an array of an array into a single array.
 =head2 map($array, $f) : Array<'a> -> ('a -> 'b) -> Array<'b>
 
 Iterates through an array and passes each element to the function C<$f>. It
-constructs a new array with the result of the function call.
+constructs a new array with the result of the function call. Different
+to built-int C<map> it has special behaviour when C<undef> is returned. In this
+case C<map> skips the element and does not add it to the resulting
+array. This way C<map> behaves like a C<<->map($f)->filter($predicate)>>
+in a single function call.
 
     # [1, 4, 9, 16, 25]
     my $squared = Array->range(1,5)->map(sub($x) { $x * $x });
+
+    # [4, 16]
+    my $squaredAndEven =
+        Array->range(1,5)->map(sub($x) {
+            my $square = $x * $x;
+            return $square % 2 == 0 ? $square : undef
+        });
+
+    # [4, 16]
+    my $squaredAndEven =
+        Array
+        ->range(1,5)
+        ->map(   sub($x) { $x * $x     })
+        ->filter(sub($x) { $x % 2 == 0 });
 
 =head2 mapi($array, $f) : Array<'a> -> ('a -> int -> 'b) -> Array<'b>
 
@@ -356,20 +374,6 @@ is returned in a new array. Works like the perl built-in C<grep>.
     my $evens =
         Array->range(1,10)
         ->filter(sub($x) { $x % 2 == 0 });
-
-=head2 choose($array, $mapping) : Array<'a> -> ('a -> Option<'b>) -> Array<'b>
-
-Combines C<map> and C<filter> into one function. Iterates through each element
-of an array and passes the value to the C<$mapping> function. Every defined
-value is put into the new array while undefined values are skipped.
-
-    # [4, 16, 36, 64, 100]
-    my $squared_and_even =
-        Array->range(1,10)
-        ->choose(sub($x) {
-            my $square = $x * $x;
-            return $square % 2 == 0 ? $square : undef;
-        });
 
 =head2 skip($array, $amount) : Array<'a> -> int -> Array<'a>
 

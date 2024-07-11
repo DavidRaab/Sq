@@ -128,26 +128,20 @@ sub rev($array) {
 
 # map : Array<'a> -> ('a -> 'b) -> Array<'b>
 sub map($array, $f) {
-    local $_;
-    return CORE::bless([map { $f->($_) } @$array], 'Array');
+    my @new;
+    for my $x ( @$array ) {
+        my $value = $f->($x);
+        push @new, $value if defined $value;
+    }
+    return CORE::bless(\@new, 'Array');
 }
 
 sub mapi($array, $f) {
     my @new;
     my $idx = 0;
     for my $x ( @$array ) {
-        push @new, $f->($x, $idx++);
-    }
-    return CORE::bless(\@new, 'Array');
-}
-
-sub choose($array, $f) {
-    my @new;
-    for my $x ( @$array ) {
-        my $value = $f->($x);
-        if ( defined $value ) {
-            push @new, $value;
-        }
+        my $value = $f->($x, $idx++);
+        push @new, $value if defined $value;
     }
     return CORE::bless(\@new, 'Array');
 }

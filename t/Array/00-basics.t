@@ -56,6 +56,8 @@ is(
     [4,16,36],
     'map filter take');
 
+is($range->map(sub($x) { undef }), [], 'empty array');
+
 is(
     $range->fold(0, sub($count, $x) { $count + 1 }),
     $range->count,
@@ -309,6 +311,13 @@ is(
     [[A => 0], [B => 1], [C => 2], [D => 3], [E => 4], [F => 5]],
     'mapi');
 
+is(
+    Array->wrap(qw/A B C D E F/)->mapi(sub($x,$i) {
+        $i < 3 ? [$x,$i] : undef
+    }),
+    [[A => 0], [B => 1], [C => 2]],
+    'mapi with filtering');
+
 is(Array->init( 0,  sub($idx) { $idx }), [], 'init with count 0');
 is(Array->init(-1,  sub($idx) { $idx }), [], 'init with count -1');
 is(Array->init(-10, sub($idx) { $idx }), [], 'init with count -10');
@@ -329,19 +338,32 @@ like(
 
 is(
     $range->map($square)->filter($is_even),
-    $range->choose(sub($x) {
+    $range->map(sub($x) {
         my $s = $x * $x;
         $s % 2 == 0 ? $s : undef
     }),
-    'choose same as map->filter');
+    'map already can filter');
 
 is(
-    $range->choose(sub($x) {
+    $range->map(sub($x) {
         my $s = $x * $x;
         $s % 2 == 0 ? $s : undef
     }),
     [grep { $_ % 2 == 0 } map { $_ * $_ } 1 .. 10],
-    'Perl implementation of choose');
+    'Perl implementation of ->map');
+
+is(
+    Array
+        ->range(1,5)
+        ->map(sub($x) {
+            my $square = $x * $x;
+            return $square % 2 == 0 ? $square : undef
+        }),
+    Array
+        ->range(1,5)
+        ->map(   sub($x) { $x * $x     })
+        ->filter(sub($x) { $x % 2 == 0 }),
+    'square and even');
 
 is($range->find(undef, sub($x) { $x > 5  }),     6, 'find 1');
 is($range->find(undef, sub($x) { $x > 10 }), undef, 'find 2');
