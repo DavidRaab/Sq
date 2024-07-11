@@ -280,6 +280,87 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     is($h2, {foo => [[1,2,3], [1,2,3]]}, 'push2 3');
 }
 
+# push with reduce
+{
+    # copy of the initial value, this is used because $data are mutated
+    # and we can easily test when $data is reseted to initial state
+    my $initial = [
+        {id => 1, name => "foo", tags => "one"   },
+        {id => 1, name => "foo", tags => "two"   },
+        {id => 1, name => "foo", tags => "three" },
+    ];
+
+    my $data = Array->new(
+        Hash->new(id => 1, name => "foo", tags => "one"),
+        Hash->new(id => 1, name => "foo", tags => "two"),
+        Hash->new(id => 1, name => "foo", tags => "three"),
+    );
+
+    # we can reduce and use push
+    my $entry = $data->reduce(undef, sub($x,$y) { $x->push(tags => $y->{tags}); $x });
+
+    is($entry, {
+        id   => 1,
+        name => "foo",
+        tags => [qw/one two three/],
+    }, 'reducing with a push');
+
+    # but be aware that push mutates an entry, not creates a new element
+    is($data, [
+        {id => 1, name => "foo", tags => [qw/one two three/]},
+        {id => 1, name => "foo", tags => "two"              },
+        {id => 1, name => "foo", tags => "three"            },
+    ], 'push mutates');
+
+    # reset first entry
+    $data->[0] = Hash->new(id => 1, name => "foo", tags => "one");
+    is($data, $initial, 'reset');
+
+    # otherwise it makes sense to use 'fold' to provide the initial new/empty element
+    my $entry2 = $data->fold(Hash->new, sub($state,$x) {
+        $state->set(
+            id => $x->{id},
+            name => $x->{name},
+        );
+        $state->push(tags => $x->{tags});
+        return $state;
+    });
+    is($data, $initial, '$data does not mutate');
+    is($entry2, {id => 1, name => 'foo', tags => [qw/one two three/]}, 'fold push');
+
+    # we also could use fold_mut instead as we anyway mutate a reference. so
+    # we can omit the return statement in the lambda.
+    my $entry3 = $data->fold_mut(Hash->new, sub($state,$x) {
+        $state->set(
+            id => $x->{id},
+            name => $x->{name},
+        );
+        $state->push(tags => $x->{tags});
+    });
+    is($data, $initial, '$data does not mutate');
+    is($entry3, {id => 1, name => 'foo', tags => [qw/one two three/]}, 'fold_mut push');
+
+    # we also could copy those fields that we think that don't change. so we don't need
+    # to call ->set in the lambda
+    my $entry4 = $data->fold_mut(
+        $data->[0]->copy(qw/id name/), # creates inital $state as a copy of first Hash
+        sub($state,$x) {
+            $state->push(tags => $x->{tags});
+        }
+    );
+    is($data, $initial, '$data does not mutate');
+    is($entry4, {id => 1, name => 'foo', tags => [qw/one two three/]}, 'fold_mut copy and push');
+
+    # or we do the creation completely different, we compute the tags array from all data
+    my $entry5 = Hash->new(
+        id   => $data->[0]->{id},
+        name => $data->[0]->{name},
+        tags => $data->map(sub($x) { $x->{tags} }),
+    );
+    is($data, $initial, '$data does not mutate');
+    is($entry5, {id => 1, name => 'foo', tags => [qw/one two three/]}, 'Hash->new with $data->map');
+}
+
 # change
 {
     my $h = Hash->new(
