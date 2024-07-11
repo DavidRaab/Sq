@@ -638,9 +638,13 @@ The following methods mutate the array instead of creating a new one.
 
 =head2 push($array, @values) : Array<'a> -> ... -> unit
 
-Adds elements to the end of the array. Same as perl built-in C<push>.
+Adds elements to the end of the array. Like the built-in C<push> function
+but additionally stops at first C<undef>. If you want to push C<undef>
+into an array then use the perl built-in C<push @$array, undef>.
 
-    $array->push(1,2,3);
+    my $array = Array->new;
+    $array->push(1,2,3);    # [1,2,3]
+    $array->push(4,undef,5) # [1,2,3,4]
 
 =head2 pop($array) : Array<'a> -> 'a
 
@@ -656,12 +660,13 @@ Removes the first element from the array and returns it. Same as perl built-in C
 
 =head2 unshift($array, @values) : Array<'a> -> ... -> unit
 
-Adds elements to the front of an array. Same as perl built-in C<unshift>.
+Adds elements to the front of an array. Same as perl built-in C<unshift>
+but stops at first C<undef>. If you still want to unshift undef to the array use
+the perl built-in C<sunhift @$array, undef>.
 
     my $array = Array->new(1,2,3,4,5);
-    $array->unshift(qw/a b c/);
-
-    # ['a','b','c',1,2,3,4,5]
+    $array->unshift(qw/a b c/);            # ['a','b','c',1,2,3,4,5]
+    $array->unshift('d', 'e', undef, 'f'); # ['d','e','a','b','c',1,2,3,4,5]
 
 =head1 SIDE-Effects
 
