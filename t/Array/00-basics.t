@@ -832,7 +832,10 @@ is(
     is($data->slice(10,1),  [],           'slice out of bound');
     is($data->slice(0,0),   [],           'slice with zero length');
     is($data->slice(0,-10), [],           'slice with negative length');
-    is($data->slice(-3,3),  [8,9,10],     'slice with negative position');
+    is($data->slice(-3,3),  [8,9,10],     'slice with negative position 1');
+    is($data->slice(-3,2),  [8,9],        'slice with negative position 2');
+    is($data->slice(-3,0),  [],           'slice with negative position and 0 length');
+    is($data->slice(-3,-3), [],           'slice both values negative');
     is($data->slice(1,3), $data->skip(1)->take(3), 'slice is like skip->take');
 }
 
