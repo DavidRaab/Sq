@@ -6,6 +6,7 @@ use 5.036;
 # -1 means left element is smaller. 0 means both elements are equal,
 # and 1 means right element is smaller.
 sub new($class, $cmpf) {
+    die "You must pass a comparison function." if not defined $cmpf;
     return bless({
         data => [undef],
         cmpf => $cmpf,

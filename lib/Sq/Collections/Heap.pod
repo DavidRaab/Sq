@@ -1,0 +1,138 @@
+# PODNAME: Sq::Collections::Heap
+# ABSTRACT: Heap
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Sq::Collection::Heap - Heap data-structure
+
+=head1 DESCRIPTION
+
+A Heap data-structure sometimes also called a Priority Queue is a data-structure
+that can efficently insert and remove items into a bag and return the smallest
+item.
+
+Adding an element to the data-structure happens in O(log n) time as removing
+an item for the data-structure also is O(log n) time.
+
+A Heap is often used in traversing Graph algorithms, for example computing
+shortest path with Dijkstra (or A* Pathfinding). In this case we usually need
+to add some amount of items to a queue, then process the smallest element,
+and while processing the smallest element it usually can add another bunch
+of items.
+
+A Heap is optimized for this kind of tasks as just using an Array, sorting
+it again and again O(n * log n) time or doing single insertion sorts O(n)
+usually performs a lot more worse.
+
+This implemention is a binary Heap using an Array as a tree like data-structure.
+
+=head1 USAGE
+
+    # A heap that sorts its elements as numbers
+    my $heap = Heap->new(sub($x,$y) { $x <=> $y });
+
+    # Adds 10
+    $heap->add(10);
+
+    # Adds 3.
+    # Its allowed to call all methods directly as functions
+    Heap::add($heap, 3);
+
+    # Adds many items at once
+    # Each addition takes O(log n) time. so here it is 5 * O(log n)
+    $heap->add(45, 30, 9, 1, 46);
+
+    # head returns the smallest element without removing it. O(1)
+    my $head = $heap->head();
+
+    # remove returns the smallest element and removes it, causing the tree
+    # to "balance" so it contains the next smallest element as first element
+    # This is O(log n)
+    my $smallest = $heap->remove();  # will be 1
+
+    # remove_all returns all items from the internal data-structure at once.
+    # after that opertaion the $heap is empty. Adding elements to a heap and
+    # removing all elements is also called a Heap sort and works in O(n * log n)
+    # timing like Merge Sort or Quick Sort. So it is one of the fastest sorting
+    # algorithm but usually still slower as the other (because it needs to allocate
+    # extra space). When all you need is to always sort all data at once, then
+    # just use Perl's built-in sort.
+    my @array = $heap->remove_all;
+    my $array = $heap->remove_all;
+
+=head1 CONSTRUCTOR
+
+=head2 Heap->new($comparer)
+
+You must pass a function that is used to decide which elements are greater/smaller.
+
+Whenever the internal tree needs to be adjusted because an element was added
+or removed than this function is called to compare two items and which is smaller.
+
+It is expected that this function returns -1, 0 or 1. -1 should be returned if
+the left item is smaller, 0 if both items are equal and otherwise 1 if the
+right element is smaller.
+
+Or instead of "smaller" consider it just as which item comes first. Usually
+you just pass the exact same function here as you would pass to a sort()
+function call.
+
+If you wish for example to just get the greatest element, instead of the
+smallest you just pass another comparision function.
+
+=head1 METHODS
+
+All methods can be called as a method C<<$heap->method>> or
+directly as a function call C<<Heap::method($heap)>>.
+
+=head2 count($heap)
+
+returns the amount of elements in the Heap.
+
+    my $count = $heap->count;
+
+=head2 add($heap, @values)
+
+adds one or multiple elements to the Heap.
+
+    $heap->add("foo");
+    $heap->add(qw/bar baz/);
+
+=head2 add_one($heap, $x)
+
+adds exactly one element to the Heap. C<add> is basically just a wrapper around
+that function that calls this function in a loop, so you don't need todo that
+if you need to add multiple elements at once.
+
+Theoretically if you only need to add excatly one item you can call this function
+and get a little performance boost. But usually this shouldn't matter much.
+
+    $heap->add_one("foo");
+
+=head2 head($heap)
+
+Returns the smallest element (according to the comparison function) without
+removing it from the data-structure.
+
+    my $smallest = $heap->head;
+
+=head2 remove($heap)
+
+Returns and removes the smallest element (according to the comparision function).
+
+    my $smallest = $heap->remove;
+
+=head2 remove_all($heap)
+
+Returns all removing elements at once in an array. This function is context
+aware. It returns a list in list context and an array-ref in scalar context.
+
+    my @array = $heap->remove_all;
+    my $array = $heap->remove_all;
+
