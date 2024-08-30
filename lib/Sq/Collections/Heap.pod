@@ -88,8 +88,8 @@ smallest you just pass another comparision function.
 
 =head1 METHODS
 
-All methods can be called as a method C<<$heap->method>> or
-directly as a function call C<<Heap::method($heap)>>.
+All methods can be called as a method C<< $heap->method >> or
+directly as a function call C<< Heap::method($heap) >>.
 
 =head2 count($heap)
 
