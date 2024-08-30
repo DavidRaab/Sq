@@ -17,6 +17,7 @@ use Sq::Collections::Array;
 use Sq::Collections::Queue;
 use Sq::Collections::List;
 use Sq::Collections::Seq;
+use Sq::Collections::Heap;
 # provides to_* from_* functions for different packages
 use Sq::Collections::Glue;
 use Sq::Io;
