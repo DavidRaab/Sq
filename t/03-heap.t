@@ -66,27 +66,27 @@ is(\@rest, [10,20,40,50,50,60,100], 'rest');
     });
 
     Heap::add($heap,
-        { first => 'Dieter',   last => 'Zentner'  },
-        { first => 'Zoola',    last => 'Bertrecht'},
-        { first => 'Micky',    last => 'Mouse'    },
-        { first => 'Daisy',    last => 'Mouse'    },
-        { first => 'Donald',   last => 'Duck'     },
-        { first => 'Donatelo', last => 'Turtle'   },
-        { first => 'Spider',   last => 'Man'      },
-        { first => 'Clark',    last => 'Kent'     },
+        { first => 'Dieter',   last => 'Zentner'   },
+        { first => 'Zoola',    last => 'Bertrecht' },
+        { first => 'Micky',    last => 'Mouse'     },
+        { first => 'Daisy',    last => 'Mouse'     },
+        { first => 'Donald',   last => 'Duck'      },
+        { first => 'Donatelo', last => 'Turtle'    },
+        { first => 'Spider',   last => 'Man'       },
+        { first => 'Clark',    last => 'Kent'      },
     );
 
     is(
         $heap->remove_all,
         [
-            { first => 'Zoola',    last => 'Bertrecht'},
-            { first => 'Donald',   last => 'Duck'     },
-            { first => 'Clark',    last => 'Kent'     },
-            { first => 'Spider',   last => 'Man'      },
-            { first => 'Daisy',    last => 'Mouse'    },
-            { first => 'Micky',    last => 'Mouse'    },
-            { first => 'Donatelo', last => 'Turtle'   },
-            { first => 'Dieter',   last => 'Zentner'  },
+            { first => 'Zoola',    last => 'Bertrecht' },
+            { first => 'Donald',   last => 'Duck'      },
+            { first => 'Clark',    last => 'Kent'      },
+            { first => 'Spider',   last => 'Man'       },
+            { first => 'Daisy',    last => 'Mouse'     },
+            { first => 'Micky',    last => 'Mouse'     },
+            { first => 'Donatelo', last => 'Turtle'    },
+            { first => 'Dieter',   last => 'Zentner'   },
         ],
         'heap sort on hashes');
 }
