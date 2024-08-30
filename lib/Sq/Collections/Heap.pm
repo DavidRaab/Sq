@@ -24,21 +24,14 @@ sub add($heap, @values) {
 }
 
 sub add_one($heap, $x) {
-    push $heap->{data}->@*, $x;
-    heap_up($heap);
-    return;
-}
-
-sub head($heap) {
-    my $data = $heap->{data};
-    return @$data > 1 ? $data->[1] : ();
-}
-
-sub heap_up($heap) {
     my $data = $heap->{data};
     my $cmpf = $heap->{cmpf};
 
-    # start with last element
+    # add new element to end
+    push @$data, $x;
+
+    # compare with parent and swap if current is smaller, repeat
+    # until current is greater than parent
     my $current = @$data - 1;
 
     while (1) {
@@ -62,29 +55,25 @@ sub heap_up($heap) {
     return;
 }
 
+sub head($heap) {
+    my $data = $heap->{data};
+    return @$data > 1 ? $data->[1] : ();
+}
+
 sub remove($heap) {
     my $data = $heap->{data};
+    my $cmpf = $heap->{cmpf};
+
+    # nothing to remove when data is empty
     return if @$data == 1;
 
-    my $first  = $data->[1];
+    # save element that is later returned
+    my $return = $data->[1];
+
+    # overwrite last element with first one, then move element as long down
+    # the tree until heap consistency is reached again.
     $data->[1] = $data->[ $data->$#* ];
     pop @$data;
-
-    heap_down($heap);
-    return $first;
-}
-
-sub remove_all($heap) {
-    my @array;
-    while ( my $x = remove($heap) ) {
-        push @array, $x;
-    }
-    return wantarray ? @array : \@array;
-}
-
-sub heap_down($heap) {
-    my $data = $heap->{data};
-    my $cmpf = $heap->{cmpf};
 
     # start with first element
     my $current = 1;
@@ -93,7 +82,7 @@ sub heap_down($heap) {
     while (1) {
         my $left  = $current * 2;
         my $right = $current * 2 + 1;
-        return if $left > $max;
+        return $return if $left > $max;
 
         # when we have left and right child we need to check both childs
         # and swap with the one that is smaller.
@@ -108,9 +97,11 @@ sub heap_down($heap) {
                 $current = $left;
                 next;
             }
+
             # otherwise we reached end and can finish
-            return;
+            return $return;
         }
+        # when we have left and right child
         else {
             my $l = $data->[$left];
             my $r = $data->[$right];
@@ -131,7 +122,15 @@ sub heap_down($heap) {
         }
     }
 
-    return;
+    return $return;
+}
+
+sub remove_all($heap) {
+    my @array;
+    while ( my $x = remove($heap) ) {
+        push @array, $x;
+    }
+    return wantarray ? @array : \@array;
 }
 
 1;
