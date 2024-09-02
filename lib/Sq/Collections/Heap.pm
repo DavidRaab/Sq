@@ -113,7 +113,7 @@ sub remove($heap) {
             $cmp = $cmpf->($l,$r);
 
             # left value is smaller
-            if ( $cmp == -1 ) {
+            if ( $cmp == -1 || $cmp == 0 ) {
                 # check if $current is smaller than $left
                 if ( $cmpf->($data->[$current], $l) == 1 ) {
                     $data->[$left]    = $data->[$current];
