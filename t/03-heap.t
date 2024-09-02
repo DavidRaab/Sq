@@ -91,4 +91,31 @@ is(\@rest, [10,20,40,50,50,60,100], 'rest');
         'heap sort on hashes');
 }
 
+# check correct true/false in remove_all
+{
+    my $heap = Heap->new(sub($x,$y) { $x <=> $y });
+    $heap->add(3,2,1);
+    $heap->add(0);
+    $heap->add(-5,-10);
+
+    is(
+        $heap->remove_all,
+        [-10,-5,0,1,2,3],
+        'correct behaviour with 0')
+}
+
+# some random gen tests
+{
+    for my $i ( 1 .. 25 ) {
+        my @data   = map { rand() } 1 .. 20;
+        my $heap   = Heap->new(sub($x,$y) { $x <=> $y });
+        $heap->add(@data);
+
+        is(
+            $heap->remove_all,
+            [sort { $a <=> $b } @data],
+            "random num test $i");
+    }
+}
+
 done_testing;

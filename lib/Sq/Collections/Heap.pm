@@ -80,9 +80,12 @@ sub remove($heap) {
     my $current = 1;
     my $max     = @$data - 1;
 
+    # Declaration outside loop for maximum performance
+    my ($left, $right, $l, $r, $cmp);
+
     while (1) {
-        my $left  = $current * 2;
-        my $right = $current * 2 + 1;
+        $left  = $current << 1;
+        $right = $left + 1;
         return $return if $left > $max;
 
         # when we have left and right child we need to check both childs
@@ -90,7 +93,7 @@ sub remove($heap) {
 
         # when right is greater than max, we only have a left-child
         if ( $right > $max ) {
-            # when left is smaller than swap
+            # when $left is smaller than $current than swap
             if ( $cmpf->($data->[$current], $data->[$left]) == 1 ) {
                 my $tmp           = $data->[$left];
                 $data->[$left]    = $data->[$current];
@@ -104,21 +107,32 @@ sub remove($heap) {
         }
         # when we have left and right child
         else {
-            my $l = $data->[$left];
-            my $r = $data->[$right];
+            # check if left or right is smaller
+            $l = $data->[$left];
+            $r = $data->[$right];
+            $cmp = $cmpf->($l,$r);
 
-            # swap with left
-            my $cmp = $cmpf->($l,$r);
-            if ( $cmp == -1 || $cmp == 0 ) {
-                $data->[$left]    = $data->[$current];
-                $data->[$current] = $l;
-                $current          = $left;
+            # left value is smaller
+            if ( $cmp == -1 ) {
+                # check if $current is smaller than $left
+                if ( $cmpf->($data->[$current], $l) == 1 ) {
+                    $data->[$left]    = $data->[$current];
+                    $data->[$current] = $l;
+                    $current          = $left;
+                    next;
+                }
+                return $return;
             }
-            # swap with right
+            # right value is smaller
             else {
-                $data->[$right]   = $data->[$current];
-                $data->[$current] = $r;
-                $current          = $right;
+                # check if $current is smaller than $right
+                if ( $cmpf->($data->[$current], $r) == 1 ) {
+                    $data->[$right]   = $data->[$current];
+                    $data->[$current] = $r;
+                    $current          = $right;
+                    next;
+                }
+                return $return;
             }
         }
     }
@@ -128,10 +142,38 @@ sub remove($heap) {
 
 sub remove_all($heap) {
     my @array;
-    while ( my $x = remove($heap) ) {
-        push @array, $x;
+    my $count = $heap->count;
+    for (my $i=0; $i < $count; $i++) {
+        push @array, remove($heap);
     }
     return wantarray ? @array : \@array;
+}
+
+sub show_tree($heap, $fmt=sub($x) { $x }) {
+    my $data  = $heap->{data};
+    my $count = count($heap);
+    my $level = 0;
+
+    NEXT_LEVEL:
+    $level++;
+    my $min   = int (2 ** ($level - 1));
+    my $max   = int ((2 ** $level) - 1);
+
+    printf "%d: ", $level;
+    for my $idx ( $min .. $max ) {
+        my $x = $data->[$idx];
+        goto ABORT if !defined $x;
+        printf "%s ", $fmt->($data->[$idx]);
+    }
+    print "\n";
+
+    goto NEXT_LEVEL if $min < $count;
+    print "\n";
+    return;
+
+    ABORT:
+    print "\n";
+    return;
 }
 
 1;
