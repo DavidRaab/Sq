@@ -141,8 +141,8 @@ sub remove($heap) {
 }
 
 sub remove_all($heap) {
-    my @array;
     my $count = $heap->count;
+    my @array;
     for (my $i=0; $i < $count; $i++) {
         push @array, remove($heap);
     }
