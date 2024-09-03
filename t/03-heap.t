@@ -105,17 +105,38 @@ is(\@rest, [10,20,40,50,50,60,100], 'rest');
 }
 
 # some random gen tests
-{
-    for my $i ( 1 .. 25 ) {
-        my @data   = map { rand() } 1 .. 20;
-        my $heap   = Heap->new(sub($x,$y) { $x <=> $y });
-        $heap->add(@data);
+for my $i ( 1 .. 25 ) {
+    my @data = map { rand() } 1 .. 20;
+    my $heap = Heap->new(sub($x,$y) { $x <=> $y });
+    $heap->add(@data);
 
-        is(
-            $heap->remove_all,
-            [sort { $a <=> $b } @data],
-            "random num test $i");
-    }
+    is(
+        $heap->remove_all,
+        [sort { $a <=> $b } @data],
+        "random num test $i");
 }
+
+sub random_string($length) {
+    state @chars = ('A' .. 'Z', 'a' .. 'z', 0 .. 9);
+    state $count = scalar @chars;
+
+    my $new = "";
+    for my $i ( 1 .. $length ) {
+        $new .= $chars[ rand() * $count ]
+    }
+    return $new;
+}
+
+for my $i ( 1 .. 10 ) {
+    my @data = map { random_string(10) } 1 .. 20;
+    my $heap = Heap->new(sub($x,$y) { $x cmp $y });
+    $heap->add(@data);
+
+    is(
+        $heap->remove_all,
+        [sort { $a cmp $b } @data],
+        "random string test $i");
+}
+
 
 done_testing;
