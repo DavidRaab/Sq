@@ -71,8 +71,8 @@ sub remove($heap) {
     # save element that is later returned
     my $return = $data->[1];
 
-    # overwrite last element with first one, then move element as long down
-    # the tree until heap consistency is reached again.
+    # overwrite first element with last one, then move element down
+    # until heap consistency is reached again.
     $data->[1] = $data->[ $data->$#* ];
     pop @$data;
 
@@ -141,7 +141,7 @@ sub remove($heap) {
 }
 
 sub remove_all($heap) {
-    my $count = $heap->count;
+    my $count = count($heap);
     my @array;
     for (my $i=0; $i < $count; $i++) {
         push @array, remove($heap);
@@ -156,8 +156,8 @@ sub show_tree($heap, $fmt=sub($x) { $x }) {
 
     NEXT_LEVEL:
     $level++;
-    my $min   = int (2 ** ($level - 1));
-    my $max   = int ((2 ** $level) - 1);
+    my $min = int (2 ** ($level - 1));
+    my $max = int ((2 ** $level) - 1);
 
     printf "%d: ", $level;
     for my $idx ( $min .. $max ) {
