@@ -165,11 +165,11 @@ It exports the following functions by default: id, fst, snd, key, assign, is_str
 
 # SUPPORT
 
-Development project is on Github [Perl-Seq](https://github.com/DavidRaab/Seq)
+Development project is on Github [Perl-Sq](https://github.com/DavidRaab/Sq)
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Seq
+    perldoc Sq
 
 You can also look for information at [my Blog on Perl Seq](https://davidraab.github.io/tags/perl-seq/)
 
