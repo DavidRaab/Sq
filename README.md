@@ -95,12 +95,12 @@ I wouldn't recommend this module at the moment to build something critical
 unless you are fine that you maybe need sometimes small-fixes to make code
 working again.
 
-* [Sq::Collections::Seq](Collections/Seq.pod)
-* [Sq::Collections::Hash](Collections/Hash.pm)
-* [Sq::Collections::Array](Collections/Array.pod)
-* [Sq::Collections::Queue](Collections/Queue.pm)
-* [Sq::Collections::List](Collections/List.pod)
-* [Sq::Collections::Heap](Collections/Heap.pm)
+* [Sq::Collections::Seq](lib/Sq/Collections/Seq.pod)
+* [Sq::Collections::Hash](lib/Sq/Collections/Hash.pm)
+* [Sq::Collections::Array](lib/Sq/Collections/Array.pod)
+* [Sq::Collections::Queue](lib/Sq/Collections/Queue.pm)
+* [Sq::Collections::List](lib/Sq/Collections/List.pod)
+* [Sq::Collections::Heap](lib/Sq/Collections/Heap.pm)
 
 # Seq Module
 
