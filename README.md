@@ -1,20 +1,121 @@
 # NAME
 
-Seq - A lazy sequence implementation
+Sq - A Language hosted in Perl
 
 # SYNOPSIS
 
-The Seq module provides a lazy sequence implementation that can be
-executed multiple times. A sequence just represent a computation without
-computing any values until they are requested.
+What is a programming language anyway? Besides its syntax I think the default
+data-structures a programming language ships with has maybe the greatest
+impact on how someone programs.
 
-Different to iterators they can be executed multiple times. A sequence
-can somehow considered an immutable iterator.
+Lisp is a language that is basically built around the idea that everything is
+just a List. Haskell took the idea that this List must be lazy evaluated.
+F# ships by default with an Immutable List, immutable Record and so on,
+so you also use them. C basically has no data-structure at all, just pointers
+to memory, so you basically just use pointers to memory and use them
+as arrays.
 
-At the moment Documentation is lacking, but the source-code is well-documented
-including the test-files. Maybe you want to look at the test-files until
-I have written more documentation. The API is not fully stable at the moment
-and can be changed.
+Perl ships with Array and Hash by default, and not surprisngly they are
+used everywhere to built stuff on top of it.
+
+`Sq` in that regards try to enhance the default `Array` and `Hash`
+implementation by giving them just more functions to work with, but it doesn't
+try to replace them.
+
+After getting used working in F# it actually becomes annoying to work in other
+languages that don't offer 100+ functions to just manipulate Lists. After
+working in Perl for 15+ years i know a lot how to implement a lot of common
+tasks efficently and with less code, and sometimes I am also annoyed that
+I have to implement those *patterns* again and again instead of giving
+them a name.
+
+Then there are modules like List::Util that offers more functions, and somehow
+I was annoyed by the order you have to write them, how some functions are
+named, or that they are still some functions missing.
+
+But the greatest problem was that there is basically no lazy Sequence
+implementation at all. And nearly zero immutable data-structures at all.
+
+`Sq` currently ships with Seq, Array, Hash, Heap and List.
+
+At the moment it is just a hobby project on my own that I work on occasionally.
+
+Still everything is intended to be usuable with good performance. I don't
+try to enforce for example an *immutable all the way down* on top of Perl. I
+am also interested that it works seaminglessly with whatever else you use.
+
+For example you see this design in the Array module. You can write.
+
+    my $nums = Array->init(10, sub($idx) { $idx });
+
+and it creates an `Array` with 10 items that just contains its indexes as
+values. But `$nums` here is just a basic Perl Array, I am not trying to
+re-implement an Array. So you can use `$nums` like any array-reference
+you are used in Perl.
+
+    for my $x ( @$nums ) {
+        say $x;
+    }
+
+Sure, some other data-structures like `Seq` have to be their own
+implementation as their are no Perl implementations that provide the same
+functionality.
+
+Besides data-structures what makes a language unique is how you check for
+types, for example static and dynamic typed. Other *frameworks* like Moose for
+example try to give you more a *static-typing* approach with its classes and
+type-check against specific concrete classes or roles, here I will try a
+different approach build around the concept of dynamic-typing and having
+data, but this is still in work.
+
+# HISTORY
+
+I started `Sq` first by just being a lazy Sequence and named it `Seq`.
+But the `Seq` namespace in Perl was already taken, deleted, and the old
+maintainer doesn't react to eMails anymore.
+
+So I decided to just name it `Sq` instead. At the same time I already had
+the idea to bring more stuff to Perl, like Records, Pattern Matching
+and Discriminated Unions, also some other approach to type-checking.
+
+So instead of realasing a dozens of seperate modules I thought about
+making one module that just combines all this ideas together. So `Sq` was
+born.
+
+# Implemented so Far
+
+Most stuff at the moment is just a place-holder, maybe some will never be
+implemented, but some stuff is already usable and tested. So if you really
+want to look around of what is usable you should look at the tests at the
+moment. I anyway think that code is the best way to see and understand code.
+
+But the API itself is not fixed, means some stuff is very likely to change.
+
+I wouldn't recommend this module at the moment to build something critical
+unless you are fine that you maybe need sometimes small-fixes to make code
+working again.
+
+* L<Sq::Collections::Seq>
+* L<Sq::Collections::Hash>
+* L<Sq::Collections::Array>
+* L<Sq::Collections::Queue>
+* L<Sq::Collections::List>
+* L<Sq::Collections::Heap>
+
+# Seq Module
+
+As I started everything with the `Seq` module, here are some example
+how to use `Seq`. Keep in mind that `Seq` is a lazy data-structure, so nothing
+is computed until you start *querying* for data. And only then only as much
+is computed as needed.
+
+But a sequence is not just an iterator. An iterator usually ends at some
+point, then either a new iterator must be created or the iterator must be
+resetted.
+
+A `Seq` is more like an *immutable-iterator*. So it defines a computation that
+you can execute and iterate as often as you wish. In some sense I think
+that this design is more what someone expects using such a module.
 
 ```perl
 use v5.36;
@@ -35,6 +136,11 @@ $fib->take(20)->iter(sub($x) {
     say $x;
 });
 
+# you can use the same $fib again, now prints: 1 1 2 3 5
+$fib->take(5)->iter(sub($x) {
+    say $x;
+});
+
 # Represents all possible combinations
 # [[clubs => 7], [clubs => 8], [clubs => 9], ...]
 my $cards =
@@ -49,116 +155,17 @@ my $maximum_id =
     Seq
     ->wrap(   path('t')->children )
     ->map(    sub($x) { $x->basename })
-    ->choose( sub($x) { $x =~ m/\A(\d+) .* \.t\z/xms ? $1 : undef } )
-    ->max;
+    ->choose( sub($x) { $x =~ m/\A(\d+) .* \.t\z/xms ? $1 : undef })
+    ->max(0); # or 0 if the sequence is empty
 ```
 
 # EXPORT
 
-This modules does not export anything by default. But you can request the following
-functions: id, fst, snd, key, assign
-
-# CONSTRUCTORS
-
-This module uses functional-programming as the main paradigm. Functions are
-divided into constructors, methods and converters.
-
-Constructor create a sequence. Methods operate on sequences and return
-another new sequence. Converter transforms a sequence to some other data-type.
-
-Methods are called methods for convenience, but no object-orientation is
-involved. Perls OO capabilities are only used as a chaning mechanism.
-
-Constructors must be called with the Package name. Functions that operate
-on Sequences can either be called as a method or directly from the Package.
-
-```perl
-my $range =
-    Seq
-    ->wrap(1,2,3)
-    ->append(Seq->wrap(4,5,6));
-```
-
-or
-
-```perl
-my $range =
-    Seq::append(
-        Seq->wrap(1,2,3),
-        Seq->wrap(4,5,6),
-    )
-```
-
-## $seq = Seq->empty()
-
-Returns an empty sequence. Useful as an initial state or as a starting point.
-
-```perl
-Seq->empty->append( $another_seq )
-```
-
-## $seq = Seq->range($start, $stop)
-
-Returns a sequence from $start to $stop. Range can also be backwards. $start
-and $stop are inclusive.
-
-```perl
-Seq->range(1, 5); # 1,2,3,4,5
-Seq->range(5, 1); # 5,4,3,2,1
-Seq->range(1, 1); # 1
-```
-
-## $seq = Seq->wrap(...)
-
-Just takes whatever you pass it to, and puts it in a sequence. This should be
-your primarily way to create a sequence with values.
-
-```perl
-Seq->wrap(qw/Hello World/); # "Hello", "World"
-Seq->wrap(1 .. 10);         # AVOID this, use Seq->range(1, 10) instead.
-Seq->wrap(@array);
-```
-
-## $seq = Seq->concat(@sequences)
-
-Takes multiple *Sequences* and returns a single flattened sequence.
-
-```perl
-# 1, 2, 3, 4, 5, 5, 4, 3, 2, 1
-Seq->concat(
-    Seq->range(1, 5),
-    Seq->range(5, 1),
-);
-```
-
-# MISSING DOC
-
-Implemented, but not documented yet:
-
-from_sub, unfold, init, range_step, from_list, from_array, from_hash
-
-# METHODS
-
-Implemented, but not documented yet:
-
-append, map, bind, flatten cartesian, join, merge, select*, choose, mapi,
-filter, take, skip, indexed, distinct, distinct_by, iter, do, rev
-
-* will maybe change
-
-# CONVERTERS
-
-Implemented, but not documented yet:
-
-fold, reduce, first, last, to_array, to_list, count, sum, sum_by, min,
-min_by, min_by_str, max, max_str, max_by, max_by_str, str_join, to_hash,
-group_by, find
-
-# Github
-
-Development project is on Github [Perl-Seq](https://github.com/DavidRaab/Seq)
+It exports the following functions by default: id, fst, snd, key, assign, is_str, is_num
 
 # SUPPORT
+
+Development project is on Github [Perl-Seq](https://github.com/DavidRaab/Seq)
 
 You can find documentation for this module with the perldoc command.
 
@@ -172,7 +179,7 @@ David Raab, C<< <davidraab83 at gmail.com> >>
 
 # LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2023 by David Raab.
+This software is Copyright (c) by David Raab.
 
 This is free software, licensed under:
 
