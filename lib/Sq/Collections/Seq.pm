@@ -952,8 +952,12 @@ sub last($seq, $default) {
 
 # to_array : Seq<'a> -> Array<'a>
 sub to_array($seq) {
-    state $folder = sub($array, $x) { push @$array, $x };
-    return fold_mut($seq, Array->new, $folder);
+    my @new;
+    my $it = $seq->();
+    while ( defined(my $x = $it->()) ) {
+        push @new, $x;
+    }
+    return \@new;
 }
 
 # Turns a Sequence into
