@@ -955,13 +955,13 @@ sub last($seq, $default) {
 
 # to_array : Seq<'a> -> Array<'a>
 sub to_array($seq) {
-    my @new;
-    my $it = $seq->();
+    my $new = Array->new;
+    my $it  = $seq->();
     my $x;
     while ( defined($x = $it->()) ) {
-        push @new, $x;
+        push @$new, $x;
     }
-    return \@new;
+    return $new;
 }
 
 # Turns a Sequence into
