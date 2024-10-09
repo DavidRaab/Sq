@@ -131,8 +131,8 @@ is(
     $range->to_array,
     'init->map');
 is(
-    Seq->range(1,10)->indexed->to_array,
-    Seq->init(10, sub($idx) { [$idx, $idx+1] })->to_array,
+    List->range(1,10)->indexed->to_array,
+    List->init(10, sub($idx) { [$idx, $idx+1] })->to_array,
     'range->indexed vs. init');
 is(
     (reduce { $a->append($b) } map { List->wrap($_) } 1 .. 10)->to_array,
@@ -353,7 +353,7 @@ is(
         List->wrap(2,3,5,8,13),
     )->flatten->to_array,
     [1,1,2,3,5,8,13],
-    'flatten - flattens a seq of seq');
+    'flatten - flattens a list of list');
 
 is(List->wrap([1,1], [1,2])->to_array, [[1,1],[1,2]], 'wrap with arrays');
 is(List->wrap([1,1])       ->to_array, [[1,1]],       'wrap with array');
