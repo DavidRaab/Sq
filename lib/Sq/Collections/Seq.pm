@@ -143,8 +143,11 @@ sub wrap($class, @xs) {
 # turns an arrayref into a seq
 # Seq->from_array : Array<'a> -> Seq<'a>
 sub from_array($class, $xs) {
-    return unfold('Seq', 0, sub($idx) {
-        return $xs->[$idx], $idx+1;
+    from_sub('Seq', sub {
+        my $idx = 0;
+        return sub {
+            return $xs->[$idx++];
+        }
     });
 }
 
@@ -954,7 +957,8 @@ sub last($seq, $default) {
 sub to_array($seq) {
     my @new;
     my $it = $seq->();
-    while ( defined(my $x = $it->()) ) {
+    my $x;
+    while ( defined($x = $it->()) ) {
         push @new, $x;
     }
     return \@new;
