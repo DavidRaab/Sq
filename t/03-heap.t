@@ -138,5 +138,4 @@ for my $i ( 1 .. 10 ) {
         "random string test $i");
 }
 
-
 done_testing;
