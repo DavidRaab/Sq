@@ -4,23 +4,28 @@ use open ':std', ':encoding(UTF-8)';
 use Sq;
 use Benchmark qw(cmpthese);
 
+# It started by bechmarking and looking at different filtering implementation
+# especially looking at the performance of a full mutable version that
+# mutates an array and removes entries instead of createing a new on. This
+# version is `by_splice`. Because it mutates and correct benchmarking behaviour
+# must be ensured there are versions that copies the array first to really
+# compare the difference of the algorithms. But there are also version without
+# copies that shows a more practical version.
+
 # creates array with 10_000 random integer numbers
-my $numbers = Array->init(10_000, sub($idx) {
+my $amount  = 10_000;
+my $numbers = Array->init($amount, sub($idx) {
     return int (rand(100_000));
 });
 
-# evens with grep
+# evens with perl built-in grep
 sub by_grep {
     my $numbers = $numbers->copy;
     my @evens   = grep { $_ % 2 == 0 } @$numbers;
     return;
 }
 
-sub by_grep_nc {
-    my @evens = grep { $_ % 2 == 0 } @$numbers;
-    return;
-}
-
+# filtering but c-style
 sub by_manual {
     my $numbers = $numbers->copy;
     my @evens;
@@ -32,7 +37,7 @@ sub by_manual {
     return;
 }
 
-# full mutable version that changes array, hard to understand
+# full mutable version that changes array
 sub by_splice {
     my $numbers = $numbers->copy;
     my $idx     = 0;
@@ -46,56 +51,7 @@ sub by_splice {
     return;
 }
 
-# only getting first 5 even numbers
-sub first_5_manual {
-    my $numbers = $numbers->copy;
-    my $count   = 0;
-    my @evens;
-    for my $x ( @$numbers ) {
-        if ( $x % 2 == 0 ) {
-            push @evens, $x;
-            last if ++$count >= 5;
-        }
-    }
-    return;
-}
-
-sub first_5_manual_nc {
-    my $count = 0;
-    my @evens;
-    for my $x ( @$numbers ) {
-        if ( $x % 2 == 0 ) {
-            push @evens, $x;
-            last if ++$count >= 5;
-        }
-    }
-    return;
-}
-
-# getting first 5 even numbers, but code is still abstract like using grep
-sub first_5_sq {
-    my $numbers = $numbers->copy;
-    my $evens =
-        Seq
-        ->from_array($numbers)
-        ->filter(sub($x) { $x % 2 == 0 })
-        ->take(5)
-        ->to_array;
-    return;
-}
-
-# when @numbers changes, then $evens will evaluate to the latest updates on trying to fetch data from it.
-sub first_5_sq_nc {
-    my $evens =
-        Seq
-        ->from_array($numbers)
-        ->filter(sub($x) { $x % 2 == 0 })
-        ->take(5)
-        ->to_array;
-    return;
-}
-
-sub all_sq {
+sub by_seq {
     my $numbers = $numbers->copy;
     my $evens =
         Seq
@@ -105,7 +61,15 @@ sub all_sq {
     return;
 }
 
-sub all_sq_nc {
+## no copy versions
+
+# like grep but without copies (nc = no copy)
+sub by_grep_nc {
+    my @evens = grep { $_ % 2 == 0 } @$numbers;
+    return;
+}
+
+sub by_seq_nc {
     my $evens =
         Seq
         ->from_array($numbers)
@@ -134,6 +98,57 @@ sub list_filter_nm {
     return;
 }
 
+## first_5_* versions
+
+# only getting first 5 even numbers
+sub first_5_manual {
+    my $numbers = $numbers->copy;
+    my $count   = 0;
+    my @evens;
+    for my $x ( @$numbers ) {
+        if ( $x % 2 == 0 ) {
+            push @evens, $x;
+            last if ++$count >= 5;
+        }
+    }
+    return;
+}
+
+# getting first 5 even numbers, but code is still abstract like using grep
+sub first_5_seq {
+    my $numbers = $numbers->copy;
+    my $evens =
+        Seq
+        ->from_array($numbers)
+        ->filter(sub($x) { $x % 2 == 0 })
+        ->take(5)
+        ->to_array;
+    return;
+}
+
+sub first_5_manual_nc {
+    my $count = 0;
+    my @evens;
+    for my $x ( @$numbers ) {
+        if ( $x % 2 == 0 ) {
+            push @evens, $x;
+            last if ++$count >= 5;
+        }
+    }
+    return;
+}
+
+# when @numbers changes, then $evens will evaluate to the latest updates on trying to fetch data from it.
+sub first_5_seq_nc {
+    my $evens =
+        Seq
+        ->from_array($numbers)
+        ->filter(sub($x) { $x % 2 == 0 })
+        ->take(5)
+        ->to_array;
+    return;
+}
+
 sub first_5_list {
     my $evens =
         $list
@@ -157,29 +172,21 @@ sub first_5_grep {
 }
 
 
-printf "Benchmarking version with array copies.\n";
+printf "Benchmarking versions with array copies.\n";
 cmpthese(-1, {
-    'all_sq'         => \&all_sq,
+    'seq'            => \&by_seq,
     'splice'         => \&by_splice,
     'manual'         => \&by_manual,
     'grep'           => \&by_grep,
-    'first_5_sq    ' => \&first_5_sq,
+    'first_5_seq'    => \&first_5_seq,
     'first_5_manual' => \&first_5_manual,
 });
 
-printf "\nWithout array copies.\n";
-cmpthese(-1, {
-    'all_sq_nc'         => \&all_sq_nc,
-    'grep_nc',          => \&by_grep_nc,
-    'first_5_manual_nc' => \&first_5_manual_nc,
-    'first_5_sq_nc'     => \&first_5_sq_nc,
-});
-
-printf "\nFiltering all with different data-structures.\n";
+printf "\nFiltering all with different data-structures. No Array copies.\n";
 cmpthese(-1, {
     'list'    => \&list_filter,
     'list_nm' => \&list_filter_nm,
-    'seq'     => \&all_sq_nc,
+    'seq'     => \&by_seq_nc,
     'array'   => \&array_filter,
     'grep'    => \&by_grep_nc,
 });
@@ -189,12 +196,12 @@ cmpthese(-1, {
     'first_5_list'      => \&first_5_list,
     'first_5_array'     => \&first_5_array,
     'first_5_grep'      => \&first_5_grep,
-    'first_5_seq'       => \&first_5_sq_nc,
+    'first_5_seq'       => \&first_5_seq_nc,
     'first_5_manual_nc' => \&first_5_manual_nc,
 });
 
 print(
-    ($numbers->count == 10_000)
+    ($numbers->count == $amount)
     ? "\nok - correct \$numbers count\n"
     : "\nnot ok - \$numbers count should be 10000\n"
 );
