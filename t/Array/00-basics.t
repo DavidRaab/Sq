@@ -876,4 +876,17 @@ is(
     is($data->slice(1,3), $data->skip(1)->take(3), 'slice is like skip->take');
 }
 
+# copy of array-ref
+{
+    my $data = [1,2,3,4,5];
+    my $new  = Array->copy($data);
+
+    is($data, $new,         'contains same data');
+    ok(not ($data eq $new), 'not same array references');
+
+    my $data2 = [1,2,3,undef,4,5,6];
+    my $new2  = Array->copy($data2);
+    is($new2, [1,2,3], 'copy only copies up to first undef');
+}
+
 done_testing;
