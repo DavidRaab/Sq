@@ -878,14 +878,13 @@ is(
 
 # copy of array-ref
 {
-    my $data = [1,2,3,4,5];
-    my $new  = Array->copy($data);
+    my $data = Array->new(1,2,3,4,5);
+    my $new  = $data->copy;
 
     is($data, $new,         'contains same data');
     ok(not ($data eq $new), 'not same array references');
 
-    my $data2 = [1,2,3,undef,4,5,6];
-    my $new2  = Array->copy($data2);
+    my $new2  = Array::copy([1,2,3,undef,4,5,6]);
     is($new2, [1,2,3], 'copy only copies up to first undef');
 }
 

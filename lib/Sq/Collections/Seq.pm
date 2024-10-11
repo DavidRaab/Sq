@@ -183,12 +183,15 @@ sub concat($class, @seqs) {
     return List::Util::reduce { append($a, $b) } @seqs;
 }
 
-
-
 #----------------------------------------------------------------------------#
 # METHODS                                                                    #
 #          functions operating on Seq and returning another Seq              #
 #----------------------------------------------------------------------------#
+
+# noop, only there for API compatibility
+sub copy($seq) {
+    return $seq;
+}
 
 # append : Seq<'a> -> Seq<'a> -> Seq<'a>
 sub append($seqA, $seqB) {

@@ -133,6 +133,11 @@ sub replicate($class, $count, $value) {
 #           functions operating on List and returning another List            #
 #-----------------------------------------------------------------------------#
 
+# noop, only there for API compatibility
+sub copy($list) {
+    return $list;
+}
+
 sub fold($list, $state, $folder) {
     my $xs = $list;
     my $s  = $state;

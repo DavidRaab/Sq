@@ -701,4 +701,10 @@ is(
     is(\@iteri, \@foreachi, 'iteri same as foreachi');
 }
 
+{
+    my $range2 = $range->copy;
+    is($range->to_array, $range2->to_array, 'Seq has ->copy');
+    ok($range eq $range2, 'same reference because sequence creates iterators');
+}
+
 done_testing;

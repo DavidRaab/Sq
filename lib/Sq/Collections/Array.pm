@@ -99,8 +99,13 @@ sub range($class, $start, $stop) {
     return range_step('Array', $start, 1, $stop);
 }
 
+#-----------------------------------------------------------------------------#
+# METHODS                                                                     #
+#           functions operating on Array and returning another Array          #
+#-----------------------------------------------------------------------------#
+
 # makes a shallow-copy of an array-reference
-sub copy($class, $array) {
+sub copy($array) {
     my @new;
     for my $x ( @$array ) {
         last if not defined $x;
@@ -108,11 +113,6 @@ sub copy($class, $array) {
     }
     return CORE::bless(\@new, 'Array');
 }
-
-#-----------------------------------------------------------------------------#
-# METHODS                                                                     #
-#           functions operating on Array and returning another Array          #
-#-----------------------------------------------------------------------------#
 
 sub bind($array, $f) {
     my @new;
