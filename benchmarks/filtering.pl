@@ -80,7 +80,13 @@ sub by_seq_nc {
 
 # this is like the grep version
 sub array_filter {
-    my $evens = Array::filter($numbers, sub($x) { $x % 2 == 0 });
+    my $evens = $numbers->filter(sub($x) { $x % 2 == 0 });
+    return;
+}
+
+# same as filter but uses string-eval to build up query
+sub array_filter_e {
+    my $evens = $numbers->filter_e('$_ % 2 == 0');
     return;
 }
 
@@ -188,6 +194,7 @@ cmpthese(-1, {
     'list_nm' => \&list_filter_nm,
     'seq'     => \&by_seq_nc,
     'array'   => \&array_filter,
+    'array_e' => \&array_filter_e,
     'grep'    => \&by_grep_nc,
 });
 

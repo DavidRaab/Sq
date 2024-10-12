@@ -162,6 +162,14 @@ sub filter($array, $predicate) {
     return CORE::bless([grep { $predicate->($_) } @$array], 'Array');
 }
 
+# same as filter but expects a string-code
+sub filter_e($array, $expr) {
+    local $_;
+    my $code = "[grep { $expr } \@\$array]";
+    my $data = eval $code;
+    return CORE::bless($data, 'Array');
+}
+
 sub skip($array, $amount) {
     return CORE::bless([@$array], 'Array') if $amount <= 0;
     return CORE::bless([$array->@[$amount .. $array->$#*]], 'Array');

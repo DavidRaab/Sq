@@ -888,4 +888,12 @@ is(
     is($new2, [1,2,3], 'copy only copies up to first undef');
 }
 
+# filter_e
+{
+    is(
+        $range->filter(sub($x) { $x % 2 == 0 }),
+        $range->filter_e('$_ % 2 == 0'),
+        'filter_e');
+}
+
 done_testing;
