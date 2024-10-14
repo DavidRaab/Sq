@@ -76,10 +76,19 @@ is(
     ["Hello", 5, "World", 5, "One", 3, "Two", 3],
     'map with multiple return values');
 
-is(
-    Array->new(qw/Hello World One Two/)->map(sub($str) { $str => length $str })->as_hash,
-    {"Hello" => 5, "World" => 5, "One" => 3, "Two" => 3},
-    'map with multiple return values and as_hash');
+{
+    my $h = Array->new(qw/Hello World One Two/)->map(sub($str) { $str => length $str })->as_hash;
+
+    is(
+        $h,
+        {"Hello" => 5, "World" => 5, "One" => 3, "Two" => 3},
+        'map with multiple return values and as_hash');
+
+    is(
+        $h,
+        check_isa('Hash'),
+        'Is a Hash');
+}
 
 is($range->map(sub($x) { undef }), [], 'empty array');
 
@@ -871,7 +880,7 @@ is(
         1   => 1,
         2   => 1,
     },
-    'as_hash');
+    'count');
 
 # mutation
 {
