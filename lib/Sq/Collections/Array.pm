@@ -56,7 +56,12 @@ sub concat($class, @arrays) {
 }
 
 sub init($class, $count, $f) {
-    return CORE::bless([map { $f->($_) } 0 .. ($count-1)], 'Array');
+    local $_;
+    return CORE::bless([
+        grep { defined  }
+        map  { $f->($_) }
+            0 .. ($count-1)
+    ], 'Array');
 }
 
 # Array->unfold : 'State -> ('State -> Option<ListContext<'a, 'State>>) -> Array<'a>

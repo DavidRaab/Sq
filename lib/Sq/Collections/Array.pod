@@ -137,11 +137,15 @@ Returns a new array with all arrays concatenated into a new one.
 =head2 Array->init($count, $f)
 
 Generates a new C<Array> with C<$count> entries. An entry generating function
-C<$f> is called by passing it the current index.
+C<$f> is called by passing it the current index. The function can return multiple
+values as a list and they will become one list, theoretically exceeding C<$count>.
+C<undef> values are skipped.
 
-    my $array = Array->init(5, sub($idx) { $idx });         // [0,1,2,3,4]
-    my $array = Array->init(5, sub($idx) { "1" x $idx });   // ["","1","11","111","1111"]
-    my $array = Array->init(3, sub($idx) { +{$idx => 1} }); // [{0 => 1},{1 => 1},{2 => 1}]
+    my $array = Array->init(5, sub($idx) { $idx });         # [0,1,2,3,4]
+    my $array = Array->init(5, sub($idx) { "1" x $idx });   # ["","1","11","111","1111"]
+    my $array = Array->init(3, sub($idx) { +{$idx => 1} }); # [{0 => 1},{1 => 1},{2 => 1}]
+    my $array = Array->init(3, sub($idx) { 1, 1     });     # [1,1,1,1,1,1]
+    my $array = Array->init(3, sub($idx) { 1, undef });     # [1,1,1]
 
 =head2 Array->unfold($state, $f)
 

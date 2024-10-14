@@ -118,10 +118,15 @@ is(
     'take->indexed');
 
 
+is(Array->init(10, \&id)->map($add1), $range, 'init->map');
 is(
-    Array->init(10, \&id)->map($add1),
-    $range,
-    'init->map');
+    Array->init(5, sub($idx) { ($idx) x $idx }),
+    [1,2,2,3,3,3,4,4,4,4],
+    'init allows multiple return values from lambda');
+is(
+    Array->init(3, sub($idx) { $idx, undef }),
+    [0,1,2],
+    'init also skips undef');
 
 is(
     Array->range(1,10)->indexed,
