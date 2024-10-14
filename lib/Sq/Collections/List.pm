@@ -559,18 +559,18 @@ sub to_hash_of_array($list, $mapper) {
 
 sub as_hash($list) {
     my $hash = Hash->new;
-    return $hash if is_empty($list);
+    return $hash if @$list == 0;
 
     my $current = $list;
     my ($key, $value);
 
     NEXT:
     # unpack key and move one forward
-    return $hash if is_empty($current);
+    return $hash if @$current == 0;
     $key     = $current->[0];
     $current = $current->[1];
     # unpack value and move one forward
-    return $hash if is_empty($current);
+    return $hash if @$current == 0;
     $value   = $current->[0];
     $current = $current->[1];
     # add key/value to hash
