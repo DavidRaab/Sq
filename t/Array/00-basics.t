@@ -79,7 +79,7 @@ is(
 is(
     Array->new(qw/Hello World One Two/)->map(sub($str) { $str => length $str })->as_hash,
     {"Hello" => 5, "World" => 5, "One" => 3, "Two" => 3},
-    'map with multiple return values');
+    'map with multiple return values and as_hash');
 
 is($range->map(sub($x) { undef }), [], 'empty array');
 

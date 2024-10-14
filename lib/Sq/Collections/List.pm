@@ -52,13 +52,17 @@ sub unfold($class, $state, $f) {
     }
 }
 
-sub wrap($class, @xs) {
+sub new($class, @xs) {
     my $count = @xs;
     return unfold('List', 0, sub($i) {
         my $x = $xs[$i];
         return undef if $i >= $count || (not defined $x);
         return $x, $i+1;
     });
+}
+
+sub wrap($class, @xs) {
+    return new('List', @xs);
 }
 
 sub init($class, $amount, $gen) {
@@ -551,6 +555,27 @@ sub to_hash_of_array($list, $mapper) {
         my ($key, $value) = $mapper->($x);
         push $hash->{$key}->@*, $value;
     });
+}
+
+sub as_hash($list) {
+    my $hash = Hash->new;
+    return $hash if is_empty($list);
+
+    my $current = $list;
+    my ($key, $value);
+
+    NEXT:
+    # unpack key and move one forward
+    return $hash if is_empty($current);
+    $key     = $current->[0];
+    $current = $current->[1];
+    # unpack value and move one forward
+    return $hash if is_empty($current);
+    $value   = $current->[0];
+    $current = $current->[1];
+    # add key/value to hash
+    $hash->{$key} = $value;
+    goto NEXT;
 }
 
 sub find($list, $default, $predicate) {

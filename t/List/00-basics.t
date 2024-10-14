@@ -274,6 +274,16 @@ is(
     },
     'to_hash_of_array');
 
+is(
+    List->new(qw/Hello 5 World 5 One 3 Two 3/)->as_hash,
+    {"Hello" => 5, "World" => 5, "One" => 3, "Two" => 3},
+    'as_hash');
+
+is(
+    List->new(qw/Hello 5 World 5 One 3 Two/)->as_hash,
+    {"Hello" => 5, "World" => 5, "One" => 3},
+    'as_hash 2');
+
 is(List->wrap(1,1,2,3,1,4,5,4,3,2,6)->distinct->to_array, [1..6],              'distinct 1');
 is(List->wrap(1,2,3,2,23,123,4,12,2)->distinct->to_array, [1,2,3,23,123,4,12], 'distinct 2');
 
