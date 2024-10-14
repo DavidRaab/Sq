@@ -165,8 +165,7 @@ sub filter($array, $predicate) {
 # same as filter but expects a string-code
 sub filter_e($array, $expr) {
     local $_;
-    my $code = "[grep { $expr } \@\$array]";
-    my $data = eval $code;
+    my $data = eval "[grep { $expr } \@\$array]";
     return CORE::bless($data, 'Array');
 }
 
