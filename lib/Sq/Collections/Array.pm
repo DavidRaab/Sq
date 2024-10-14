@@ -143,12 +143,15 @@ sub rev($array) {
 
 # map : Array<'a> -> ('a -> 'b) -> Array<'b>
 sub map($array, $f) {
-    my @new;
-    for my $x ( @$array ) {
-        my $value = $f->($x);
-        push @new, $value if defined $value;
-    }
-    return CORE::bless(\@new, 'Array');
+    return CORE::bless([
+        grep { defined  }
+        map  { $f->($_) } @$array
+    ], 'Array');
+}
+
+sub map_e($array, $expr) {
+    my $new = eval "[grep { defined } map { $expr } \@\$array]";
+    return CORE::bless($new, 'Array');
 }
 
 sub mapi($array, $f) {
@@ -600,7 +603,7 @@ sub group_by($array, $get_key) {
     return $hash;
 }
 
-# uses every array entry as a key in a hash, and counts appearances of each entry
+# counts every array entry
 #
 # Array<'a> -> Hash<'a,int>
 sub count($array) {

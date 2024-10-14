@@ -57,6 +57,26 @@ is(
     'map filter take');
 
 is(
+    $range->map($square)->filter_e('$_ % 2 == 0'),
+    [4,16,36,64,100],
+    'filter_e');
+
+is(
+    Array->range(1,3)->map(sub($x) { ($x) x 3 }),
+    [1,1,1, 2,2,2, 3,3,3],
+    'map can return a list');
+
+is(
+    Array->range(1,3)->map_e('($_) x 3'),
+    [1,1,1, 2,2,2, 3,3,3],
+    'map_e with a list');
+
+is(
+    Array->new(qw/Hello World One Two/)->map(sub($str) { $str => length $str }),
+    ["Hello", 5, "World", 5, "One", 3, "Two", 3],
+    'map with multiple return values');
+
+is(
     Array->new(qw/Hello World One Two/)->map(sub($str) { $str => length $str })->as_hash,
     {"Hello" => 5, "World" => 5, "One" => 3, "Two" => 3},
     'map with multiple return values');
@@ -298,6 +318,22 @@ is(
         Awesome => 1,
     },
     'count');
+
+is(
+    Array->new(qw/Hello World Awesome World/)->count_by(sub($str) { length $str }),
+    {
+        5 => 3,
+        7 => 1,
+    },
+    'count_by');
+
+is(
+    Array->new(qw/Hello World Awesome World/)
+    ->map(sub($x) { length $x })
+    ->count,
+
+    Array->new(qw/Hello World Awesome World/)->count_by(sub($str) { length $str }),
+    'map->count same as count_by');
 
 is(Array->wrap(1,1,2,3,1,4,5,4,3,2,6)->distinct, [1..6],              'distinct 1');
 is(Array->wrap(1,2,3,2,23,123,4,12,2)->distinct, [1,2,3,23,123,4,12], 'distinct 2');
