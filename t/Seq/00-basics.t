@@ -36,8 +36,8 @@ is($range->take(5)->to_array,  [1..5], 'take 1');
 is($range->take(0)->to_array,  [],     'take 2');
 is($range->take(-1)->to_array, [],     'take 3');
 
-is($range->count, 10, 'count');
-is($range->take(5)->count, 5, 'take & count');
+is($range->length, 10, 'length');
+is($range->take(5)->length, 5, 'take & length');
 is(
     $range->map($square)->filter($is_even)->to_array,
     [4,16,36,64,100],
@@ -47,8 +47,8 @@ is(
     [4,16,36],
     'map filter take');
 is(
-    $range->fold(0, sub($count, $x) { $count + 1 }),
-    $range->count,
+    $range->fold(0, sub($length, $x) { $length + 1 }),
+    $range->length,
     'fold with non-reftype');
 is(
     $range->fold([], sub($array, $x) { push @$array, $x; $array }),
@@ -277,9 +277,9 @@ is(Seq->wrap(1,2,3,2,23,123,4,12,2)->distinct->to_array, [1,2,3,23,123,4,12], 'd
         {id => 1, name => "Foo"},
     );
 
-    is($data->count, 4, 'distinct_by starts with 4');
-    is($data->distinct->count, 4, 'still 4 as HashRefs are always unequal');
-    is($data->distinct_by(sub($x) { $x->{id} })->count, 3, 'one element less');
+    is($data->length, 4, 'distinct_by starts with 4');
+    is($data->distinct->length, 4, 'still 4 as HashRefs are always unequal');
+    is($data->distinct_by(sub($x) { $x->{id} })->length, 3, 'one element less');
     is(
         $data->distinct_by(sub($x) { $x->{id} })->to_array,
         [
@@ -295,9 +295,9 @@ is(
     [[A => 0], [B => 1], [C => 2], [D => 3], [E => 4], [F => 5]],
     'mapi');
 
-is(Seq->init( 0,  sub($idx) { $idx })->to_array, [], 'init with count 0');
-is(Seq->init(-1,  sub($idx) { $idx })->to_array, [], 'init with count -1');
-is(Seq->init(-10, sub($idx) { $idx })->to_array, [], 'init with count -10');
+is(Seq->init( 0,  sub($idx) { $idx })->to_array, [], 'init with length 0');
+is(Seq->init(-1,  sub($idx) { $idx })->to_array, [], 'init with length -1');
+is(Seq->init(-10, sub($idx) { $idx })->to_array, [], 'init with length -10');
 is(Seq->range_step(1,1,1)->to_array, [1], 'range_step with 1,1,1');
 is(
     Seq->range_step(0,0.1,1)->to_array,

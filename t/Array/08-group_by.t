@@ -44,7 +44,7 @@ my $data = Array->new(
 {
     my $grouped = $data->group_by(key 'id');
     is($grouped, check_isa('Hash'), 'group_by return Hash');
-    is($grouped->count, 3, '3 elements');
+    is($grouped->length, 3, '3 elements');
 
     is(
         $grouped,

@@ -1,7 +1,7 @@
 package Hash;
 use 5.036;
 use Carp ();
-use subs 'bind', 'keys', 'values', 'bless', 'map', 'foreach', 'delete';
+use subs 'bind', 'keys', 'values', 'bless', 'map', 'foreach', 'delete', 'length';
 
 # TODO: equal, eual_values, is_disjoint
 #       change, push
@@ -85,12 +85,12 @@ sub fold($hash, $state, $f) {
     return $state;
 }
 
-sub count($hash) {
+sub length($hash) {
     return scalar (CORE::keys %$hash);
 }
 
 sub is_empty($hash) {
-    return count($hash) == 0 ? 1 : 0;
+    return length($hash) == 0 ? 1 : 0;
 }
 
 # Iterates through a hash and passes the key & value to a function. That
@@ -250,7 +250,7 @@ sub has_keys($hash, @keys) {
 #       get compared deeply. All other references must be reference-equal
 sub equal($hash, $other) {
     return 0 if ref $other ne 'Hash' && ref $other ne 'HASH';
-    return 0 if count($hash) != count($other);
+    return 0 if length($hash) != length($other);
     for my $key ( CORE::keys %$hash ) {
         return 0 if not exists $other->{$key};
         return 0 if $hash->{$key} ne $other->{$key};

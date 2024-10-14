@@ -24,12 +24,12 @@ my $snd     = sub($array) { $array->[1] };
     my @data = (1,2,3,4,5);
     my $data = Seq->from_array(\@data);
 
-    is($data->count, 5, 'count is 5');
+    is($data->length, 5, 'length is 5');
     is($data->to_array, [1..5], '$data as array');
 
     # change @data
     push @data, 6;
-    is($data->count, 6, 'count is 6');
+    is($data->length, 6, 'length is 6');
     is($data->to_array, [1..6], '$data is now 6');
 }
 
@@ -45,7 +45,7 @@ my $snd     = sub($array) { $array->[1] };
         return $key . $value;
     });
 
-    is($data->count, 3, 'count from hashref is 3');
+    is($data->length, 3, 'length from hashref is 3');
     is(
         $data->to_array,
         bag {
@@ -59,7 +59,7 @@ my $snd     = sub($array) { $array->[1] };
     # add entry to data
     $data{4} = 'Maz';
 
-    is($data->count, 4, 'count from hashref is 4');
+    is($data->length, 4, 'length from hashref is 4');
     is(
         $data->to_array,
         bag {
@@ -81,14 +81,14 @@ my $snd     = sub($array) { $array->[1] };
     # just refers to the array
     my $data2 = Seq->from_array(\@data);
 
-    is($data1->count, 10, '$data1 has 10 items');
-    is($data2->count, 10, '$data2 has 10 items');
+    is($data1->length, 10, '$data1 has 10 items');
+    is($data2->length, 10, '$data2 has 10 items');
 
     # we now add an element to the array
     push @data, 11;
 
-    is($data1->count, 10, '$data1 still has 10 items');
-    is($data2->count, 11, '$data2 now has 11 items');
+    is($data1->length, 10, '$data1 still has 10 items');
+    is($data2->length, 11, '$data2 now has 11 items');
 }
 
 done_testing;

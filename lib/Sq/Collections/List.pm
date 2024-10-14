@@ -1,6 +1,6 @@
 package List;
 use 5.036;
-use subs 'bind', 'join', 'select', 'last', 'sort', 'map', 'foreach';
+use subs 'bind', 'join', 'select', 'last', 'sort', 'map', 'foreach', 'length';
 use Scalar::Util ();
 use List::Util ();
 use Carp ();
@@ -521,7 +521,7 @@ sub expand($list) {
     return @{ to_array($list) };
 }
 
-sub count($list) {
+sub length($list) {
     state $folder = sub($state, $x) { $state + 1 };
     return fold($list, 0, $folder);
 }

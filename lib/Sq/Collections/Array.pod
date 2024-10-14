@@ -481,12 +481,11 @@ array had.
 
 Converter are methods on an array that don't return C<Array>.
 
-=head2 count($array) : Array<'a> -> int
+=head2 length($array) : Array<'a> -> int
 
 Returns the amount of elements in an array.
 
-    # 3
-    my $count = Array->new(0,0,0)->count;
+    my $count = Array->new(0,0,0)->length; # 3
 
 =head2 fold($array, $state, $f) : Array<'a> -> 'State -> ('State -> 'a -> 'State) -> 'State
 
@@ -633,6 +632,14 @@ all values of the same key into an array.
     for my $x ( qw/foo bar hello world a/ ) {
         push $hash->{ length $x }->@*, $x;
     }
+
+=head2 as_hash($array)
+
+Transforms array into an hash. Same as assigning Array to a Hash. But blessed
+in the C<Hash> package and as a reference.
+
+    my %hash = @$array;
+    my $hash = $array->as_hash;
 
 =head2 keyed_by
 

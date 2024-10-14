@@ -116,7 +116,7 @@ is($data3, $ishash,                             '$data3 isa Hash');
 is($data->fold(0, sub($state, $k, $v) { $state + $v }), 16, 'fold 1');
 is($data->fold(1, sub($state, $k, $v) { $state + $v }), 17, 'fold 2');
 
-is($data->count, 3, 'count');
+is($data->length, 3, 'length');
 
 # union, append, intersection, difference
 {

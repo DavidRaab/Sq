@@ -44,8 +44,8 @@ is($range->filter($is_even), [2,4,6,8,10],                'filter');
 is($range->take(5),   [1..5], 'take 1');
 is($range->take(0),       [], 'take 2');
 is($range->take(-1),      [], 'take 3');
-is($range->count,         10, 'count');
-is($range->take(5)->count, 5, 'take & count');
+is($range->length,         10, 'length');
+is($range->take(5)->length, 5, 'take & length');
 
 is(
     $range->map($square)->filter($is_even),
@@ -56,11 +56,16 @@ is(
     [4,16,36],
     'map filter take');
 
+is(
+    Array->new(qw/Hello World One Two/)->map(sub($str) { $str => length $str })->as_hash,
+    {"Hello" => 5, "World" => 5, "One" => 3, "Two" => 3},
+    'map with multiple return values');
+
 is($range->map(sub($x) { undef }), [], 'empty array');
 
 is(
-    $range->fold(0, sub($count, $x) { $count + 1 }),
-    $range->count,
+    $range->fold(0, sub($length, $x) { $length + 1 }),
+    $range->length,
     'fold with non-reftype');
 is(
     $range->fold([], sub($array, $x) { push @$array, $x; $array }),
@@ -285,6 +290,15 @@ is(
     },
     'to_hash_of_array');
 
+is(
+    Array->new(qw/Hello World Awesome World/)->count,
+    {
+        Hello   => 1,
+        World   => 2,
+        Awesome => 1,
+    },
+    'count');
+
 is(Array->wrap(1,1,2,3,1,4,5,4,3,2,6)->distinct, [1..6],              'distinct 1');
 is(Array->wrap(1,2,3,2,23,123,4,12,2)->distinct, [1,2,3,23,123,4,12], 'distinct 2');
 is(Array::distinct([1,2,3,2,23,123,4,12,2]),     [1,2,3,23,123,4,12], 'distinct 3');
@@ -298,9 +312,9 @@ is(Array::distinct([1,2,3,2,23,123,4,12,2]),     [1,2,3,23,123,4,12], 'distinct 
         {id => 1, name => "Foo"},
     );
 
-    is($data->count, 4, 'distinct_by starts with 4');
-    is($data->distinct->count, 4, 'still 4 as HashRefs are always unequal');
-    is($data->distinct_by(sub($x) { $x->{id} })->count, 3, 'one element less');
+    is($data->length, 4, 'distinct_by starts with 4');
+    is($data->distinct->length, 4, 'still 4 as HashRefs are always unequal');
+    is($data->distinct_by(sub($x) { $x->{id} })->length, 3, 'one element less');
     is(
         $data->distinct_by(sub($x) { $x->{id} }),
         [
@@ -323,9 +337,9 @@ is(
     [[A => 0], [B => 1], [C => 2]],
     'mapi with filtering');
 
-is(Array->init( 0,  sub($idx) { $idx }), [], 'init with count 0');
-is(Array->init(-1,  sub($idx) { $idx }), [], 'init with count -1');
-is(Array->init(-10, sub($idx) { $idx }), [], 'init with count -10');
+is(Array->init( 0,  sub($idx) { $idx }), [], 'init with length 0');
+is(Array->init(-1,  sub($idx) { $idx }), [], 'init with length -1');
+is(Array->init(-10, sub($idx) { $idx }), [], 'init with length -10');
 is(Array->range_step(1,1,1), [1], 'range_step with 1,1,1');
 is(
     Array->range_step(0,0.1,1),
@@ -762,7 +776,7 @@ is(Array->new(qw/1 9 10 5/)->sort_num, [1, 5, 9, 10],  'sort_num');
         'keyed_by');
 
     is(
-        $data->keyed_by(key 'name')->count,
+        $data->keyed_by(key 'name')->length,
         3,
         'keyed_by name only has 3 entries');
 
@@ -812,9 +826,8 @@ is(Array->new(qw/1 9 10 5/)->sort_num, [1, 5, 9, 10],  'sort_num');
         'sort_hash_num id');
 }
 
-# as_hash
 is(
-    Array->new(qw/foo bar baz foo bar foo 1 2/)->as_hash,
+    Array->new(qw/foo bar baz foo bar foo 1 2/)->count,
     {
         foo => 3,
         bar => 2,

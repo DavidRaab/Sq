@@ -90,12 +90,12 @@ is(
     ],
     'check content of file');
 
-is($file->count, 3, 'line count');
-is($file->count, 3, 'should return 3 again');
+is($file->length, 3, 'line count');
+is($file->length, 3, 'should return 3 again');
 is(
     $file
     ->filter(sub($x) { $x =~ m/test/i })
-    ->count,
+    ->length,
 
     1,
     'one line containing test');
@@ -122,7 +122,7 @@ my $second = $temp->filter(sub ($x) { $x =~ m/second/i });
 my $third  = $temp->filter(sub ($x) { $x =~ m/third/i  });
 
 # on empty file
-is($temp->count,                        0, '0 - empty file');
+is($temp->length,                       0, '0 - empty file');
 is($first->first(undef),            undef, '0 - no first');
 is($second->first(undef),           undef, '0 - no second');
 is($third->first(undef),            undef, '0 - no third');
@@ -131,7 +131,7 @@ is($third->first(undef),            undef, '0 - no third');
 $fh->printflush("First Line\n");
 
 # run tests again
-is($temp->count,                        1, '1 - 1 line');
+is($temp->length,                       1, '1 - 1 line');
 is($first->first(undef),   "First Line\n", '1 - first line');
 is($second->first(undef),           undef, '1 - no second');
 is($third->first(undef),            undef, '1 - no third');
@@ -140,7 +140,7 @@ is($third->first(undef),            undef, '1 - no third');
 $fh->printflush("Second Line\n");
 
 # run tests again
-is($temp->count,                        2, '2 - 2 lines');
+is($temp->length,                       2, '2 - 2 lines');
 is($first->first(undef),   "First Line\n", '2 - first line');
 is($second->first(undef), "Second Line\n", '2 - second line');
 is($third->first(undef),            undef, '2 - no third');
@@ -149,7 +149,7 @@ is($third->first(undef),            undef, '2 - no third');
 $fh->printflush("Third Line\n");
 
 # run tests again
-is($temp->count,                        3, '3 - 3 lines');
+is($temp->length,                       3, '3 - 3 lines');
 is($first->first(undef),   "First Line\n", '3 - first line');
 is($second->first(undef), "Second Line\n", '3 - second line');
 is($third->first(undef),   "Third Line\n", '3 - third lines');

@@ -1,6 +1,6 @@
 package Seq;
 use 5.036;
-use subs 'bind', 'join', 'select', 'last', 'sort', 'map', 'foreach';
+use subs 'bind', 'join', 'select', 'last', 'sort', 'map', 'foreach', 'length';
 use Scalar::Util ();
 use List::Util ();
 use Carp ();
@@ -974,8 +974,8 @@ sub expand($seq) {
     return @{ to_array($seq) };
 }
 
-# count : Seq<'a> -> int
-sub count($seq) {
+# length : Seq<'a> -> int
+sub length($seq) {
     state $folder = sub($count, $x) { $count+1 };
     return fold($seq, 0, $folder);
 }

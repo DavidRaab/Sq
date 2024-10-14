@@ -1,6 +1,6 @@
 package Array;
 use 5.036;
-use subs 'bind', 'join', 'select', 'last', 'sort', 'map', 'foreach', 'bless';
+use subs 'bind', 'join', 'select', 'last', 'sort', 'map', 'foreach', 'bless', 'length';
 use Scalar::Util ();
 use List::Util ();
 use Carp ();
@@ -190,8 +190,8 @@ sub take($array, $amount) {
     return CORE::bless(\@array, 'Array');
 }
 
-# count : Array<'a> -> int
-sub count($array) {
+# length : Array<'a> -> int
+sub length($array) {
     return scalar @{ $array };
 }
 
@@ -570,6 +570,11 @@ sub to_hash_of_array($array, $mapper) {
     return $hash;
 }
 
+# Array -> Hash<'Key,'Value>
+sub as_hash($array) {
+    return CORE::bless({ @$array }, 'Hash');
+}
+
 # Applies $get_key to each array entry and put the entry into a hash
 # under the key. Entries with the same key overrides previous ones.
 #
@@ -598,10 +603,18 @@ sub group_by($array, $get_key) {
 # uses every array entry as a key in a hash, and counts appearances of each entry
 #
 # Array<'a> -> Hash<'a,int>
-sub as_hash($array) {
+sub count($array) {
     my $new = Hash->new;
     for my $key ( @$array ) {
         $new->{$key}++;
+    }
+    return $new;
+}
+
+sub count_by($array, $f) {
+    my $new = Hash->new;
+    for my $x ( @$array ) {
+        $new->{$f->{$x}}++;
     }
     return $new;
 }
