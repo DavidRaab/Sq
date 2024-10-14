@@ -614,7 +614,7 @@ sub count($array) {
 sub count_by($array, $f) {
     my $new = Hash->new;
     for my $x ( @$array ) {
-        $new->{$f->{$x}}++;
+        $new->{$f->($x)}++;
     }
     return $new;
 }
