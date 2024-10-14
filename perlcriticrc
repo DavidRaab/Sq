@@ -1,0 +1,4 @@
+[-Subroutines::RequireArgUnpacking]
+[-Subroutines::ProhibitSubroutinePrototypes]
+[-Subroutines::ProhibitExplicitReturnUndef]
+[-BuiltinFunctions::ProhibitStringyEval]
