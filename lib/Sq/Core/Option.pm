@@ -124,4 +124,11 @@ sub to_array($opt) {
          : bless([],          'Array');
 }
 
+sub get($opt) {
+    if ( $opt->[0] == $Some ) {
+        return $opt->[1];
+    }
+    die "Cannot extract value of None\n";
+}
+
 1;

@@ -279,3 +279,13 @@ Arrays are blessed into the Sq Array.
     my $x = Some(1)->to_array; # [1]
     my $x = None   ->to_array; # []
 
+=head2 get($optional)
+
+Returns the value inside of an optional, but only when the value is Some value,
+otherwise throws an exception. This function should be avoided as much as
+possible if you want a working program. At least you should use C<is_some>
+before extracting, or even better either use C<match>, C<or> or C<or_with>
+to extract the value.
+
+    my $x = Some(10)->get; # 10
+    my $x = None    ->get; # throws exception

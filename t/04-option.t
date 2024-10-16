@@ -213,4 +213,13 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end 
     is($b, check_isa('Array'), '$b is blessed');
 }
 
+# get
+{
+    is(Some(10)->get, 10, 'get');
+    like(
+        dies { None->get },
+        qr/\ACannot extract value of None/,
+        'get of None');
+}
+
 done_testing;
