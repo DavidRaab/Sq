@@ -5,13 +5,18 @@ use Scalar::Util ();
 use Sub::Exporter -setup => {
     exports => [
         qw(id fst snd key assign is_str is_num),
+        Some => sub { \&Option::Some },
+        None => sub { \&Option::None },
     ],
     groups => {
-        default => [qw(id fst snd key assign is_str is_num)],
+        default => [qw(id fst snd key assign is_str is_num Some None)],
     },
 };
 
-# Load Seq Module -- available under 'Seq'
+# Load Basic Data Types
+use Sq::Core::Option;
+
+# Load Collections Modules
 use Sq::Collections::Hash;
 use Sq::Collections::Array;
 use Sq::Collections::Queue;
