@@ -116,6 +116,17 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end 
     is(Some(undef)->map($incr), None,     'map on undef');
     is(None       ->map($dbl),  None,     'map on None');
     is(Some(10)   ->map($dbl),  Some(20), 'map with dbl');
+
+    my $add = sub($x,$y) { $x + $y };
+
+    # map2
+    is(Option::map2(Some(10),     Some(3), $add), Some(13), 'map2 - 1');
+    is(Option::map2(Some(10),        None, $add),     None, 'map2 - 2');
+    is(Option::map2(None,         Some(3), $add),     None, 'map2 - 3');
+    is(Option::map2(Some(undef),  Some(3), $add),     None, 'map2 - 4');
+    is(Option::map2(Some(10), Some(undef), $add),     None, 'map2 - 5');
+
+    is(Some(10)->map2(Some(3), $add), Some(13), 'map2 - 6');
 }
 
 # validate

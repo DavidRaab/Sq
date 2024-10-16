@@ -60,6 +60,13 @@ sub map($opt, $f) {
          : $None;
 }
 
+sub map2($a, $b, $f) {
+    if ( $a->[0] == $Some && $b->[0] == $Some ) {
+        return Some( $f->($a->[1], $b->[1]) );
+    }
+    return $None;
+}
+
 sub validate($opt, $f) {
     if ( $opt->[0] == $Some && $f->($opt->[1]) ) {
         return $opt;
