@@ -64,6 +64,20 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end 
 
     is($a->or_with(sub{ 10 }), 'Hello', '$a->or_with');
     is($c->or_with(sub{ 10 }),      10, '$c->or_with');
+
+    # fold
+    {
+        my $add = sub($state, $x) { $state + $x };
+        is(None       ->fold(100, $add),  100, 'fold 1');
+        is(Some(undef)->fold(100, $add),  100, 'fold 2');
+        is(Some(0)    ->fold(100, $add),  100, 'fold 3');
+        is(Some(10)   ->fold(100, $add),  110, 'fold 4');
+
+        is(
+            Option::fold(Some(10), 3, sub($x,$y){ $x - $y }),
+            -7,
+            'functional-style');
+    }
 }
 
 # bind

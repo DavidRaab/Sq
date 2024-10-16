@@ -75,4 +75,13 @@ sub flatten($opt) {
     return $result;
 }
 
+sub fold($opt, $state, $f) {
+    if ( $opt->[0] == $Some ) {
+        return $f->($state, $opt->[1]);
+    }
+    else {
+        return $state;
+    }
+}
+
 1;
