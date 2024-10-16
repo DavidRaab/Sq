@@ -13,13 +13,13 @@ Sq::Core::Option - Option functions
 
 =head1 DESCRIPTION
 
-A Option is an alternative to represent undef/null values. By default every
+An Option is an alternative to represent undef/null values. By default every
 value in Perl can be C<undef>. The problem with working with C<undef> is that
 you need to check them, but are never forced todo so. If you forget to check
 for C<undef> than typical warnings in Perl will appear or maybe even the program
 crashes when you try to call a method on an C<undef> value.
 
-A option is a way to make it explicitly visible that a function sometimes returns
+An option is a way to make it explicitly visible that a function sometimes returns
 no value at all. A user of the option value must explicitly work with an option
 and unpack the value or use some of the methods provided by the option module.
 
@@ -31,8 +31,6 @@ to create optional values.
     my $x = Some(10);
     my $y = Some(0);
     my $z = None;
-
-=back
 
 =head1 CONSTRUCTORS
 
@@ -113,22 +111,22 @@ C<or> instead.
 Returns the value when it is Some value or the C<$default> value passed to it
 when it is C<None>
 
-    my $a = $opt->or(10);
-    my $b = Some(10)->or(0); # 10
-    my $c = None->or(0);     #  0
+    my $a = $opt    ->or(10);
+    my $b = Some(10)->or(0);      # 10
+    my $c = None    ->or(0);      #  0
     my $d = Option::or($opt, 10);
 
 =head2 or_with($optional, $f)
 
-Same as C<or> but instead of passing a value that is returned in the case of
-C<None>, a function is called and the value of it is returned. This is useful
-in two cases.
+Same as C<or> but instead of passing a value that is used in the None case, a
+function is expected and executed. This is useful in two cases.
 
 =over 4
 
 =item
 
-When you have mutable values that should be different.
+When the or case should create different mutable values. Also when those values
+only should be created when the value is None.
 
 =item
 
@@ -139,23 +137,25 @@ When you want to execute a function for some kind of side-effects.
     # always returns a new array-ref
     my $x = $opt->or_with(sub { [] });
 
-    # returns current time of None
+    # returns current time in the case of None
     my $x = $opt->or_with(sub { scalar localtime });
 
 =head2 map($optional, $f)
 
-C<map> runs a function that don't know about optionals on the value it contains
-and returns the new optional value or C<None> if it was C<None>. C<map> is
-good for functions with the signature C<<'a -> 'b>>
+When you have a function that don't know about optionals, then you use C<map>
+to let the function run of its value. When the optional is C<None> then
+the function will not be executed. Always returns an optional.
+
+C<map> is good for functions with the signature C<< 'a -> 'b >>
 
     # Here $incr is a function expecting a number and returning a number
     # no optional is involved.
     my $incr = sub($x) { $x + 1 }
 
-    my $x = $opt    ->map($incr);
-    my $x = Some(0) ->map($incr); # Some(1)
-    my $x = Some(10)->map($incr); # Some(11)
-    my $x = None    ->map($incr); # None
+    my $opt = $opt    ->map($incr);
+    my $opt = Some(0) ->map($incr); # Some(1)
+    my $opt = Some(10)->map($incr); # Some(11)
+    my $opt = None    ->map($incr); # None
 
 =head2 map2($optA, $optB, $f)
 
@@ -165,11 +165,11 @@ optional values, you use this function. Returns an optional value again.
     my $add = sub($x,$y) { $x + $y }
 
     # adds together both optional values or returns None if one of them is None
-    my $x = Option::map2($optA, $optB, $add);
-    my $x = $optA->map2($optB, $add);
+    my $opt = Option::map2($optA, $optB, $add);
+    my $opt = $optA->map2($optB, $add);
 
-    my $x = Some(10)->map2(Some(3), $add); # Some(13)
-    my $x = None    ->map2(Some(3), $add); # None
+    my $opt = Some(10)->map2(Some(3), $add); # Some(13)
+    my $opt = None    ->map2(Some(3), $add); # None
 
 =head2 map3($optA, $optB, $optC, $f)
 
@@ -177,7 +177,7 @@ Same as C<map2> but for three optional values.
 
     # adds all three optional together as long all of them are Some value
     # otherwise $x will be None.
-    my $x =
+    my $opt =
         Option::map3($optA, $optB, $optC, sub($a, $b, $c) {
             return $a + $b + $c;
         });
@@ -188,7 +188,7 @@ Same as C<map3> but for four optional values.
 
     # adds all three optional together as long all of them are Some value
     # otherwise $x will be None.
-    my $x =
+    my $opt =
         Option::map3($optA, $optB, $optC, $optD, sub($a, $b, $c, $d) {
             return $a + $b + $c + $d;
         });
@@ -209,16 +209,18 @@ value. It is good for functions with the signature C<<< 'a -> Option<'b> >>>
     };
 
     # The result will be an optional number or None.
-    $opt->bind($parse_int);
+    my $opt = $opt->bind($parse_int);
 
-    my $x = Some("10")->bind($parse_int); # Some(10)
-    my $x = Some("ab")->bind($parse_int); # None
-    my $x = None      ->bind($parse_int); # None
+    my $opt = Some("10")->bind($parse_int); # Some(10)
+    my $opt = Some("ab")->bind($parse_int); # None
+    my $opt = None      ->bind($parse_int); # None
 
     # compare it when you have used map instead of bind
-    my $x = Some("10")->map($parse_int);  # Some(Some(10))
-    my $x = Some("ab")->map($parse_int);  # Some(None)
-    my $x = None      ->map($parse_int);  # None
+    my $opt = Some("10")->map($parse_int);  # Some(Some(10))
+    my $opt = Some("ab")->map($parse_int);  # Some(None)
+    my $opt = None      ->map($parse_int);  # None
+
+    # calling ->map($f)->flatten will return the same result as using bind()
 
 =head2 validate($optional, $predicate)
 
@@ -241,11 +243,11 @@ Whenever you have multiple nested optionals you just call C<flatten> and it
 flattens its down to just a single optional value. One reason why you could
 end up with multiple nested optionals is when you use C<map> instead of C<bind>.
 
-    my $x = None->flatten              # None
-    my $x = Some(10)->flatten          # Some(10)
-    my $x = Some(Some(10))             # Some(10)
-    my $x = Some(Some(Some(Some(10)))) # Some(10)
-    my $x = Some(Some(Some(None)))     # None
+    my $x = None                      ->flatten # None
+    my $x = Some(10)                  ->flatten # Some(10)
+    my $x = Some(Some(10))            ->flatten # Some(10)
+    my $x = Some(Some(Some(Some(10))))->flatten # Some(10)
+    my $x = Some(Some(Some(None)))    ->flatten # None
 
 =head2 fold($optional, $state, $f)
 
@@ -253,14 +255,14 @@ When you have a function expecting two normal values, but one value is an
 optional, then this function is probably what you wanna use. It either returns
 C<$state> when the optional is None. Otherwise it executes C<$f> by passing
 it the C<$state> and the extracted value of C<$optional>. The function either
-returns C<$state> or whatever C<$f> returns. The types of both should be the
-same, oterwise this function hardly makes any sense.
+returns C<$state> or whatever C<$f> returns. The type of C<$state> and whatever
+C<$f> returns should be the same, oterwise this function hardly makes any sense.
 
     my $add = sub($state, $x) { $state + $x };
 
     my $x = $opt    ->fold(100, $add);
-    my $x = Some(10)->fold(100, $add); # 110
-    my $x = None    ->fold(100, $add); # 100
+    my $x = Some(10)->fold(100, $add); # $add->(100,10) -> 110
+    my $x = None    ->fold(100, $add); # $state         -> 100
 
 =head2 iter($optional, $f)
 
