@@ -270,3 +270,12 @@ Usually this is done for side-effect as the funtion returns nothing.
     # prints $opt if it is Some value, otherwise don't.
     $opt->iter(sub($str) { printf "%s\n", $str });
 
+=head2 to_array($optional)
+
+Converts the optional into an array. In the case of Some value it turns into
+an array of length 1 containing the value, otherwise it is an empty array.
+Arrays are blessed into the Sq Array.
+
+    my $x = Some(1)->to_array; # [1]
+    my $x = None   ->to_array; # []
+

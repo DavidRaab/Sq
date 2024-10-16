@@ -118,4 +118,10 @@ sub iter($opt, $f) {
     return;
 }
 
+sub to_array($opt) {
+    return $opt->[0] == $Some
+         ? bless([$opt->[1]], 'Array')
+         : bless([],          'Array');
+}
+
 1;

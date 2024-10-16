@@ -202,4 +202,15 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end 
     is($sum, 13, 'iter');
 }
 
+# to_array
+{
+    my $a = Some(1)->to_array;
+    my $b = None->to_array;
+
+    is($a, [1], '$a is [1]');
+    is($b, [],  '$a is []');
+    is($a, check_isa('Array'), '$a is blessed');
+    is($b, check_isa('Array'), '$b is blessed');
+}
+
 done_testing;
