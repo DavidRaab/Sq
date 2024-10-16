@@ -143,4 +143,15 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end 
     }
 }
 
+# flatten
+{
+    is(Some(Some(Some(10)))->flatten, Some(10), 'flatten 10');
+    is(Some(Some(None))    ->flatten, None,     'flatten None');
+    is(Some(None)          ->flatten, None,     'flatten None 2');
+    is(Some(Some(undef))   ->flatten, None,     'flatten None 2');
+    is(Some(Some(Some([])))->flatten, Some([]), 'Some array');
+    is(Some(1)             ->flatten, Some(1),  'Some 1');
+    is(None                ->flatten, None,     'None')
+}
+
 done_testing;

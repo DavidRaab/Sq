@@ -67,4 +67,17 @@ sub validate($opt, $f) {
     return $None;
 }
 
+sub flatten($opt) {
+    my $result = $opt;
+
+    REPEAT:
+    if ( $result->[0] == $Some ) {
+        if ( ref $result->[1] eq 'Option' ) {
+            $result = $result->[1];
+            goto REPEAT;
+        }
+    }
+    return $result;
+}
+
 1;
