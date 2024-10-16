@@ -67,6 +67,29 @@ sub map2($a, $b, $f) {
     return $None;
 }
 
+sub map3($a, $b, $c, $f) {
+    if (
+           $a->[0] == $Some
+        && $b->[0] == $Some
+        && $c->[0] == $Some
+    ) {
+        return Some( $f->($a->[1], $b->[1], $c->[1]) );
+    }
+    return $None;
+}
+
+sub map4($a, $b, $c, $d, $f) {
+    if (
+           $a->[0] == $Some
+        && $b->[0] == $Some
+        && $c->[0] == $Some
+        && $d->[0] == $Some
+    ) {
+        return Some( $f->($a->[1], $b->[1], $c->[1], $d->[1]) );
+    }
+    return $None;
+}
+
 sub validate($opt, $f) {
     if ( $opt->[0] == $Some && $f->($opt->[1]) ) {
         return $opt;

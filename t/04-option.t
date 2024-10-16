@@ -127,6 +127,18 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end 
     is(Option::map2(Some(10), Some(undef), $add),     None, 'map2 - 5');
 
     is(Some(10)->map2(Some(3), $add), Some(13), 'map2 - 6');
+
+    # map3
+    is(
+        Option::map3(Some(1), Some(2), Some(3), sub($a,$b,$c) { $a + $b + $c }),
+        Some(6),
+        'map3');
+
+    # map4
+    is(
+        Option::map4(Some(1), Some(2), Some(3), Some(4), sub($a,$b,$c,$d) { $a + $b + $c + $d }),
+        Some(10),
+        'map4');
 }
 
 # validate
