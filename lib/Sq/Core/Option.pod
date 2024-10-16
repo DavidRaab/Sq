@@ -261,3 +261,12 @@ same, oterwise this function hardly makes any sense.
     my $x = $opt    ->fold(100, $add);
     my $x = Some(10)->fold(100, $add); # 110
     my $x = None    ->fold(100, $add); # 100
+
+=head2 iter($optional, $f)
+
+Runs function C<$f> with the value in the optional or don't if it is C<None>.
+Usually this is done for side-effect as the funtion returns nothing.
+
+    # prints $opt if it is Some value, otherwise don't.
+    $opt->iter(sub($str) { printf "%s\n", $str });
+

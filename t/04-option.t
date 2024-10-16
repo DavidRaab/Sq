@@ -191,4 +191,15 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end 
     is(None                ->flatten, None,     'None')
 }
 
+# iter
+{
+    my $sum = 0;
+
+    Some(10)->iter(sub($x) { $sum += $x });
+    None    ->iter(sub($x) { $sum += $x });
+    Some(3) ->iter(sub($x) { $sum += $x });
+
+    is($sum, 13, 'iter');
+}
+
 done_testing;

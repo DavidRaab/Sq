@@ -111,4 +111,11 @@ sub fold($opt, $state, $f) {
          : $state;
 }
 
+sub iter($opt, $f) {
+    if ( $opt->[0] == $Some ) {
+        $f->($opt->[1]);
+    }
+    return;
+}
+
 1;
