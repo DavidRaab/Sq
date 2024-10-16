@@ -1,0 +1,263 @@
+# PODNAME: Sq::Core::Option
+# ABSTRACT: Option functions
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Sq::Core::Option - Option functions
+
+=head1 DESCRIPTION
+
+A Option is an alternative to represent undef/null values. By default every
+value in Perl can be C<undef>. The problem with working with C<undef> is that
+you need to check them, but are never forced todo so. If you forget to check
+for C<undef> than typical warnings in Perl will appear or maybe even the program
+crashes when you try to call a method on an C<undef> value.
+
+A option is a way to make it explicitly visible that a function sometimes returns
+no value at all. A user of the option value must explicitly work with an option
+and unpack the value or use some of the methods provided by the option module.
+
+Like the other modules you always can call every method in a functional-style.
+
+By loading C<Sq> it automatically imports the function C<Some> and C<None>
+to create optional values.
+
+    my $x = Some(10);
+    my $y = Some(0);
+    my $z = None;
+
+=back
+
+=head1 CONSTRUCTORS
+
+These function creates optional values.
+
+=head2 Some
+
+The C<Some> function is automatically imported by loading C<Sq>. Every value
+except C<undef> turns into a valid value.
+
+    my $a = Some(10);
+    my $b = Some([]);
+    my $c = Some({ a => 1, b => 2});
+
+    # None
+    my $d = Some(undef);
+
+=head2 None
+
+This indicates the absence of a value
+
+    my $a = None();
+    my $b = None;
+
+=head1 METHODS
+
+Methods work on an optional value. All Methods can also be called in a
+functional-style.
+
+=head2 is_some($optional)
+
+returns a truish value when the optional contains some value. Most of the
+time you probably want to use an extraction method instead.
+
+    if ( $opt->is_some ) {
+        ...
+    }
+
+=head2 is_none($optional)
+
+returns a truish value when the optional is None. Most of the time you probably
+want to use an extraction method instead.
+
+    if ( $opt->is_none ) {
+        ...
+    }
+
+=head2 match($opt, Some => sub($value){ ... }, None => sub(){ ... })
+
+Pattern matches against the optional value. It either runs the function provided
+with the Some argument or the None argument. It's usually used to extract the value
+by providing two functions for each case the optional can be in. If
+you just want to extract the value or use a default value then use the method
+C<or> instead.
+
+    my $number =
+        $opt->match(
+            Some => sub($x) { $x + 1 },
+            None => sub     { 0      },
+        );
+
+    # will be 11
+    my $number =
+        Some(10)->match(
+            Some => sub($x) { $x + 1 },
+            None => sub     { 0      },
+        );
+
+    # will be 0
+    my $number =
+        None->match(
+            Some => sub($x) { $x + 1 },
+            None => sub     { 0      },
+        );
+
+=head2 or($optinal, $value)
+
+Returns the value when it is Some value or the C<$default> value passed to it
+when it is C<None>
+
+    my $a = $opt->or(10);
+    my $b = Some(10)->or(0); # 10
+    my $c = None->or(0);     #  0
+    my $d = Option::or($opt, 10);
+
+=head2 or_with($optional, $f)
+
+Same as C<or> but instead of passing a value that is returned in the case of
+C<None>, a function is called and the value of it is returned. This is useful
+in two cases.
+
+=over 4
+
+=item
+
+When you have mutable values that should be different.
+
+=item
+
+When you want to execute a function for some kind of side-effects.
+
+=back
+
+    # always returns a new array-ref
+    my $x = $opt->or_with(sub { [] });
+
+    # returns current time of None
+    my $x = $opt->or_with(sub { scalar localtime });
+
+=head2 map($optional, $f)
+
+C<map> runs a function that don't know about optionals on the value it contains
+and returns the new optional value or C<None> if it was C<None>. C<map> is
+good for functions with the signature C<<'a -> 'b>>
+
+    # Here $incr is a function expecting a number and returning a number
+    # no optional is involved.
+    my $incr = sub($x) { $x + 1 }
+
+    my $x = $opt    ->map($incr);
+    my $x = Some(0) ->map($incr); # Some(1)
+    my $x = Some(10)->map($incr); # Some(11)
+    my $x = None    ->map($incr); # None
+
+=head2 map2($optA, $optB, $f)
+
+Whenever you have a function expecting two normal values, but you have two
+optional values, you use this function. Returns an optional value again.
+
+    my $add = sub($x,$y) { $x + $y }
+
+    # adds together both optional values or returns None if one of them is None
+    my $x = Option::map2($optA, $optB, $add);
+    my $x = $optA->map2($optB, $add);
+
+    my $x = Some(10)->map2(Some(3), $add); # Some(13)
+    my $x = None    ->map2(Some(3), $add); # None
+
+=head2 map3($optA, $optB, $optC, $f)
+
+Same as C<map2> but for three optional values.
+
+    # adds all three optional together as long all of them are Some value
+    # otherwise $x will be None.
+    my $x =
+        Option::map3($optA, $optB, $optC, sub($a, $b, $c) {
+            return $a + $b + $c;
+        });
+
+=head2 map4($optA, $optB, $optC, $optD, $f)
+
+Same as C<map3> but for four optional values.
+
+    # adds all three optional together as long all of them are Some value
+    # otherwise $x will be None.
+    my $x =
+        Option::map3($optA, $optB, $optC, $optD, sub($a, $b, $c, $d) {
+            return $a + $b + $c + $d;
+        });
+
+=head2 bind($optional, $f)
+
+C<bind> is also sometimes called C<chain> or C<then>. It allows chaining
+together functions that expects a non optional value, but returns an optional
+value. It is good for functions with the signature C<<< 'a -> Option<'b> >>>
+
+    # this function parses a string and returns an optional. Either Some value
+    # when the functions succeeds or None if not.
+    my $parse_int = sub($str) {
+        if ( $str =~ m/\A \s* (\d+) \s* \z/xms ) {
+            return Some($1);
+        }
+        return None;
+    };
+
+    # The result will be an optional number or None.
+    $opt->bind($parse_int);
+
+    my $x = Some("10")->bind($parse_int); # Some(10)
+    my $x = Some("ab")->bind($parse_int); # None
+    my $x = None      ->bind($parse_int); # None
+
+    # compare it when you have used map instead of bind
+    my $x = Some("10")->map($parse_int);  # Some(Some(10))
+    my $x = Some("ab")->map($parse_int);  # Some(None)
+    my $x = None      ->map($parse_int);  # None
+
+=head2 validate($optional, $predicate)
+
+Runs a predicate function (a function returning a boolish value) on the value.
+When C<$optional> is Some value and the C<$predicate> function returns a truish
+value then C<$optional> will not change. Otherwise returns C<None> instead.
+
+    my $is_normalized = sub($x) {
+        return $x >= 0 && $x <= 1.0 ? 1 : 0;
+    };
+
+    my $x = Some(0)  ->validate($is_normalized) # Some(0)
+    my $x = Some(0.2)->validate($is_normalized) # Some(0.2)
+    my $x = Some(2)  ->validate($is_normalized) # None
+    my $x = None     ->validate($is_normalized) # None
+
+=head2 flatten($optional)
+
+Whenever you have multiple nested optionals you just call C<flatten> and it
+flattens its down to just a single optional value. One reason why you could
+end up with multiple nested optionals is when you use C<map> instead of C<bind>.
+
+    my $x = None->flatten              # None
+    my $x = Some(10)->flatten          # Some(10)
+    my $x = Some(Some(10))             # Some(10)
+    my $x = Some(Some(Some(Some(10)))) # Some(10)
+    my $x = Some(Some(Some(None)))     # None
+
+=head2 fold($optional, $state, $f)
+
+When you have a function expecting two normal values, but one value is an
+optional, then this function is probably what you wanna use. It either returns
+C<$state> when the optional is None. Otherwise it executes C<$f> by passing
+it the C<$state> and the extracted value of C<$optional>. The function either
+returns C<$state> or whatever C<$f> returns. The types of both should be the
+same, oterwise this function hardly makes any sense.
+
+    my $add = sub($state, $x) { $state + $x };
+
+    my $x = $opt    ->fold(100, $add);
+    my $x = Some(10)->fold(100, $add); # 110
+    my $x = None    ->fold(100, $add); # 100
