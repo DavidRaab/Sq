@@ -232,10 +232,10 @@ value then C<$optional> will not change. Otherwise returns C<None> instead.
         return $x >= 0 && $x <= 1.0 ? 1 : 0;
     };
 
-    my $x = Some(0)  ->validate($is_normalized) # Some(0)
-    my $x = Some(0.2)->validate($is_normalized) # Some(0.2)
-    my $x = Some(2)  ->validate($is_normalized) # None
-    my $x = None     ->validate($is_normalized) # None
+    my $opt = Some(0)  ->validate($is_normalized) # Some(0)
+    my $opt = Some(0.2)->validate($is_normalized) # Some(0.2)
+    my $opt = Some(2)  ->validate($is_normalized) # None
+    my $opt = None     ->validate($is_normalized) # None
 
 =head2 flatten($optional)
 
@@ -243,11 +243,11 @@ Whenever you have multiple nested optionals you just call C<flatten> and it
 flattens its down to just a single optional value. One reason why you could
 end up with multiple nested optionals is when you use C<map> instead of C<bind>.
 
-    my $x = None                      ->flatten # None
-    my $x = Some(10)                  ->flatten # Some(10)
-    my $x = Some(Some(10))            ->flatten # Some(10)
-    my $x = Some(Some(Some(Some(10))))->flatten # Some(10)
-    my $x = Some(Some(Some(None)))    ->flatten # None
+    my $opt = None                      ->flatten # None
+    my $opt = Some(10)                  ->flatten # Some(10)
+    my $opt = Some(Some(10))            ->flatten # Some(10)
+    my $opt = Some(Some(Some(Some(10))))->flatten # Some(10)
+    my $opt = Some(Some(Some(None)))    ->flatten # None
 
 =head2 fold($optional, $state, $f)
 
@@ -270,7 +270,9 @@ Runs function C<$f> with the value in the optional or don't if it is C<None>.
 Usually this is done for side-effect as the funtion returns nothing.
 
     # prints $opt if it is Some value, otherwise don't.
-    $opt->iter(sub($str) { printf "%s\n", $str });
+    $opt->iter(sub($str) {
+        printf "%s\n", $str
+    });
 
 =head2 to_array($optional)
 
@@ -278,8 +280,8 @@ Converts the optional into an array. In the case of Some value it turns into
 an array of length 1 containing the value, otherwise it is an empty array.
 Arrays are blessed into the Sq Array.
 
-    my $x = Some(1)->to_array; # [1]
-    my $x = None   ->to_array; # []
+    my $array = Some(1)->to_array; # [1]
+    my $array = None   ->to_array; # []
 
 =head2 get($optional)
 
