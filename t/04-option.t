@@ -93,5 +93,54 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end 
         'bind with lambda');
 }
 
+# map
+{
+    my $incr = sub($x) { $x + 1 };
+    my $dbl  = sub($x) { $x * 2 };
+
+    is(Some(10)   ->map($incr), Some(11), 'map incr');
+    is(Some(undef)->map($incr), None,     'map on undef');
+    is(None       ->map($dbl),  None,     'map on None');
+    is(Some(10)   ->map($dbl),  Some(20), 'map with dbl');
+}
+
+# validate
+{
+    my $between = sub($x,$y) {
+        return sub($value) {
+            return $value >= $x && $value <= $y ? 1 : 0;
+        }
+    };
+
+    is(Some(-1)->validate($between->(0,10)),     None, '-1 in 0-10');
+    is(Some(0) ->validate($between->(0,10)),  Some(0), '0 in 0-10');
+    is(Some(5) ->validate($between->(0,10)),  Some(5), '5 in 0-10');
+    is(Some(10)->validate($between->(0,10)), Some(10), '10 in 0-10');
+    is(Some(11)->validate($between->(0,10)),     None, '11 in 0-10');
+
+    my @tests = (
+        [" foo",    None],
+        [" 10 ",    None],
+        [" 1",   Some(2)],
+        [" 123 ",   None],
+        ["0",    Some(0)],
+        [" 5",  Some(10)],
+    );
+
+    my $idx = 0;
+    for my $test ( @tests ) {
+        my ($value, $expected) = @$test;
+
+        is(
+            Some($value)
+            ->bind(sub($str) { $str =~ m/\A \s* (\d+) \s* \z/xms ? Some $1 : None })
+            ->map( sub($x)   { $x * 2 })
+            ->validate($between->(0,10)),
+
+            $expected,
+            "validate $idx");
+        $idx++;
+    }
+}
 
 done_testing;

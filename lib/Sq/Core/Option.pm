@@ -54,4 +54,17 @@ sub bind($opt, $f) {
     return $opt->[0] == $Some ? $f->($opt->[1]) : $None;
 }
 
+sub map($opt, $f) {
+    return $opt->[0] == $Some
+         ? Some( $f->($opt->[1]) )
+         : $None;
+}
+
+sub validate($opt, $f) {
+    if ( $opt->[0] == $Some && $f->($opt->[1]) ) {
+        return $opt;
+    }
+    return $None;
+}
+
 1;
