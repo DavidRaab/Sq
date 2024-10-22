@@ -52,7 +52,30 @@ sub or_with($opt, $f) {
 
 # bind : Option<'a> -> ('a -> Option<'b>) -> Option<'b>
 sub bind($opt, $f) {
-    return $opt->[0] == $Some ? $f->($opt->[1]) : $None;
+    return $opt->[0] == $Some
+         ? $f->($opt->[1])
+         : $None;
+}
+
+sub bind2($optA, $optB, $f) {
+    if ( $optA->[0] == $Some && $optB->[0] == $Some ) {
+        return $f->($optA->[1], $optB->[1]);
+    }
+    return $None;
+}
+
+sub bind3($optA, $optB, $optC, $f) {
+    if ( $optA->[0] == $Some && $optB->[0] == $Some && $optC->[0] ) {
+        return $f->($optA->[1], $optB->[1], $optC->[1]);
+    }
+    return $None;
+}
+
+sub bind4($optA, $optB, $optC, $optD, $f) {
+    if ( $optA->[0] == $Some && $optB->[0] == $Some && $optC->[0] && $optD->[0] ) {
+        return $f->($optA->[1], $optB->[1], $optC->[1], $optD->[1]);
+    }
+    return $None;
 }
 
 sub map($opt, $f) {

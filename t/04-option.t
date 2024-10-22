@@ -373,4 +373,83 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end 
         'filter_valid_by 4');
 }
 
+# bind 1-4
+{
+    my $add1 = sub($x)          { Some($x+1)        };
+    my $add2 = sub($x,$y)       { Some($x+$y)       };
+    my $add3 = sub($x,$y,$z)    { Some($x+$y+$z)    };
+    my $add4 = sub($x,$y,$z,$w) { Some($x+$y+$z+$w) };
+
+    is(
+        Option::bind(Some(1), $add1),
+        Some(2),
+        'bind1');
+
+    is(
+        Option::bind2(Some(1), Some(2), $add2),
+        Some(3),
+        'bind2');
+
+    is(
+        Option::bind3(Some(1), Some(2), Some(3), $add3),
+        Some(6),
+        'bind3');
+
+    is(
+        Option::bind4(Some(1), Some(2), Some(3), Some(4), $add4),
+        Some(10),
+        'bind4');
+}
+
+# functional-style - bind2
+{
+    # adds two numbers toegther when they are greater zero, otherwise returns None
+    my $add_greater_0 = sub($a,$b) {
+        if ( $a > 0 && $b > 0 ) {
+            return Some($a + $b);
+        }
+        return None;
+    };
+
+    my @tests = (
+        [Some 1,   Some 2, Some  3],
+        [Some 1,   Some 1, Some  2],
+        [Some 10, Some 10, Some 20],
+        [Some 1,     None,    None],
+        [None,     Some 1,    None],
+        [None,       None,    None],
+        [Some 0,   Some 1,    None],
+        [Some 1,   Some 0,    None],
+    );
+
+    my $idx = 0;
+    for my $test ( @tests ) {
+        my ( $optA, $optB, $expected ) = @$test;
+        is(
+            Option::bind2($optA, $optB, $add_greater_0),
+            $expected,
+            "bind2 - functional - $idx");
+
+        is(
+            $optA->bind2($optB, $add_greater_0),
+            $expected,
+            "bind2 - method - $idx");
+
+        $idx++;
+    }
+}
+
+# bind3, bind4
+{
+    is(
+        Option::bind3(Some(1), Some(2), Some(3), sub($x,$y,$z) { Some $x+$y+$z }),
+        Some(6),
+        'bind3');
+
+    is(
+        Option::bind4(Some 1, Some 2, Some 3, Some 4, sub($x,$y,$z,$w) { Some $x+$y+$z+$w }),
+        Some(10),
+        'bind4');
+}
+
 done_testing;
