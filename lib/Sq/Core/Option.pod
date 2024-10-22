@@ -304,6 +304,24 @@ them to C<$f> that returns an optional value.
             return None;
         });
 
+=head2 bind_v(@opts, $f)
+
+Unpacks all optionals and when all values are C<Some> value then passes all
+values to function C<$f> that returns an Optional value again.
+
+    my $sum_under_100 = sub {
+        my $sum = 0;
+        for my $x ( @_ ) {
+            $sum += $x;
+        }
+        return $sum <= 100
+             ? Some($sum)
+             : None;
+    };
+
+    # Some(28)
+    Option::bind_v(Some 1, Some 2, Some 3, Some 4, Some 5, Some 6, Some 7, $sum_under_100);
+
 =head2 validate($optional, $predicate)
 
 Runs a predicate function (a function returning a boolish value) on the value.

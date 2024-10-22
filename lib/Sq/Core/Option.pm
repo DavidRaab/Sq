@@ -78,6 +78,23 @@ sub bind4($optA, $optB, $optC, $optD, $f) {
     return $None;
 }
 
+sub bind_v {
+    my @opts = @_;
+    my $f    = pop @opts;
+
+    my @unpack;
+    for my $opt ( @opts ) {
+        if ( $opt->[0] == $Some ) {
+            push @unpack, $opt->[1];
+        }
+        else {
+            return $None;
+        }
+    }
+
+    return $f->(@unpack);
+}
+
 sub map($opt, $f) {
     return $opt->[0] == $Some
          ? Some( $f->($opt->[1]) )

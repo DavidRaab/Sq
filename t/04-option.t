@@ -482,4 +482,32 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end 
         'map_v with two arguments');
 }
 
+# bind_v
+{
+    my $sum_under_100 = sub {
+        my $sum = 0;
+        for my $x ( @_ ) {
+            $sum += $x;
+        }
+        return $sum <= 100
+             ? Some($sum)
+             : None;
+    };
+
+    is(
+        Option::bind_v(Some 1, Some 2, Some 3, Some 4, Some 5, Some 6, Some 7, $sum_under_100),
+        Some(28),
+        'bind_v 1');
+
+    is(
+        Option::map_v(Some 1, Some 2, Some 3, Some 4, Some 5, Some 6, Some 7, $sum_under_100),
+        Some(Some(28)),
+        'map_v compared to bind_v');
+
+    is(
+        Option::bind_v(Some 10, Some 50, Some 50, $sum_under_100),
+        None,
+        'bind_v 2');
+}
+
 done_testing;
