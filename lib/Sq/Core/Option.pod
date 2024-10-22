@@ -11,6 +11,8 @@ __END__
 
 Sq::Core::Option - Option functions
 
+This module is automatically loaded and accessible under C<Option> by loading C<Sq>.
+
 =head1 DESCRIPTION
 
 An Option is an alternative to represent undef/null values. By default every
@@ -21,7 +23,10 @@ crashes when you try to call a method on an C<undef> value.
 
 An option is a way to make it explicitly visible that a function sometimes returns
 no value at all. A user of the option value must explicitly work with an option
-and unpack the value or use some of the methods provided by the option module.
+and unpack the value or use some of the methods provided by the option module
+instead of directly extracting the value. When a value is extracted the user
+typically must write code for both cases that reduces the amount of errorness
+code that is possible to write.
 
 Like the other modules you always can call every method in a functional-style.
 
@@ -44,9 +49,7 @@ except C<undef> turns into a valid value.
     my $a = Some(10);
     my $b = Some([]);
     my $c = Some({ a => 1, b => 2});
-
-    # None
-    my $d = Some(undef);
+    my $d = Some(undef);             # None
 
 =head2 None
 
@@ -58,7 +61,10 @@ This indicates the absence of a value
 =head1 METHODS
 
 Methods work on an optional value. All Methods can also be called in a
-functional-style.
+functional-style. That means you always can do both calling styles.
+
+    $opt->map(sub($x) { ... });
+    Option::map($opt, sub($x) { ... });
 
 =head2 is_some($optional)
 
@@ -81,8 +87,8 @@ want to use an extraction method instead.
 =head2 match($opt, Some => sub($value){ ... }, None => sub(){ ... })
 
 Pattern matches against the optional value. It either runs the function provided
-with the Some argument or the None argument. It's usually used to extract the value
-by providing two functions for each case the optional can be in. If
+with the C<Some> argument or the C<None> argument. It's usually used to extract
+the value by providing two functions for each case the optional can be in. If
 you just want to extract the value or use a default value then use the method
 C<or> instead.
 
@@ -108,7 +114,7 @@ C<or> instead.
 
 =head2 or($optinal, $value)
 
-Returns the value when it is Some value or the C<$default> value passed to it
+Returns the value when it is C<Some> value or the C<$default> value passed to it
 when it is C<None>
 
     my $a = $opt    ->or(10);
@@ -126,11 +132,16 @@ function is expected and executed. This is useful in two cases.
 =item
 
 When the or case should create different mutable values. Also when those values
-only should be created when the value is None.
+only should be lazily created only when the value is C<None>. Consider that when
+using C<or> you always already create a value before the C<or> function is run.
+For just "normal" values like strings or numbers this might be okay. But when the
+C<$default> value might execute some kind of side-effect or has some expensive
+cost attached to it, you highly want to use C<or_with>.
 
 =item
 
-When you want to execute a function for some kind of side-effects.
+When you want to execute a piece of code containing some kind of side-effects
+that only should be executed when the value was C<None>.
 
 =back
 
@@ -142,14 +153,15 @@ When you want to execute a function for some kind of side-effects.
 
 =head2 map($optional, $f)
 
-When you have a function that don't know about optionals, then you use C<map>
+When you have a function that don't know about optionals then you use C<map>
 to let the function run of its value. When the optional is C<None> then
-the function will not be executed. Always returns an optional.
+the function will not be executed, otherwise the function is executed
+with the value that the optional holds. Always returns an optional.
 
 C<map> is good for functions with the signature C<< 'a -> 'b >>
 
     # Here $incr is a function expecting a number and returning a number
-    # no optional is involved.
+    # no optional is involved. It's basically of type: number -> number
     my $incr = sub($x) { $x + 1 }
 
     my $opt = $opt    ->map($incr);
@@ -186,21 +198,23 @@ Same as C<map2> but for three optional values.
 
 Same as C<map3> but for four optional values.
 
-    # adds all three optional together as long all of them are Some value
+    # adds all four optional together as long all of them are Some value
     # otherwise $x will be None.
     my $opt =
-        Option::map3($optA, $optB, $optC, $optD, sub($a, $b, $c, $d) {
+        Option::map4($optA, $optB, $optC, $optD, sub($a, $b, $c, $d) {
             return $a + $b + $c + $d;
         });
 
 =head2 bind($optional, $f)
 
-C<bind> is also sometimes called C<chain> or C<then>. It allows chaining
-together functions that expects a non optional value, but returns an optional
-value. It is good for functions with the signature C<<< 'a -> Option<'b> >>>
+C<bind> is also sometimes called C<chain> or C<then> (depending on language
+or module). It allows chaining together functions that expects a non optional
+value, but returns an optional value. It is good for functions with the
+signature C<<< 'a -> Option<'b> >>>
 
-    # this function parses a string and returns an optional. Either Some value
+    # this function parses a string and returns an optional. Either Some integer
     # when the functions succeeds or None if not.
+    # Type: string -> Option<int>
     my $parse_int = sub($str) {
         if ( $str =~ m/\A \s* (\d+) \s* \z/xms ) {
             return Some($1);
@@ -208,7 +222,7 @@ value. It is good for functions with the signature C<<< 'a -> Option<'b> >>>
         return None;
     };
 
-    # The result will be an optional number or None.
+    # The result will be Option<int>. Some(int) or None.
     my $opt = $opt->bind($parse_int);
 
     my $opt = Some("10")->bind($parse_int); # Some(10)
@@ -220,7 +234,7 @@ value. It is good for functions with the signature C<<< 'a -> Option<'b> >>>
     my $opt = Some("ab")->map($parse_int);  # Some(None)
     my $opt = None      ->map($parse_int);  # None
 
-    # calling ->map($f)->flatten will return the same result as using bind()
+    # calling ->map($f)->flatten() will return the same result as using bind()
 
 =head2 validate($optional, $predicate)
 
@@ -266,8 +280,9 @@ C<$f> returns should be the same, oterwise this function hardly makes any sense.
 
 =head2 iter($optional, $f)
 
-Runs function C<$f> with the value in the optional or don't if it is C<None>.
-Usually this is done for side-effect as the funtion returns nothing.
+Runs function C<$f> when there is C<Some> value otherwise does nothing when
+the value is C<None>. Usually this is done for side-effects as the funtion
+returns nothing.
 
     # prints $opt if it is Some value, otherwise don't.
     $opt->iter(sub($str) {
@@ -280,6 +295,7 @@ Converts the optional into an array. In the case of Some value it turns into
 an array of length 1 containing the value, otherwise it is an empty array.
 Arrays are blessed into the Sq Array.
 
+    my $array = $opt->to_array();
     my $array = Some(1)->to_array; # [1]
     my $array = None   ->to_array; # []
 
