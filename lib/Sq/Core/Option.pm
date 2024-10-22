@@ -61,9 +61,9 @@ sub map($opt, $f) {
          : $None;
 }
 
-sub map2($a, $b, $f) {
-    if ( $a->[0] == $Some && $b->[0] == $Some ) {
-        return Some( $f->($a->[1], $b->[1]) );
+sub map2($optA, $optB, $f) {
+    if ( $optA->[0] == $Some && $optB->[0] == $Some ) {
+        return Some( $f->($optA->[1], $optB->[1]) );
     }
     return $None;
 }
