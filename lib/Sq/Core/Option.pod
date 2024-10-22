@@ -162,7 +162,7 @@ C<map> is good for functions with the signature C<< 'a -> 'b >>
 
     # Here $incr is a function expecting a number and returning a number
     # no optional is involved. It's basically of type: number -> number
-    my $incr = sub($x) { $x + 1 }
+    my $incr = sub($x) { $x + 1 };
 
     my $opt = $opt    ->map($incr);
     my $opt = Some(0) ->map($incr); # Some(1)
