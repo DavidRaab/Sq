@@ -211,6 +211,10 @@ Expects a variable amount of optional values and a function as the last argument
 Executes the function with all unpacked values when all optionals are C<Some> values.
 Otherwise returns C<None>.
 
+Theoretically C<map_v> can replace all other C<mapX> functions, but consider that
+this function is usually slower because of its implementation compared to
+directly calling C<map>, C<map2>, C<map3> or C<map4>.
+
     # Some(28)
     Option::map_v(Some 1, Some 2, Some 3, Some 4, Some 5, Some 6, Some 7, sub {
         my $sum = 0;
