@@ -1,7 +1,5 @@
 package Sq::Io;
 use v5.36;
-use lib "../../lib";
-use Sq::Collections::Seq;
 
 # Opens a file as UTF-8 text
 sub open_text($class, $file) {
