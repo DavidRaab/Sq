@@ -114,6 +114,23 @@ sub map4($a, $b, $c, $d, $f) {
     return $None;
 }
 
+sub map_v {
+    my @opts = @_;
+    my $f    = pop @opts;
+
+    my @unpack;
+    for my $opt ( @opts ) {
+        if ( $opt->[0] == $Some ) {
+            push @unpack, $opt->[1];
+        }
+        else {
+            return None;
+        }
+    }
+
+    return Some($f->(@unpack));
+}
+
 sub validate($opt, $f) {
     if ( $opt->[0] == $Some && $f->($opt->[1]) ) {
         return $opt;

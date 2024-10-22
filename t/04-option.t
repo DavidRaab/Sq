@@ -452,4 +452,34 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end 
         'bind4');
 }
 
+# map_v
+{
+    is(
+        Option::map_v(Some 1, Some 2, Some 3, Some 4, Some 5, Some 6, Some 7, sub {
+            my $sum = 0;
+            for my $x ( @_ ) {
+                $sum += $x;
+            }
+            return $sum;
+        }),
+        Some(28),
+        'map_v');
+
+    is(
+        Some(1)->map_v(Some 2, Some 3, Some 4, Some 5, Some 6, Some 7, sub {
+            my $sum = 0;
+            for my $x ( @_ ) {
+                $sum += $x;
+            }
+            return $sum;
+        }),
+        Some(28),
+        'map_v as method');
+
+    is(
+        Option::map_v(Some 1, Some 2, sub($x,$y) { $x + $y }),
+        Some(3),
+        'map_v with two arguments');
+}
+
 done_testing;

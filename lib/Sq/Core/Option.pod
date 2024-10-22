@@ -205,6 +205,21 @@ Same as C<map3> but for four optional values.
             return $a + $b + $c + $d;
         });
 
+=head2 map_v(@opts, $f)
+
+Expects a variable amount of optional values and a function as the last argument.
+Executes the function with all unpacked values when all optionals are C<Some> values.
+Otherwise returns C<None>.
+
+    # Some(28)
+    Option::map_v(Some 1, Some 2, Some 3, Some 4, Some 5, Some 6, Some 7, sub {
+        my $sum = 0;
+        for my $x ( @_ ) {
+            $sum += $x;
+        }
+        return $sum;
+    });
+
 =head2 bind($optional, $f)
 
 C<bind> is also sometimes called C<chain> or C<then> (depending on language
