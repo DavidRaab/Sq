@@ -16,12 +16,13 @@ my $None = bless([0], 'Option');
 my $Some = 1;
 
 # Constructor functions that are importet by Sq
-sub Some($value) {
+sub Some :prototype($) ($value)  {
     return defined $value
          ? bless([$Some, $value], 'Option')
          : $None;
 }
-sub None() {
+
+sub None :prototype() () {
     return $None;
 }
 
