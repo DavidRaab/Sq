@@ -293,7 +293,7 @@ Unpacks four optional values and when all three are C<Some> values passes
 them to C<$f> that returns an optional value.
 
     my $opt_sum =
-        Option::bind4($optA, $optB, $optC, $optD, sub($a,$b,$c) {
+        Option::bind4($optA, $optB, $optC, $optD, sub($a,$b,$c,$d) {
             if ( $a > 0 && $b > 0 && $c > 0 && $d > 0 ) {
                 return Some($a + $b + $c + $d);
             }
