@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use v5.36;
 use open ':std', ':encoding(UTF-8)';
-use Seq qw(fst snd);
+use Sq;
 
 # This is definetly not the fastest way to get all possible permutations.
 # The point is, that this code still works. computes/prints all permutation

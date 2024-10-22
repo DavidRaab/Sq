@@ -1,17 +1,8 @@
 #!/usr/bin/env perl
 use v5.36;
 use open ':std', ':encoding(UTF-8)';
-use Data::Printer;
-use Getopt::Long::Descriptive;
 use POSIX qw(round);
 use Sq;
-
-my ($opt, $usage) = describe_options(
-    'Usage: %c %o',
-    ['help|h', 'Print this message', {shortcircuit => 1}],
-);
-
-$usage->die if $opt->help;
 
 # "Theoretical" finite sequence of prime numbers
 # "theoretical" because we only have 64 bit float

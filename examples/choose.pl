@@ -1,16 +1,7 @@
 #!/usr/bin/env perl
 use v5.36;
 use open ':std', ':encoding(UTF-8)';
-use Data::Printer;
-use Getopt::Long::Descriptive;
 use Sq;
-
-my ($opt, $usage) = describe_options(
-    'Usage: %c %o',
-    ['help|h', 'Print this message', {shortcircuit => 1}],
-);
-
-$usage->die if $opt->help;
 
 my $square  = sub($x) { $x * $x     };
 my $is_even = sub($x) { $x % 2 == 0 };
@@ -36,7 +27,7 @@ $query->iter(sub($x) {
 
 # What's the difference?
 #
-# The do() immediately executes for every computed element.
+# The iter() immediately executes for every computed element.
 # But the for-loop first needs to compute all items until it can begin
 # printing to the console.
 
@@ -46,6 +37,7 @@ $query->iter(sub($x) {
 local $| = 1;
 
 # This can crash your computer
+
 =pod
 
 print "Showing 100 Mio dots ...\n";
