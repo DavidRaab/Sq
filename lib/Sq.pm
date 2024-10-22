@@ -88,3 +88,30 @@ Besides just data-structures the idea of Sq is to have a certain high-level
 API for basic programming tasks. An easier API for doing all kinds of
 File System operations or reading and writing from files like CSV or JSON that
 uses the data-structures of this module.
+
+=head1 IMPORTED FUNCTIONS
+
+id, fst, snd, key, assign, is_str, is_num, Some, None
+
+=head1 AUTOMATICALLY LOADED MODULES
+
+=over 4
+
+=item L<Sq::Core::Option>
+
+=item L<Sq::Io>
+
+=item L<Sq::Collections::Hash>
+
+=item L<Sq::Collections::Array>
+
+=item L<Sq::Collections::Queue>
+
+=item L<Sq::Collections::List>
+
+=item L<Sq::Collections::Seq>
+
+=item L<Sq::Collections::Heap>
+
+=back
+

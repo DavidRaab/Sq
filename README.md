@@ -95,6 +95,7 @@ I wouldn't recommend this module at the moment to build something critical
 unless you are fine that you maybe need sometimes small-fixes to make code
 working again.
 
+* [Sq::Core::Option](lib/Sq/Core/Option.pod)
 * [Sq::Collections::Seq](lib/Sq/Collections/Seq.pod)
 * [Sq::Collections::Hash](lib/Sq/Collections/Hash.pm)
 * [Sq::Collections::Array](lib/Sq/Collections/Array.pod)
@@ -161,7 +162,7 @@ my $maximum_id =
 
 # EXPORT
 
-It exports the following functions by default: id, fst, snd, key, assign, is_str, is_num
+It exports the following functions by default: id, fst, snd, key, assign, is_str, is_num, Some, None.
 
 # SUPPORT
 
