@@ -3,20 +3,28 @@ use v5.36;
 use open ':std', ':encoding(UTF-8)';
 use Sq;
 use Benchmark qw(cmpthese);
+use Test2::V0;
 
 ### map, map2 and map_v
 
 my $None = bless([0], 'Option');
 
-sub map($opt, $f) {
+sub map1($opt, $f) {
     return $opt->[0] == 1
-         ? Some( $f->($opt->[1]) )
+         ? Some $f->($opt->[1])
          : $None;
 }
 
 sub map2($optA, $optB, $f) {
     if ( $optA->[0] == 1 && $optB->[0] == 1 ) {
-        return Some( $f->($optA->[1], $optB->[1]) );
+        return Some $f->($optA->[1], $optB->[1]);
+    }
+    return $None;
+}
+
+sub map3($optA, $optB, $optC, $f) {
+    if ( $optA->[0] == 1 && $optB->[0] == 1 && $optC->[0] == 1 ) {
+        return Some $f->($optA->[1], $optB->[1], $optC->[1]);
     }
     return $None;
 }
@@ -38,6 +46,30 @@ sub map_v {
     return Some($f->(@unpack));
 }
 
+# same as map_v2 but uses array indexes instead of pop
+sub map_v2 {
+    my $f = $_[-1];
+
+    my $max = @_ - 2;
+    my @unpack;
+    for (my $idx=0; $idx <= $max; $idx++) {
+        if ( $_[$idx][0] == 1 ) {
+            push @unpack, $_[$idx][1];
+        }
+        else {
+            return $None;
+        }
+    }
+
+    return Some($f->(@unpack));
+}
+
+## Some tests
+is(map_v (Some 1, Some 2, sub($x,$y) { $x + $y }), Some(3), 'map_v');
+is(map_v2(Some 1, Some 2, sub($x,$y) { $x + $y }), Some(3), 'map_v2');
+is(map_v2(Some 1, Some 2, Some 3, sub($x,$y,$z) { $x + $y + $z }), Some(6), 'map_v2');
+done_testing;
+
 ### Benchmarks
 
 printf("map vs map_v\n");
@@ -46,13 +78,13 @@ cmpthese(-1, {
     'map' => sub {
         my $add1 = sub($x) { $x + 1 };
         for my $opt ( @$test ) {
-            $opt->map($add1);
+            map1($opt, $add1);
         }
     },
     'map_v' => sub {
         my $add1 = sub($x) { $x + 1 };
         for my $opt ( @$test ) {
-            $opt->map_v($add1);
+            map_v($opt, $add1);
         }
     }
 });
@@ -66,7 +98,7 @@ cmpthese(-1, {
         for my $idx ( 0 .. ($test->length-1) ) {
             my $optA = $test ->[$idx];
             my $optB = $test2->[$idx];
-            $optA->map2($optB, $add);
+            map2($optA, $optB, $add);
         }
     },
     'map_v' => sub {
@@ -75,7 +107,7 @@ cmpthese(-1, {
         for my $idx ( 0 .. ($test->length-1) ) {
             my $optA = $test ->[$idx];
             my $optB = $test2->[$idx];
-            $optA->map_v($optB, $add);
+            map_v($optA, $optB, $add);
         }
     }
 });
@@ -90,7 +122,7 @@ cmpthese(-1, {
             my $optA = $test ->[$idx];
             my $optB = $test2->[$idx];
             my $optC = $test3->[$idx];
-            $optA->map3($optB, $optC, $add);
+            map3($optA, $optB, $optC, $add);
         }
     },
     'map_v' => sub {
@@ -100,7 +132,23 @@ cmpthese(-1, {
             my $optA = $test ->[$idx];
             my $optB = $test2->[$idx];
             my $optC = $test3->[$idx];
-            $optA->map_v($optB, $optC, $add);
+            map_v($optA, $optB, $optC, $add);
+        }
+    }
+});
+
+printf("\nmap_v vs map_v2\n");
+cmpthese(-1, {
+    map_v => sub {
+        my $add1 = sub($x) { $x + 1 };
+        for my $opt ( @$test ) {
+            map_v($opt, $add1);
+        }
+    },
+    map_v2 => sub {
+        my $add1 = sub($x) { $x + 1 };
+        for my $opt ( @$test ) {
+            map_v2($opt, $add1);
         }
     }
 });
