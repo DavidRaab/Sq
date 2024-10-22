@@ -165,7 +165,14 @@ sub to_array($opt) {
          : bless([],          'Array');
 }
 
-# Functions
+sub get($opt) {
+    if ( $opt->[0] == $Some ) {
+        return $opt->[1];
+    }
+    die "Cannot extract value of None\n";
+}
+
+### Module Functions
 
 sub all_valid($, $array_of_opt) {
     my $new = Array->new;
@@ -213,13 +220,6 @@ sub filter_valid_by($, $array, $f) {
         }
     }
     return $new;
-}
-
-sub get($opt) {
-    if ( $opt->[0] == $Some ) {
-        return $opt->[1];
-    }
-    die "Cannot extract value of None\n";
 }
 
 1;
