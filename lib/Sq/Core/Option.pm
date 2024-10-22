@@ -124,7 +124,7 @@ sub map_v {
             push @unpack, $opt->[1];
         }
         else {
-            return None;
+            return $None;
         }
     }
 
@@ -188,7 +188,7 @@ sub all_valid_by($, $array, $f) {
             push @$new, $opt->[1];
         }
         else {
-            return None;
+            return $None;
         }
     }
     return Some($new);
