@@ -124,6 +124,56 @@ sub to_array($opt) {
          : bless([],          'Array');
 }
 
+# Functions
+
+sub all_valid($, $array_of_opt) {
+    my $new = Array->new;
+    for my $opt ( @$array_of_opt ) {
+        if ( $opt->[0] == $Some ) {
+            push @$new, $opt->[1];
+        }
+        else {
+            return None;
+        }
+    }
+    return Some($new);
+}
+
+sub all_valid_by($, $array, $f) {
+    my $new = Array->new;
+    for my $x ( @$array ) {
+        my $opt = $f->($x);
+        if ( $opt->[0] == $Some ) {
+            push @$new, $opt->[1];
+        }
+        else {
+            return None;
+        }
+    }
+    return Some($new);
+}
+
+sub filter_valid($, $array_of_opt) {
+    my $new = Array->new;
+    for my $opt ( @$array_of_opt ) {
+        if ( $opt->[0] == $Some ) {
+            push @$new, $opt->[1];
+        }
+    }
+    return $new;
+}
+
+sub filter_valid_by($, $array, $f) {
+    my $new = Array->new;
+    for my $x ( @$array ) {
+        my $opt = $f->($x);
+        if ( $opt->[0] == $Some ) {
+            push @$new, $opt->[1];
+        }
+    }
+    return $new;
+}
+
 sub get($opt) {
     if ( $opt->[0] == $Some ) {
         return $opt->[1];

@@ -222,4 +222,155 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end 
         'get of None');
 }
 
+# all_valid & filter_valid
+{
+    my $valids = Array->new(
+        Some(10),
+        Some(3),
+        Some(42),
+        Some("Hello"),
+        Some("World"),
+    );
+
+    is(
+        Option->all_valid($valids),
+        Some([10,3,42,"Hello", "World"]),
+        'all_valid all Some');
+
+    is(
+        Option->filter_valid($valids),
+        [10,3,42,"Hello", "World"],
+        'filter_valid all Some');
+
+    is(
+        Option->all_valid(
+            $valids->map(sub($opt) {
+                $opt->map(sub($x) {
+                    if ( is_num($x) ) { $x * 2  } # double numbers
+                    else              { $x . $x } # double strings
+                })
+            })
+        ),
+        Some([20, 6, 84, "HelloHello", "WorldWorld"]),
+        'all_valid with map'
+    );
+
+    ### tests with invalid
+
+    my $invalid = Array->new(
+        Some(10),
+        None,
+        Some(3),
+        None,
+        Some(42),
+    );
+
+    is(
+        Option->all_valid($invalid),
+        None,
+        'all_valid with None');
+
+    is(
+        Option->filter_valid($invalid),
+        [10,3,42],
+        'filter_valid with None');
+
+    is(
+        Option->filter_valid(
+            $invalid->map(sub($opt) {
+                $opt->map(sub($x) { $x * 2 })
+            })
+        ),
+        [20,6,84],
+        'filter_valid containing array::map');
+}
+
+# all_valid_by
+{
+    my $is_num   = sub($x) { is_num($x) ? Some($x) : None };
+    my $str_nums = Array->new("23", "100", "16");
+
+    # sometimes we want to map a list with an optional function that turns
+    # a value into an optional value. this results into a list of optionals,
+    # then with `all_valid` we can check if all transformations returned
+    # Some value.
+    is(
+        Option->all_valid($str_nums->map($is_num)),
+        Some([23, 100, 16]),
+        'all_valid on array->map');
+
+    # with all_valid_by we can do the same in one operation
+    is(
+        Option->all_valid_by($str_nums, $is_num),
+        Some([23, 100, 16]),
+        'all_valid_by');
+
+    is(
+        Option->all_valid_by([qw/1 2 3/], $is_num),
+        Some([1,2,3]),
+        'all_valid_by with array 1');
+
+    is(
+        Option->all_valid_by([qw/1 2 3 foo/], $is_num),
+        None,
+        'all_valid_by with array 2');
+}
+
+# filter_valid_by
+{
+    my $is_num   = sub($x) { is_num($x) ? Some($x) : None };
+    my $str_nums = Array->new("23", "foo", "100g", "16");
+
+    # sometimes we want to map a list with an optional function that turns
+    # a value into an optional value. this results into a list of optionals,
+    # then with `filter_valid` we can only get the Some values and drop
+    # the None.
+    is(
+        Option->filter_valid($str_nums->map($is_num)),
+        [23, 16],
+        'filter_valid on array->map');
+
+    # with filter_valid_by we can do the same in one operation
+    is(
+        Option->filter_valid_by($str_nums, $is_num),
+        [23, 16],
+        'filter_valid_by');
+}
+
+{
+    is(Option->filter_valid([Some(1), Some(2), Some(3)]),       [1,2,3], 'filter_valid 1');
+    is(Option->filter_valid([Some(1), Some(2),    None]),         [1,2], 'filter_valid 2');
+    is(Option->filter_valid([None]),                                 [], 'filter_valid 3');
+    is(Option->filter_valid([]),                                     [], 'filter_valid 4');
+    is(Option->all_valid   ([Some(1), Some(2), Some(3)]), Some([1,2,3]), 'all_valid 1');
+    is(Option->all_valid   ([Some(1), Some(2),    None]),          None, 'all_valid 2');
+    is(Option->all_valid   ([None]),                               None, 'all_valid 3');
+    is(Option->all_valid   ([]),                               Some([]), 'all_valid 4');
+}
+
+{
+    # an option generating function
+    my $some_num = sub($str) { is_num($str) ? Some($str) : None };
+
+    is(
+        Option->filter_valid([map { $some_num->($_) } 1,2,3]),
+        [1,2,3],
+        'filter_valid_by 1');
+
+    is(
+        Option->filter_valid(Array->range(1,3)->map($some_num)),
+        [1,2,3],
+        'filter_valid_by 2');
+
+    is(
+        Option->filter_valid(Array->new(qw/1 foo 2/)->map($some_num)),
+        [1,2],
+        'filter_valid_by 3');
+
+    is(
+        Option->filter_valid_by([qw/1 foo 2/], $some_num),
+        [1,2],
+        'filter_valid_by 4');
+}
+
 done_testing;

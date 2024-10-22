@@ -309,3 +309,88 @@ to extract the value.
 
     my $x = Some(10)->get; # 10
     my $x = None    ->get; # throws exception
+
+=head1 MODULE FUNCTIONS
+
+=head2 Option->all_valid($array_of_opt)
+
+Sometimes we have an array of optionals. Like C<[Some(1), Some(2), Some(3)]>.
+But instead of an array of optionals we basically want to turn it inside-out.
+We want an optional array C<Some([1,2,3])> instead. The idea is that we only
+get C<Some> array when all values are C<Some>. As soon one value in the whole
+array is C<None> we immediately just get C<None>. So we can validate all
+values in a array at once.
+
+Usually we get an array of optionals when we call an option generating function
+on every element of an array. For example by using C<Array::map>.
+
+    # is_num() is a function automatically imported by Sq. It is just a shortcut
+    # for using Scalar::Util::looks_like_number()
+
+    # an option generating function
+    my $some_num = sub($str) { is_num($str) ? Some($str) : None };
+
+    # Some([12, 100, 13])
+    my $opt_nums =
+        Option->all_valid(
+            Array->new("12", "100", "13")->map($some_num)
+        );
+
+    # None
+    my $opt_nums =
+        Option->all_valid(
+            Array->new("12", "100g", "13")->map($some_num)
+        );
+
+=head2 Option->all_valid_by($array, $f)
+
+When you already have an array of optionals you use C<< Option->all_valid >>. But when
+you want to run an optional generating function on every element of an array
+and then call C<< Option->all_valid >> then you better use C<< Option->all_valid_by >>
+that does both steps in one operation.
+
+    # an option generating function
+    my $some_num = sub($str) { is_num($str) ? Some($str) : None };
+
+    # Some([12, 100, 13])
+    my $opt_nums =
+        Option->all_valid_by(Array->new("12", "100", "13"), $some_num);
+
+    # Some([12, 100, 13])
+    my $opt_nums =
+        Option->all_valid_by(["12", "100", "13"], $some_num);
+
+    # Some([12, 100, 13])
+    my $opt_nums =
+        Option->all_valid(
+            Array->new("12", "100", "13")->map($some_num)
+        );
+
+=head2 Option->filter_valid($array)
+
+Similar to C<< Option->all_valid >> but instead of becoming C<None> as soon one
+value is C<None> in an array it just filters C<None> values out. Additional
+an Sq array instead of an option is returned.
+
+    my $nums = Option->filter_valid([Some(1), Some(2), Some(3)]); # [1,2,3]
+    my $nums = Option->filter_valid([Some(1), Some(2),    None]); # [1,2]
+    my $nums = Option->filter_valid([None]);                      # []
+    my $nums = Option->filter_valid([]);                          # []
+
+    my $opt_nums = Option->all_valid([Some(1), Some(2), Some(3)]); # Some([1,2,3])
+    my $opt_nums = Option->all_valid([Some(1), Some(2),    None]); # None
+    my $opt_nums = Option->all_valid([None])                       # None
+    my $opt_nums = Option->all_valid([])                           # Some([])
+
+=head2 Option->filter_valid_by($array, $f)
+
+Like C<< Option->filter_valid >> but additionaly runs function C<$f> on every
+element of C<$array> to create an option value first.
+
+    # an option generating function
+    my $some_num = sub($str) { is_num($str) ? Some($str) : None };
+
+    my $nums = Option->filter_valid   ([ map { $some_num->($_) } 1,2,3 ]);       # [1,2,3]
+    my $nums = Option->filter_valid   (Array->range(1,3)      ->map($some_num)); # [1,2,3]
+    my $nums = Option->filter_valid   (Array->new(qw/1 foo 2/)->map($some_num)); # [1,2]
+    my $nums = Option->filter_valid_by([qw/1 foo 2/], $some_num);                # [1,2]
