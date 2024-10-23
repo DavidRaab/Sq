@@ -167,6 +167,13 @@ sub validate($opt, $predicate) {
     return $None;
 }
 
+sub check($opt, $predicate) {
+    if ( $opt->[0] == $Some ) {
+        return $predicate->($opt->[1]) ? 1 : 0;
+    }
+    return 0;
+}
+
 sub flatten($opt) {
     my $result = $opt;
     while ( $result->[0] == $Some && ref $result->[1] eq 'Option' ) {

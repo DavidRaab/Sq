@@ -195,6 +195,20 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end 
     }
 }
 
+# check
+{
+    is(Some(0)      ->check(\&is_num), 1, 'check some(0)');
+    is(Some(1)      ->check(\&is_num), 1, 'check some(1)');
+    is(Some("0E0")  ->check(\&is_num), 1, 'check 0E0');
+    is(Some(" 100") ->check(\&is_num), 1, 'check " 100"');
+    is(Some("0.00") ->check(\&is_num), 1, 'check decimal');
+    is(Some("+0.00")->check(\&is_num), 1, 'check decimal with +');
+    is(Some("f100") ->check(\&is_num), 0, 'check " 100"');
+    is(Some(undef)  ->check(\&is_num), 0, 'check some(undef)');
+    is(Some("")     ->check(\&is_num), 0, 'check some("")');
+    is(None         ->check(\&is_num), 0, 'check None');
+}
+
 # flatten
 {
     is(Some(Some(Some(10)))->flatten, Some(10), 'flatten 10');

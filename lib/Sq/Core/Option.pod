@@ -354,6 +354,23 @@ value then C<$optional> will not change. Otherwise returns C<None> instead.
     my $opt = Some(2)  ->validate($is_normalized) # None
     my $opt = None     ->validate($is_normalized) # None
 
+=head2 check($optional, $predicate)
+
+Similar to C<validate>. But instead of returning an optional that contains
+the information if value was valid or not it directly returns the boolean
+value. A C<None> value always return a falsish value.
+
+    my $bool = Some(0)      ->check(\&is_num) # 1
+    my $bool = Some(1)      ->check(\&is_num) # 1
+    my $bool = Some("0E0")  ->check(\&is_num) # 1
+    my $bool = Some(" 100") ->check(\&is_num) # 1
+    my $bool = Some("0.00") ->check(\&is_num) # 1
+    my $bool = Some("+0.00")->check(\&is_num) # 1
+    my $bool = Some("f100") ->check(\&is_num) # 0
+    my $bool = Some(undef)  ->check(\&is_num) # 0
+    my $bool = Some("")     ->check(\&is_num) # 0
+    my $bool = None         ->check(\&is_num) # 0
+
 =head2 flatten($optional)
 
 Whenever you have multiple nested optionals you just call C<flatten> and it
