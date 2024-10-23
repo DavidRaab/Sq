@@ -112,7 +112,7 @@ C<or> instead.
             None => sub     { 0      },
         );
 
-=head2 or($optinal, $value)
+=head2 or($optional, $value)
 
 Returns the value when it is C<Some> value or the C<$default> value passed to it
 when it is C<None>.
@@ -336,8 +336,8 @@ values to function C<$f> that returns an Optional value again.
              : None;
     };
 
-    # Some(28)
-    Option::bind_v(Some 1, Some 2, Some 3, Some 4, Some 5, Some 6, Some 7, $sum_under_100);
+    Option::bind_v(Some 1, Some 2, Some 3, Some 4, Some 5, Some 6, $sum_under_100); # Some(21)
+    Option::bind_v(Some 30, Some 50, Some 40,                      $sum_under_100); # None
 
 =head2 validate($optional, $predicate)
 
@@ -404,10 +404,8 @@ Runs function C<$f> when there is C<Some> value otherwise does nothing when
 the value is C<None>. Usually this is done for side-effects as the funtion
 returns nothing.
 
-    # prints $opt if it is Some value, otherwise don't.
-    $opt->iter(sub($str) {
-        printf "%s\n", $str
-    });
+    Some("Hello")->iter(sub($str) { say $str }); # prints: "hello"
+    None         ->iter(sub($str) { say $str }); # prints nothing
 
 =head2 to_array($optional)
 
