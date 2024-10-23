@@ -160,8 +160,8 @@ sub map_v {
     return Some($f->(@unpack));
 }
 
-sub validate($opt, $f) {
-    if ( $opt->[0] == $Some && $f->($opt->[1]) ) {
+sub validate($opt, $predicate) {
+    if ( $opt->[0] == $Some && $predicate->($opt->[1]) ) {
         return $opt;
     }
     return $None;
