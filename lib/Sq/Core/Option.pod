@@ -115,12 +115,21 @@ C<or> instead.
 =head2 or($optinal, $value)
 
 Returns the value when it is C<Some> value or the C<$default> value passed to it
-when it is C<None>
+when it is C<None>.
 
     my $a = $opt    ->or(10);
     my $b = Some(10)->or(0);      # 10
     my $c = None    ->or(0);      #  0
     my $d = Option::or($opt, 10);
+
+=head2 or_else($optional, $defaultOptional)
+
+Similar to C<or> but returns C<$optional> as-is as long it is C<Some> value.
+Otherwise returns C<$defaultOptional> that is expected to be an optional.
+
+    my $opt = $opt   ->or_else(Some("foo"));
+    my $opt = Some(1)->or_else(Some 2);      # Some 1
+    my $opt = None   ->or_else(Some 3);      # Some 3
 
 =head2 or_with($optional, $f)
 
@@ -150,6 +159,14 @@ that only should be executed when the value was C<None>.
 
     # returns current time in the case of None
     my $x = $opt->or_with(sub { scalar localtime });
+
+=head2 or_else_with($optional, $fopt)
+
+When C<$optional> is C<Some> value returns C<$optional> as-is. Otherwise executes
+and returns the result of C<< $fopt->() >> that should generate an optional value.
+
+    my $opt = Some([1])->or_else_with(sub { Some [] }) # Some [1]
+    my $opt = None     ->or_else_with(sub { Some [] }) # Some []
 
 =head2 map($optional, $f)
 

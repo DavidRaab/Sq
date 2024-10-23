@@ -80,6 +80,21 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end 
     }
 }
 
+# or_else
+{
+    is(Some("Hello")->or_else(Some 10), Some("Hello"), 'or_else 1');
+    is(None         ->or_else(Some 10),      Some(10), 'or_else 2');
+    is(Some(undef)  ->or_else(Some 10),      Some(10), 'or_else 2');
+
+    my $calls = 0;
+    my $next  = sub { Some(++$calls) };
+
+    is(Some("World")->or_else_with($next), Some("World"), 'or_else_with 1');
+    is(None         ->or_else_with($next),       Some(1), 'or_else_with 2');
+    is(Some(10)     ->or_else_with($next),      Some(10), 'or_else_with 3');
+    is(Some(undef)  ->or_else_with($next),       Some(2), 'or_else_with 4');
+}
+
 # bind
 {
     my $parse_int = sub($str) {
