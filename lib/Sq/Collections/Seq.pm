@@ -123,7 +123,6 @@ sub range($class, $start, $stop) {
     return range_step('Seq', $start, 1, $stop);
 }
 
-# turns all arguments into an sequence
 # Seq->wrap : List<'a> -> Seq<'a>
 sub new($class, @xs) {
     return bless(sub {
@@ -143,7 +142,6 @@ sub wrap($class, @xs) {
     return new('Seq', @xs);
 }
 
-# turns an arrayref into a seq
 # Seq->from_array : Array<'a> -> Seq<'a>
 sub from_array($class, $xs) {
     from_sub('Seq', sub {
@@ -154,10 +152,6 @@ sub from_array($class, $xs) {
     });
 }
 
-# Pass it a hashref. The function $f is executed for every
-# (key, value) pair. The result is used as a single item in
-# the sequence.
-#
 # Seq->from_hash : Hash<'Key, 'Value> -> ('Key -> 'Value -> 'a) -> Seq<'a>
 sub from_hash($class, $hashref, $f) {
     from_sub('Seq', sub {
@@ -173,7 +167,6 @@ sub from_hash($class, $hashref, $f) {
     });
 }
 
-# Concatenates a list of Seq into a single Seq
 # Seq->concat : List<Seq<'a>> -> Seq<'a>
 sub concat($class, @seqs) {
     my $count = @seqs;
@@ -463,8 +456,6 @@ sub take($seq, $amount) {
     });
 }
 
-# Generates a new sequence as long predicate returns a truish value.
-#
 # take_while : Seq<'a> -> ('a -> bool) -> Seq<'a>
 sub take_while($seq, $predicate) {
     from_sub('Seq', sub {
@@ -491,9 +482,6 @@ sub skip($seq, $amount) {
     });
 }
 
-# Generates a new sequence by skipping all values at the begging as long $predicate
-# returns a truish value. After that, returns all values as-is.
-#
 # skip_while : Seq<'a> -> ('a -> bool) -> Seq<'a>
 sub skip_while($seq, $predicate) {
     from_sub('Seq', sub {
