@@ -343,6 +343,26 @@ Flattens an array of an array into a single array.
              ->map(sub($word) { [split //, $word] })
              ->flatten;
 
+=head2 cartesian($arrayA, $arrayB) -> $array
+
+returns a new array containing the cartesian product of both arrays. The
+cartesian product is every item in C<$arrayA> combined with every item in
+C<$arrayB>.
+
+    # manually creating cartesian product of two arrays
+    my @cartesian;
+    for my $a ( @as ) {
+        for my $b ( @bs ) {
+            push @cartesian, [$a, $b];
+        }
+    }
+
+    # cartesian product of two arrays
+    $as->cartesian($bs)->iter(sub($pair) {
+        my ($a, $b) = @$pair;
+        printf "A=%s B=%s\n", $a, $b;
+    });
+
 =head2 map($array, $f) : Array<'a> -> ('a -> 'b) -> Array<'b>
 
 Iterates through an array and passes each element to the function C<$f>. It

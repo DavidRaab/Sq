@@ -959,4 +959,18 @@ is(
         'filter_e');
 }
 
+# cartesian
+{
+    my $nums   = Array->new(7,8,9,10);
+    my $symbol = Array->new("Hearth", "Spades");
+
+    is(
+        $nums->cartesian($symbol),
+        [
+            [7,"Hearth"], [7,"Spades"],  [8,"Hearth"],  [8,"Spades"],
+            [9,"Hearth"], [9,"Spades"], [10,"Hearth"], [10,"Spades"],
+        ],
+        'cartesian');
+}
+
 done_testing;

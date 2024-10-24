@@ -131,6 +131,16 @@ sub flatten($array) {
     return bind($array, \&Sq::id);
 }
 
+sub cartesian($as, $bs) {
+    my $new = new('Array');
+    for my $a ( @$as ) {
+        for my $b ( @$bs ) {
+            push @$new, [$a, $b];
+        }
+    }
+    return $new;
+}
+
 # append : Array<'a> -> Array<'a> -> Array<'a>
 sub append($array1, $array2) {
     return CORE::bless([@$array1, @$array2], 'Array');
