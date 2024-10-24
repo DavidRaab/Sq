@@ -339,6 +339,79 @@ List::copy.
 
     my $same = $seq->copy;
 
+=head2 append($seqA, $seqB) -> $seq
+
+returns a new sequence where both sequences are appended into a single one.
+When you want to append multiple sequences it is usually better to use C<< Seq->concat >>
+instead.
+
+    my $new    = $seq->append($other_seq);
+    my $upto10 = Seq->range(1,5)->append( Seq->range(6,10) ); # seq { 1 .. 10 }
+
+=head2 map($seq, $f) -> $seq
+
+returns a new sequence where every value is mapped with the function C<$f>.
+
+    my $seq = Seq->range(1,10);
+
+    my $double  = $seq->map(sub($x) { $x * 2  }); # seq { 2,4,6,8,10,12,14,16,18,20 }
+    my $squared = $seq->map(sub($x) { $x * $x }); # seq { 1,4,9,16,25,36,49,64,81,100 }
+
+=head2 bind($seq, $f) -> $seq
+
+Similar to C<map> as every value of the sequence is passed to function C<$f>. But
+C<$f> is supposed to return a new sequence again. Instead of returning a sequence
+of sequence it just returns them as a flattened sequence.
+
+    # seq { 0,1, 0,1,2, 0,1,2,3, 0,1,2,3,4, 0,1,2,3,4,5 }
+    my $nums =
+        Seq
+        ->range(1,5)
+        ->bind(sub($x) { Seq->range(0,$x) });
+
+=head2 flatten($seq_of_seq) -> $seq
+
+returns a new sequence that flattens a sequence of sequences into a single sequence.
+You typically can get a sequence of sequence when you use C<map> with a function that
+returns a sequence. Instead of calling C<flatten> on that result use C<bind> instead of C<map>.
+
+    # seq { seq {1,2,3}, seq{4,5,6}, seq{7,8,9} }
+    my $nums = Seq->new(
+        Seq->range(1,3),
+        Seq->range(4,6),
+        Seq->range(7,9),
+    );
+
+    # seq { 1,2,3,4,5,6,7,8,9 }
+    my $flatten = $nums->flatten;
+
+=head2 flatten_array($seq_of_array) -> $seq
+
+returns a new sequence that flattens a sequence of arrays into a single sequence.
+
+    # seq { 1 .. 9 }
+    my $nums = Seq->new([1,2,3], [4,5,6], [7,8,9])->flatten;
+
+=head2 cartesian($seqA, $seqB) -> $seq
+
+returns a new sequence containing the cartesian product of both sequences. The
+cartesian product is every item in C<$seqA> combined with every item in C<$seqB>.
+
+    # cartesian product of two arrays
+    my @cartesian;
+    for my $a ( @as ) {
+        for my $b ( @bs ) {
+            push @cartesian, [$a, $b];
+        }
+    }
+
+    # cartesian product of two sequences
+    $a->cartesian($b)->iter(sub($pair) {
+        my ($a, $b) = @$pair;
+        printf "A=%s B=%s\n", $a, $b;
+    });
+
+
 =head1 CONVERTERS
 
 Implemented, but not documented yet:
