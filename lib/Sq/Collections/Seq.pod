@@ -491,6 +491,46 @@ returns a truish value. After that, returns all values as-is.
         ->new(20,10,3,70,105,40,200)
         ->skip_while(sub($x) { $x < 50 ? 1 : 0 });
 
+=head2 indexed($seq) -> $seq
+
+returns a new sequence that puts the index and on element together. If you
+just need to process an item with the index you should use C<mapi> or C<iteri>
+instead.
+
+    # seq { [0,10], [1,11], [2,12], [3,13], [4,14], [5,15] }
+    my $seq = Seq->range(10,15)->indexed;
+
+=head2 distinct($seq) -> $seq
+
+returns a new sequence where every element will only appear once. Internally
+a hash is used for seen elements. That means it only works properly when
+elements can be converted to a string. Otherwise use C<distinct_by>.
+
+    # seq { 1,2,3,4,5,6,7,10,8 }
+    my $seq =
+        Seq
+        ->new(1,2,3,3,4,2,1,5,6,5,4,7,10,8)
+        ->distinct;
+
+=head2 distinct_by($seq, $f) -> $seq
+
+Same as C<distinct> but uses function C<$f> to generate the key for an item
+to be used as the seen key.
+
+    my $data = Seq->new(
+        {id => 1, name => "Foo"},
+        {id => 2, name => "Bar"},
+        {id => 3, name => "Baz"},
+        {id => 1, name => "Foo"},
+    );
+
+    my $seq = $data->distinct_by(sub($x) { $x->{id} });
+    # seq {
+    #     {id => 1, name => "Foo"},
+    #     {id => 2, name => "Bar"},
+    #     {id => 3, name => "Baz"},
+    # }
+
 =head1 CONVERTERS
 
 Implemented, but not documented yet:

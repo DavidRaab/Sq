@@ -265,8 +265,9 @@ is(
     },
     'to_hash_of_array');
 
-is(Seq->wrap(1,1,2,3,1,4,5,4,3,2,6)->distinct->to_array, [1..6],              'distinct 1');
-is(Seq->wrap(1,2,3,2,23,123,4,12,2)->distinct->to_array, [1,2,3,23,123,4,12], 'distinct 2');
+is(Seq->wrap(1,1,2,3,1,4,5,4,3,2,6)       ->distinct->to_array, [1..6],               'distinct 1');
+is(Seq->wrap(1,2,3,2,23,123,4,12,2)       ->distinct->to_array, [1,2,3,23,123,4,12],  'distinct 2');
+is(Seq->wrap(1,2,3,3,4,2,1,5,6,5,4,7,10,8)->distinct->to_array, [1,2,3,4,5,6,7,10,8], 'distinct 3');
 
 # distinct_by tests
 {
