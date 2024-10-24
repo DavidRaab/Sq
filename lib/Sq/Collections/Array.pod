@@ -60,7 +60,7 @@ new Arrays. All Constructor function must be called with an arrow C<->>
 as you expect it from typical OO code. Like C<< Array->new(...) >> or
 C<< Array->init(...) >>.
 
-=head2 Array->new($x,$y,$z,...)
+=head2 Array->new($x,$y,$z,...) -> $array
 
 Creates an Array with the specified values to C<new>. There is a special
 behaviour that aborts on an C<undef>. This is to be align with the L<Sq::Collections::Seq>
@@ -70,18 +70,18 @@ don't want to have C<undef> as values in an array.
     my $numbers = Array->new(1,2,3,4,5);        # [1..5]
     my $numbers = Array->new(1,2,3,undef,4,5,6) # [1,2,3]
 
-=head2 Array->wrap($x,$y,$z,...)
+=head2 Array->wrap($x,$y,$z,...) -> $array
 
 Same as C<new>. Used this naming because of the I<Monad Abstraction>. Maybe
 get deleted.
 
-=head2 Array->empty
+=head2 Array->empty -> $array
 
 Returns an empty fresh Array.
 
     my $empty = Array->empty;
 
-=head2 Array->bless($aref)
+=head2 Array->bless($aref) -> $array
 
 Adds the I<Array> blessing to the array reference and returns it. Can be used
 in two ways.
@@ -91,17 +91,17 @@ in two ways.
 
     my $someArray = Array->bless([1,2,3]);
 
-=head2 Array->from_array($aref)
+=head2 Array->from_array($aref) -> $array
 
 Same as C<< Array->bless >>
 
-=head2 Array->replicate($count, $value)
+=head2 Array->replicate($count, $value) -> $array
 
 Creates a new I<Array> that contains C<$value> C<$count> times.
 
     my $xs = Array->replicate(5,"x"); # [qw/x x x x x/]
 
-=head2 Array->range($start, $stop)
+=head2 Array->range($start, $stop) -> $array
 
 Generates a new array from C<$start> to C<$stop> inclusive. It also supports
 counting downwards.
@@ -109,7 +109,7 @@ counting downwards.
     my $array = Array->range(1,10); # [1..10]
     my $array = Array->range(10,1); # [10,9,8,7,6,5,4,3,2,1]
 
-=head2 Array->range_step($start, $step, $stop)
+=head2 Array->range_step($start, $step, $stop) -> $array
 
 Like C<< Array->range >> but let's you specify a step. Both values
 are inclusive and also supports steps with floating-point. Consider
@@ -120,7 +120,7 @@ floating-point inaccurassy.
     my $array = Array->range(1,0.2,2) # [1,1.2,1.4,1.6,1.8,2]
     my $array = Array->range(1,0.2,2) # [2,1.8,1.6,1.4,1.2,1]
 
-=head2 Array->concat(@arrays)
+=head2 Array->concat(@arrays) -> $array
 
 Returns a new array with all arrays concatenated into a new one.
 
@@ -134,7 +134,7 @@ Returns a new array with all arrays concatenated into a new one.
     # same as
     my $array = Array->range(1,7)->append([10,10,10]);
 
-=head2 Array->init($count, $f)
+=head2 Array->init($count, $f) -> $array
 
 Generates a new C<Array> with C<$count> entries. An entry generating function
 C<$f> is called by passing it the current index. The function can return multiple
@@ -147,7 +147,7 @@ C<undef> values are skipped.
     my $array = Array->init(3, sub($idx) { 1, 1     });     # [1,1,1,1,1,1]
     my $array = Array->init(3, sub($idx) { 1, undef });     # [1,1,1]
 
-=head2 Array->unfold($state, $f)
+=head2 Array->unfold($state, $f) -> $array
 
 C<<< 'State -> ('State -> ('a * 'State)) -> Array<'a> >>>
 
@@ -234,7 +234,7 @@ this code roughly translates to
 
 =head1 METHODS
 
-=head2 copy($array)
+=head2 copy($array) -> $array
 
 Creates a shallow copy of an array, up until the first undef. This behaviour
 is choosen to avoid `undef` as being as data and being consistent to all

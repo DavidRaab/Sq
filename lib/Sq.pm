@@ -91,7 +91,50 @@ uses the data-structures of this module.
 
 =head1 IMPORTED FUNCTIONS
 
-id, fst, snd, key, assign, is_str, is_num, Some, None
+is_str, is_num, Some, None
+
+=head2 id
+
+return its input as-is
+
+    sub id($x) { return $x }
+
+=head2 fst
+
+return the first element of an array
+
+    sub fst($array) { return $array->[0] }
+
+=head2 snd
+
+return the second element of an array
+
+    sub snd($array) { return $array->[1] }
+
+=head2 key
+
+generates a function that picks a value from a hash.
+
+    sub key($name) { sub($hash) { return $hash->{$name} } }
+
+=head2 assign
+
+allows you to assign a value, but also do a computation.
+
+    my $value = assign {
+        my $x = ...  # code to compute $x
+        my $y = ...  # code to compute $y
+        $x + $y;
+    };
+
+Same as
+
+    my $value;
+    {
+        my $x = ...  # code to compute $x
+        my $y = ...  # code to compute $y
+        $value = $x + $y;
+    }
 
 =head1 AUTOMATICALLY LOADED MODULES
 

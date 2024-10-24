@@ -73,7 +73,6 @@ sub replicate($class, $count, $initial) {
     });
 }
 
-
 # TODO: When $state is a reference. Same handling as in fold?
 #
 # Seq->unfold : 'State -> ('State -> Option<ListContext<'a,'State>>) -> Seq<'a>
@@ -126,7 +125,7 @@ sub range($class, $start, $stop) {
 
 # turns all arguments into an sequence
 # Seq->wrap : List<'a> -> Seq<'a>
-sub wrap($class, @xs) {
+sub new($class, @xs) {
     return bless(sub {
         my $abort = 0;
         my $idx   = 0;
@@ -138,6 +137,10 @@ sub wrap($class, @xs) {
             return undef;
         }
     }, 'Seq');
+}
+
+sub wrap($class, @xs) {
+    return new('Seq', @xs);
 }
 
 # turns an arrayref into a seq

@@ -87,57 +87,34 @@ I have written more documentation. The API is not fully stable at the moment.
 
 =head1 CONCEPT
 
-Describe CONSTRUCTORS, METHODS (Find another name), CONVERTERS.
+Functions are divided into CONSTRUCTORS, METHODS, CONVERTERS.
 
-BUILD, TRANSFORM, COMBINE, QUERY,
+=head2 CONSTRUCTORS
 
-=head1 EXPORT
+All constructor functions are directly called from the C<Seq> module. Like
+C<< Seq->init( ... ) >>. The return a C<Seq>.
 
-This modules does not export anything by default. But you can request the
-following functions.
+=head2 METHODS
 
-=head2 id
+All methods can be called like a method on a C<Seq> or still be called in a
+functional-style. Both styles are supported. In the documentation only the
+functional style how it is defined in Perl is shown.
 
-return its input as-is
+    $seq->length();
+    Seq::length($seq);
 
-    sub id($x) { return $x }
+=head2 CONVERTERS
 
-=head2 fst
+Calling style is the same as METHODS. They are called CONVERTERS because they
+usually return something different than a sequence again. For example
+C<< $seq->map(...) >> returns a new sequence, but C<< $seq->max >> will
+return a maximum value out of a sequence that can be potentially something
+different than a sequence.
 
-return the first element of an array
+=head1 IMPORTING / EXPORTING / LOADING
 
-    sub fst($array) { return $array->[0] }
-
-=head2 snd
-
-return the second element of an array
-
-    sub snd($array) { return $array->[1] }
-
-=head2 key
-
-generates a function that picks a value from a hash.
-
-    sub key($name) { sub($hash) { return $hash->{$name} } }
-
-=head2 assign
-
-allows you to assign a value, but also do a computation.
-
-    my $value = assign {
-        my $x = ...  # code to compute $x
-        my $y = ...  # code to compute $y
-        $x + $y;
-    };
-
-Same as
-
-    my $value;
-    {
-        my $x = ...  # code to compute $x
-        my $y = ...  # code to compute $y
-        $value = $x + $y;
-    }
+This module is automatically loaded when you load C<Sq>. The module is
+available under C<Seq>.
 
 =head1 CALLING STYLE
 
@@ -170,45 +147,180 @@ or
             Seq->wrap(4,5,6),
         )
 
-=head2 $seq = Seq->empty()
+=head2 Seq->empty() -> $seq
 
 Returns an empty sequence. Useful as an initial state or as a starting point.
 
-    Seq->empty->append( $another_seq )
+    my $seq = Seq->empty->append( $another_seq );
 
-=head2 $seq = Seq->range($start, $stop)
+=head2 Seq->range($start, $stop) -> $seq
 
 Returns a sequence from $start to $stop. Range can also be backwards. $start
 and $stop are inclusive.
 
-    Seq->range(1, 5); # 1,2,3,4,5
-    Seq->range(5, 1); # 5,4,3,2,1
-    Seq->range(1, 1); # 1
+    my $seq = Seq->range(1, 5); # 1,2,3,4,5
+    my $seq = Seq->range(5, 1); # 5,4,3,2,1
+    my $seq = Seq->range(1, 1); # 1
 
-=head2 $seq = Seq->wrap(...)
+=head2 Seq->range_step($start, $step, $stop) -> $seq
+
+Like C<< Seq->range >> but let's you specify a step. Both values
+are inclusive and also supports steps with floating-point. Consider
+floating-point inaccurassy.
+
+    my $seq = Seq->range(1,2,10)  # [1,3,5,7,9]
+    my $seq = Seq->range(10,2,1)  # [10,8,6,4,2]
+    my $seq = Seq->range(1,0.2,2) # [1,1.2,1.4,1.6,1.8,2]
+    my $seq = Seq->range(1,0.2,2) # [2,1.8,1.6,1.4,1.2,1]
+
+=head2 Seq->new(...) -> $seq
 
 Just takes whatever you pass it to, and puts it in a sequence. This should be
 your primarily way to create a sequence with values.
 
-    Seq->wrap(qw/Hello World/); # "Hello", "World"
-    Seq->wrap(1 .. 10);         # AVOID this, use Seq->range(1, 10) instead.
-    Seq->wrap(@array);
+    my $seq = Seq->new(qw/Hello World/); # "Hello", "World"
+    my $seq = Seq->new(1 .. 10);         # AVOID this, use Seq->range(1, 10) instead.
+    my $seq = Seq->new(@array);
 
-=head2 $seq = Seq->concat(@sequences)
+=head2 Seq->wrap(...) -> $seq
+
+Same as C<< Seq->new >>.
+
+    my $seq = Seq->wrap(qw/Hello World/); # "Hello", "World"
+    my $seq = Seq->wrap(1 .. 10);         # AVOID this, use Seq->range(1, 10) instead.
+    my $seq = Seq->wrap(@array);
+
+=head2 Seq->concat(@sequences) -> $seq
 
 Takes multiple *Sequences* and returns a single flattened sequence.
 
-    # 1, 2, 3, 4, 5, 5, 4, 3, 2, 1
-    Seq->concat(
+    # 0, 1, 2, 3, 4, 5, 5, 4, 3, 2, 1, 0
+    my $seq = Seq->concat(
+        Seq->new(0),
         Seq->range(1, 5),
         Seq->range(5, 1),
+        Seq->new(0),
     );
+
+=head2 Seq->always($x) -> $seq
+
+Returns an infinite sequence that always returns C<$x> as it's value.
+
+    my $seq    = Seq->always(10);
+    my $array1 = $seq->take(5)->to_array; # [10, 10, 10, 10, 10]
+    my $array2 = $seq->take(3)->to_array; # [10, 10, 10]
+
+=head2 Seq->replicate($count, $x) -> $seq
+
+Creates a sequence representing C<$x> C<$count> times.
+
+    # A sequence representing 100_000 times the value 1
+    my $seq = Seq->replicate(100_000, 1);
+
+=head2 Seq->unfold($state, $f) -> $seq
+
+C<unfold> is like writing a loop to generate values. But instead that the
+whole loop is completely run to an end it just runs the function C<$f>
+with the current C<$state> to generate the next value in a sequence and which
+next C<$state> should be used for the next call. It runs as long you try
+to query data from it or the sequence indicates an end by returning C<undef>.
+
+    my $seq = Seq->unfold(0, sub($x) {   # $x is 0 on first invocation
+        return $x, $x+1;                 # return $x, and uses $x+1 as the next state.
+    });
+
+    my $first100 = $seq->take(100); # represents a sequence containing 0-99
+    my $first500 = $seq->take(500); # represents a sequence containing 0-499
+
+=head2 Seq->init($count, $f) -> $seq
+
+Generates a maximum of C<$count> items and passes the current index to the function
+C<$f> that performs the generation for that entry.
+
+    my $seq = Seq->init(10, sub($idx) { $idx     }); # seq { 0 .. 9 }
+    my $seq = Seq->init(10, sub($idx) { $idx * 2 }); # seq { 0,2,4,6,8,10,12,14,16,18 }
+
+=head2 Seq->from_array($array) -> $seq
+
+Generates a sequence from an array reference. This operation if very efficent
+as the array is not copied. When you created an array (in a function) but want
+to return it as a sequence this is the function you maybe wanna use. This way you also
+can return an array as an immutable sequence, at least as long the original
+array reference gets out of scope. Otherwise changing the original mutable
+array will yield new/updated values.
+
+    my $array = [1 .. 10];
+    my $seq   = Seq->from_array($array);
+
+    my $sumA = $seq->sum; # 55
+
+    push @$array, 10;
+    my $sumB = $seq->sum; # 65
+
+=head2 Seq->from_hash($hash, $f) -> $seq
+
+Turns a hash-ref into a sequence. When data is queried than every key,value pair
+is passed to C<$f> that then can return a value that is used as the sequence
+item. The hash-ref is not copied like in C<< Seq->from_array >>. This means
+changing the hashref and quering the sequence again will get updated values.
+
+    my $hash = {
+        foo => 1,
+        bar => 2,
+        baz => 3,
+    };
+
+    my $keys   = Seq->from_hash($hash, sub($key,$value) { $key   });
+    my $values = Seq->from_hash($hash, sub($key,$value) { $value });
+
+    my $ka  = $keys->to_array; # ["foo", "bar", "baz"]
+    my $sum = $values->sum;    # 6
+
+    $hash->{maz} = 4;
+
+    my $ka  = $keys->to_array; # ["foo", "bar", "baz", "maz"]
+    my $sum = $values->sum;    # 10
+
+=head2 Seq->from_sub($f) -> $seq
+
+The foundation from that all sequences are created. You can turn any function
+that returns a function into a sequence. The inner function must return C<undef>
+to indicate the end of the sequence. As soon the inner function returns C<undef>
+you can be sure that the inner function is never called again and memory should
+be released.
+
+For example an C<upto> function that just returns the value from 0 upto C<$x>
+could be implemented this way.
+
+    sub upto($x) {
+        return Seq->from_sub(sub {
+            # Here comes the Initial State of the iterator
+            my $current = 0;
+
+            return sub {
+                if ( $current <= $x ) {
+                    return $current++;
+                }
+                return undef;
+            };
+        });
+    }
+
+    # A sequence from 0-100
+    my $seq = upto(100);
+
+    # [0, 2, 4, 6, 8]
+    my $first5even =
+        $seq
+        ->filter(sub($x) { $x % 2 == 0 })
+        ->take(5)
+        ->to_array;
 
 =head2 MISSING DOC
 
 Implemented, but not documented yet:
 
-from_sub, unfold, init, range_step, from_list, from_array, from_hash
+from_list
 
 =head1 METHODS
 
@@ -218,6 +330,14 @@ append, map, bind, flatten cartesian, join, merge, select*, choose, mapi,
 filter, take, skip, indexed, distinct, distinct_by, iter, do, rev
 
 * will maybe change
+
+=head2 copy($seq) -> $seq
+
+Copies a sequence, but because how sequence works it basically does nothing.
+It is just here for API compatibility with other modules like Array::copy or
+List::copy.
+
+    my $same = $seq->copy;
 
 =head1 CONVERTERS
 
