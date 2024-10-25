@@ -436,7 +436,7 @@ returns a new sequence that flattens a sequence of arrays into a single sequence
     # seq { 1 .. 9 }
     my $nums = Seq->new([1,2,3], [4,5,6], [7,8,9])->flatten;
 
-=head2 cartesian($seqA, $seqB) -> $seq
+=head2 cartesian($seqA, $seqB) -> $seq_of_array
 
 returns a new sequence containing the cartesian product of both sequences. The
 cartesian product is every item in C<$seqA> combined with every item in C<$seqB>.
@@ -491,7 +491,7 @@ returns a truish value. After that, returns all values as-is.
         ->new(20,10,3,70,105,40,200)
         ->skip_while(sub($x) { $x < 50 ? 1 : 0 });
 
-=head2 indexed($seq) -> $seq
+=head2 indexed($seq) -> $seq_of_array
 
 returns a new sequence that puts the index and on element together. If you
 just need to process an item with the index you should use C<mapi> or C<iteri>
@@ -531,6 +531,141 @@ to be used as the seen key.
     #     {id => 3, name => "Baz"},
     # }
 
+=head2 fsts($seq_of_array) -> $seq
+
+returns a new sequence that only picks the first element of each array.
+
+    # seq { "Hearth","Hearth","Spades" }
+    my $strings =
+        Seq->new(
+            ["Hearth", 1],
+            ["Hearth", 2],
+            ["Spades", 3],
+        )
+        ->fsts;
+
+=head2 fsts($seq_of_array) -> $seq
+
+returns a new sequence that only picks the second element of each array.
+
+    # seq { 1,2,3 }
+    my $nums =
+        Seq->new(
+            ["Hearth", 1],
+            ["Hearth", 2],
+            ["Spades", 3],
+        )
+        ->snds;
+
+=head2 zip($seqA, $seqB) -> $seq_of_array
+
+Combines two sequences into a single sequence by always combining the next
+element of both sequences. Stops as soon one sequence finish.
+
+    # seq { ["foo",1], ["bar",1], ["baz",1] }
+    my $mapping = Seq->zip(
+        Seq->new(qw/foo bar baz/),
+        Seq->always(1),
+    );
+
+=head2 rev($seq) -> $seq
+
+returns a new sequence that reverses the sequence. Consider that reversing is
+only possible when all elements of a sequence are iterated. Internally this
+function builds a stack from a sequence and than pops every element until
+done. Calling this method on a infinite sequence will probably hang/crash your
+program/computer.
+
+    # seq { 10,9,8,7,6,5,4,3,2,1 }
+    my $seq = Seq->range(1,10)->rev;
+
+=head2 sort($seq, $comparer) -> $seq
+
+Sorts a sequence by using C<$comparer> function. Consider that sorting is only
+possible when all elements of a sequence are known. Thus this method must build
+an array from all elements of a sequence and than sorts it.
+
+    # seq { 1,2,5,8,10,20,30 }
+    my $sorted_nums =
+        Seq
+        ->new(1,30,5,2,8,10,20)
+        ->sort(sub($x,$y) { $x <=> $y });
+
+=head2 sort_by($seq, $comparer, $get_key) -> $seq
+
+Does a Schwartzian Transformation by first passing every element to the function
+C<$get_key> that returns the key used in sorting. Than uses C<$comparer> to sort
+by the generated keys. Returns the original entries sorted by its keys.
+
+    # seq { "a","as","hello","between" }
+    my $seq =
+        Seq
+        ->new("hello", "a", "between", "as")
+        ->sort_by(
+            sub($x,$y){ $x <=> $y },  # comparer, sort by number
+            sub($x)   { length $x },  # get_key that uses string length
+        );
+
+=head2 group_fold
+
+TODO
+
+=head2 group_by
+
+TODO
+
+=head2 cache($seq) -> $seq
+
+runs a sequence at this point and builts an array. Then returns a new sequence
+from that array. This can be good when you have a long chain of transformations
+and at certain points you want to compute the values instead of recomputing
+it again and again. It's also a good candidate when the sequence operates on
+mutable data. Calling C<cache> still only makes sense when you want to use
+the final sequence and do additional operations on it. Otherwise you just can
+call C<to_array>.
+
+    my $evens =
+        Seq
+        ->range(1,10_000)
+        ->filter(sub($x) { $x % 2 == 0 })
+        ->cache;
+
+    # $evens is only computed once, but also uses more memory.
+    my $doubled = $evens->map(sub($x) { $x * 2  });
+    my $squared = $evens->map(sub($x) { $x * $x });
+
+=head2 regex_match($seq_of_strings, $regex, $array_picks) -> $seq
+
+Matches a C<$regex> against every element of a sequence. C<$array_picks>
+contains the $1, $2, $3, ... numbers that should be extracted from the regex.
+
+TODO EXAMPLE
+
+=head2 windowed($seq, $window_size) -> $seq_of_array
+
+TODO
+
+=head2 intersperse($seq, $separator) -> $seq
+
+returns a new sequence with C<$sepator> injected between every element.
+
+    # seq { 1,'+',2,'+',3,'+',4,'+',5 }
+    my $seq = Seq->range(1,5)->intersperse('+');
+
+=head2 infinity($seq) -> $seq
+
+Repreats a sequence up to infinity.
+
+    # seq { 1,2,3,1,2,3,1,2,3,1,2,3,1, ... }
+    my $seq = Seq->range(1,3)->infinity;
+
+=head2 repeat($seq, $cont) -> $seq
+
+Repeats a whole sequence a given amount.
+
+    # seq { 1,2,3, 1,2,3, 1,2,3 }
+    my $seq = Seq->range(1,3)->repeat(3);
+
 =head1 CONVERTERS
 
 Implemented, but not documented yet:
@@ -539,6 +674,7 @@ fold, reduce, first, last, to_array, to_list, count, sum, sum_by, min,
 min_by, min_by_str, max, max_str, max_by, max_by_str, str_join, to_hash,
 group_by, find
 
+=head1 SIDE-EFFECTS
 
 =head1 Github
 

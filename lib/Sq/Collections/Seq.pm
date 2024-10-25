@@ -531,10 +531,6 @@ sub distinct_by($seq, $f) {
     });
 }
 
-# remove duplicates - it uses a hash to remember seen items
-# so it only works good when Seq contains Strings or Numbers.
-# Use distinct_by for other data.
-#
 # distinct : Seq<'a> -> Seq<'a>
 sub distinct($seq) {
     return distinct_by($seq, \&Sq::id);
@@ -701,6 +697,7 @@ sub regex_match($seq, $regex, $picks) {
 }
 
 # TODO: Really Seq<Array<'a>> as return value? Seq<Seq<'a>> instead?
+# TODO: Not completely lazy
 # windowed : Seq<'a> -> int -> Seq<Array<'a>>
 sub windowed($seq, $window_size) {
     return empty('Seq') if $window_size <= 0;
@@ -716,8 +713,6 @@ sub windowed($seq, $window_size) {
     });
 }
 
-# puts a value between all other elements
-#
 # intersperse : Seq<'a> -> 'a -> Seq<'a>
 sub intersperse($seq, $sep) {
     from_sub(Seq => sub() {
@@ -760,8 +755,6 @@ sub intersperse($seq, $sep) {
     });
 }
 
-# repeats a sequence to infinity
-#
 # infinity : Seq<'a> -> Seq<'a>
 sub infinity($seq) {
     from_sub(Seq => sub {
@@ -784,9 +777,7 @@ sub infinity($seq) {
     });
 }
 
-# Repeats a whole sequence a given amount
-#
-# repeat : Seq<'a> -> Seq<'a>
+# repeat : Seq<'a> -> int -> Seq<'a>
 sub repeat($seq, $count) {
     from_sub(Seq => sub {
         my $count = $count;
