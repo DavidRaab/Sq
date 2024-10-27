@@ -148,7 +148,7 @@ sub range($class, $start, $stop) {
     return range_step('Seq', $start, 1, $stop);
 }
 
-# Seq->wrap : List<'a> -> Seq<'a>
+# Seq->new : List<'a> -> Seq<'a>
 sub new($class, @xs) {
     return bless(sub {
         my $abort = 0;
