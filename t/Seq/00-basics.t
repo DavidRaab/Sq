@@ -722,4 +722,21 @@ is(
     ok($range eq $range2, 'same reference because sequence creates iterators');
 }
 
+# as_hash
+{
+    my $h = Seq->new(qw/Hello World One Two/)->bind(sub($str) {
+        Seq->new($str, length $str)
+    })->as_hash;
+
+    is(
+        $h,
+        {"Hello" => 5, "World" => 5, "One" => 3, "Two" => 3},
+        'map with multiple return values and as_hash');
+
+    is(
+        $h,
+        check_isa('Hash'),
+        'Is a Hash');
+}
+
 done_testing;
