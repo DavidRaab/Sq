@@ -238,6 +238,26 @@ sub map($seq, $f) {
     }, 'Seq');
 }
 
+# map2 : Seq<'a> -> Seq<'b> -> ('a -> 'b -> 'c) -> Seq<'c>
+sub map2($seqA, $seqB, $f) {
+    return bless(sub {
+        my $abort = 0;
+        my $itA   = $seqA->();
+        my $itB   = $seqB->();
+        my ($a,$b);
+        return sub {
+            return undef if $abort;
+            if ( defined($a = $itA->()) ) {
+            if ( defined($b = $itB->()) ) {
+                return $f->($a,$b);
+            }}
+            $abort = 1;
+            undef $itA;
+            undef $itB;
+        }
+    }, 'Seq');
+}
+
 # bind : Seq<'a> -> ('a -> Seq<'b>) -> Seq<'b>
 sub bind($seq, $f) {
     return bless(sub {

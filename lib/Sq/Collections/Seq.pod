@@ -242,7 +242,7 @@ C<$f> that performs the generation for that entry.
 
 =head2 Seq->from_array($array) : $seq
 
-Generates a sequence from an array reference. This operation if very efficent
+Generates a sequence from an array reference. This operation is very efficent
 as the array is not copied. When you created an array (in a function) but want
 to return it as a sequence this is the function you maybe wanna use. This way you also
 can return an array as an immutable sequence, at least as long the original
@@ -357,6 +357,25 @@ returns a new sequence where every value is mapped with the function C<$f>.
     my $double  = $seq->map(sub($x) { $x * 2  }); # seq { 2,4,6,8,10,12,14,16,18,20 }
     my $squared = $seq->map(sub($x) { $x * $x }); # seq { 1,4,9,16,25,36,49,64,81,100 }
 
+=head2 map2($seqA, $seqB, $f) : $seq
+
+Goes through two sequences at once, and passes both values to C<$f>. C<$f>
+then generates the new value used in the sequence. Stops as soon one sequence
+finishes.
+
+    # [1+5, 2+4, 3+3, 4+2, 5+1]
+    my $additions =
+        Seq::map2(
+            Seq->new(1,2,3,4,5,6),
+            Seq->new(5,4,3,2,1),
+            sub($x,$y) { $x + $y });
+
+    # [1+5, 2+4, 3+3, 4+2, 5+1]
+    my $additions =
+        Seq->new(1,2,3,4,5,6)->map2(
+            Seq->new(5,4,3,2,1),
+            sub($x,$y) { $x + $y });
+
 =head2 mapi($seq, $f) : $seq
 
 Similar to C<map> but the function C<$f> additionally receives the current
@@ -381,8 +400,8 @@ for an array.
 =head2 choose($seq, $chooser) : $seq
 
 Similar to C<map> as it executes C<$chooser> function on every element of the
-sequence, but when C<$choose> returns C<undef> than the item is skipped in the
-final sequence. This function allows to combine C<map> followed by C<filter>
+sequence, but when C<$choose> returns C<undef> then the item is skipped in the
+final sequence. This function is a combination of C<map> followed by C<filter>
 in a single call.
 
     # seq { 2,4,6,8,10,12,14,16,18,20 }

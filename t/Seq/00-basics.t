@@ -783,4 +783,28 @@ is(
         'joining inner arrays');
 }
 
+# map2
+{
+    my $words = Seq->new(qw(foo bar baz));
+    my $one   = Seq->always(1);
+
+    # method
+    my $seq1  = $words->map2($one, sub($word,$one) {
+        Array->new($word, $one);
+    });
+    is(
+        $seq1->to_array,
+        [["foo",1], ["bar",1], ["baz",1]],
+        'map2 - method');
+
+    # functional
+    my $seq2  = Seq::map2($words, $one, sub($word,$one) {
+        Array->new($word, $one);
+    });
+    is(
+        $seq2->to_array,
+        [["foo",1], ["bar",1], ["baz",1]],
+        'map2 - functional');
+}
+
 done_testing;
