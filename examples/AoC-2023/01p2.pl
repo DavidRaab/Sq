@@ -17,7 +17,7 @@ $usage->die if $opt->help;
 my $sum =
     Sq->io->open_text($opt->file)
     ->map(sub($str)    { chomp $str; $str                    })
-    ->doi(sub($i,$str) { printf "%4d %s", $i, $str           })
+    ->doi(sub($str,$i) { printf "%4d %s", $i, $str           })
     ->map(sub($line)   { digitize($line)                     })
     ->do( sub($str)    { printf " %s", $str                  })
     ->map(sub($str)    {[ split //, $str                    ]})

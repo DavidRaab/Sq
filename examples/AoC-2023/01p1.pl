@@ -16,11 +16,11 @@ $usage->die if $opt->help;
 
 my $sum =
     Sq->io->open_text($opt->file)
-    ->str_split(qr//)
+    ->split(qr//)
     ->map( sub($array)    { Array::filter($array, \&is_num)       })
     ->map( sub($array)    { [ $array->first(0), $array->last(0) ] })
     ->map( sub($array)    { join "", @$array                      })
-    ->doi( sub($idx,$num) { printf "%3d -> %d\n", $idx, $num      })
+    ->doi( sub($num,$idx) { printf "%3d -> %d\n", $idx, $num      })
     ->sum;
 
 printf "Sum: %d\n", $sum;
