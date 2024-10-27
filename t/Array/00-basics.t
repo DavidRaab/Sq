@@ -974,4 +974,22 @@ is(
         'cartesian');
 }
 
+# split and join
+{
+    my $words =
+        Array
+        ->new("Foo+Bar+Baz", "maz+faz")
+        ->split(qr/\+/);
+
+    is(
+        $words,
+        [[qw/Foo Bar Baz/], [qw/maz faz/]],
+        'strings splitted into arrays');
+
+    is(
+        $words->map(sub($inner) { $inner->join('+') }),
+        ["Foo+Bar+Baz", "maz+faz"],
+        'joining inner arrays');
+}
+
 done_testing;

@@ -537,6 +537,12 @@ sub join($array, $sep) {
     return CORE::join($sep, @$array);
 }
 
+sub split($array, $regex) {
+    CORE::bless([
+        map { CORE::bless([split $regex, $_], 'Array') } @$array
+    ], 'Array');
+}
+
 # Combines grouping and folding in one operation. All elements of a sequence
 # are grouped together by a key. The $folder function than can combine
 # multiple elements of the same key. For the first element found for a

@@ -608,23 +608,35 @@ is faster because it doesn't need to create an intermediate array.
     # 15
     my $sum = $data->map($value)->sum;
 
-=head2 join($array, $sep) : Array<string> -> string -> string
+=head2 join($array_of_str, $sep) : $string
 
-concatenates an array of strings into a single string. The same as the
-perl built-in function C<join>.
+concatenates an array of strings into a single string. The same as the perl
+built-in function C<join>.
 
     # "1,2,3,4,5,6,7,8,9,10"
     my $str = Array->range(1,10)->join(',');
+
+=head2 split($array_of_str, $regex) : $array_of_array_string
+
+performs a C<split> operation on every string in the array. This then returns
+an array of arrays containing string. Every inner array is also a blessed Sq
+Array.
+
+    # [[1,2,3], [4,5,6]]
+    my $data =
+        Array
+        ->new("1-2-3", "4-5-6")
+        ->split(qr/-/);
 
 =head2 group_fold
 
 TODO
 
-=head2 to_hash($array, $mapper) : Array<'a> -> ('a -> 'Key * 'Value) -> Hash<'Key,'Value>
+=head2 to_hash($array, $mapper) : $hash
 
-Applies C<$mapper> function to each Array entry that return the new 'Key,
-'Value to be used in a Hash. When you return a 'Key that was already
-computed before you will overwrite the previous value.
+Applies C<$mapper> function to each Array entry that return the new B<Key,Value>
+to be used in a Hash. When you return a B<Key> that was already computed before
+you will overwrite the previous value.
 
     # { 3 => "bar", 5 => "world", 1 => "a" }
     my $hash = Array->new(qw/foo bar hello world a/)->to_hash(sub($x) {
