@@ -432,6 +432,36 @@ of sequence it just returns them as a flattened sequence.
         ->range(1,5)
         ->bind(sub($x) { Seq->range(0,$x) });
 
+Think of C<bind> as a way to just iterate through every item of a sequence,
+but the function you provide to C<bind> returns a sequence again. But instead
+of getting a sequence of sequence you get just a single sequence flattened.
+
+This operation is powerful as you can implement a lot of other functions just
+with C<bind>. This operation is also for example called C<then> in JavaScript/promises
+API. It allows you to chain operations. Like an async operation that returns
+an async again.
+
+It is called C<bind> because it resembles I<binding a value>. Consider the code
+
+    my $x = 10;
+
+then you would bind the value C<10> to the variable C<$x>. When you loop through
+an array.
+
+    for my $x ( @array ) {
+        ...
+    }
+
+Then you could say that you bind every value inside of C<@array> to C<$x>.
+
+    $seq->bind(sub($x) {
+        ...
+    });
+
+Here we also bind every value of a sequence to C<$x>. The binding is just reversed
+in the sense that instead of having something on the right and binding it to the
+variable on the left, we just bind it from left-to-right.
+
 =head2 flatten($seq_of_seq) : $seq
 
 returns a new sequence that flattens a sequence of sequences into a single sequence.
