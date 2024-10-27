@@ -100,8 +100,8 @@ working again.
 * [Sq::Collections::Hash](lib/Sq/Collections/Hash.pm)
 * [Sq::Collections::Array](lib/Sq/Collections/Array.pod)
 * [Sq::Collections::Queue](lib/Sq/Collections/Queue.pm)
-* [Sq::Collections::List](lib/Sq/Collections/List.pod)
-* [Sq::Collections::Heap](lib/Sq/Collections/Heap.pm)
+* [Sq::Collections::List](lib/Sq/Collections/List.pm)
+* [Sq::Collections::Heap](lib/Sq/Collections/Heap.pod)
 
 # Seq Module
 
