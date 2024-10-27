@@ -52,16 +52,13 @@ sub from_sub($class, $f) {
 
 # always return $x
 sub always($class, $x) {
-    return bless(sub {
-        return sub {
-            return $x;
-        }
-    }, 'Seq');
+    bless(sub { sub { $x } }, 'Seq');
 }
 
 # empty sequence
 sub empty($class) {
-    return always(Seq => undef);
+    state $empty = bless(sub { sub { undef } }, 'Seq');
+    return $empty;
 }
 
 # replicates an $initial value $count times
