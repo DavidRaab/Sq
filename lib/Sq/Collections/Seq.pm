@@ -1059,7 +1059,7 @@ sub max_str_by($seq, $key, $default) {
 }
 
 # str_join : Seq<string> -> string -> string
-sub str_join($seq, $sep) {
+sub join($seq, $sep) {
     return CORE::join($sep, expand($seq));
 }
 

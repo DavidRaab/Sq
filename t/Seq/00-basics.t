@@ -243,9 +243,9 @@ is(
 
 is(Seq->wrap([A => 1], [B => 2], [C => 3])->sum_by(\&snd), 6, 'sumBy');
 is(
-    Seq->wrap(qw/H e l l o W o r l d !/)->str_join('-'),
+    Seq->wrap(qw/H e l l o W o r l d !/)->join('-'),
     "H-e-l-l-o-W-o-r-l-d-!",
-    'str_join');
+    'join');
 
 is(
     Seq->wrap(qw/Hello World you are awesome/)->to_hash(sub($x) { length $x => $x }),
