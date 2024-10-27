@@ -144,12 +144,17 @@ sub wrap($class, @xs) {
 
 # Seq->from_array : Array<'a> -> Seq<'a>
 sub from_array($class, $xs) {
-    from_sub('Seq', sub {
-        my $idx = 0;
+    return bless(sub {
+        my $abort = 0;
+        my $idx   = 0;
+        my $x;
         return sub {
-            return $xs->[$idx++];
+            return undef if $abort;
+            return $x if defined($x = $xs->[$idx++]);
+            $abort = 1;
+            return undef;
         }
-    });
+    }, 'Seq');
 }
 
 # Seq->from_hash : Hash<'Key, 'Value> -> ('Key -> 'Value -> 'a) -> Seq<'a>
