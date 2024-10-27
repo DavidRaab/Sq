@@ -765,4 +765,22 @@ is(
     is($sum, 30, '$sum is now 30');
 }
 
+# split and join
+{
+    my $words =
+        Seq
+        ->new("Foo+Bar+Baz", "maz+faz")
+        ->split(qr/\+/);
+
+    is(
+        $words->to_array,
+        [[qw/Foo Bar Baz/], [qw/maz faz/]],
+        'strings splitted into arrays');
+
+    is(
+        $words->map(sub($inner) { $inner->join('+') })->to_array,
+        ["Foo+Bar+Baz", "maz+faz"],
+        'joining inner arrays');
+}
+
 done_testing;

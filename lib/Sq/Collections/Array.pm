@@ -533,7 +533,7 @@ sub sum_by($array, $mapper) {
     return $sum;
 }
 
-sub str_join($array, $sep) {
+sub join($array, $sep) {
     return CORE::join($sep, @$array);
 }
 

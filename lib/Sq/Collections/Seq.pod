@@ -674,7 +674,7 @@ fold, reduce, first, last, to_list, count, sum, sum_by, min,
 min_by, min_by_str, max, max_str, max_by, max_by_str, str_join, to_hash,
 group_by, find
 
-=head2 to_array($seq, $count=undef) -> Array
+=head2 to_array($seq, $count=undef) -> $array
 
 Converts the whole sequence into an array. This causes the sequence to compute
 things. Optionally you can pass in a C<$count> of how many max items you want to
@@ -689,6 +689,13 @@ and then iterate through that array just use C<iter> instead.
 
     my $array = $seq->to_array;
     my $array = $seq->to_array(10);
+
+=head2 join($seq, $separator) -> $string
+
+Concatenates all elements of a sequence to a string with C<$separator>.
+
+    # "foo-bar"
+    my $str = Seq->new("foo", "bar)->join(-);
 
 =head2 first($seq, $default)
 

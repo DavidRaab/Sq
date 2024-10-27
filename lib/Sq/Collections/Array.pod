@@ -608,13 +608,13 @@ is faster because it doesn't need to create an intermediate array.
     # 15
     my $sum = $data->map($value)->sum;
 
-=head2 str_join($array, $sep) : Array<string> -> string -> string
+=head2 join($array, $sep) : Array<string> -> string -> string
 
 concatenates an array of strings into a single string. The same as the
 perl built-in function C<join>.
 
     # "1,2,3,4,5,6,7,8,9,10"
-    my $str = Array->range(1,10)->str_join(',');
+    my $str = Array->range(1,10)->join(',');
 
 =head2 group_fold
 

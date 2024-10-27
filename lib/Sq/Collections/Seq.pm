@@ -1063,9 +1063,9 @@ sub join($seq, $sep) {
     return CORE::join($sep, expand($seq));
 }
 
-sub str_split($seq, $regex) {
+sub split($seq, $regex) {
     return Seq::map($seq, sub($line) {
-        [ split $regex, $line ]
+        bless([split $regex, $line], 'Array');
     });
 }
 

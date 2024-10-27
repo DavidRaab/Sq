@@ -655,7 +655,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 
     is(
         $str_concat,
-        $data->{baz}->map(sub($h){ $h->get('name',"") })->str_join(""),
+        $data->{baz}->map(sub($h){ $h->get('name',"") })->join(""),
         "on baz: string concat 1");
     is(
         $str_concat,
