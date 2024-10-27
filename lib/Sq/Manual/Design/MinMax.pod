@@ -1,0 +1,91 @@
+=head1 Seq::Design::MinMax
+
+When I first started, all functions like C<min>, C<max> and and all of it
+variations that are present on C<Seq>, C<Array> or C<List> didn't expected
+a C<$default> parameter. That meant you just could write for example:
+
+    my $max = $seq->max;
+
+The problem of this approach is. What happens when C<$seq> is actually empty?
+
+We could do:
+
+=over 4
+
+=item * Throw an exception
+
+=item * Return undef
+
+=item * Expect a default parameter
+
+=item * return an optional
+
+=back
+
+I choosed to pick the option to expect a default parameter because I think it
+is the most useful one.
+
+=head2 Exceptions
+
+First I don't like exceptions at all. They are basically a pain in the ass. The
+only causes your program to crash when you never expect it. They are just a source
+of hidden bugs you didn't encountered yet because you maybe forgot to write
+the tests for it.
+
+=head2 returning undef
+
+For a short time I returned C<undef>. I actually used C<Sq> already by myself
+and in some script that helped me to create new test files I used C<max> to get
+the highest number of all test-script files, so i knew which number to pick next.
+
+When I had written the script this was okay. Script files where already presents
+so i knew that calling C<max> could never fail. Then things happened. I copied
+the same file to another project and boooom. The program crashed because I had
+no test files yet.
+
+Now, i could easily fixed this problem by writing
+
+    my $max = $seq->max // 0;
+
+Perl has that very handy I<defined-or> operator that makes that stuff easy todo.
+But still, you are not enforced to write this code/check.
+
+=head2 expect default parameter
+
+With expecting a C<$default> parameter you are now forced to write.
+
+    my $max = $seq->max(0);
+
+Maybe this is sometimes annoying to write? Good, you really should think
+about what happens when the sequence is empty and which value should
+be choosen instead. It's part of writing useful and bug-free code.
+
+You cannot forget to pass that argument as Sq will complain about missing
+arguments.
+
+Consider that you still want to return C<undef>, maybe because you are lazy
+or want to differentate if a number was returned. In that case you still
+can write.
+
+    my $max = $seq->max(undef);
+
+It's maybe even more painful to write, but you will later be grateful that you
+just can search your source code for C<undef> and find all occurences where
+you were lazy.
+
+=head2 returning an optional
+
+Instead of expecting the default argument it would also be possible to return
+an optional value instead. This would be the approach seen in ML languages like
+F#. There it makes sense because of either restriction of static-typing or
+the difference of Value-types vs. Reference-types. But in Perl it's less dramatic,
+you always can return C<undef> for every value, also for numbers.
+
+Returning an optional would have some other benefits. The optionals module
+have quite some functions you can use that are pretty handy. But still, I think
+most of the time functions like C<max> or C<min> are used on simple types/objects
+and providing the default value as an argument is what you probably expect
+for most of the time.
+
+If not. You can still pass in C<undef> as the default argument and then do
+an explicit check against C<undef>.

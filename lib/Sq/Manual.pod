@@ -16,14 +16,22 @@ Coming SOON
 
 =head2 OTHER
 
-
-=head3 Seq::Manual::FromSub
+=head3 L<Sq::Manual::FromSub>
 
 An in-depth tutorial on how to use Seq->fromSub to create your own
 constructor functions and make other Perl Code / Modules work with
 Seq.
 
-
 =head2 DESIGN
 
-Coming SOON
+=over 4
+
+=item L<Sq::Manual::Design::Wrap>
+
+Describes why ceratin operations like C<< Seq->wrap >> stops at C<undef>
+
+=item L<Sq::Manual::Design::MinMax>
+
+Describes why functions like C<Sq::max> uses a mandatory C<$default> argument.
+
+=back
