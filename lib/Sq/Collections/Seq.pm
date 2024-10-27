@@ -969,10 +969,11 @@ sub first($seq, $default) {
 
 # last : Seq<'a> -> 'a -> 'a
 sub last($seq, $default) {
-    my $last;
-    iter($seq, sub($x) {
+    my $it = $seq->();
+    my ($last, $x);
+    while ( defined($x = $it->()) ) {
         $last = $x;
-    });
+    }
     return defined $last ? $last : $default;
 }
 
