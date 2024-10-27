@@ -207,7 +207,7 @@ cmpthese(-1, {
 });
 
 print(
-    ($numbers->count == $amount)
+    ($numbers->length == $amount)
     ? "\nok - correct \$numbers count\n"
-    : "\nnot ok - \$numbers count should be 10000\n"
+    : "\nnot ok - \$numbers length should be $amount but got ". $numbers->length . "\n"
 );
