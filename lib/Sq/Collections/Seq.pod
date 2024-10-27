@@ -462,6 +462,15 @@ Here we also bind every value of a sequence to C<$x>. The binding is just revers
 in the sense that instead of having something on the right and binding it to the
 variable on the left, we just bind it from left-to-right.
 
+You could for example implement C<Seq::map> the following way. Even though this
+is not implemented this way because of performance reasons.
+
+    sub seq_map($seq, $f) {
+        $seq->bind(sub($x) {
+            Seq->new($f->($x));
+        });
+    }
+
 =head2 flatten($seq_of_seq) : $seq
 
 returns a new sequence that flattens a sequence of sequences into a single sequence.
