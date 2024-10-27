@@ -147,13 +147,13 @@ or
             Seq->wrap(4,5,6),
         )
 
-=head2 Seq->empty() -> $seq
+=head2 Seq->empty() : $seq
 
 Returns an empty sequence. Useful as an initial state or as a starting point.
 
     my $seq = Seq->empty->append( $another_seq );
 
-=head2 Seq->range($start, $stop) -> $seq
+=head2 Seq->range($start, $stop) : $seq
 
 Returns a sequence from $start to $stop. Range can also be backwards. $start
 and $stop are inclusive.
@@ -162,7 +162,7 @@ and $stop are inclusive.
     my $seq = Seq->range(5, 1); # 5,4,3,2,1
     my $seq = Seq->range(1, 1); # 1
 
-=head2 Seq->range_step($start, $step, $stop) -> $seq
+=head2 Seq->range_step($start, $step, $stop) : $seq
 
 Like C<< Seq->range >> but let's you specify a step. Both values
 are inclusive and also supports steps with floating-point. Consider
@@ -173,7 +173,7 @@ floating-point inaccurassy.
     my $seq = Seq->range(1,0.2,2) # [1,1.2,1.4,1.6,1.8,2]
     my $seq = Seq->range(1,0.2,2) # [2,1.8,1.6,1.4,1.2,1]
 
-=head2 Seq->new(...) -> $seq
+=head2 Seq->new(...) : $seq
 
 Just takes whatever you pass it to, and puts it in a sequence. This should be
 your primarily way to create a sequence with values.
@@ -182,7 +182,7 @@ your primarily way to create a sequence with values.
     my $seq = Seq->new(1 .. 10);         # AVOID this, use Seq->range(1, 10) instead.
     my $seq = Seq->new(@array);
 
-=head2 Seq->wrap(...) -> $seq
+=head2 Seq->wrap(...) : $seq
 
 Same as C<< Seq->new >>.
 
@@ -190,7 +190,7 @@ Same as C<< Seq->new >>.
     my $seq = Seq->wrap(1 .. 10);         # AVOID this, use Seq->range(1, 10) instead.
     my $seq = Seq->wrap(@array);
 
-=head2 Seq->concat(@sequences) -> $seq
+=head2 Seq->concat(@sequences) : $seq
 
 Takes multiple *Sequences* and returns a single flattened sequence.
 
@@ -202,7 +202,7 @@ Takes multiple *Sequences* and returns a single flattened sequence.
         Seq->new(0),
     );
 
-=head2 Seq->always($x) -> $seq
+=head2 Seq->always($x) : $seq
 
 Returns an infinite sequence that always returns C<$x> as it's value.
 
@@ -210,14 +210,14 @@ Returns an infinite sequence that always returns C<$x> as it's value.
     my $array1 = $seq->take(5)->to_array; # [10, 10, 10, 10, 10]
     my $array2 = $seq->take(3)->to_array; # [10, 10, 10]
 
-=head2 Seq->replicate($count, $x) -> $seq
+=head2 Seq->replicate($count, $x) : $seq
 
 Creates a sequence representing C<$x> C<$count> times.
 
     # A sequence representing 100_000 times the value 1
     my $seq = Seq->replicate(100_000, 1);
 
-=head2 Seq->unfold($state, $f) -> $seq
+=head2 Seq->unfold($state, $f) : $seq
 
 C<unfold> is like writing a loop to generate values. But instead that the
 whole loop is completely run to an end it just runs the function C<$f>
@@ -232,7 +232,7 @@ to query data from it or the sequence indicates an end by returning C<undef>.
     my $first100 = $seq->take(100); # represents a sequence containing 0-99
     my $first500 = $seq->take(500); # represents a sequence containing 0-499
 
-=head2 Seq->init($count, $f) -> $seq
+=head2 Seq->init($count, $f) : $seq
 
 Generates a maximum of C<$count> items and passes the current index to the function
 C<$f> that performs the generation for that entry.
@@ -240,7 +240,7 @@ C<$f> that performs the generation for that entry.
     my $seq = Seq->init(10, sub($idx) { $idx     }); # seq { 0 .. 9 }
     my $seq = Seq->init(10, sub($idx) { $idx * 2 }); # seq { 0,2,4,6,8,10,12,14,16,18 }
 
-=head2 Seq->from_array($array) -> $seq
+=head2 Seq->from_array($array) : $seq
 
 Generates a sequence from an array reference. This operation if very efficent
 as the array is not copied. When you created an array (in a function) but want
@@ -257,7 +257,7 @@ array will yield new/updated values.
     push @$array, 10;
     my $sumB = $seq->sum; # 65
 
-=head2 Seq->from_hash($hash, $f) -> $seq
+=head2 Seq->from_hash($hash, $f) : $seq
 
 Turns a hash-ref into a sequence. When data is queried than every key,value pair
 is passed to C<$f> that then can return a value that is used as the sequence
@@ -281,7 +281,7 @@ changing the hashref and quering the sequence again will get updated values.
     my $ka  = $keys->to_array; # ["foo", "bar", "baz", "maz"]
     my $sum = $values->sum;    # 10
 
-=head2 Seq->from_sub($f) -> $seq
+=head2 Seq->from_sub($f) : $seq
 
 The foundation from that all sequences are created. You can turn any function
 that returns a function into a sequence. The inner function must return C<undef>
@@ -331,7 +331,7 @@ filter, take, skip, indexed, distinct, distinct_by, iter, do, rev
 
 * will maybe change
 
-=head2 copy($seq) -> $seq
+=head2 copy($seq) : $seq
 
 Copies a sequence, but because how sequence works it basically does nothing.
 It is just here for API compatibility with other modules like Array::copy or
@@ -339,7 +339,7 @@ List::copy.
 
     my $same = $seq->copy;
 
-=head2 append($seqA, $seqB) -> $seq
+=head2 append($seqA, $seqB) : $seq
 
 returns a new sequence where both sequences are appended into a single one.
 When you want to append multiple sequences it is usually better to use C<< Seq->concat >>
@@ -348,7 +348,7 @@ instead.
     my $new    = $seq->append($other_seq);
     my $upto10 = Seq->range(1,5)->append( Seq->range(6,10) ); # seq { 1 .. 10 }
 
-=head2 map($seq, $f) -> $seq
+=head2 map($seq, $f) : $seq
 
 returns a new sequence where every value is mapped with the function C<$f>.
 
@@ -357,7 +357,7 @@ returns a new sequence where every value is mapped with the function C<$f>.
     my $double  = $seq->map(sub($x) { $x * 2  }); # seq { 2,4,6,8,10,12,14,16,18,20 }
     my $squared = $seq->map(sub($x) { $x * $x }); # seq { 1,4,9,16,25,36,49,64,81,100 }
 
-=head2 mapi($seq, $f) -> $seq
+=head2 mapi($seq, $f) : $seq
 
 Similar to C<map> but the function C<$f> additionally receives the current
 index of the item it processes.
@@ -368,7 +368,7 @@ index of the item it processes.
         ->range(5,10)
         ->mapi(sub($x,$idx) { [$x,$idx] });
 
-=head2 filter($seq, $predicate) -> $seq
+=head2 filter($seq, $predicate) : $seq
 
 returns a new sequence with the elements filtered by C<$predicate>. A predicate
 function is a function that returns a boolish value. When it returns a truish
@@ -378,7 +378,7 @@ for an array.
     # contains only even numbers
     my $seq = $seq->filter(sub($x) { $x % 2 == 0 });
 
-=head2 choose($seq, $chooser) -> $seq
+=head2 choose($seq, $chooser) : $seq
 
 Similar to C<map> as it executes C<$chooser> function on every element of the
 sequence, but when C<$choose> returns C<undef> than the item is skipped in the
@@ -401,7 +401,7 @@ in a single call.
             return $x % 2 == 0 ? $x : undef;
         });
 
-=head2 bind($seq, $f) -> $seq
+=head2 bind($seq, $f) : $seq
 
 Similar to C<map> as every value of the sequence is passed to function C<$f>. But
 C<$f> is supposed to return a new sequence again. Instead of returning a sequence
@@ -413,7 +413,7 @@ of sequence it just returns them as a flattened sequence.
         ->range(1,5)
         ->bind(sub($x) { Seq->range(0,$x) });
 
-=head2 flatten($seq_of_seq) -> $seq
+=head2 flatten($seq_of_seq) : $seq
 
 returns a new sequence that flattens a sequence of sequences into a single sequence.
 You typically can get a sequence of sequence when you use C<map> with a function that
@@ -429,14 +429,14 @@ returns a sequence. Instead of calling C<flatten> on that result use C<bind> ins
     # seq { 1,2,3,4,5,6,7,8,9 }
     my $flatten = $nums->flatten;
 
-=head2 flatten_array($seq_of_array) -> $seq
+=head2 flatten_array($seq_of_array) : $seq
 
 returns a new sequence that flattens a sequence of arrays into a single sequence.
 
     # seq { 1 .. 9 }
     my $nums = Seq->new([1,2,3], [4,5,6], [7,8,9])->flatten;
 
-=head2 cartesian($seqA, $seqB) -> $seq_of_array
+=head2 cartesian($seqA, $seqB) : $seq_of_array
 
 returns a new sequence containing the cartesian product of both sequences. The
 cartesian product is every item in C<$seqA> combined with every item in C<$seqB>.
@@ -455,14 +455,14 @@ cartesian product is every item in C<$seqA> combined with every item in C<$seqB>
         printf "A=%s B=%s\n", $a, $b;
     });
 
-=head2 take($seq, $amount) -> $seq
+=head2 take($seq, $amount) : $seq
 
 returns a new sequence that only takes C<$amount> from its previous sequence.
 
     # seq { 1 .. 10 }
     my $seq = Seq->range(1,100)->take(10);
 
-=head2 take_while($seq, $predicate) -> $seq
+=head2 take_while($seq, $predicate) : $seq
 
 returns a new sequence and picks every element from the sequence as long
 C<$predicate> returns a truish value.
@@ -473,14 +473,14 @@ C<$predicate> returns a truish value.
         ->new(20,10,3,70,105,40,200)
         ->take_while(sub($x) { $x < 100 ? 1 : 0 });
 
-=head2 skip($seq, $amount) -> $seq
+=head2 skip($seq, $amount) : $seq
 
 returns a new sequence, but skips C<$amount> items.
 
     # seq { 4,5,6,7,8,9,10 }
     my $seq = Seq->range(1,10)->skip(3);
 
-=head2 skip_while($seq, $predicate) -> $seq
+=head2 skip_while($seq, $predicate) : $seq
 
 returns a new sequence by skipping all values at the begging as long C<$predicate>
 returns a truish value. After that, returns all values as-is.
@@ -491,7 +491,7 @@ returns a truish value. After that, returns all values as-is.
         ->new(20,10,3,70,105,40,200)
         ->skip_while(sub($x) { $x < 50 ? 1 : 0 });
 
-=head2 indexed($seq) -> $seq_of_array
+=head2 indexed($seq) : $seq_of_array
 
 returns a new sequence that puts the index and on element together. If you
 just need to process an item with the index you should use C<mapi> or C<iteri>
@@ -500,7 +500,7 @@ instead.
     # seq { [0,10], [1,11], [2,12], [3,13], [4,14], [5,15] }
     my $seq = Seq->range(10,15)->indexed;
 
-=head2 distinct($seq) -> $seq
+=head2 distinct($seq) : $seq
 
 returns a new sequence where every element will only appear once. Internally
 a hash is used for seen elements. That means it only works properly when
@@ -512,7 +512,7 @@ elements can be converted to a string. Otherwise use C<distinct_by>.
         ->new(1,2,3,3,4,2,1,5,6,5,4,7,10,8)
         ->distinct;
 
-=head2 distinct_by($seq, $f) -> $seq
+=head2 distinct_by($seq, $f) : $seq
 
 Same as C<distinct> but uses function C<$f> to generate the key for an item
 to be used as the seen key.
@@ -531,7 +531,7 @@ to be used as the seen key.
     #     {id => 3, name => "Baz"},
     # }
 
-=head2 fsts($seq_of_array) -> $seq
+=head2 fsts($seq_of_array) : $seq
 
 returns a new sequence that only picks the first element of each array.
 
@@ -544,7 +544,7 @@ returns a new sequence that only picks the first element of each array.
         )
         ->fsts;
 
-=head2 fsts($seq_of_array) -> $seq
+=head2 fsts($seq_of_array) : $seq
 
 returns a new sequence that only picks the second element of each array.
 
@@ -557,7 +557,7 @@ returns a new sequence that only picks the second element of each array.
         )
         ->snds;
 
-=head2 zip($seqA, $seqB) -> $seq_of_array
+=head2 zip($seqA, $seqB) : $seq_of_array
 
 Combines two sequences into a single sequence by always combining the next
 element of both sequences. Stops as soon one sequence finish.
@@ -568,7 +568,7 @@ element of both sequences. Stops as soon one sequence finish.
         Seq->always(1),
     );
 
-=head2 rev($seq) -> $seq
+=head2 rev($seq) : $seq
 
 returns a new sequence that reverses the sequence. Consider that reversing is
 only possible when all elements of a sequence are iterated. Internally this
@@ -579,7 +579,7 @@ program/computer.
     # seq { 10,9,8,7,6,5,4,3,2,1 }
     my $seq = Seq->range(1,10)->rev;
 
-=head2 sort($seq, $comparer) -> $seq
+=head2 sort($seq, $comparer) : $seq
 
 Sorts a sequence by using C<$comparer> function. Consider that sorting is only
 possible when all elements of a sequence are known. Thus this method must build
@@ -591,7 +591,7 @@ an array from all elements of a sequence and than sorts it.
         ->new(1,30,5,2,8,10,20)
         ->sort(sub($x,$y) { $x <=> $y });
 
-=head2 sort_by($seq, $comparer, $get_key) -> $seq
+=head2 sort_by($seq, $comparer, $get_key) : $seq
 
 Does a Schwartzian Transformation by first passing every element to the function
 C<$get_key> that returns the key used in sorting. Than uses C<$comparer> to sort
@@ -614,7 +614,7 @@ TODO
 
 TODO
 
-=head2 cache($seq) -> $seq
+=head2 cache($seq) : $seq
 
 runs a sequence at this point and builts an array. Then returns a new sequence
 from that array. This can be good when you have a long chain of transformations
@@ -634,32 +634,32 @@ call C<to_array>.
     my $doubled = $evens->map(sub($x) { $x * 2  });
     my $squared = $evens->map(sub($x) { $x * $x });
 
-=head2 regex_match($seq_of_strings, $regex, $array_picks) -> $seq
+=head2 regex_match($seq_of_strings, $regex, $array_picks) : $seq
 
 Matches a C<$regex> against every element of a sequence. C<$array_picks>
 contains the $1, $2, $3, ... numbers that should be extracted from the regex.
 
 TODO EXAMPLE
 
-=head2 windowed($seq, $window_size) -> $seq_of_array
+=head2 windowed($seq, $window_size) : $seq_of_array
 
 TODO
 
-=head2 intersperse($seq, $separator) -> $seq
+=head2 intersperse($seq, $separator) : $seq
 
 returns a new sequence with C<$sepator> injected between every element.
 
     # seq { 1,'+',2,'+',3,'+',4,'+',5 }
     my $seq = Seq->range(1,5)->intersperse('+');
 
-=head2 infinity($seq) -> $seq
+=head2 infinity($seq) : $seq
 
 Repreats a sequence up to infinity.
 
     # seq { 1,2,3,1,2,3,1,2,3,1,2,3,1, ... }
     my $seq = Seq->range(1,3)->infinity;
 
-=head2 repeat($seq, $cont) -> $seq
+=head2 repeat($seq, $cont) : $seq
 
 Repeats a whole sequence a given amount.
 
@@ -674,7 +674,7 @@ fold, reduce, first, last, to_list, count, sum, sum_by, min,
 min_by, min_by_str, max, max_str, max_by, max_by_str, str_join, to_hash,
 group_by, find
 
-=head2 to_array($seq, $count=undef) -> $array
+=head2 to_array($seq, $count=undef) : $array
 
 Converts the whole sequence into an array. This causes the sequence to compute
 things. Optionally you can pass in a C<$count> of how many max items you want to
@@ -690,14 +690,14 @@ and then iterate through that array just use C<iter> instead.
     my $array = $seq->to_array;
     my $array = $seq->to_array(10);
 
-=head2 join($seq, $separator) -> $string
+=head2 join($seq, $separator) : $string
 
 Concatenates all elements of a sequence to a string with C<$separator>.
 
     # "foo-bar"
     my $str = Seq->new("foo", "bar)->join(-);
 
-=head2 first($seq, $default)
+=head2 first($seq, $default) : $x
 
 Returns first element of seq or C<$default> if sequence is empty.
 
@@ -706,7 +706,7 @@ Returns first element of seq or C<$default> if sequence is empty.
     my $one   = Seq->range(1,10)->first(0);
     my $zero  = Seq->empty      ->first(0);
 
-=head2 last($seq, $default)
+=head2 last($seq, $default) : $x
 
 Returns last element of seq or C<$default> if sequence is empty.
 
@@ -715,7 +715,7 @@ Returns last element of seq or C<$default> if sequence is empty.
     my $ten   = Seq->range(1,10)->last(0);
     my $zero  = Seq->empty      ->last(0);
 
-=head2 as_hash($seq) -> $hash
+=head2 as_hash($seq) : $hash
 
 Turns a sequence into a Sq Hash by expecting that the sequence contains key/value
 pairs. Similar as writing C<< my %hash = @list >> in Perl.
@@ -723,7 +723,7 @@ pairs. Similar as writing C<< my %hash = @list >> in Perl.
     # { foo => 1, bar => 2 }
     my $hash = Seq->new(qw/foo 1 bar 2/)->as_hash;
 
-=head2 to_hash($seq, $mapper) -> $hash
+=head2 to_hash($seq, $mapper) : $hash
 
 Calls C<$mapper> function for every element in the sequence. Expects that
 C<$mapper> returns the key and value used to build the final Hash.
@@ -733,7 +733,7 @@ C<$mapper> returns the key and value used to build the final Hash.
         $key => length $key
     });
 
-=head2 expand($seq)
+=head2 expand($seq) : ($x,$x,$x,$x,...)
 
 Similar to C<to_array> as that it starts to turn a sequence into an array. But
 instead of returning it as a blessed Sq Array it returns it as a Perl List
@@ -756,7 +756,7 @@ C<as_hash> or C<to_hash> instead.
         ...
     });
 
-=head2 fold($seq, $state, $folder) -> Any
+=head2 fold($seq, $state, $folder) : $state
 
 fold is like a foreach-loop. You iterate through all items generating a new B<State>.
 The C<$folder> is passed the latest B<State> and one element from the sequence. You
@@ -788,7 +788,7 @@ Array as comparison to understand what C<fold> does.
     }
     return $state;
 
-=head2 fold_mut($seq, $state, $folder) -> Any
+=head2 fold_mut($seq, $state, $folder) : $state
 
 C<fold_mut> is an optimization of C<fold>. C<fold> works by computing a new C<$state>
 on every call. Every time the C<$folder> function is executed the result of this
@@ -812,7 +812,7 @@ returned.
         # value of this lambda is not used.
     });
 
-=head2 reduce($seq, $default, $reducer) -> Any
+=head2 reduce($seq, $default, $reducer) : $return_of_reducer
 
 In a dynamic-typed language like Perl it is basically the same as C<fold>. The
 only difference is that no C<$state> is explicitly passed and it just begins
@@ -833,7 +833,7 @@ I highly encourage to better use C<fold> or C<fold_mut> instead of C<reduce>.
 
 =head1 SIDE-EFFECTS
 
-=head2 iter($seq, $f)
+=head2 iter($seq, $f) : void
 
 Iterates through all elements of a sequence and calling C<$f> for every element.
 As C<iter> returns nothing it is just used for doing side-effects. Or maybe
@@ -844,7 +844,7 @@ using C<fold> or C<fold_mut> instead. Or any other of the B<CONVERTER> methods.
         say $x;
     });
 
-=head2 foreach($seq, $f)
+=head2 foreach($seq, $f) : void
 
 Same as C<iter>.
 
@@ -852,7 +852,7 @@ Same as C<iter>.
         say $x;
     });
 
-=head2 iteri($seq, $f)
+=head2 iteri($seq, $f) : void
 
 Same as C<iter> but C<$f> additionally gets an index passed.
 
@@ -868,7 +868,7 @@ Same as C<iter> but C<$f> additionally gets an index passed.
     # 4: 14
     # 5: 15
 
-=head2 foreachi($seq, $f)
+=head2 foreachi($seq, $f) : void
 
 Same as C<iteri>.
 
@@ -884,7 +884,7 @@ Same as C<iteri>.
     # 4: 14
     # 5: 15
 
-=head2 do($seq, $f) -> $seq
+=head2 do($seq, $f) : $seq
 
 A functions like C<iter> starts to iterate all elements of a sequence. C<do> does
 not. It just allows that a function is called before each element is returned.
@@ -914,7 +914,7 @@ C<do> only executes for those elements you ask for. If you don't force evaluatio
 somehow through any B<CONVERTER> method, then nothing will happen. Use C<iter>
 when you want to force evaluation.
 
-=head2 doi($seq, $f) -> $seq
+=head2 doi($seq, $f) : $seq
 
 Same as C<do> but additionally passes an B<index> to the function C<$f>.
 
