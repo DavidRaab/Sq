@@ -704,15 +704,7 @@ sub group_by($seq, $get_key) {
 
 # cache : Seq<'a> -> Seq<'a>
 sub cache($seq) {
-    my $array = to_array($seq);
-    my $count = $array->@*;
-
-    from_sub(Seq => sub {
-        my $current = 0;
-        return sub {
-            return $array->[$current++];
-        }
-    });
+    return from_array('Seq', to_array($seq));
 }
 
 # regex_match : Seq<string> -> Regex -> Array<int> -> Seq<Array<string>>
