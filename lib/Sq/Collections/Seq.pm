@@ -900,18 +900,15 @@ sub doi($seq, $f) {
 #         Those are functions converting Seq to none Seq types         #
 #----------------------------------------------------------------------#
 
-# fold is like a foreach-loop. You iterate through all items generating
-# a new 'State. The $folder is passed the latest
-# 'State and one 'a from the sequence. You return
-# the next 'State that should be used. Once all elements of 'a
-# sequence are processed. The last 'State is returned.
-#
 # fold : Seq<'a> -> 'State -> ('State -> 'a -> 'State) -> 'State
 sub fold($seq, $state, $folder) {
-    iter($seq, sub($x) {
-        $state = $folder->($state, $x);
-    });
-    return $state;
+    my $it     = $seq->();
+    my $result = $state;
+    my $x;
+    while ( defined($x = $it->()) ) {
+        $result = $folder->($result, $x);
+    }
+    return $result;
 }
 
 # Same as fold. But when you want to mutate 'State and return 'State from
@@ -921,9 +918,11 @@ sub fold($seq, $state, $folder) {
 #
 # fold_mut : Seq<'a> -> 'State -> ('State -> 'a -> unit) -> 'State
 sub fold_mut($seq, $state, $folder) {
-    iter($seq, sub($x) {
+    my $it = $seq->();
+    my $x;
+    while ( defined($x = $it->()) ) {
         $folder->($state, $x);
-    });
+    }
     return $state;
 }
 
