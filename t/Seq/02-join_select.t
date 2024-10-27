@@ -96,9 +96,9 @@ my $objects_to_tags = Seq->wrap(
 # A query to join the data together
 my $query =
     $objects
-    ->join($objects_to_tags, sub($obj, $tag) {$obj->{id} == $tag->{object_id} })
+    ->left_join($objects_to_tags, sub($obj, $tag) {$obj->{id} == $tag->{object_id} })
     ->select({id => 'object_id', name => 'object_name'}, [qw/tag_id/])
-    ->join($tags, sub($left, $tag) { $left->{tag_id} == $tag->{id} })
+    ->left_join($tags, sub($left, $tag) { $left->{tag_id} == $tag->{id} })
     ->select(ALL => {name => 'tag_name'});
 
 # check if query contains correct data

@@ -306,7 +306,7 @@ sub cartesian($seqA, $seqB) {
 # join creates the cartesian product, but only for those elements
 # $predicate returns true.
 # join : Seq<'a> -> Seq<'b> -> ('a -> 'b -> bool) -> Seq<'a * 'b>
-sub join($seqA, $seqB, $predicate) {
+sub left_join($seqA, $seqB, $predicate) {
     bind($seqA, sub($a) {
     bind($seqB, sub($b) {
         return wrap(Seq => [$a, $b]) if $predicate->($a, $b);
