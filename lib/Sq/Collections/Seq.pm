@@ -319,7 +319,7 @@ sub flatten_array($seq) {
 sub cartesian($seqA, $seqB) {
     bind($seqA, sub($a) {
     bind($seqB, sub($b) {
-        wrap('Seq', [$a, $b]);
+        new('Seq', [$a, $b]);
     })});
 }
 
@@ -329,7 +329,7 @@ sub cartesian($seqA, $seqB) {
 sub left_join($seqA, $seqB, $predicate) {
     bind($seqA, sub($a) {
     bind($seqB, sub($b) {
-        return wrap(Seq => [$a, $b]) if $predicate->($a, $b);
+        return new(Seq => [$a, $b]) if $predicate->($a, $b);
         return empty('Seq');
     })});
 }
@@ -339,7 +339,7 @@ sub left_join($seqA, $seqB, $predicate) {
 # merge : Seq<'a * 'b> -> ('a -> 'b -> 'c) -> Seq<'c>
 sub merge($seq, $merge) {
     bind($seq, sub($tuple) {
-        return wrap(Seq => $merge->($tuple->[0], $tuple->[1]));
+        return new(Seq => $merge->($tuple->[0], $tuple->[1]));
     });
 }
 
