@@ -826,6 +826,57 @@ I highly encourage to better use C<fold> or C<fold_mut> instead of C<reduce>.
 
 =head1 SIDE-EFFECTS
 
+=head2 iter($seq, $f)
+
+Iterates through all elements of a sequence and calling C<$f> for every element.
+As C<iter> returns nothing it is just used for doing side-effects. Or maybe
+when you want to iterate through a sequence and build other data. But consider
+using C<fold> or C<fold_mut> instead. Or any other of the B<CONVERTER> methods.
+
+    Seq->range(1,1000)->iter(sub($x) {
+        say $x;
+    });
+
+=head2 foreach($seq, $f)
+
+Same as C<iter>.
+
+    Seq->range(1,1000)->foreach(sub($x) {
+        say $x;
+    });
+
+=head2 iteri($seq, $f)
+
+Same as C<iter> but C<$f> additionally gets an index passed.
+
+    Seq->range(10,15)->iteri(sub($x,$idx) {
+        printf "%d: %d\n", $idx, $x;
+    });
+
+    # prints
+    # 0: 10
+    # 1: 11
+    # 2: 12
+    # 3: 13
+    # 4: 14
+    # 5: 15
+
+=head2 foreachi($seq, $f)
+
+Same as C<iteri>.
+
+    Seq->range(10,15)->foreachi(sub($x,$idx) {
+        printf "%d: %d\n", $idx, $x;
+    });
+
+    # prints
+    # 0: 10
+    # 1: 11
+    # 2: 12
+    # 3: 13
+    # 4: 14
+    # 5: 15
+
 =head1 Github
 
 Development project is on Github. L<https://github.com/DavidRaab/Seq>

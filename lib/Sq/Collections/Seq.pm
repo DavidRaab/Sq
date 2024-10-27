@@ -582,7 +582,7 @@ sub zip($seqA, $seqB) {
         return sub {
             if (defined ($a = $itA->())) {
             if (defined ($b = $itB->())) {
-                    return [$a,$b];
+                return [$a,$b];
             }}
             return undef;
         }
@@ -598,7 +598,6 @@ sub rev($seq) {
         };
     });
 }
-
 
 # sort : Seq<'a> -> ('a -> 'a -> int) -> Seq<'a>
 sub sort($seq, $comparer) {
