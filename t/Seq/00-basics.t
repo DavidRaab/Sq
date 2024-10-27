@@ -744,4 +744,25 @@ is(
     is($h, $h2, 'bind->as_hash vs to_hash');
 }
 
+# test order of doi
+{
+    my $sum = 0;
+    my $seq = Seq->range(1,10)->doi(sub($x,$idx) {
+        $sum += $x;
+    });
+
+    is($sum, 0, '$sum 0 as no data was queried');
+    is(
+        $seq->to_array(5),
+        [1,2,3,4,5],
+        'first 5 of $seq');
+    is($sum, 15, '$sum is now 15');
+
+    is(
+        $seq->to_array(5),
+        [1,2,3,4,5],
+        'first 5 of $seq');
+    is($sum, 30, '$sum is now 30');
+}
+
 done_testing;

@@ -885,7 +885,7 @@ sub doi($seq, $f) {
 
         return sub {
             if ( defined($x = $it->()) ) {
-                $f->($idx++, $x);
+                $f->($x, $idx++);
                 return $x;
             }
             return undef;
@@ -950,10 +950,13 @@ sub to_array($seq, $count=undef) {
     my $x;
     if ( defined $count ) {
         my $current = 0;
-        while ( defined($x = $it->()) ) {
-            return $new if $current++ >= $count;
+
+        NEXT:
+        return $new if $current++ >= $count;
+        if ( defined($x = $it->()) ) {
             push @$new, $x;
         }
+        goto NEXT;
     }
     else {
         while ( defined($x = $it->()) ) {

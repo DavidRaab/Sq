@@ -877,6 +877,57 @@ Same as C<iteri>.
     # 4: 14
     # 5: 15
 
+=head2 do($seq, $f) -> $seq
+
+A functions like C<iter> starts to iterate all elements of a sequence. C<do> does
+not. It just allows that a function is called before each element is returned.
+This is usually useful in debugging. You can easily intercept anywhere between
+in a sequence.
+
+    # [4,16,36,64,100]
+    my $array =
+        Seq
+        ->range(1, 1000)
+        ->filter(sub($x) { $x % 2 == 0       })
+        ->do(    sub($x) { printf "%d\n", $x })
+        ->map(   sub($x) { $x * $x           })
+        ->to_array(5);
+
+The above code first filters out even numbers, then calculates the square of
+each number. It only returns the first 5 numbers as an array. But besides doing
+that, this code will print.
+
+    2
+    4
+    6
+    8
+    10
+
+C<do> only executes for those elements you ask for. If you don't force evaluation
+somehow through any B<CONVERTER> method, then nothing will happen. Use C<iter>
+when you want to force evaluation.
+
+=head2 doi($seq, $f) -> $seq
+
+Same as C<do> but additionally passes an B<index> to the function C<$f>.
+
+    # [4,16,36,64,100]
+    my $array =
+        Seq
+        ->range(1, 1000)
+        ->filter(sub($x)      { $x % 2 == 0                 })
+        ->doi(   sub($x,$idx) { printf "$d: %d\n", $idx, $x })
+        ->map(   sub($x)      { $x * $x                     })
+        ->to_array(5);
+
+Besides returning the array, the code will also print.
+
+    0: 2
+    1: 4
+    2: 6
+    3: 8
+    4: 10
+
 =head1 Github
 
 Development project is on Github. L<https://github.com/DavidRaab/Seq>
