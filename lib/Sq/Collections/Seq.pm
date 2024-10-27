@@ -937,18 +937,12 @@ sub reduce($seq, $default, $reducer) {
     return fold(skip($seq, 1), first($seq, $default), $reducer);
 }
 
-# Returns first element of seq or default
-#
 # first : Seq<'a> -> 'a -> 'a
 sub first($seq, $default) {
     my $first = $seq->()();
     return defined $first ? $first : $default;
 }
 
-# TODO: first_match / last_match
-
-# Returns last element of seq or default
-#
 # last : Seq<'a> -> 'a -> 'a
 sub last($seq, $default) {
     my $last;
@@ -957,6 +951,8 @@ sub last($seq, $default) {
     });
     return defined $last ? $last : $default;
 }
+
+# TODO: first_match / last_match
 
 # to_array : Seq<'a> -> Array<'a>
 sub to_array($seq, $count=undef) {
@@ -979,8 +975,6 @@ sub to_array($seq, $count=undef) {
     return $new;
 }
 
-# Turns a Sequence into
-#
 # expand : Seq<'a> -> ListContext<'a>
 sub expand($seq) {
     return @{ to_array($seq) };

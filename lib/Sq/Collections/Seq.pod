@@ -690,6 +690,46 @@ and then iterate through that array just use C<iter> instead.
     my $array = $seq->to_array;
     my $array = $seq->to_array(10);
 
+=head2 first($seq, $default)
+
+Returns first element of seq or C<$default> if sequence is empty.
+
+    my $first = $seq->first(0);
+
+    my $one   = Seq->range(1,10)->first(0);
+    my $zero  = Seq->empty      ->first(0);
+
+=head2 last($seq, $default)
+
+Returns last element of seq or C<$default> if sequence is empty.
+
+    my $last = $seq->first(0);
+
+    my $ten   = Seq->range(1,10)->last(0);
+    my $zero  = Seq->empty      ->last(0);
+
+=head2 expand($seq)
+
+Similar to C<to_array> as that it starts to turn a sequence into an array. But
+instead of returning it as a blessed Sq Array it returns it as a Perl List
+in List Context.
+
+Only use this function if you need to pass a list of values to some other function,
+if you just want to iterate every element use C<iter>, C<iteri> instead. Prefer
+C<to_array> over C<expand>.
+
+    my @array = $seq->expand;
+    my $array = $seq->to_array();
+
+    for my $x ( $seq->expand ) {
+        ...
+    }
+
+    # Better
+    $seq->iter(sub($x) {
+        ...
+    });
+
 =head1 SIDE-EFFECTS
 
 =head1 Github
