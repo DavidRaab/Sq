@@ -76,6 +76,7 @@ is(
     ["Hello", 5, "World", 5, "One", 3, "Two", 3],
     'map with multiple return values');
 
+# as_hash
 {
     my $h = Array->new(qw/Hello World One Two/)->map(sub($str) { $str => length $str })->as_hash;
 
