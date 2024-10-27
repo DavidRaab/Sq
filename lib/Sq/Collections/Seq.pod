@@ -749,6 +749,38 @@ C<as_hash> or C<to_hash> instead.
         ...
     });
 
+=head2 fold($seq, $state, $folder) -> Any
+
+fold is like a foreach-loop. You iterate through all items generating a new B<State>.
+The C<$folder> is passed the latest B<State> and one element from the sequence. You
+return the next B<State> that should be used. Once all elements of the sequence are
+processed the latest B<State> is returned.
+
+    my $seq = Seq->range(1,1000);
+    my $sum = $seq->fold(0, sub($state, $x) {
+        $state + $x
+    });
+
+Above you can see that C<0> is passed as the starting B<State>. On the first iteration
+the subroutine gets C<0> as C<$state> passed and C<1> as the first element of the
+sequence. It calculates C<0 + 1> and returns C<1> as the next B<State>.
+
+Then for the next iteration C<1> for C<$state> is used and C<2> as C<$x>. It returns
+C<1 + 2> as the next C<$state> and continues until all elements of the sequence
+are iterated. The last calculated C<$state> is returned as the final result of
+C<fold>.
+
+You can compare it to a foreach-loop because what you define as C<$state> is usually
+what you would define outside of a loop. Consider the following example with an
+Array as comparison to understand what C<fold> does.
+
+    my @seq = (1 .. 1000);
+    my $state = 0;
+    for my $x ( @seq ) {
+        $state = $state + $x;
+    }
+    return $state;
+
 =head1 SIDE-EFFECTS
 
 =head1 Github
