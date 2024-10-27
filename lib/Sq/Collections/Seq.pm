@@ -626,7 +626,7 @@ sub zip($seqA, $seqB) {
         return sub {
             if (defined ($a = $itA->())) {
             if (defined ($b = $itB->())) {
-                return [$a,$b];
+                return Array->new($a,$b);
             }}
             return undef;
         }
