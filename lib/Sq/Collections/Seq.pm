@@ -1079,7 +1079,20 @@ sub str_split($seq, $regex) {
 }
 
 sub as_hash($seq) {
-    return bless({ expand($seq) }, 'Hash');
+    my $h  = Hash->new;
+    my $it = $seq->();
+
+    my ($key, $value);
+    NEXT:
+    $key   = $it->();
+    goto ABORT if not defined($key);
+    $value = $it->();
+    goto ABORT if not defined($value);
+    $h->{$key} = $value;
+    goto NEXT;
+
+    ABORT:
+    return $h;
 }
 
 # Build a hash by providing a mapping function returning a key/value pair.
