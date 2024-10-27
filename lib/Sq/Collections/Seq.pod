@@ -670,9 +670,25 @@ Repeats a whole sequence a given amount.
 
 Implemented, but not documented yet:
 
-fold, reduce, first, last, to_array, to_list, count, sum, sum_by, min,
+fold, reduce, first, last, to_list, count, sum, sum_by, min,
 min_by, min_by_str, max, max_str, max_by, max_by_str, str_join, to_hash,
 group_by, find
+
+=head2 to_array($seq, $count=undef) -> Array
+
+Converts the whole sequence into an array. This causes the sequence to compute
+things. Optionally you can pass in a C<$count> of how many max items you want to
+take from the sequence. When no C<$count> or C<undef> or not a number is passed,
+then all items from the sequence are taken.
+
+When you just want to iterate through all items, instead of calling C<to_array>
+and then iterate through that array just use C<iter> instead.
+
+    # those are the same
+    $seq->take(10)->to_array == $seq->to_array(10);
+
+    my $array = $seq->to_array;
+    my $array = $seq->to_array(10);
 
 =head1 SIDE-EFFECTS
 

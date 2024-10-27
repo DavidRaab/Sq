@@ -21,7 +21,15 @@ is($range->to_array, [1 .. 10], 'to_array');
 is($range->to_array, [1 .. 10], 'calling to_array twice still returns the same');
 is(Seq->range(1,1)->to_array, [1], 'range is inclusive');
 is($rangeDesc->to_array, [reverse 1 .. 10], 'rangeDesc');
-is($range->to_array, $rangeDesc->rev->to_array, 'reverse of rangeDesc same as range');
+is($range->to_array,     $rangeDesc->rev->to_array, 'reverse of rangeDesc same as range');
+
+# to_array with a limit
+is($range->to_array(0),     [],      'to_array(0)');
+is($range->to_array(-1),    [],      'to_array(-1)');
+is($range->to_array(1),     [1],     'to_array(1)');
+is($range->to_array(5),     [1..5],  'to_array(5)');
+is($range->to_array(100),   [1..10], 'to_array(100)');
+is($range->to_array("foo"), $range->to_array, 'to_array(not number)');
 
 is(
     $range->map($double)->to_array,
@@ -35,6 +43,10 @@ is(
 is($range->take(5)->to_array,  [1..5], 'take 1');
 is($range->take(0)->to_array,  [],     'take 2');
 is($range->take(-1)->to_array, [],     'take 3');
+is($range->take(5)->to_array,  $range->to_array(5),  'take(x) same as to_array(x) 1');
+is($range->take(0)->to_array,  $range->to_array(0),  'take(x) same as to_array(x) 2');
+is($range->take(-1)->to_array, $range->to_array(-1), 'take(x) same as to_array(x) 3');
+
 
 is($range->length, 10, 'length');
 is($range->take(5)->length, 5, 'take & length');

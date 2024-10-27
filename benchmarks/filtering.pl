@@ -150,8 +150,7 @@ sub first_5_seq_nc {
         Seq
         ->from_array($numbers)
         ->filter(sub($x) { $x % 2 == 0 })
-        ->take(5)
-        ->to_array;
+        ->to_array(5);
     return;
 }
 

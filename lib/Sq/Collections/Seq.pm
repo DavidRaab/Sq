@@ -939,12 +939,22 @@ sub last($seq, $default) {
 }
 
 # to_array : Seq<'a> -> Array<'a>
-sub to_array($seq) {
+sub to_array($seq, $count=undef) {
+    $count  = Sq::is_num($count) ? int($count) : undef;
     my $new = Array->new;
     my $it  = $seq->();
     my $x;
-    while ( defined($x = $it->()) ) {
-        push @$new, $x;
+    if ( defined $count ) {
+        my $current = 0;
+        while ( defined($x = $it->()) ) {
+            return $new if $current++ >= $count;
+            push @$new, $x;
+        }
+    }
+    else {
+        while ( defined($x = $it->()) ) {
+            push @$new, $x;
+        }
     }
     return $new;
 }
