@@ -223,16 +223,19 @@ sub append($seqA, $seqB) {
 
 # map : Seq<'a> -> ('a -> 'b) -> Seq<'b'>
 sub map($seq, $f) {
-    from_sub('Seq', sub {
-        my $it = $seq->();
+    return bless(sub {
+        my $abort = 0;
+        my $it    = $seq->();
         my $x;
         return sub {
+            return undef if $abort;
             if ( defined($x = $it->()) ) {
                 return $f->($x);
             }
-            return undef;
+            $abort = 1;
+            undef $it;
         }
-    });
+    }, 'Seq');
 }
 
 # bind : Seq<'a> -> ('a -> Seq<'b>) -> Seq<'b>
@@ -436,29 +439,41 @@ sub mapi($seq, $f) {
 
 # filter : Seq<'a> -> ('a -> bool) -> Seq<'a>
 sub filter($seq, $predicate) {
-    from_sub('Seq', sub {
-        my $it = $seq->();
+    return bless(sub {
+        my $abort = 0;
+        my $it    = $seq->();
         my $x;
         return sub {
+            return undef if $abort;
             while ( defined($x = $it->()) ) {
                 return $x if $predicate->($x);
             }
-            return undef;
+            $abort = 1;
+            undef $it;
         }
-    });
+    }, 'Seq');
 }
 
 # take : Seq<'a> -> int -> Seq<'a>
 sub take($seq, $amount) {
-    from_sub('Seq', sub {
-        my $i             = $seq->();
+    return bless(sub {
+        my $abort         = 0;
+        my $it            = $seq->();
         my $returnedSoFar = 0;
         my $x;
         return sub {
-            return $i->() if $returnedSoFar++ < $amount;
+            return undef if $abort;
+            if ( $returnedSoFar++ < $amount ) {
+                if ( defined($x = $it->()) ) {
+                    return $x;
+                }
+                $abort = 1;
+                undef $it;
+            }
+
             return undef;
         }
-    });
+    }, 'Seq');
 }
 
 # take_while : Seq<'a> -> ('a -> bool) -> Seq<'a>

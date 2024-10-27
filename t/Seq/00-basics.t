@@ -50,6 +50,7 @@ is($range->take(-1)->to_array, $range->to_array(-1), 'take(x) same as to_array(x
 
 is($range->length, 10, 'length');
 is($range->take(5)->length, 5, 'take & length');
+is($range->map(sub($x) { undef })->to_array, [], 'map function returns undef');
 is(
     $range->map($square)->filter($is_even)->to_array,
     [4,16,36,64,100],
@@ -84,6 +85,7 @@ is(
 
 is($range->sum, 55, 'sum');
 is($range->sum, $range->rev->sum, 'sum 2');
+
 
 # Checking wrap & rangeStep
 {
