@@ -807,4 +807,13 @@ is(
         'map2 - functional');
 }
 
+# range
+{
+    my $seq = Seq->range_step(1, 0.3, 2);
+    is(
+        $seq->to_array,
+        [1,1.3, 1.6, 1.9],
+        'does not overshoot');
+}
+
 done_testing;

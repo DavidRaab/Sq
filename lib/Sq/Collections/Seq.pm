@@ -77,17 +77,22 @@ sub replicate($class, $count, $initial) {
 #
 # Seq->unfold : 'State -> ('State -> Option<ListContext<'a,'State>>) -> Seq<'a>
 sub unfold($class, $state, $f) {
-    from_sub('Seq', sub {
+    bless(sub {
+        my $abort = 0;
         # IMPORTANT: Perl signatures are aliases. As we assign
         # to $state later, we need to make a copy here.
         # Removing this lines causes bugs.
         my $state = $state;
         my $x;
         return sub {
+            return undef if $abort;
             ($x, $state) = $f->($state);
-            return $x;
+            return $x if defined $x;
+            $abort = 1;
+            undef $state;
+            undef $x;
         }
-    });
+    }, 'Seq');
 }
 
 # Seq->init : int -> (int -> 'a) -> Seq<'a>
@@ -104,17 +109,37 @@ sub range_step($class, $start, $step, $stop) {
 
     # Ascending order
     if ( $start <= $stop ) {
-        return unfold('Seq', $start, sub($current) {
-            return $current, $current+$step if $current <= $stop;
-            return undef;
-        });
+        return bless(sub {
+            my $abort   = 0;
+            my $current = $start;
+            my $next    = $current;
+
+            return sub {
+                return undef if $abort;
+                $current = $next;
+                $next   += $step;
+                return $current if $current <= $stop;
+                $abort = 1;
+                return undef;
+            }
+        }, 'Seq');
     }
     # Descending
     else {
-        return unfold('Seq', $start, sub($current) {
-            return $current, $current-$step if $current >= $stop;
-            return undef;
-        });
+        return bless(sub {
+            my $abort   = 0;
+            my $current = $start;
+            my $next    = $current;
+
+            return sub {
+                return undef if $abort;
+                $current = $next;
+                $next   -= $step;
+                return $current if $current >= $stop;
+                $abort = 1;
+                return undef;
+            }
+        }, 'Seq');
     }
 }
 
