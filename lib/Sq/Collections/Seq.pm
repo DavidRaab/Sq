@@ -1095,9 +1095,6 @@ sub as_hash($seq) {
     return $h;
 }
 
-# Build a hash by providing a mapping function returning a key/value pair.
-# Later keys overwrite prrevious ones.
-#
 # to_hash : Seq<'a> -> ('a -> 'Key,'Value) -> Hash<'Key * 'a>
 sub to_hash($seq, $mapper) {
     my $hash = Hash->new;

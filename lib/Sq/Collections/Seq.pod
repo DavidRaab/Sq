@@ -708,6 +708,24 @@ Returns last element of seq or C<$default> if sequence is empty.
     my $ten   = Seq->range(1,10)->last(0);
     my $zero  = Seq->empty      ->last(0);
 
+=head2 as_hash($seq) -> $hash
+
+Turns a sequence into a Sq Hash by expecting that the sequence contains key/value
+pairs. Similar as writing C<< my %hash = @list >> in Perl.
+
+    # { foo => 1, bar => 2 }
+    my $hash = Seq->new(qw/foo 1 bar 2/)->as_hash;
+
+=head2 to_hash($seq, $mapper) -> $hash
+
+Calls C<$mapper> function for every element in the sequence. Expects that
+C<$mapper> returns the key and value used to build the final Hash.
+
+    # {"Hello" => 5, "World" => 5, "One" => 3, "Two" => 3}
+    my $hash = Seq->new(qw/Hello World One Two/)->to_hash(sub($key) {
+        $key => length $key
+    });
+
 =head2 expand($seq)
 
 Similar to C<to_array> as that it starts to turn a sequence into an array. But
@@ -716,7 +734,8 @@ in List Context.
 
 Only use this function if you need to pass a list of values to some other function,
 if you just want to iterate every element use C<iter>, C<iteri> instead. Prefer
-C<to_array> over C<expand>.
+C<to_array> over C<expand>. When you want to turn a Sequence into a Hash, use
+C<as_hash> or C<to_hash> instead.
 
     my @array = $seq->expand;
     my $array = $seq->to_array();

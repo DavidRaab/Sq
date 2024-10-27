@@ -737,6 +737,11 @@ is(
         $h,
         check_isa('Hash'),
         'Is a Hash');
+
+    my $h2 = Seq->new(qw/Hello World One Two/)->to_hash(sub($key) {
+        $key => length $key
+    });
+    is($h, $h2, 'bind->as_hash vs to_hash');
 }
 
 done_testing;
