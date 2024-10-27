@@ -52,9 +52,11 @@ sub from_sub($class, $f) {
 
 # always return $x
 sub always($class, $x) {
-    return from_sub(Seq => sub {
-        return sub { return $x }
-    });
+    return bless(sub {
+        return sub {
+            return $x;
+        }
+    }, 'Seq');
 }
 
 # empty sequence
