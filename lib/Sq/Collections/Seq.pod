@@ -781,6 +781,49 @@ Array as comparison to understand what C<fold> does.
     }
     return $state;
 
+=head2 fold_mut($seq, $state, $folder) -> Any
+
+C<fold_mut> is an optimization of C<fold>. C<fold> works by computing a new C<$state>
+on every call. Every time the C<$folder> function is executed the result of this
+call is assigned to C<$state>. In a fully immutable programming environment
+this is usually fine and the only way to create immutable-data.
+
+Perl on the other hand is not an immutable language, don't provide immutable
+data-types by default and because of the lack like a JIT or a compiler with
+a dozens of compiler optimizations is in general slower. Because of that it
+is sometimes helpful to operate on mutable data as an optimization.
+
+C<fold_mut> works the same as C<fold>, but it expects that C<$state> is mutated
+during every iteration. After all operations are finished, C<$state> is still
+returned.
+
+    # this transforms a sequence into an array
+    my $array = Seq->range(1,1000)->fold_mut([], sub($array, $x) {
+        push @$array, $x;
+        return;
+        # the explicit return is not needed.It just shows that the return
+        # value of this lambda is not used.
+    });
+
+=head2 reduce($seq, $default, $reducer) -> Any
+
+In a dynamic-typed language like Perl it is basically the same as C<fold>. The
+only difference is that no C<$state> is explicitly passed and it just begins
+calling C<$reducer> with the first two elements of the sequence.
+
+When the sequence only has one element than this element is immediately returned
+without that C<$reducer> is ever called. It is compareable when you have an
+empty sequence and use C<fold>, then C<$state> is immediately returned.
+
+But what should be returned when the sequence is empty? Because of this C<reduce>
+expects an argument C<$default>. Other possibilites would be to throw an exception,
+return an option or something else.
+
+I highly encourage to better use C<fold> or C<fold_mut> instead of C<reduce>.
+
+    my $sum = Seq->range(1,1000)->reduce(0, sub($x,$y)     { $x + $y     });
+    my $sum = Seq->range(1,1000)->fold(  0, sub($state,$x) { $state + $x });
+
 =head1 SIDE-EFFECTS
 
 =head1 Github

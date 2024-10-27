@@ -911,11 +911,6 @@ sub fold($seq, $state, $folder) {
     return $result;
 }
 
-# Same as fold. But when you want to mutate 'State and return 'State from
-# the lambda you can use this function instead. Its faster and creates
-# less garbage. Works best when $state is directely created with
-# the fold_mut call. Otherwise can have serious issues.
-#
 # fold_mut : Seq<'a> -> 'State -> ('State -> 'a -> unit) -> 'State
 sub fold_mut($seq, $state, $folder) {
     my $it = $seq->();
@@ -926,11 +921,6 @@ sub fold_mut($seq, $state, $folder) {
     return $state;
 }
 
-# Like fold, but without an initial state. When sequence is empty
-# it returns an undef. Otherwise combines two elements from
-# left to right to produce an output. Needs a sequence
-# with one item to work properly. It is encouraged to use `fold`
-# instead.
 # reduce: Seq<'a> -> ('a -> 'a -> 'a) -> 'a
 sub reduce($seq, $default, $reducer) {
     return fold(skip($seq, 1), first($seq, $default), $reducer);
