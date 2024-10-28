@@ -112,6 +112,30 @@ is($data,  {foo  => 1, bar  => 10, baz  =>  5}, '$data stays the same');
 is($data3, {bar => 10, baz => 5},               'filter');
 is($data3, $ishash,                             '$data3 isa Hash');
 
+{
+    my $player_points = Hash->new(
+        Anne   => 10,
+        Marie  => 12,
+        Ralph  => 8,
+        Rudolf => 9,
+    );
+
+    is(
+        $player_points->filter(sub($k,$v) { $v > 9 ? 1 : 0 }),
+        { Anne => 10, Marie => 12 },
+        'above 9');
+
+    is(
+        $player_points->filter(sub($k,$v) { $k =~ m/\AR/ }),
+        { Ralph => 8, Rudolf => 9 },
+        'players starting with R');
+
+    is(
+        $player_points->filter(sub($k,$v) { $v > 100 ? 1 : 0 }),
+        { },
+        'above 100');
+}
+
 # fold
 is($data->fold(0, sub($state, $k, $v) { $state + $v }), 16, 'fold 1');
 is($data->fold(1, sub($state, $k, $v) { $state + $v }), 17, 'fold 2');
