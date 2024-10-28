@@ -23,7 +23,7 @@ and will never be done. This design is choosen for several reasons.
 
 =over 4
 
-=item *
+=item Normal Array
 
 You always can use and threat an array created by this package like a normal
 Perl Array. Doing this is completely fine.
@@ -35,18 +35,18 @@ Perl Array. Doing this is completely fine.
 
     push @$array, 6, 7, 8;
 
-=item *
+=item Compatibility
 
 An Sq Array always should and can be used wherever an Array reference is
 expected. This works as long a module does not any kind of pseudo type-checking
 and just uses it as an array.
 
-=item *
+=item Performance
 
-No re-implementation of an Array, as it not needed. Would be probably to slow
+No re-implementation of an Array, as it is not needed. Would be probably to slow
 and a burden to work with in Perl.
 
-=item *
+=item Convenience
 
 This way it just extends the possibility that you can call a lot of functions
 in this package as methods on an array.
