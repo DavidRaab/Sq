@@ -234,7 +234,7 @@ this code roughly translates to
 
 =head1 METHODS
 
-=head2 copy($array) -> $array
+=head2 copy($array) : $array
 
 Creates a shallow copy of an array, up until the first undef. This behaviour
 is choosen to avoid `undef` as being as data and being consistent to all
@@ -286,7 +286,7 @@ reference. So you always can chain methods even if you started without any.
 
     my $array = Array::append([1..10], [11..20])->rev # Array->range(20,1)
 
-=head2 append($array1, $array2) : Array<'a> -> Array<'a> -> Array<'a>
+=head2 append($array1, $array2) : $array
 
 returns a $new array that has $array2 appended onto $array1. C<append> only
 works with two arrays (one argument in method-style). If you want to
@@ -300,21 +300,21 @@ append multiple arrays together use C<< Array->concat >> instead.
         Array->range(7,9),
     );
 
-=head2 rev($array) : Array<'a> -> Array<'a>
+=head2 rev($array) : $array
 
 returns a new array with all elements reversed
 
     # [5,4,3,2,1]
     my $array = Array->range(1,5)->rev
 
-=head2 bind($array, $f) : Array<'a> -> ('a -> Array<'b>) -> Array<'b>
+=head2 bind($array_a, $f_array_b) : $array_b
 
 Iterates through each element of an array and passes each element to the
-function C<$f>. C<$f> must then return another array. The results of all
-function calls are then concatenated into a single array.
+function C<$f_array_b>. C<$f_array_b> must then return another array.
+The results of all function calls are then concatenated into a single array.
 
-When you pass the same function C<$f> to C<map> and then C<flatten> you
-achieve the same result.
+When you pass the same function C<$f_array_b> to C<map> and then C<flatten> you
+achieve the same result as calling C<bind>.
 
     my $words = Array->new(qw/foo bar baz/);
     # [qw/f o o b a r b a z/]
@@ -323,7 +323,7 @@ achieve the same result.
             return [split //, $word];
         });
 
-=head2 flatten($array) : Array<Array<'a>> -> Array<'a>
+=head2 flatten($array_of_array) : $array
 
 Flattens an array of an array into a single array.
 
@@ -343,7 +343,7 @@ Flattens an array of an array into a single array.
              ->map(sub($word) { [split //, $word] })
              ->flatten;
 
-=head2 cartesian($arrayA, $arrayB) -> $array
+=head2 cartesian($arrayA, $arrayB) : $array_of_array_a_b
 
 returns a new array containing the cartesian product of both arrays. The
 cartesian product is every item in C<$arrayA> combined with every item in
@@ -363,11 +363,11 @@ C<$arrayB>.
         printf "A=%s B=%s\n", $a, $b;
     });
 
-=head2 map($array, $f) : Array<'a> -> ('a -> 'b) -> Array<'b>
+=head2 map($array_a, $f_b) : $array_b
 
-Iterates through an array and passes each element to the function C<$f>. It
+Iterates through an array and passes each element to the function C<$f_b>. It
 constructs a new array with the result of the function call. Different
-to built-int C<map> it has special behaviour when C<undef> is returned. In this
+to built-in C<map> it has special behaviour when C<undef> is returned. In this
 case C<map> skips the element and does not add it to the resulting
 array. This way C<map> behaves like a C<<->map($f)->filter($predicate)>>
 in a single function call.
@@ -389,7 +389,7 @@ in a single function call.
         ->map(   sub($x) { $x * $x     })
         ->filter(sub($x) { $x % 2 == 0 });
 
-=head2 mapi($array, $f) : Array<'a> -> ('a -> int -> 'b) -> Array<'b>
+=head2 mapi($array_a, $f_b) : $array_b
 
 Same as C<map> but the function C<$f> additionally gets an index passed.
 
@@ -398,7 +398,7 @@ Same as C<map> but the function C<$f> additionally gets an index passed.
         Array->new(qw/foo bar baz/)
         ->mapi(sub($x,$i) { [$i,$x] };
 
-=head2 filter($array, $predicate) : Array<'a> -> ('a -> bool) -> Array<'a>
+=head2 filter($array, $predicate) : $array
 
 Iterates through each element of an array and passes it to the C<$predicate>
 function. When the C<$predicate> function returns a truish value then the value
@@ -409,7 +409,7 @@ is returned in a new array. Works like the perl built-in C<grep>.
         Array->range(1,10)
         ->filter(sub($x) { $x % 2 == 0 });
 
-=head2 skip($array, $amount) : Array<'a> -> int -> Array<'a>
+=head2 skip($array, $amount) : $array
 
 skips C<$amount> entries of an array. Negative values or zero has no effect.
 Skipping more elements than the array has leds to an empty array. Always
@@ -422,7 +422,7 @@ returns a new array, even in the case of passing it a zero or negative amount.
     # []
     my $array = Array->range(1,10)->skip(100);
 
-=head2 take($array, $amount) : Array<'a> -> int -> Array<'a>
+=head2 take($array, $amount) : $array
 
 Takes the first C<$amount> elements of an array and returns it as a new array.
 zero or negative elements return an empty array. Taking more elements as the
@@ -431,7 +431,7 @@ array just returns the whole array again. Always returns a new array.
     # [1,2,3,4,5]
     my $five = Array->range(1,100)->take(5);
 
-=head2 indexed($array) : Array<'a> -> Array<Array<int,'a>>
+=head2 indexed($array) : [[$index,$x], [$index,$x], ...]
 
 Returns a new array where each element is put together with its index inside
 another array. Consider using C<mapi> or C<iteri> if they are more appropiated
