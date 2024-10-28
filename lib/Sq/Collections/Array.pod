@@ -501,19 +501,19 @@ array had.
 
 Converter are methods on an array that don't return C<Array>.
 
-=head2 length($array) : Array<'a> -> int
+=head2 length($array) : $int
 
 Returns the amount of elements in an array.
 
     my $count = Array->new(0,0,0)->length; # 3
 
-=head2 fold($array, $state, $f) : Array<'a> -> 'State -> ('State -> 'a -> 'State) -> 'State
+=head2 fold($array, $state, $f_state) : $state
 
 Iterates through each element of an array. On first iteration it passes C<$state>
-and the first element of the array to the function C<$f>. C<$f> then returns
-the next state that is passed with the second element of the array. This continues
-until all elements of an array are iterated. The last state of the last C<$f>
-function call is returned.
+and the first element of the array to the function C<$f_state>. C<$f_state> then returns
+the next state that is used in the next call to C<$f_state> and the next
+item of the array. This continues until all elements of an array are iterated. The
+last state of the last C<$f_state> function call is returned.
 
 When the array is empty C<$state> is immediately returned.
 
@@ -524,13 +524,13 @@ When the array is empty C<$state> is immediately returned.
 
 TODO
 
-=head2 reduce($array, $default, $f) : Array<'a> -> 'a -> ('a -> 'a -> 'a) -> 'a
+=head2 reduce($array, $default, $f_x) : $x
 
-The idea is to combine two values into one value. Two values are passed to C<$f>
+The idea is to combine two values into one value. Two values are passed to C<$f_x>
 that combines the value into a new one. That new value is then passed with
 the third value of an array. Continues until all values are iterated and the
-last call to C<$f> is returned. When the array only has one value than this
-value is returned without C<$f> is ever being called. When the array is empty
+last call to C<$f_x> is returned. When the array only has one value than this
+value is returned without C<$f_x> is ever being called. When the array is empty
 C<$default> is returned.
 
 C<reduce> is a lot like C<fold>. C<reduce> just omits the starting state,
@@ -549,7 +549,7 @@ Because of all of this I highly recommend to always use C<fold> instead.
     # 0
     my $sum = Array->empty->reduce(0, sub($x,$y) { $x + $y });
 
-=head2 expand($array) : Array<'a> -> ListContext<'a>
+=head2 expand($array) : ($x,$x,$x,$x,...)
 
 Expands an array into its values. Array is just an array-reference. Calling
 C<expand> is the same as writing C<@$array>.
@@ -559,9 +559,9 @@ C<expand> is the same as writing C<@$array>.
     for my $x ( $array->@* )     { ... }
     for my $x ( @$array )        { ... }
 
-=head2 first($array, $default) : Array<'a> -> 'a -> 'a
+=head2 first($array, $default_x) : $x
 
-Returns the first element of an array or C<$default> if the array is empty.
+Returns the first element of an array or C<$default_x> if the array is empty.
 
     # 10
     my $first = Array->range(1,10)->rev->first(0);
@@ -569,9 +569,9 @@ Returns the first element of an array or C<$default> if the array is empty.
     # 100
     my $first = Array->empty->first(100);
 
-=head2 last($array, $default) : Array<'a> -> 'a -> 'a
+=head2 last($array, $default_x) : $x
 
-Returns the last element of an array or C<$default> if the array is empty.
+Returns the last element of an array or C<$default_x> if the array is empty.
 
     # 1
     my $last = Array->range(1,10)->rev->last(0);
@@ -579,7 +579,7 @@ Returns the last element of an array or C<$default> if the array is empty.
     # 100
     my $last = Array->empty->last(100);
 
-=head2 sum($array) : Array<Number> : Number
+=head2 sum($array_of_numbers) : $number
 
 Adds all numbers together in an array. Does no type-checking or something like
 that. If you have an array with other values than numbers then expect a lot of
@@ -588,11 +588,11 @@ warnings and weird results.
     # 55
     my $sum = Array->range(1,10)->sum;
 
-=head2 sum_by($array, $f) : Array<'a> -> ('a -> Number) -> Number
+=head2 sum_by($array, $f_number) : $number
 
 A lot like C<sum> but every value of an array is first passed to the function
-C<$f>. That function then can return a number that is used for adding. You
-could achive the same by calling C<< $array->map($f)->sum >> but this version
+C<$f_number>. That function then should return a number that is used for adding. You
+could achive the same by calling C<< $array->map($f_number)->sum >> but this version
 is faster because it doesn't need to create an intermediate array.
 
     my $value = sub($hash) { $hash->{value} };
@@ -622,11 +622,16 @@ performs a C<split> operation on every string in the array. This then returns
 an array of arrays containing string. Every inner array is also a blessed Sq
 Array.
 
+You could achieve the same by using C<map> and then splitting every string. But
+this version is faster.
+
     # [[1,2,3], [4,5,6]]
-    my $data =
-        Array
-        ->new("1-2-3", "4-5-6")
-        ->split(qr/-/);
+    my $data = Array->new("1-2-3", "4-5-6")->split(qr/-/);
+
+    # same as
+    my $data = Array->new("1-2-3", "4-5-6")->map(sub($str) {
+        Array->new(split /-/, $str)
+    });
 
 =head2 group_fold
 
@@ -649,7 +654,7 @@ you will overwrite the previous value.
         $hash->{ length $x } = $x;
     }
 
-=head2 to_hash_of_array($array, $mapper) : Array<'a> -> ('a -> 'Key * 'Value) -> Hash<'Key,'Value>
+=head2 to_hash_of_array($array, $mapper) : $hash_of_arrays
 
 Same as C<to_hash> but instead of overwriting previous values it collects
 all values of the same key into an array.
@@ -665,7 +670,7 @@ all values of the same key into an array.
         push $hash->{ length $x }->@*, $x;
     }
 
-=head2 as_hash($array)
+=head2 as_hash($array) : $hash
 
 Transforms array into an hash. Same as assigning Array to a Hash. But blessed
 in the C<Hash> package and as a reference.
@@ -748,7 +753,7 @@ Only copies as much values that are present in C<$source_array>.
 The following methods have no return value and exists for various kind
 of doing side-effects.
 
-=head2 iter($array, $f) : Array<'a> -> ('a -> unit)
+=head2 iter($array, $f) : void
 
 Iterates through an array and passes each element to the provided function
 that does some kind of side-effect.
@@ -756,7 +761,7 @@ that does some kind of side-effect.
     # prints all numbers from 1 to 100
     Array->range(1,100)->iter(sub($x) { say $x });
 
-=head2 iteri($array, $f) : Array<'a> -> ('a -> int -> unit)
+=head2 iteri($array, $f) : void
 
 Iterates through an array and passes each element inlcuding the index to the
 provided function that does some kind of side-effect.
@@ -764,10 +769,10 @@ provided function that does some kind of side-effect.
     # prints: 0 => 1, 1 => 2, 2 => 3 ...
     Array->range(1,100)->iter(sub($x,$i) { printf "%d => %d\n", $i, $x });
 
-=head2 foreach($array, $f) : Array<'a> -> ('a -> unit)
+=head2 foreach($array, $f) : void
 
 Same as C<iter>, just an alias.
 
-=head2 foreachi($array, $f) : Array<'a> -> ('a -> int -> unit)
+=head2 foreachi($array, $f) : void
 
 Same as C<iteri>, just an alias.
