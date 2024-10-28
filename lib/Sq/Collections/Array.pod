@@ -56,7 +56,7 @@ in this package as methods on an array.
 =head1 CONSTRUCTORS
 
 Constructor functions are package functions that helps in the creation of
-new Arrays. All Constructor function must be called with an arrow C<->>
+new Arrays. All Constructor functions must be called with an arrow C<< -> >>
 as you expect it from typical OO code. Like C<< Array->new(...) >> or
 C<< Array->init(...) >>.
 
