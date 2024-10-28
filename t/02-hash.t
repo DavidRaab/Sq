@@ -624,19 +624,24 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
         'testing optional none case');
 
     is(
-        $data->pick(sub($k,$v){ return $k >= 10 ? [$k,$v] : undef}),
-        [10 => 'baz'],
+        $data->pick(sub($k,$v){ return $k >= 10 ? Some [$k,$v] : None}),
+        Some [10 => 'baz'],
         'pick baz');
 
     is(
-        $data->pick(sub($k,$v){ return $k < 2 ? [$k,$v] : undef}),
-        [ 1 => 'foo' ],
+        $data->pick(sub($k,$v){ return $k < 2 ? Some [$k,$v] : None}),
+        Some [ 1 => 'foo' ],
         'pick foo');
 
     is(
-        $data->pick(sub($k,$v){ return $k > 100 ? [$k,$v] : undef}),
-        undef,
+        $data->pick(sub($k,$v){ return $k > 100 ? Some [$k,$v] : None}),
+        None,
         'pick did not found anything');
+
+    is(
+        $data->pick(sub($k,$v){ $k > 9 ? Some $k * 2 : None}),
+        Some 20,
+        'pick returning string');
 }
 
 # on & has_keys

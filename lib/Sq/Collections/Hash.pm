@@ -55,16 +55,12 @@ sub find($hash, $predicate) {
     return Option::None();
 }
 
-# Like find. But $mapping must return an "optional". Any other value than undef
-# that $mapping returns is immediately returned. If $mapping never returns
-# any other value than undef, then undef is returned.
-# pick is like ->find->map combined
 sub pick($hash, $mapping) {
     for my $k ( CORE::keys %$hash ) {
-        my $x = $mapping->($k,$hash->{$k});
-        return $x if defined $x;
+        my $opt = $mapping->($k,$hash->{$k});
+        return $opt if Option::is_some($opt);
     }
-    return undef;
+    return Option::None();
 }
 
 sub filter($hash, $predicate) {

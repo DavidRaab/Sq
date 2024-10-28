@@ -170,3 +170,27 @@ then you cannot expect a certain entry.
         ->map(sub($array) { $array->[1] })  # Option::map
         ->or("whatever");                   # Option::or
 
+=head2 pick($hash, $f_opt) : Option<$x>
+
+Similar to find as it searches for a key,value pair. But instead of providing
+a function that returns a truish value it is expected that it returns an
+optional value.
+
+If C<$f_opt> returns C<Some> value then the value is used, when it return C<None>
+then the value is skipped. When C<$f_opt> returns B<None> for all values, then
+B<None> is returned is a value.
+
+C<pick> is like finding a value, and then calling C<Option::map> on the result,
+but in a single operation.
+
+    my $data = Hash->new(
+        1  => 'foo',
+        2  => 'bar',
+        10 => 'baz',
+    );
+
+    my $opt = $data->pick(sub($k,$v){ $k >= 10 ? Some [$k,$v] : None}) # Some [10 => 'baz']
+    my $opt = $data->pick(sub($k,$v){ $k  <  2 ? Some [$k,$v] : None}) # Some [ 1 => 'foo']
+    my $opt = $data->pick(sub($k,$v){ $k > 100 ? Some [$k,$v] : None}) # None
+    my $opt = $data->pick(sub($k,$v){ $k >   9 ? Some $k * 2  : None}) # Some 20
+
