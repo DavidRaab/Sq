@@ -187,6 +187,32 @@ sub filter_e($array, $expr) {
     return CORE::bless($data, 'Array');
 }
 
+sub blit($source_array, $source_index, $target_array, $target_index, $amount) {
+    # allow negative indexing
+    $source_index =
+        $source_index < 0
+        ? @$source_array + $source_index
+        : $source_index;
+
+    # allows negativ indexing
+    $target_index =
+        $target_index < 0
+        ? @$target_array + $target_index
+        : $target_index;
+
+    # copy only as much values as available in source
+    my $max_amount = @$source_array - $source_index;
+    $amount = $amount < $max_amount ? $amount : $max_amount;
+
+    # actual copying
+    for ( 1 .. $amount ) {
+        $target_array->[$target_index] = $source_array->[$source_index];
+        $source_index++;
+        $target_index++;
+    }
+    return;
+}
+
 sub skip($array, $amount) {
     return CORE::bless([@$array], 'Array') if $amount <= 0;
     return CORE::bless([$array->@[$amount .. $array->$#*]], 'Array');

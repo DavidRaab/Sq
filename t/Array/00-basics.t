@@ -992,4 +992,66 @@ is(
         'joining inner arrays');
 }
 
+# bliting
+{
+    my $source = Array->range(100,110);
+    my $target = Array->range(1,10);
+
+    $source->blit(0, $target, 5, 2);
+    is($source, [100..110],                 '$source did not change');
+    is($target, [1,2,3,4,5,100,101,8,9,10], 'new $target');
+
+    $source->blit(20, $target, 0, 3);
+    is($target, [1,2,3,4,5,100,101,8,9,10], 'blit outside of range 1');
+
+    $source->blit(9, $target, 0, 3);
+    is($target, [109,110,3,4,5,100,101,8,9,10], 'blit outside of range 2');
+
+    $source->blit(5, $target, 10, 3);
+    is($target, [109,110,3,4,5,100,101,8,9,10,105,106,107], 'blit can append 1');
+
+    $source->blit(5, $target, 14, 1);
+    is(
+        $target,
+        [109,110,3,4,5,100,101,8,9,10,105,106,107,undef,105],
+        'blit can append 2');
+
+    $source->blit(-3, $target, -1, 5);
+    is(
+        $target,
+        [109,110,3,4,5,100,101,8,9,10,105,106,107,undef,108,109,110],
+        'blit with negative index');
+
+    $source->blit(-3, $target, 0, 3);
+    is(
+        $target,
+        [108,109,110,4,5,100,101,8,9,10,105,106,107,undef,108,109,110],
+        'blit with negative index 2');
+
+    $source->blit(5, $target, -3, 4);
+    is(
+        $target,
+        [108,109,110,4,5,100,101,8,9,10,105,106,107,undef,105,106,107,108],
+        'blit with negative index 3');
+
+    is($source, [100..110], '$source never changed');
+}
+
+{
+    my $source = Array->range(100,105);
+    my $target = Array->range(1,5);
+
+    $source->blit(0,  $target, 0,    3);
+    is($target, [100,101,102,4,5], 'pod example 1');
+
+    $source->blit(-2, $target, 0,  100);
+    is($target, [104,105,102,4,5], 'pod example 2');
+
+    $source->blit(4,  $target, -3,   2);
+    is($target, [104,105,104,105,5], 'pod example 3');
+
+    $source->blit(0,  $target, -1,   100);
+    is($target, [104,105,104,105,100,101,102,103,104,105], 'pod example 4');
+}
+
 done_testing;

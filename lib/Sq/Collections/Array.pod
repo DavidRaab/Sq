@@ -725,6 +725,24 @@ the perl built-in C<sunhift @$array, undef>.
     $array->unshift(qw/a b c/);            # ['a','b','c',1,2,3,4,5]
     $array->unshift('d', 'e', undef, 'f'); # ['d','e','a','b','c',1,2,3,4,5]
 
+=head2 blit($source_array, $source_index, $target_array, $target_index, $count) : void
+
+Copies C<$count> entries from C<$source_array> at position C<$source_index> to
+C<$target_array> starting at position C<$target_index>.
+
+C<$source_index> and C<$target_index> can both be negative indexes to define
+an index from the end.
+
+Only copies as much values that are present in C<$source_array>.
+
+    my $source = Array->range(100,105);
+    my $target = Array->range(1,5);
+
+    $source->blit(0,  $target, 0,    3); # $target -> [100,101,102,4,5]
+    $source->blit(-2, $target, 0,  100); # $target -> [104,105,102,4,5]
+    $source->blit(4,  $target, -3,   2); # $target -> [104,105,104,105,5]
+    $source->blit(0,  $target, -1, 100); # $target -> [104,105,104,105,100,101,102,103,104,105]
+
 =head1 SIDE-Effects
 
 The following methods have no return value and exists for various kind
