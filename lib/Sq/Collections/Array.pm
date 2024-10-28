@@ -109,7 +109,6 @@ sub range($class, $start, $stop) {
 #           functions operating on Array and returning another Array          #
 #-----------------------------------------------------------------------------#
 
-# makes a shallow-copy of an array-reference
 sub copy($array) {
     my @new;
     for my $x ( @$array ) {
