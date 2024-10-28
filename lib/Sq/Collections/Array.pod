@@ -476,19 +476,19 @@ for whatever you wanna do.
 
 =head2 skip_while
 
-=head2 slice($array, $pos, $length) : Array<'a> -> int -> int -> Array<'a>
+=head2 slice($array, $pos, $length) : $array
 
 Extracts a portion of values into a new array. The values are a shallow copy,
 but the array is a new array. If C<$pos> is negative than it is considered
 as a position from the end. C<$length> says how much elements starting from
 C<$pos> should be extracted. If C<$length> is zero or negative a new empty
 array is returned. It only extracts or creates as much values the original
-array had.
+array can provide.
 
     my $data = Array->range(1,10);
 
     $data->slice(0,3)   # [1,2,3]
-    $data->slive(1,3)   # [2,3,4]
+    $data->slice(1,3)   # [2,3,4]
     $data->slice(20,10) # []
     $data->slice(5,100) # [6,7,8,9,10]
     $data->slice(3,3)   # [4,5,6]
