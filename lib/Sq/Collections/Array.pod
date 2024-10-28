@@ -693,7 +693,7 @@ in the C<Hash> package and as a reference.
 
 The following methods mutate the array instead of creating a new one.
 
-=head2 push($array, @values) : Array<'a> -> ... -> unit
+=head2 push($array, @values) : void
 
 Adds elements to the end of the array. Like the built-in C<push> function
 but additionally stops at first C<undef>. If you want to push C<undef>
@@ -703,19 +703,19 @@ into an array then use the perl built-in C<push @$array, undef>.
     $array->push(1,2,3);    # [1,2,3]
     $array->push(4,undef,5) # [1,2,3,4]
 
-=head2 pop($array) : Array<'a> -> 'a
+=head2 pop($array) : $x
 
 Removes the last element from the array and returns it. Same as perl built-in C<pop>
 
     my $last = $array->pop;
 
-=head2 shift($array) : Array<'a> -> 'a
+=head2 shift($array) : $x
 
 Removes the first element from the array and returns it. Same as perl built-in C<shift>
 
     my $first = $array->shift;
 
-=head2 unshift($array, @values) : Array<'a> -> ... -> unit
+=head2 unshift($array, @values) : void
 
 Adds elements to the front of an array. Same as perl built-in C<unshift>
 but stops at first C<undef>. If you still want to unshift undef to the array use
