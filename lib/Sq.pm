@@ -91,35 +91,59 @@ uses the data-structures of this module.
 
 =head1 IMPORTED FUNCTIONS
 
-is_str, is_num, Some, None
+=head2 is_num($str) : $bool
 
-=head2 id
+returns a truish value if C<$str> is a number.
+
+=head2 is_str($str) : $bool
+
+returns a truish value if C<$str> is a string.
+
+=head2 Some($x) : $opt_x
+
+generates an optional value containing $x. See L<Sq::Core::Option>.
+The value C<undef> returns C<None>.
+
+    my $opt = Some(10);         # Some(10)
+    my $opt = Some(Array->new); # Some([])
+    my $opt = Some(undef);      # None
+
+=head2 None : $opt
+
+generates an optional value that indicates the absence of any value.
+
+    my $opt = None();
+    my $opt = None;
+
+=head2 id($x) : $x
 
 return its input as-is
 
     sub id($x) { return $x }
 
-=head2 fst
+=head2 fst($array) : $x0
 
 return the first element of an array
 
     sub fst($array) { return $array->[0] }
 
-=head2 snd
+=head2 snd($array) : $x1
 
 return the second element of an array
 
     sub snd($array) { return $array->[1] }
 
-=head2 key
+=head2 key($name) : $f_key_of_hash
 
-generates a function that picks a value from a hash.
+returns a function that selects the specified key from a hash.
 
     sub key($name) { sub($hash) { return $hash->{$name} } }
 
 =head2 assign
 
-allows you to assign a value, but also do a computation.
+This allows you to easily create a new scope where you can defined
+temporarily variables. The last expression of C<assign { ... }> is
+returned.
 
     my $value = assign {
         my $x = ...  # code to compute $x
@@ -131,8 +155,8 @@ Same as
 
     my $value;
     {
-        my $x = ...  # code to compute $x
-        my $y = ...  # code to compute $y
+        my $x  = ...  # code to compute $x
+        my $y  = ...  # code to compute $y
         $value = $x + $y;
     }
 
@@ -144,17 +168,16 @@ Same as
 
 =item L<Sq::Io>
 
-=item L<Sq::Collections::Hash>
+=item L<Sq::Collections::Seq>
 
 =item L<Sq::Collections::Array>
+
+=item L<Sq::Collections::Hash>
 
 =item L<Sq::Collections::Queue>
 
 =item L<Sq::Collections::List>
 
-=item L<Sq::Collections::Seq>
-
 =item L<Sq::Collections::Heap>
 
 =back
-
