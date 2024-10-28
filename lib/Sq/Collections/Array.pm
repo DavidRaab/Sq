@@ -164,6 +164,17 @@ sub map_e($array, $expr) {
     return CORE::bless($new, 'Array');
 }
 
+sub choose($array, $f_opt) {
+    my $new = new('Array');
+    for my $x ( @$array ) {
+        my $opt = $f_opt->($x);
+        if ( $opt->[0] == 1 ) {
+            push @$new, $opt->[1];
+        }
+    }
+    return $new;
+}
+
 sub mapi($array, $f) {
     my @new;
     my $idx = 0;

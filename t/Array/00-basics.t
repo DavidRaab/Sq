@@ -76,6 +76,17 @@ is(
     ["Hello", 5, "World", 5, "One", 3, "Two", 3],
     'map with multiple return values');
 
+# choose
+{
+    my $data = Array->range(1,10);
+    is(
+        $data->choose(sub($x) {
+            $x % 2 == 0 ? Some($x * $x) : None
+        }),
+        [4,16,36,64,100],
+        'choose');
+}
+
 # as_hash
 {
     my $h = Array->new(qw/Hello World One Two/)->map(sub($str) { $str => length $str })->as_hash;
