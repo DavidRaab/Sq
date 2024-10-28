@@ -593,19 +593,35 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     );
 
     is(
-        [ $data->find("not found", sub($k,$v){ return $k >= 10 ? 1 : 0 }) ],
-        [ 10 => 'baz' ],
+        $data->find(sub($k,$v){ return $k >= 10 ? 1 : 0 }),
+        Some([10 => 'baz']),
         'find baz');
 
     is(
-        [ $data->find("not found", sub($k,$v){ return $k < 2 ? 1 : 0 }) ],
-        [ 1 => 'foo' ],
+        $data->find(sub($k,$v){ return $k < 2 ? 1 : 0 }),
+        Some([ 1 => 'foo' ]),
         'find foo');
 
     is(
-        [ $data->find("not found", sub($k,$v){ return $k > 100 ? 1 : 0 }) ],
-        ["not found"],
+        $data->find(sub($k,$v){ return $k > 100 ? 1 : 0 }),
+        None,
         'not found');
+
+    is(
+        $data
+            ->find(sub($k,$v) { $k >= 10    })
+            ->map(sub($array) { $array->[1] })  # Option::map
+            ->or("whatever"),                   # Option::or
+        'baz',
+        'testing optional some case');
+
+    is(
+        $data
+            ->find(sub($k,$v) { $k >= 100   })
+            ->map(sub($array) { $array->[1] })  # Option::map
+            ->or("whatever"),                   # Option::or
+        'whatever',
+        'testing optional none case');
 
     is(
         $data->pick(sub($k,$v){ return $k >= 10 ? [$k,$v] : undef}),
