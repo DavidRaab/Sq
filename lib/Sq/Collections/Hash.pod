@@ -100,6 +100,57 @@ If the above doesn't work it is considered a bug. Additionally every C<$hash>
 or C<$array> returned by any C<Hash> function should always be blessed in
 the package C<Hash> or C<Array>.
 
+=head2 map($hash, $f) : $hash
+
+Iterates through a hash and passes every C<$key> and C<$value> to the function
+C<$f>. C<$f> is supposed to return a new C<$key> and C<$value> that is used
+to create a new Hash.
+
+    my $hash = Hash->new(foo => 1, bar => 2);
+
+    # { foofoo => 2, barbar => 4 }
+    my $new  = $hash->map(sub($key,$value) {
+        my $new_key   = $key . $key;
+        my $new_value = $value * 2;
+        return $new_key, $new_value;
+    });
+
+=head2 filter($hash, $predicate) : $hash
+
+iterates through every key,value of a hash and passes it to the C<$predicate>
+function. When this function returns a truish value, then the (key,value) are
+used to build and return a new hash.
+
+    my $player_points = Hash->new(
+        Anne   => 10,
+        Marie  => 12,
+        Ralph  => 8,
+        Rudolf => 9,
+    );
+
+    my $hash = $player_points->filter(sub($k,$v) { $v > 9 ? 1 : 0   }); # { Anne => 10, Marie => 12 }
+    my $hash = $player_points->filter(sub($k,$v) { $k =~ m/\AR/     }); # { Ralph => 8, Rudolf => 9 }
+    my $hash = $player_points->filter(sub($k,$v) { $v > 100 ? 1 : 0 }); # {}
+
+=head1 CONVERTERS
+
+Converters are methods that either transforms or extract data from a Hash. Usually
+returning something different than a Hash. Like METHODS they also
+can be called in a functional-style.
+
+=head2 is_empty($hash) : $bool
+
+returns a boolean value indicating if the Hash is empty or not.
+
+    my $bool = Hash->empty->is_empty;         # 1
+    my $bool = hash->new(foo => 1)->is_empty; # 0
+
+=head2 length($hash) : $int_length
+
+returns the amount of entries in a Hash.
+
+    my $x = Hash->new(foo => 1, bar => 1, baz => 1)->length; # 3
+
 =head2 keys($hash) : $array
 
 returns all the keys of a Hash. Same as perl built-in C<keys> functions.
@@ -123,21 +174,6 @@ returns all values of a hash as a Sq Array. Same as perl built-in C<values>.
 
     $hash->values->iter(sub($value) {
         say $value;
-    });
-
-=head2 map($hash, $f) : $hash
-
-Iterates through a hash and passes every C<$key> and C<$value> to the function
-C<$f>. C<$f> is supposed to return a new C<$key> and C<$value> that is used
-to create a new Hash.
-
-    my $hash = Hash->new(foo => 1, bar => 2);
-
-    # { foofoo => 2, barbar => 4 }
-    my $new  = $hash->map(sub($key,$value) {
-        my $new_key   = $key . $key;
-        my $new_value = $value * 2;
-        return $new_key, $new_value;
     });
 
 =head2 find($hash, $predicate) : Option<[$key,$value]>
@@ -194,19 +230,26 @@ but in a single operation.
     my $opt = $data->pick(sub($k,$v){ $k > 100 ? Some [$k,$v] : None}) # None
     my $opt = $data->pick(sub($k,$v){ $k >   9 ? Some $k * 2  : None}) # Some 20
 
-=head2 filter($hash, $predicate) : $hash
+=head2 fold($hash, $state, $f) : $state
 
-iterates through every key,value of a hash and passes it to the C<$predicate>
-function. When this function returns a truish value, then the (key,value) are
-used to build and return a new hash.
+Iterates through every ($key,$value) of a Hash and passes C<$state>, C<$key>
+and C<$value> to the function C<$f>. C<$f> than computes the next C<$state>.
 
-    my $player_points = Hash->new(
-        Anne   => 10,
-        Marie  => 12,
-        Ralph  => 8,
-        Rudolf => 9,
+When all (key,value) pairs are iterated, returns the last C<$state>.
+
+    my $money = Hash->new(
+        Anne         => 100,
+        Marie        => 50,
+        Frankenstein => 250,
     );
 
-    my $hash = $player_points->filter(sub($k,$v) { $v > 9 ? 1 : 0   }); # { Anne => 10, Marie => 12 }
-    my $hash = $player_points->filter(sub($k,$v) { $k =~ m/\AR/     }); # { Ralph => 8, Rudolf => 9 }
-    my $hash = $player_points->filter(sub($k,$v) { $v > 100 ? 1 : 0 }); # {}
+    # 400
+    my $total_money = $money->fold(0, sub($state,$name,$money) {
+        $state + $money;
+    });
+
+    # ['Anne', 'Marie', 'Frankenstein']  in any order
+    my $player_names = $money->fold(Array->new, sub($state,$name,$money) {
+        $state->push($name);
+        $state;
+    });

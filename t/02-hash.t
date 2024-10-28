@@ -715,4 +715,32 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     is($calls, 0, 'on raz: lambda not called');
 }
 
+# fold
+{
+    my $money = Hash->new(
+        Anne         => 100,
+        Marie        => 50,
+        Frankenstein => 250,
+    );
+
+    my $total_money = $money->fold(0, sub($state,$name,$money) {
+        $state + $money;
+    });
+    is($total_money, 400, 'total money');
+
+    my $player_names = $money->fold(Array->new, sub($state,$name,$money) {
+        $state->push($name);
+        $state;
+    });
+    is(
+        $player_names->length,
+        3,
+        '3 names');
+
+    my $is_name = sub($expected) { sub($got) { $got eq $expected } };
+    is($player_names->find(undef, $is_name->('Anne')),         'Anne',         'Contains Anne');
+    is($player_names->find(undef, $is_name->('Marie')),        'Marie',        'Contains Marie');
+    is($player_names->find(undef, $is_name->('Frankenstein')), 'Frankenstein', 'Contains Frankenstein');
+}
+
 done_testing;
