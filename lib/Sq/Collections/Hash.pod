@@ -257,8 +257,8 @@ is supposed to return the C<$value> used for the newly created C<$hash>.
     my $h = Hash->new(foo => 1, bar => 2);
     my $i = Hash->new(bar => 3, baz => 4);
 
-    $h->intersection($i, sub($k,$x,$y) { [$x,$y]           }); # { bar => [2,3] }
-    $h->intersection($i, sub($k,$x,$y) { $x > $y ? $x : $y }); # { bar => 3     }
+    my $hash = $h->intersection($i, sub($k,$x,$y) { [$x,$y]           }); # { bar => [2,3] }
+    my $hash = $h->intersection($i, sub($k,$x,$y) { $x > $y ? $x : $y }); # { bar => 3     }
 
 =head2 difference($hashA, $hashB) : $hash
 
@@ -269,8 +269,8 @@ and the result is returned.
     my $h = Hash->new(foo => 1, bar => 2);
     my $i = Hash->new(bar => 3, baz => 4);
 
-    $h->difference($i);      # { foo => 1 }
-    Hash::difference($h,$i); # { foo => 1 }
+    my $hash = $h->difference($i);      # { foo => 1 }
+    my $hash = Hash::difference($h,$i); # { foo => 1 }
 
 =head1 CONVERTERS
 
@@ -308,13 +308,13 @@ returns the amount of entries in a Hash.
 
 =head2 keys($hash) : $array
 
-returns all the keys of a Hash. Same as perl built-in C<keys> functions.
+returns all keys of a Hash as a Sq Array. Same as perl built-in C<keys> functions.
 
     for my $key ( @{ $hash->keys } ) {
         say $key;
     }
 
-    # keys returns an Sq Array
+    # keys returns a Sq Array
     $hash->keys->iter(sub($key) {
         say $key;
     });
@@ -327,6 +327,7 @@ returns all values of a hash as a Sq Array. Same as perl built-in C<values>.
         say $value;
     }
 
+    # values returns a Sq Array
     $hash->values->iter(sub($value) {
         say $value;
     });
@@ -382,11 +383,12 @@ including its values.
     my $bool = $h->equal($i);                  # 1
     my $bool = $h->equal($i->with(test => 1)); # 0
 
-=head2 find($hash, $predicate) : Option<[$key,$value]>
+=head2 find($hash, $predicate) : $opt_array_of_kv
 
 Goes through every key and value of a Hash, passes it to C<$predicate> and
-returns the first key,value that C<$predicate> returns a truish value. When
-C<$predicate> does not find any key,value than it returns C<None>.
+returns the first B<key,value> that C<$predicate> returns a truish value
+as an optional value. The B<key,value> is put into an array. When C<$predicate>
+does not find any key,value than it returns C<None>.
 
 Hashes have no order, so if C<$predicate> could return true for multiple entries
 then you cannot expect a certain entry.
@@ -412,9 +414,9 @@ then you cannot expect a certain entry.
         ->map(sub($array) { $array->[1] })  # Option::map
         ->or("whatever");                   # Option::or
 
-=head2 pick($hash, $f_opt) : Option<$x>
+=head2 pick($hash, $f_opt) : $opt_x
 
-Similar to find as it searches for a key,value pair. But instead of providing
+Similar to find as it searches for a B<key,value> pair. But instead of providing
 a function that returns a truish value it is expected that it returns an
 optional value.
 
