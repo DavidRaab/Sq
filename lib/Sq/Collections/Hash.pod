@@ -142,6 +142,17 @@ used to build and return a new hash.
     my $hash = $player_points->filter(sub($k,$v) { $k =~ m/\AR/     }); # { Ralph => 8, Rudolf => 9 }
     my $hash = $player_points->filter(sub($k,$v) { $v > 100 ? 1 : 0 }); # {}
 
+=head2 append($hashA, $hashB) : $hash
+
+returns a new hash by combining both hashes. Key,Values in C<$hashB> overwrites
+entries from C<$hashA>.
+
+    my $a = Hash->new(Anne  => 10, Marie => 12);
+    my $b = Hash->new(Frank => 4,  Anne  => 6);
+
+    my $c = Hash::append($a, $b); # { Anne => 6, Marie => 12, Frank => 4 }
+    my $c = $a->append($b);       # { Anne => 6, Marie => 12, Frank => 4 }
+
 =head1 CONVERTERS
 
 Converters are methods that either transforms or extract data from a Hash. Usually

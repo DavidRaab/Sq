@@ -115,9 +115,12 @@ sub bind($hash, $f) {
 
 # appends a second hash onto the first hash, overwriting all keys that appear
 # in the first one.
-sub append($hash, $other) {
-    state $second = sub($,$y) { return $y };
-    return union($hash, $other, $second);
+sub append($hashA, $hashB) {
+    my %new = %$hashA;
+    while ( my ($key,$value) = each %$hashB ) {
+        $new{$key} = $value;
+    }
+    return CORE::bless(\%new, 'Hash');
 }
 
 # union of two hashes, when a key exists in both hashes then both values
