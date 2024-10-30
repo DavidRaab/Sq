@@ -82,6 +82,16 @@ returns a new empty Sq Hash.
 
     my $hash = Hash->empty;
 
+=head2 Hash->init($amount, $f_kv) : $hash
+
+Initializes a new Hash with C<$amount> entries. An index is passed to C<$f_kv>
+that is expected to return a key,value pair.
+
+    # { 0 => 0, 1 => 1, 2 => 4, 3 => 9, 4 => 16 }
+    my $hash = Hash->init(5, sub($idx) {
+        return $idx => $idx*$idx;
+    });
+
 =head1 METHODS
 
 Like an Sq Array all methods can be called in a method style.

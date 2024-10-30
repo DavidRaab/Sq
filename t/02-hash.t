@@ -743,4 +743,16 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     is($player_names->find(undef, $is_name->('Frankenstein')), 'Frankenstein', 'Contains Frankenstein');
 }
 
+# init
+{
+    my $hash = Hash->init(5, sub($idx) {
+        return $idx, $idx*$idx;
+    });
+
+    is(
+        $hash,
+        { 0 => 0, 1 => 1, 2 => 4, 3 => 9, 4 => 16 },
+        'init');
+}
+
 done_testing;

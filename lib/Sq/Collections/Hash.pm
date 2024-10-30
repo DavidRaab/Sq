@@ -26,6 +26,15 @@ sub bless($, $href) {
     }
 }
 
+sub init($, $amount, $f) {
+    my $hash = new('Hash');
+    for my $idx ( 0 .. $amount-1 ) {
+        my ($k,$v) = $f->($idx);
+        $hash->{$k} = $v;
+    }
+    return $hash;
+}
+
 sub keys($hash) {
     return CORE::bless([CORE::keys %$hash], 'Array');
 }
