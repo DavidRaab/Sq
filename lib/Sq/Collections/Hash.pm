@@ -10,14 +10,14 @@ sub empty($) {
     return CORE::bless({}, 'Hash');
 }
 
-sub new($class, @args) {
+sub new($, @args) {
     Carp::croak("Hash->new() must be called with even-sized list.")
         if @args % 2 == 1;
 
     return CORE::bless({@args}, 'Hash');
 }
 
-sub bless($class, $href) {
+sub bless($, $href) {
     if ( ref $href eq 'HASH' ) {
         return CORE::bless($href, 'Hash');
     }
