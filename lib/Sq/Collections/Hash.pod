@@ -39,9 +39,19 @@ Perl Hash. Doing this is completely fine.
 
 =item Compatibility
 
-An Sq Hash always should and can be used wherever a Hash reference is
-expected. This works as long a module does not any kind of pseudo type-checking
-and just uses it as a hash-reference.
+An Sq Hash always should and can be used wherever a Hash reference is expected.
+This works as long a library does not do any kind of pseudo type-checking and just
+uses it as a hash-reference.
+
+But it also works the other way around. You always can pass a bare Perl Hash to
+any function that expects a Hash. Consider that this way you obviously cannot
+use the Method syntax and are forced to use the functional-style.
+
+    # works fine even without blessed Hashes
+    my $hash = Hash::difference(
+        {foo => 1, bar => 1},
+        {bar => 1}
+    );
 
 =item Performance
 

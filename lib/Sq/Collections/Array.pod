@@ -38,8 +38,15 @@ Perl Array. Doing this is completely fine.
 =item Compatibility
 
 An Sq Array always should and can be used wherever an Array reference is
-expected. This works as long a module does not any kind of pseudo type-checking
-and just uses it as an array.
+expected. This works as long a library does not do any kind of pseudo type-checking
+and just uses it as an array reference.
+
+But it also works the other way around. You always can pass a bare Perl Array to
+any function that expects an array. Consider that this way you obviously cannot
+use the Method syntax and are forced to use the functional-style.
+
+    # works fine
+    my $append = Array::append([1,2,3], [4,5,6]);
 
 =item Performance
 
