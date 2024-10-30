@@ -137,12 +137,21 @@ sub union($hash, $other, $f) {
     return CORE::bless(\%new, 'Hash');
 }
 
-# returns a new hash only containg keys that appear in both hashes
 sub intersection($hash, $other, $f) {
+    # $hash is the hash that is iterated, for performance reasons
+    # it is useful to iterate the hash that has fewer keys. So we check
+    # if $other has less keys and swap the hashes if that is true.
+    if ( length($other) < length($hash) ) {
+        my $tmp = $hash;
+        $hash  = $other;
+        $other = $tmp;
+    }
+
+    # build intersection
     my %new;
     while ( my ($key, $value) = each %$hash ) {
         if ( exists $other->{$key} ) {
-            $new{$key} = $f->($value, $other->{$key});
+            $new{$key} = $f->($key, $value, $other->{$key});
         }
     }
     return CORE::bless(\%new, 'Hash');

@@ -160,9 +160,15 @@ is($data->length, 3, 'length');
     );
 
     is(
-        $h->intersection($i, sub($x,$y) { [$x,$y] }),
+        $h->intersection($i, sub($k,$x,$y) { [$x,$y] }),
         { bar => [2,3] },
-        'intersection'
+        'intersection 1'
+    );
+
+    is(
+        $h->intersection($i, sub($k,$x,$y) { $x > $y ? $x : $y }),
+        { bar => 3 },
+        'intersection 2'
     );
 
     is(
