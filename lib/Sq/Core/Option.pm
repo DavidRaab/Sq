@@ -28,6 +28,11 @@ sub None :prototype() () {
 
 ### Methods
 
+sub is_opt($, $any) {
+    return 1 if ref $any eq 'Option';
+    return 0;
+}
+
 sub is_some($opt) { return $opt->[0] == $Some ? 1 : 0 }
 sub is_none($opt) { return $opt->[0] ==     0 ? 1 : 0 }
 

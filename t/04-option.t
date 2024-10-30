@@ -539,4 +539,13 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end 
         'bind_v 2');
 }
 
+is(Option->is_opt(Some({})),    1, 'is_opt 1');
+is(Option->is_opt(Some(1)),     1, 'is_opt 2');
+is(Option->is_opt(None),        1, 'is_opt 3');
+is(Option->is_opt(Some(undef)), 1, 'is_opt 4');
+is(Option->is_opt(""),          0, 'is_opt 5');
+is(Option->is_opt(0),           0, 'is_opt 6');
+is(Option->is_opt([]),          0, 'is_opt 7');
+is(Option->is_opt({}),          0, 'is_opt 8');
+
 done_testing;

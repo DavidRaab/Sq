@@ -441,6 +441,19 @@ dummy value as first argument.
     Option->all_valid($array_of_opt);
     Option::all_valid(undef, $array_of_opt);
 
+=head2 Option->is_opt($any) : $bool
+
+returns a truish value when C<$any> is an optional value.
+
+    my $bool = Option->is_opt(Some({}));    # 1
+    my $bool = Option->is_opt(Some(1));     # 1
+    my $bool = Option->is_opt(None);        # 1
+    my $bool = Option->is_opt(Some(undef)); # 1
+    my $bool = Option->is_opt("");          # 0
+    my $bool = Option->is_opt(0);           # 0
+    my $bool = Option->is_opt([]);          # 0
+    my $bool = Option->is_opt({}):          # 0
+
 =head2 Option->all_valid($array_of_opt)
 
 Sometimes we have an array of optionals. Like C<[Some(1), Some(2), Some(3)]>.
