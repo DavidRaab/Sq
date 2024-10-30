@@ -235,7 +235,7 @@ optional value.
 
 If C<$f_opt> returns C<Some> value then the value is used, when it return C<None>
 then the value is skipped. When C<$f_opt> returns B<None> for all values, then
-B<None> is returned is a value.
+B<None> is returned by C<pick>.
 
 C<pick> is like finding a value, and then calling C<Option::map> on the result,
 but in a single operation.
