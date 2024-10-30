@@ -97,10 +97,6 @@ sub is_empty($hash) {
     return length($hash) == 0 ? 1 : 0;
 }
 
-# Iterates through a hash and passes the key & value to a function. That
-# function is then expected to return another hash. All hashes are then
-# combined into a single hash.
-#
 # Hash<'a> -> ('a -> Hash<'b>) -> Hash<'b>
 sub bind($hash, $f) {
     my %new;
@@ -178,7 +174,6 @@ sub concat($hash, @others) {
     return CORE::bless(\%new, 'Hash');
 }
 
-# checks if all keys in $hash exists in $other
 sub is_subset_of($hash, $other) {
     for my $key ( CORE::keys %$hash ) {
         return 0 if not exists $other->{$key}
@@ -186,14 +181,10 @@ sub is_subset_of($hash, $other) {
     return 1;
 }
 
-# returns a single entry
 sub get($hash, $key) {
     return Option::Some($hash->{$key});
 }
 
-# fetches many entries and returns it as an array, uses default value
-# when entry does not exists in hash
-#
 # Hash<'a> -> 'a -> ListContext<'a> -> Array<'a>
 sub extract($hash, @keys) {
     my $array = Array->new;
