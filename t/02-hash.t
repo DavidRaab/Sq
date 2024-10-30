@@ -484,6 +484,11 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     is( $h->copy('maz'),
         { maz => 4 },
         'copy only maz');
+
+    is(
+        $h->copy(qw/foo barr/),
+        { foo => 1 },
+        'copy with a missing key');
 }
 
 # with - with mutable values

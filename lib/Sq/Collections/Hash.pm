@@ -194,7 +194,6 @@ sub extract($hash, @keys) {
     return $array;
 }
 
-# creates a shallow copy
 sub copy($hash, @keys) {
     # copy the whole hash when no keys are defined
     if ( @keys == 0 ) {
@@ -204,7 +203,8 @@ sub copy($hash, @keys) {
     else {
         my $new = Hash->new;
         for my $key ( @keys ) {
-            $new->{$key} = $hash->{$key};
+            my $v = $hash->{$key};
+            $new->{$key} = $v if defined $v;
         }
         return $new;
     }

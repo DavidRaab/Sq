@@ -120,6 +120,22 @@ If the above doesn't work it is considered a bug. Additionally every C<$hash>
 or C<$array> returned by any C<Hash> function should always be blessed in
 the package C<Hash> or C<Array>.
 
+=head2 copy($hash, @keys) : $hash
+
+Creates a shallow copy of the Hash. You can additionally specify which keys
+are copied to the new hash only copying certain keys. When you try to copy a
+key that doesn't exists then the key will not appear on the result.
+
+    my $h = Hash->new(
+        foo => 1, bar => 2,
+        baz => 3, maz => 4,
+    );
+
+    my $hash = $h->copy;              # { foo => 1, bar => 2, baz => 3, maz => 4 }
+    my $hash = $h->copy(qw/foo bar/); # { foo => 1, bar => 2 }
+    my $hash = $h->copy(qw/foo baz/); # { foo => 1, baz => 3 }
+    my $hash = $h->copy('maz');       # { maz => 4 }
+
 =head2 map($hash, $f) : $hash
 
 Iterates through a hash and passes every C<$key> and C<$value> to the function
