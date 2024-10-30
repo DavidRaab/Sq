@@ -210,18 +210,15 @@ sub copy($hash, @keys) {
     }
 }
 
-# like a 'set' but returns a new hash with the changes applied instead of
-# mutating the hash
 sub with($hash, @kvs) {
     my $new = copy($hash);
     set($new, @kvs);
     return $new;
 }
 
-# Returns a new hash by applying transform mapping functions for defined keys.
 sub withf($hash, @kfs) {
     my %input = @kfs;
-    my $new = Hash->new;
+    my $new   = Hash->new;
     for my $key ( CORE::keys %$hash ) {
         my $value = $hash->{$key};
         if ( defined $value ) {
@@ -232,7 +229,6 @@ sub withf($hash, @kfs) {
     return $new;
 }
 
-# checks if keys exists and are defined in hash
 sub has_keys($hash, @keys) {
     for my $key ( @keys ) {
         return 0 if !exists $hash->{$key} || !defined $hash->{$key};

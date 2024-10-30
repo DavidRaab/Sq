@@ -451,6 +451,37 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     is($k, {foo => 2, bar => 3, maz => 4},                  'with 4');
     is($l, {foo => 2, bar => 2, maz => 4, ratatat => 1},    'with 5');
     is($m, {foo => 2, bar => "xx", maz => 5, ratatat => 1}, 'withf');
+
+    my $points = Hash->new(Anne => 10, Frank => 3);
+    is(
+        $points->withf(Anne  => sub($points) { $points + 1 }),
+        { Anne => 11, Frank => 3 },
+        'pod example 1');
+    is(
+        $points->withf(Frank => sub($points) { $points + 1 }),
+        { Anne => 10, Frank => 4 },
+        'pod example 2');
+
+    my $games = Hash->new(
+        n64  => Array->new("Mario 64", "Zelda"),
+        snes => Array->new("Super Mario Kart", "Street Fighter 2"),
+    );
+    is(
+        $games->withf(
+            n64  => sub($array) { $array->join(',') },
+            snes => sub($array) { $array->join(',') },
+        ),
+        { n64 => "Mario 64,Zelda", snes => "Super Mario Kart,Street Fighter 2" },
+        'pod example 3');
+
+    is(
+        $games->withf(
+            n64  => sub($array) { $array->join(',') },
+            snes => sub($array) { $array->join(',') },
+            blub => sub($array) { $array->join(',') },
+        ),
+        { n64 => "Mario 64,Zelda", snes => "Super Mario Kart,Street Fighter 2" },
+        'not existing keys are ignored');
 }
 
 # copy
