@@ -153,6 +153,18 @@ entries from C<$hashA>.
     my $c = Hash::append($a, $b); # { Anne => 6, Marie => 12, Frank => 4 }
     my $c = $a->append($b);       # { Anne => 6, Marie => 12, Frank => 4 }
 
+=head2 union($hashA, $hashB, $f_value) : $hash
+
+union of two hashes, when a key exists in both hashes then C<$f_value> is called
+with C<$key,$a_value,$b_value>. C<$f_value> then returns the B<value> that should
+be used in the new generated hash.
+
+    my $h = Hash->new(foo => 1, bar => 2);
+    my $i = Hash->new(bar => 3, baz => 4);
+
+    # { foo => 1, bar => 5, baz => 4 }
+    my $hash = $h->union($i, sub($k, $v1, $v2) { $v1 + $v2 });
+
 =head1 CONVERTERS
 
 Converters are methods that either transforms or extract data from a Hash. Usually

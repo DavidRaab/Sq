@@ -148,7 +148,7 @@ is($data->length, 3, 'length');
     my $i = Hash->new(bar => 3, baz => 4);
 
     is(
-        $h->union($i, sub($v1, $v2) { $v1 + $v2 }),
+        $h->union($i, sub($k, $v1, $v2) { $v1 + $v2 }),
         { foo => 1, bar => 5, baz => 4 },
         'union'
     );

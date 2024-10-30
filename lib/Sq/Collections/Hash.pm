@@ -113,8 +113,6 @@ sub bind($hash, $f) {
     return CORE::bless(\%new, 'Hash');
 }
 
-# appends a second hash onto the first hash, overwriting all keys that appear
-# in the first one.
 sub append($hashA, $hashB) {
     my %new = %$hashA;
     while ( my ($key,$value) = each %$hashB ) {
@@ -123,17 +121,13 @@ sub append($hashA, $hashB) {
     return CORE::bless(\%new, 'Hash');
 }
 
-# union of two hashes, when a key exists in both hashes then both values
-# are passed to function $f that then return the value that should be used.
-#
-# union is like adding two hashes
 sub union($hash, $other, $f) {
     my %new;
     my %seen;
     while ( my ($key, $value) = each %$hash ) {
         if ( exists $other->{$key} ) {
             $seen{$key} = 1;
-            $new{$key}  = $f->($value, $other->{$key});
+            $new{$key}  = $f->($key, $value, $other->{$key});
         }
         else {
             $new{$key} = $value;
