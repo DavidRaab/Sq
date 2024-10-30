@@ -123,18 +123,14 @@ sub append($hashA, $hashB) {
 
 sub union($hash, $other, $f) {
     my %new;
-    my %seen;
     while ( my ($key, $value) = each %$hash ) {
-        if ( exists $other->{$key} ) {
-            $seen{$key} = 1;
-            $new{$key}  = $f->($key, $value, $other->{$key});
-        }
-        else {
-            $new{$key} = $value;
-        }
+        $new{$key} =
+            exists $other->{$key}
+                ? $f->($key, $value, $other->{$key})
+                : $value;
     }
     while ( my ($key, $value) = each %$other ) {
-        if ( not $seen{$key} ) {
+        if ( not exists $new{$key} ) {
             $new{$key} = $value;
         }
     }
