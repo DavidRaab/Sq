@@ -167,6 +167,14 @@ entries from C<$hashA>.
     my $c = Hash::append($a, $b); # { Anne => 6, Marie => 12, Frank => 4 }
     my $c = $a->append($b);       # { Anne => 6, Marie => 12, Frank => 4 }
 
+=head2 concat(@hashes) : $hash
+
+Like C<append> but repeadetly appends all hashes into a single hash. You must
+at least pass a single hash otherwise function throws an error.
+
+    my $hash = Hash::concat($hashA, $hashB, $hashC, $hashD, ...);
+    my $hash = $hashA->concat($hashB, $hashC, $hashD, ...);
+
 =head2 union($hashA, $hashB, $f_value) : $hash
 
 Union of two hashes. This means they are added together like C<append>. But while
@@ -208,9 +216,24 @@ and the result is returned.
 
 =head1 CONVERTERS
 
-Converters are methods that either transforms or extract data from a Hash. Usually
-returning something different than a Hash. Like METHODS they also
+Converters are also METHODS that either transforms or extract data from a Hash.
+Usually returning something different than a Hash. Like METHODS they also
 can be called in a functional-style.
+
+=head2 is_subset_of($hashA, $hashB) : $bool
+
+Checks if all keys in C<$hashA> also appear in C<$hashB>. When this is the case
+than a truish value is returned, otherwise not.
+
+    my $a = Hash->new(foo => 1);
+    my $b = Hash->new(foo => 1, bar => 2);
+
+    my $bool = $a->is_subset_of($b); # 1
+    my $bool = $b->is_subset_of($a); # 0
+    my $bool = Hash::is_subset_of(   # 1
+        {a => 1},
+        {a => 1, b => 1}
+    );
 
 =head2 is_empty($hash) : $bool
 
