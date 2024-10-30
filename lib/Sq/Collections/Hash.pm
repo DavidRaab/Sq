@@ -187,18 +187,18 @@ sub is_subset_of($hash, $other) {
 }
 
 # returns a single entry
-sub get($hash, $key, $default) {
-    return $hash->{$key} // $default;
+sub get($hash, $key) {
+    return Option::Some($hash->{$key});
 }
 
 # fetches many entries and returns it as an array, uses default value
 # when entry does not exists in hash
 #
 # Hash<'a> -> 'a -> ListContext<'a> -> Array<'a>
-sub extract($hash, $default, @keys) {
+sub extract($hash, @keys) {
     my $array = Array->new;
     for my $key ( @keys ) {
-        push @$array, ($hash->{$key} // $default);
+        push @$array, Option::Some($hash->{$key});
     }
     return $array;
 }

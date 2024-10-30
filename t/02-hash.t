@@ -242,17 +242,35 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 # get, set, extract
 {
     my $h = Hash->new(foo => 1, bar => 2, baz => 3);
-    is($h->get(foo => 0), 1, 'get 1');
-    is($h->get("bar", 0), 2, 'get 2');
-    is($h->get("baz", 0), 3, 'get 3');
-    is($h->get("maz", 0), 0, 'get 4');
+    is($h->get("foo"), Some 1, 'get 1');
+    is($h->get("bar"), Some 2, 'get 2');
+    is($h->get("baz"), Some 3, 'get 3');
+    is($h->get("maz"),   None, 'get 4');
 
     # set
     $h->set(bar => 4);
-    is($h->get("bar", 0), 4, 'set');
+    is($h->get("bar"), Some(4), 'set');
 
     # extract
-    is($h->extract(0, qw/foo latz bar/), [1, 0, 4], 'extract');
+    is(
+        $h->extract(qw/foo latz bar/),
+        [Some 1, None, Some 4],
+        'extract');
+
+    is(
+        Option->all_valid($h->extract(qw/foo latz bar/)),
+        None,
+        'extract 2');
+
+    is(
+        Option->all_valid($h->extract(qw/foo bar/)),
+        Some([1, 4]),
+        'extract 3');
+
+    is(
+        Option->filter_valid($h->extract(qw/foo latz bar/)),
+        [1, 4],
+        'extract 4');
 }
 
 # push
@@ -480,8 +498,9 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     is($h, {foo => 1, bar => [1..4]}, 'with mutable 1');
     is($i, {foo => 2, bar => [1..4]}, 'with mutable 2');
 
-    my $aref = $h->get(bar => []);
-    push @$aref, 5;
+    $h->get("bar")->map(sub($array) {
+        $array->push(5);
+    });
 
     is($h, {foo => 1, bar => [1..5]}, 'with mutable 3');
     is($i, {foo => 2, bar => [1..5]}, 'with mutable 4');
@@ -701,16 +720,16 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 
     my $str_concat;
     $data->on(baz => sub($array) {
-        $array->map(sub($hash) { $str_concat .= $hash->get('name',"") })
+        $array->map(sub($hash) { $str_concat .= $hash->get('name')->or("") })
     });
 
     is(
         $str_concat,
-        $data->{baz}->map(sub($h){ $h->get('name',"") })->join(""),
+        $data->{baz}->map(sub($h){ $h->get('name')->or("") })->join(""),
         "on baz: string concat 1");
     is(
         $str_concat,
-        $data->{baz}->fold("", sub($str,$h) { $str .= $h->get('name',"") }),
+        $data->{baz}->fold("", sub($str,$h) { $str .= $h->get('name')->or("") }),
         "on baz: string concat 2");
 
     my $calls = 0;

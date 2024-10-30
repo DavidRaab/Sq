@@ -273,6 +273,26 @@ returns all values of a hash as a Sq Array. Same as perl built-in C<values>.
         say $value;
     });
 
+=head2 get($hash, $key) : $opt
+
+Get C<$key> from C<$hash> as an optional value. If C<$key> exist returns C<Some>
+value otherwise returns C<None>.
+
+    my $opt    = $hash->get('name');
+    my $string = $hash->get('name')->or('Anne');
+
+=head2 extract($hash, @keys) : $array_of_opt
+
+Extracts many keys at once and returns them in an array in order they were specified.
+Every extracted key is an B<Option> type representing if the key existed or not.
+
+    my $h = Hash->new(foo => 1, bar => 2, baz => 3);
+
+    my $array_opts = $h->extract(qw/foo latz bar/);                       # [Some 1, None, Some 2]
+    my $opt_array  = Option->all_valid(   $h->extract(qw/foo bar/));      # Some([1, 2])
+    my $opt_array  = Option->all_valid(   $h->extract(qw/foo latz bar/)); # None
+    my $array      = Option->filter_valid($h->extract(qw/foo latz bar/)); # [1, 4]
+
 =head2 find($hash, $predicate) : Option<[$key,$value]>
 
 Goes through every key and value of a Hash, passes it to C<$predicate> and
