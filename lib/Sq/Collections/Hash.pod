@@ -125,6 +125,10 @@ to create a new Hash.
         return $new_key, $new_value;
     });
 
+=head2 bind($hash, $f_hash) : $hash
+
+TODO
+
 =head2 filter($hash, $predicate) : $hash
 
 iterates through every key,value of a hash and passes it to the C<$predicate>
