@@ -194,6 +194,18 @@ is supposed to return the C<$value> used for the newly created C<$hash>.
     $h->intersection($i, sub($k,$x,$y) { [$x,$y]           }); # { bar => [2,3] }
     $h->intersection($i, sub($k,$x,$y) { $x > $y ? $x : $y }); # { bar => 3     }
 
+=head2 difference($hashA, $hashB) : $hash
+
+returns a new hash with the difference of both. You can think of it as doing
+C<$hashA - $hashB>. All keys that appear in C<$hashB> are removed from C<$hashA>
+and the result is returned.
+
+    my $h = Hash->new(foo => 1, bar => 2);
+    my $i = Hash->new(bar => 3, baz => 4);
+
+    $h->difference($i);      # { foo => 1 }
+    Hash::difference($h,$i); # { foo => 1 }
+
 =head1 CONVERTERS
 
 Converters are methods that either transforms or extract data from a Hash. Usually

@@ -157,9 +157,6 @@ sub intersection($hash, $other, $f) {
     return CORE::bless(\%new, 'Hash');
 }
 
-# Only returns hash entries that appear in $hash but not in $other.
-# Like subtraction it removes all entries in $hash that appear in $other
-#
 # Hash<'a,'b> -> Hash<'a,'b> -> Hash<'a,'b>
 sub difference($hash, $other) {
     my %new;
