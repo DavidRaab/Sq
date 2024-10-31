@@ -488,7 +488,31 @@ When all (key,value) pairs are iterated, returns the last C<$state>.
 
 =head2 on($hash, $key, $f) : void
 
-TODO
+Similar to C<change>. It reads the value of C<$key> and passes it to C<$f>
+that then can do something with it. Any return value of C<$f> is ignored. Usually
+the idea is todo some kind of side-effect with the value of C<$key>. But consider
+that when the value is some kind of mutable value you also can use it to change
+the value.
+
+    my $hash = Hash->new(
+        name => 'Anne',
+        tags => Array->new('red', 'hot'),
+    );
+
+    # It's like selecting the key 'tags' to do some work with it
+    $hash->on(tags => sub($tags) {
+        $tags->iter(sub($tag) {
+            printf "Tag = %s\n", $tag;
+        });
+    });
+
+    # select tags an adds 'blue' to it
+    $hash->on(tags => sub($tags) {
+        $tags->push('blue');
+    });
+
+    # you can achive the same with
+    $hash->push(tags => 'blue');
 
 =head2 iter($hash, $f) : void
 
@@ -511,18 +535,88 @@ Same as C<iter>.
 
 These METHODS do mutate the Hash.
 
-=head2 set($hash, @kvs)
+=head2 set($hash, @kvs) : void
 
-TODO
+Allows you to add/set multiple keys at once. This is the mutable version of C<with>.
 
-=head2 change($hash, $key, $f, @kfs)
+    my $hash = Hash->empty;
 
-TODO
+    $hash->set(
+        name   => 'Anne',
+        age    => 20,
+        points => 100,
+    );
 
-=head2 push($hash, $key, $value, @values)
+=head2 change($hash, @kfs) : void
 
-TODO
+Similar to C<set> but instead of just providing a value you pass in a function
+and that function gets the current value of the key returning the new value
+to be used. This is the mutable version of C<withf>.
 
-=head2 delete($hash, $key, @keys)
+This function cannot add new keys as it expects a current value. When you pass
+in a key that does not exist on the hash, then the function will never be
+called.
 
-TODO
+    my $hash = Hash->new(
+        name   => 'Anne',
+        age    => 20,
+        points => 100,
+    );
+
+    $hash->change(
+        name   => sub($name)   { $name . $name     },
+        age    => sub($age)    { $age    + 1       },
+        points => sub($points) { $points + 10      },
+        what   => sub($what)   { Array::sum($what) },
+    );
+
+    # $hash is now
+    # {
+    #     name   => 'AnneAnne',
+    #     age    => 21,
+    #     points => 110,
+    # }
+
+=head2 push($hash, $key, @values)
+
+Pushes C<@values> to the C<$key>. When the C<$key> does not exist then an Array
+will be created. When C<$key> is not an Array then it will be transformed into
+an Array containing its current value as the first entry in the Array.
+
+The Array will be turned into an Sq Array. Even when you start with a pure perl
+Array it gets the 'Array' blessing added.
+
+    my $h = Hash->new;
+    $h->push(foo => 1);
+    $h->push(foo => 2,3);
+    $h->push(bar => 1);
+    $h->push(bar => 2);
+
+    # $h
+    # { foo => [1,2,3], bar => [1,2] }
+
+    my $data = Hash->new(
+        id   => 1,
+        tags => 'one',
+    );
+    $data->push(tags => 'two');
+
+    # $data
+    # { id => 1, tags => ['one', 'two'] }
+
+    # tags is now an Sq Array and you can call methods on it
+    $data->change(tags => sub($array) { $array->join(',') });
+
+    # $data
+    # { id => 1, tags => 'one,two' }
+
+=head2 delete($hash, @keys)
+
+Delete keys from a Hash. Same as Perl built-in C<delete>.
+
+    my $hash = Hash->new(foo => 1, bar => 2, baz => 3);
+
+    $hash->delete("foo", "bar");
+
+    # $hash
+    # { baz => 3 }

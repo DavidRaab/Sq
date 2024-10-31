@@ -280,8 +280,6 @@ sub foreach($hash, $f) {
 # MUTATION METHODS
 #
 
-# set overwrites each key with the specified values. key does not need
-# to exists before setting.
 sub set($hash, @kvs) {
     if ( @kvs % 2 == 0 ) {
         my $count = @kvs;
@@ -295,8 +293,6 @@ sub set($hash, @kvs) {
     return;
 }
 
-# similar to set as you set a key to a new value. But it reads the current
-# value of a key and passes it to a function that then returns the new value.
 sub change($hash, $key, $f, @kfs) {
     my %kfs = ($key, $f, @kfs);
     while ( my ($key, $f) = each %kfs ) {
@@ -306,9 +302,6 @@ sub change($hash, $key, $f, @kfs) {
     return;
 }
 
-# threats $key as an array and pushes a value onto it
-# when it doesn't exists it creates an array, or if it is something
-# different it turns it into an array.
 sub push($hash, $key, $value, @values) {
     my $v = $hash->{$key};
     if ( defined $v ) {
@@ -317,7 +310,7 @@ sub push($hash, $key, $value, @values) {
         if ( $ref eq 'Array' ) {
             CORE::push @$v, $value, @values;
         }
-        # if perl plain array addition Array blessing is added.
+        # if perl plain array then Array blessing is added.
         elsif ( $ref eq 'ARRAY' ) {
             Array->bless($v);
             CORE::push @$v, $value, @values;

@@ -277,8 +277,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 {
     my $h = Hash->new;
     $h->push(foo => 1);
-    $h->push(foo => 2);
-    $h->push(foo => 3);
+    $h->push(foo => 2,3);
     $h->push(bar => 1);
     $h->push(bar => 2);
 
@@ -311,6 +310,12 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
         id => 1,
         tags => ['one', 'two'],
     }, 'pushing on not array, turns it into an array');
+
+    $data->change(tags => sub($array) { $array->join(',') });
+    is($data, {
+        id => 1,
+        tags => 'one,two',
+    }, 'pod example');
 }
 
 # push 2
@@ -430,6 +435,24 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     );
 
     is($h, { foo => 6, bar => 120, baz => 6 }, 'change 2');
+}
+
+# change pod example
+{
+    my $hash = Hash->new(
+        name   => 'Anne',
+        age    => 20,
+        points => 100,
+    );
+
+    $hash->change(
+        name   => sub($name)   { $name . $name     },
+        age    => sub($age)    { $age    + 1       },
+        points => sub($points) { $points + 10      },
+        what   => sub($what)   { Array::sum($what) },
+    );
+
+    is($hash, { name => 'AnneAnne', age => 21, points => 110 }, 'pod example 1');
 }
 
 # with & withf
