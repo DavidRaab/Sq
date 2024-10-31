@@ -6,6 +6,8 @@ use subs 'bind', 'keys', 'values', 'bless', 'map', 'foreach', 'delete', 'length'
 # TODO: equal, eual_values, is_disjoint
 #       change, push
 
+### CONSTRUCTORS
+
 sub empty($) {
     return CORE::bless({}, 'Hash');
 }
@@ -34,6 +36,18 @@ sub init($, $amount, $f) {
     }
     return $hash;
 }
+
+sub from_array($, $array, $f) {
+    my $new  = new('Hash');
+    my $stop = @$array;
+    for (my $i=0; $i < $stop; $i++) {
+        my ($k,$v) = $f->($i,$array->[$i]);
+        $new->{$k} = $v;
+    }
+    return $new;
+}
+
+### METHODS
 
 sub keys($hash) {
     return CORE::bless([CORE::keys %$hash], 'Array');
@@ -248,12 +262,18 @@ sub equal($hash, $other) {
     return 1;
 }
 
+sub to_array($hash, $f) {
+    my $a = Array->new;
+    while ( my ($key, $value) = each %$hash ) {
+        CORE::push @$a, $f->($key, $value);
+    }
+    return $a;
+}
+
 #
 # SIDE-EFFECTS
 #
 
-# check if $key exists and is defined, when this is the case it executes
-# $f with the value for some side-effects.
 sub on($hash, $key, $f) {
     if ( exists $hash->{$key} ) {
         my $value = $hash->{$key};

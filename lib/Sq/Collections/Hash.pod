@@ -124,6 +124,14 @@ that is expected to return a key,value pair.
         return $idx => $idx*$idx;
     });
 
+=head2 Hash->from_array($array, $f_kv) : $hash
+
+Creates a new Hash from an existing Array. It iterates through an Array passing
+every value of the array to C<$f_kv>. It then expects that C<$f_kv> returns
+the B<key,value> to be used in the newly created Hash.
+
+TODO EXAMPLE
+
 =head1 METHODS
 
 Like an Sq Array all methods can be called in a method style.
@@ -483,6 +491,22 @@ When all (key,value) pairs are iterated, returns the last C<$state>.
         $state->push($name);
         $state;
     });
+
+=head2 to_array($hash, $f_x) : $array
+
+Iterates through the hash and passes C<$key,$value> to the function C<$f_x>.
+This function is then supposed to return C<$x> that is used to build a new
+Array.
+
+The newly created Array is an Sq Array.
+
+    my $points = Hash->new(
+        Alice => 10,
+        Frank => 5,
+        Marie => 11,
+    );
+
+    my $array = $points->to_array(sub($k,$v) { $k }); # ["Frank", "Marie", "Alice"]
 
 =head1 SIDE-EFFECTS
 
