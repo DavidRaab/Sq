@@ -50,8 +50,32 @@ use the Method syntax and are forced to use the functional-style.
 
 =item Performance
 
-No re-implementation of an Array, as it is not needed. Would be probably to slow
-and a burden to work with in Perl.
+Because an Sq Array is just a normal Perl Array it doesn't have a performance
+penalty. The only reason why a blessing is added is because the different
+functions in this package then can be called as a method on an Array.
+
+Most functions you find here is code you would have probably written anyway
+yourself. So in some way you just can consider this package as a utility library
+providing you many useful functions that you don't need to write yourself.
+
+It makes developing in itself faster because you don't need to re-implement
+different functions again and again. Also having functions for common tasks
+makes code in itself shorter and better understandable leading to fewer bugs
+in general.
+
+Most functions are written in a style that tries to make the task they do as
+fast as possible but still with the idea to be as correct and useful as possible.
+
+Using functions from this package can still sometimes makes things a little bit
+slower when it comes to execution timing because this library heavily depends
+on passing subroutines and calling them. And calling functions are not B<free>
+especially in Perl. Every function call has some overhead and sadly Perl has
+no JIT or inlining capability.
+
+But again, as a Sq Array is just a normal Perl array with an added blessing only
+for the purpose for calling the function as a method, you always can use a Sq Array
+like any normal Array and do whatever you want todo with it if the overhead
+of this module seems to make things slower as expected.
 
 =item Convenience
 
