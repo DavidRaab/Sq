@@ -331,14 +331,14 @@ is(
     $range->map($square)->filter($is_even)->to_array,
     $range->choose(sub($x) {
         my $s = $x * $x;
-        $s % 2 == 0 ? $s : undef
+        $s % 2 == 0 ? Some $s : None
     })->to_array,
     'choose same as map->filter');
 
 is(
     $range->choose(sub($x) {
         my $s = $x * $x;
-        $s % 2 == 0 ? $s : undef
+        $s % 2 == 0 ? Some $s : None
     })->to_array,
     [grep { $_ % 2 == 0 } map { $_ * $_ } 1 .. 10],
     'Non Lazy Perl implementation of choose');

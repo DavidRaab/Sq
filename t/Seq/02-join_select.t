@@ -169,7 +169,7 @@ is(
 # filter->map can be replaced with choose
 is(
     $query
-    ->choose(sub($obj) { $obj->{object_name} eq 'David' ? $obj->{tag_name} : undef })
+    ->choose(sub($obj) { $obj->{object_name} eq 'David' ? Some $obj->{tag_name} : None })
     ->to_array,
 
     [qw/WoW Super/],

@@ -454,14 +454,14 @@ sub select($seq, $mapA, $mapB) {
 }
 
 # choose : Seq<'a> -> ('a -> option<'b>) -> Seq<'b>
-sub choose($seq, $chooser) {
+sub choose($seq, $f_opt) {
     from_sub('Seq', sub {
         my $it = $seq->();
-        my ($x, $optional);
+        my ($x, $opt);
         return sub {
             while ( defined($x = $it->()) ) {
-                $optional = $chooser->($x);
-                return $optional if defined $optional;
+                $opt = $f_opt->($x);
+                return $opt->[1] if $opt->[0] == 1;
             }
             return undef;
         }

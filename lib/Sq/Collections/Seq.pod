@@ -397,12 +397,14 @@ for an array.
     # contains only even numbers
     my $seq = $seq->filter(sub($x) { $x % 2 == 0 });
 
-=head2 choose($seq, $chooser) : $seq
+=head2 choose($seq, $f_opt) : $seq
 
-Similar to C<map> as it executes C<$chooser> function on every element of the
-sequence, but when C<$choose> returns C<undef> then the item is skipped in the
-final sequence. This function is a combination of C<map> followed by C<filter>
-in a single call.
+Similar to C<map> as it executes C<$f_opt> function on every element of the
+sequence. C<$f_opt> is supposed to return an optional value that indicates if
+that element should be picked or not. When it returns B<Some> value it will
+use the value, and B<None> values are skipped.
+
+This function is a combination of C<map> followed by C<filter> in a single call.
 
     # seq { 2,4,6,8,10,12,14,16,18,20 }
     my $seq =
@@ -417,7 +419,7 @@ in a single call.
         ->range(1,10)
         ->choose(sub($x){
             my $double = $x * 2;
-            return $x % 2 == 0 ? $x : undef;
+            return $double % 2 == 0 ? Some($double) : None;
         });
 
 =head2 bind($seq, $f) : $seq
