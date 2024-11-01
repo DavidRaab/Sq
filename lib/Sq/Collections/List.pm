@@ -256,12 +256,12 @@ sub bind($list, $f) {
     while (1) {
         return $new if @$list == 0;
 
-        my $xs = $f->(head($list));
+        my $xs = $f->($list->[0]);
         while ( @$xs != 0 ) {
-            $tail = $mut_append->($tail, head($xs));
-            $xs   = tail($xs);
+            $tail = $mut_append->($tail, $xs->[0]);
+            $xs   = $xs->[1];
         }
-        $list = tail($list);
+        $list = $list->[1];
     }
 }
 
@@ -471,8 +471,8 @@ sub skip_while($list, $predicate) {
 sub iter($list, $f) {
     my $l = $list;
     while ( @$l != 0 ) {
-        $f->(head($l));
-        $l = tail($l);
+        $f->($l->[0]);
+        $l = $l->[1];
     }
     return;
 }
@@ -486,8 +486,8 @@ sub iteri($list, $f) {
     my $idx = 0;
     my $l   = $list;
     while ( @$l != 0 ) {
-        $f->(head($l), $idx++);
-        $l = tail($l);
+        $f->($l->[0], $idx++);
+        $l = $l->[1];
     }
     return;
 }
