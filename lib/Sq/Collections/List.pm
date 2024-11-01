@@ -234,14 +234,14 @@ sub map2($listA, $listB, $f) {
     }
 }
 
-sub choose($list, $chooser) {
+sub choose($list, $f_opt) {
     my $new  = empty('List');
     my $tail = $new;
 
     iter($list, sub($x) {
-        my $y = $chooser->($x);
-        if ( defined $y ) {
-            $tail = $mut_append->($tail, $y);
+        my $opt = $f_opt->($x);
+        if ( $opt->[0] == 1 ) {
+            $tail = $mut_append->($tail, $opt->[1]);
         }
     });
 
