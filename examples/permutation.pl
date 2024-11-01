@@ -13,7 +13,7 @@ my $keys = Seq->wrap(qw/A B C D E F G H I J/);
 # only picks permutation so far
 my $permutation = sub ($x) {
     my $str = (fst $x) . (snd $x);
-    has_duplicates($str) ? undef : $str;
+    has_duplicates($str) ? None : Some $str;
 };
 
 # defines all permutations
