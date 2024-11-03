@@ -495,9 +495,7 @@ use it like this.
     }
 
 
-to the idea of first checking with C<< Option->is_opt($any) >> if it is an
-Optional value, then they maybe call C<< $any->is_some >> and finally do a
-C<< $any->get >> to get the value. B<Don't do that>.
+B<Don't do that.>
 
 =over 4
 
