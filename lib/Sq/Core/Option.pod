@@ -66,7 +66,7 @@ functional-style. That means you always can do both calling styles.
     $opt->map(sub($x) { ... });
     Option::map($opt, sub($x) { ... });
 
-=head2 is_some($optional)
+=head2 is_some($any)
 
 returns a truish value when the optional contains some value. Most of the
 time you probably want to use an extraction method instead.
@@ -75,7 +75,22 @@ time you probably want to use an extraction method instead.
         ...
     }
 
-=head2 is_none($optional)
+Calling this method in a functional-style has the benefit that it also does
+a proper type-checking of an optional, you can pass any value to it and get
+back if the value is an optional, and if it is B<Some> value.
+
+    my $bool = Option::is_some($any)
+
+    Option::is_some(Some({}));    # 1
+    Option::is_some(Some(1));     # 1
+    Option::is_some(None);        # 0
+    Option::is_some(Some(undef)); # 0
+    Option::is_some("");          # 0
+    Option::is_some(0);           # 0
+    Option::is_some([]);          # 0
+    Option::is_some({});          # 0
+
+=head2 is_none($any)
 
 returns a truish value when the optional is None. Most of the time you probably
 want to use an extraction method instead.
@@ -83,6 +98,23 @@ want to use an extraction method instead.
     if ( $opt->is_none ) {
         ...
     }
+
+Calling this method in a functional-style has the benefit that it also does
+a proper type-checking of an optional, you can pass any value to it and get
+back if the value is an optional, and if it is B<None> value.
+
+    Option::is_none(Some({}));    # 0
+    Option::is_none(Some(1));     # 0
+    Option::is_none(None);        # 1
+    Option::is_none(Some(undef)); # 1
+    Option::is_none("");          # 0
+    Option::is_none(0);           # 0
+    Option::is_none([]);          # 0
+    Option::is_none({});          # 0
+
+Consider that other values than B<Some> or B<None> also return C<0> because
+an empty string for example is not an optional to begin with. Currently I will
+consider if those cases also should return C<1>.
 
 =head2 match($opt, Some => sub($value){ ... }, None => sub(){ ... })
 
@@ -453,6 +485,84 @@ returns a truish value when C<$any> is an optional value.
     my $bool = Option->is_opt(0);           # 0
     my $bool = Option->is_opt([]);          # 0
     my $bool = Option->is_opt({}):          # 0
+
+B<WARNING:> In probably 90% of all cases this is not the function you wanna use.
+Some new people that are introduced to the idea of optional values usually might
+use it like this.
+
+    if ( Option->is_opt($any) && $any->is_some ) {
+        my $value = $any->get;
+    }
+
+
+to the idea of first checking with C<< Option->is_opt($any) >> if it is an
+Optional value, then they maybe call C<< $any->is_some >> and finally do a
+C<< $any->get >> to get the value. B<Don't do that>.
+
+=over 4
+
+=item First
+
+Instead of C<< Option->is_opt >> you can use C<Option::is_some> or C<Option::is_none>
+in a functional-style to also check C<$any> value. Those functions are written in a way
+that they don't expect an optional value. You can directly do
+
+    if ( Option::is_some($any) ) {
+        my $value = $any->get
+    }
+
+This does the same and is shorter and clearer.
+
+=item Second
+
+Only call C<< Option->is_opt >> when you expect that a function can return many different
+values of different types and you need to check if it is an optional value. Obviously
+when you know that something should return an optional then trust it and just
+use it as an optional. That's how dynamic-typing works.
+
+That leads to the idea that very often you maybe want to check if you get
+B<Some> value and do something with it. A first better aproach would be
+to use C<match> instead.
+
+    my $double =
+        $option->match(
+            Some => sub($x) { $x * 2 },
+            None => sub     { 0      },
+        );
+
+In this case C<$double> will either be the double of C<$x> or C<0>.
+
+=item Third
+
+The above assumes that you know a default value to be used when the value is
+B<None>. But what do you do when you don't know a default value at this place?
+You could return an optional again.
+
+    my $opt_double =
+        $option->match(
+            Some => sub($x) { Some($x * 2) },
+            None => sub     { None         },
+        );
+
+but, this function is exactly what C<map> does! So instead write.
+
+    my $opt_double = $option->map(sub($x) { $x * 2 });
+
+Consider C<map> as a way to write code that only get's executed when you have
+B<Some> value. Otherwise the code will not be executed.
+
+When the code you pass to C<map> returns an optional you should use C<bind>
+instead of C<map>.
+
+=item Fourth
+
+The idea of working with Optional values is that you keep working with an C<Option>
+value as long as you can. Only at the very last step where you just need to
+access the value then you usually either use C<match>, C<or>, C<or_with>, C<or_else>,
+C<or_else_with> to extract the value. Also C<get> should be avoided if possible.
+
+Use C<fold> when you want to extract the value and then transform it to something
+else. Use C<iter> when you want to do just some side-effect with the value.
 
 =head2 Option->all_valid($array_of_opt)
 

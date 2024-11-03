@@ -548,4 +548,24 @@ is(Option->is_opt(0),           0, 'is_opt 6');
 is(Option->is_opt([]),          0, 'is_opt 7');
 is(Option->is_opt({}),          0, 'is_opt 8');
 
+is(Option::is_some(Some({})),    1, 'is_some 1');
+is(Option::is_some(Some(1)),     1, 'is_some 2');
+is(Option::is_some(None),        0, 'is_some 3');
+is(Option::is_some(Some(undef)), 0, 'is_some 4');
+is(Option::is_some(""),          0, 'is_some 5');
+is(Option::is_some(0),           0, 'is_some 6');
+is(Option::is_some([]),          0, 'is_some 7');
+is(Option::is_some({}),          0, 'is_some 8');
+
+is(Option::is_none(Some({})),    0, 'is_none 1');
+is(Option::is_none(Some(1)),     0, 'is_none 2');
+is(Option::is_none(None),        1, 'is_none 3');
+is(Option::is_none(Some(undef)), 1, 'is_none 4');
+
+# TODO: THINK ABOUT: should is_none return 1 for those cases or not?
+is(Option::is_none(""),          0, 'is_none 5');
+is(Option::is_none(0),           0, 'is_none 6');
+is(Option::is_none([]),          0, 'is_none 7');
+is(Option::is_none({}),          0, 'is_none 8');
+
 done_testing;
