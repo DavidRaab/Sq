@@ -17,7 +17,7 @@ This module is automatically loaded and accessible under C<Option> by loading C<
 
 An Option is an alternative to represent undef/null values. By default every
 value in Perl can be C<undef>. The problem with working with C<undef> is that
-you need to check them, but are never forced todo so. If you forget to check
+you need to check them but are never forced todo so. If you forget to check
 for C<undef> than typical warnings in Perl will appear or maybe even the program
 crashes when you try to call a method on an C<undef> value.
 
@@ -25,8 +25,11 @@ An option is a way to make it explicitly visible that a function sometimes retur
 no value at all. A user of the option value must explicitly work with an option
 and unpack the value or use some of the methods provided by the option module
 instead of directly extracting the value. When a value is extracted the user
-typically must write code for both cases that reduces the amount of errorness
-code that is possible to write.
+must write code for both cases that reduces the amount of errorness code that
+is possible to write.
+
+But the whole idea on top of that is that there are special functions written
+that helps working and doing typical task with optional values.
 
 Like the other modules you always can call every method in a functional-style.
 
@@ -41,22 +44,22 @@ to create optional values.
 
 These function creates optional values.
 
-=head2 Some
+=head2 Some($x) : $opt_x
 
 The C<Some> function is automatically imported by loading C<Sq>. Every value
 except C<undef> turns into a valid value.
 
-    my $a = Some(10);
-    my $b = Some([]);
-    my $c = Some({ a => 1, b => 2});
-    my $d = Some(undef);             # None
+    my $opt = Some(10);
+    my $opt = Some([]);
+    my $opt = Some({ a => 1, b => 2});
+    my $opt = Some(undef);             # None
 
-=head2 None
+=head2 None() : $opt
 
 This indicates the absence of a value
 
-    my $a = None();
-    my $b = None;
+    my $opt = None();
+    my $opt = None;
 
 =head1 METHODS
 
@@ -66,7 +69,7 @@ functional-style. That means you always can do both calling styles.
     $opt->map(sub($x) { ... });
     Option::map($opt, sub($x) { ... });
 
-=head2 is_some($any)
+=head2 is_some($any) : $bool
 
 returns a truish value when the optional contains some value. Most of the
 time you probably want to use an extraction method instead.
@@ -81,16 +84,16 @@ back if the value is an optional, and if it is B<Some> value.
 
     my $bool = Option::is_some($any)
 
-    Option::is_some(Some({}));    # 1
-    Option::is_some(Some(1));     # 1
-    Option::is_some(None);        # 0
-    Option::is_some(Some(undef)); # 0
-    Option::is_some("");          # 0
-    Option::is_some(0);           # 0
-    Option::is_some([]);          # 0
-    Option::is_some({});          # 0
+    my $bool = Option::is_some(Some({}));    # 1
+    my $bool = Option::is_some(Some(1));     # 1
+    my $bool = Option::is_some(None);        # 0
+    my $bool = Option::is_some(Some(undef)); # 0
+    my $bool = Option::is_some("");          # 0
+    my $bool = Option::is_some(0);           # 0
+    my $bool = Option::is_some([]);          # 0
+    my $bool = Option::is_some({});          # 0
 
-=head2 is_none($any)
+=head2 is_none($any) : $bool
 
 returns a truish value when the optional is None. Most of the time you probably
 want to use an extraction method instead.
@@ -103,14 +106,14 @@ Calling this method in a functional-style has the benefit that it also does
 a proper type-checking of an optional, you can pass any value to it and get
 back if the value is an optional, and if it is B<None> value.
 
-    Option::is_none(Some({}));    # 0
-    Option::is_none(Some(1));     # 0
-    Option::is_none(None);        # 1
-    Option::is_none(Some(undef)); # 1
-    Option::is_none("");          # 0
-    Option::is_none(0);           # 0
-    Option::is_none([]);          # 0
-    Option::is_none({});          # 0
+    my $bool = Option::is_none(Some({}));    # 0
+    my $bool = Option::is_none(Some(1));     # 0
+    my $bool = Option::is_none(None);        # 1
+    my $bool = Option::is_none(Some(undef)); # 1
+    my $bool = Option::is_none("");          # 0
+    my $bool = Option::is_none(0);           # 0
+    my $bool = Option::is_none([]);          # 0
+    my $bool = Option::is_none({});          # 0
 
 Consider that other values than B<Some> or B<None> also return C<0> because
 an empty string for example is not an optional to begin with. Currently I will
