@@ -564,6 +564,8 @@ C<or_else_with> to extract the value. Also C<get> should be avoided if possible.
 Use C<fold> when you want to extract the value and then transform it to something
 else. Use C<iter> when you want to do just some side-effect with the value.
 
+=back
+
 =head2 Option->all_valid($array_of_opt)
 
 Sometimes we have an array of optionals. Like C<[Some(1), Some(2), Some(3)]>.
