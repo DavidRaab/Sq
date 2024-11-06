@@ -16,7 +16,7 @@ Sq::Collection::Array - Array functions
 An Sq Array is just a Perl array blessed into the Array package. You
 could create it yourself by just typing.
 
-    return $array = bless([], 'Array');
+    my $array = bless([], 'Array');
 
 Nothing is added to the reference or nothing special besides that is done
 and will never be done. This design is choosen for several reasons.
