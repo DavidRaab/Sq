@@ -630,6 +630,32 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
         },
         'bind'
     );
+
+    my $files = Hash->new(
+        etc => Array->new(qw/fstab passwd crontab/),
+        bin => Array->new(qw/vim ls man ps/),
+    );
+
+    my $path_length = $files->bind(sub($folder,$files) {
+        return $files->to_hash(sub($file) {
+            my $path   = $folder . '/' . $file;
+            my $length = length $path;
+            return $path => $length;
+        });
+    });
+
+    is(
+        $path_length,
+        {
+            'etc/fstab'   => 9,
+            'etc/passwd'  => 10,
+            'etc/crontab' => 11,
+            'bin/vim'     => 7,
+            'bin/ls'      => 6,
+            'bin/man'     => 7,
+            'bin/ps'      => 6,
+        },
+        'bind 2');
 }
 
 # to_array / from_array
@@ -651,6 +677,11 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
         return $i, $v;
     });
     is($k, {0 => [bar=>2], 1 => [baz=>3], 2 => [foo=>1]}, 'from_array 2');
+
+    is(
+        Hash->from_array([qw/Alice Anny Sola Candy Lilly/], sub($idx, $name) { $name => $idx }),
+        {Alice => 0, Anny => 1, Sola => 2, Candy => 3, Lilly => 4},
+        'pod example');
 }
 
 # equal
