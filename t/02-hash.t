@@ -839,4 +839,35 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
         'init');
 }
 
+# lock
+{
+    my $h = Hash->new(
+        name     => 'Anne',
+        birthday => '1970-01-01',
+    )->lock;
+
+    my $orig = $h->copy;
+
+    like(
+        dies { $h->{age} = 12 },
+        qr/\AAttempt to access disallowed key/,
+        'setting new key dies after lock');
+
+    is($h, $orig, 'still the same');
+
+    like(
+        dies { my $age = $h->{age} },
+        qr/\AAttempt to access disallowed key/,
+        'reading a not allowed key');
+
+    $h->{name} = 'Marie';
+    is($h, {name => "Marie", birthday => '1970-01-01' }, 'but mutation is allowed');
+
+    # Second Hash
+    my $j = Hash->new(name => 'Zola')->lock(qw/hair_color/);
+
+    $j->{hair_color} = 'black';
+    is($j, {name => 'Zola', hair_color => 'black'}, 'additional key');
+}
+
 done_testing;

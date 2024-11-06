@@ -510,6 +510,28 @@ The newly created Array is an Sq Array.
 
 =head1 SIDE-EFFECTS
 
+=head2 lock($hash, @keys) : $hash
+
+This locks the keys of a Hash. You can specify additional C<@keys> to be locked.
+Locking keys means you are only allowed to read and write the allowed keys.
+Reading or writing any not allowed key will throw an exception.
+
+This function just returns the hash itself again. So you can chain the C<lock>
+method after creation of a new hash.
+
+Mutation of values is still allowed.
+
+    my $person = Hash->new(
+        name     => 'Alice',
+        birthday => '1970-01-01',
+    )->lock("hair_color");
+
+    $person->{foo} = 1;        # throws exception
+    my $foo = $person->{foo};  # throws exception
+
+    $person->{name}       = 'Candy'; # okay
+    $person->{hair_color} = 'black'; # fine too
+
 =head2 on($hash, $key, $f) : void
 
 Similar to C<change>. It reads the value of C<$key> and passes it to C<$f>

@@ -1,5 +1,6 @@
 package Hash;
 use 5.036;
+use Hash::Util ();
 use Carp ();
 use subs 'bind', 'keys', 'values', 'bless', 'map', 'foreach', 'delete', 'length';
 
@@ -294,6 +295,11 @@ sub foreach($hash, $f) {
         $f->($key, $value);
     }
     return;
+}
+
+sub lock($hash, @keys) {
+    Hash::Util::lock_keys_plus(%$hash, @keys);
+    return $hash;
 }
 
 #
