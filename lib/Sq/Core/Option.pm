@@ -35,14 +35,14 @@ sub is_opt($, $any) {
 
 sub is_some($any) {
     return
-        defined $any && ref $any eq 'Option' && $any->[0] == $Some
+        ref $any eq 'Option' && $any->[0] == $Some
         ? 1
         : 0;
 }
 
 sub is_none($any) {
     return
-        defined $any && ref $any eq 'Option' && $any->[0] == 0
+        ref $any eq 'Option' && $any->[0] == 0
         ? 1
         : 0;
 }
