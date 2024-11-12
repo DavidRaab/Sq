@@ -107,3 +107,11 @@ an Error value.
     my $result = Err([]);
     my $result = Err({ a => 1, b => 2});
     my $result = Err(undef);
+
+=head1 METHODS
+
+Methods work on a result value. All methods can also be called in a
+functional-style. This means you always can do both calling styles.
+
+    $result->map(sub($x) { ... });
+    Result::map($result, sub($x) { ... });

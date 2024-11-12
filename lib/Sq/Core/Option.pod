@@ -64,7 +64,7 @@ This indicates the absence of a value
 =head1 METHODS
 
 Methods work on an optional value. All Methods can also be called in a
-functional-style. That means you always can do both calling styles.
+functional-style. This means you always can do both calling styles.
 
     $opt->map(sub($x) { ... });
     Option::map($opt, sub($x) { ... });

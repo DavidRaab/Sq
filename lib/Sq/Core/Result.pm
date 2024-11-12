@@ -6,6 +6,7 @@ use Sub::Exporter -setup => {
     groups  => {},
 };
 
+# enum values representing Ok/Err
 my $err = 0;
 my $ok  = 1;
 
