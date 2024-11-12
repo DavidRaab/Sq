@@ -12,8 +12,8 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end 
     my $z = None;
 
     is($x, check_isa('Option'), '$x is option');
-    is($y, check_isa('Option'), '$x is option');
-    is($z, check_isa('Option'), '$x is option');
+    is($y, check_isa('Option'), '$y is option');
+    is($z, check_isa('Option'), '$z is option');
 
     ok($x->is_some, 'some value');
     ok($y->is_none, 'none value');

@@ -7,14 +7,17 @@ use Sub::Exporter -setup => {
         qw(id fst snd key assign is_str is_num),
         Some => sub { \&Option::Some },
         None => sub { \&Option::None },
+        Ok   => sub { \&Result::Ok   },
+        Err  => sub { \&Result::Err  },
     ],
     groups => {
-        default => [qw(id fst snd key assign is_str is_num Some None)],
+        default => [qw(id fst snd key assign is_str is_num Some None Ok Err)],
     },
 };
 
 # Load Basic Data Types
 use Sq::Core::Option;
+use Sq::Core::Result;
 
 # Load Collections Modules
 use Sq::Collections::Hash;
