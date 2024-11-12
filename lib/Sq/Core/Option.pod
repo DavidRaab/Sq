@@ -80,7 +80,7 @@ time you probably want to use an extraction method instead.
 
 Calling this method in a functional-style has the benefit that it also does
 a proper type-checking of an optional, you can pass any value to it and get
-back if the value is an optional, and if it is B<Some> value.
+back if the value is an optional and if it is B<Some> value.
 
     my $bool = Option::is_some($any)
 
@@ -104,7 +104,7 @@ want to use an extraction method instead.
 
 Calling this method in a functional-style has the benefit that it also does
 a proper type-checking of an optional, you can pass any value to it and get
-back if the value is an optional, and if it is B<None> value.
+back if the value is an optional and if it is a B<None> value.
 
     my $bool = Option::is_none(Some({}));    # 0
     my $bool = Option::is_none(Some(1));     # 0
@@ -116,8 +116,7 @@ back if the value is an optional, and if it is B<None> value.
     my $bool = Option::is_none({});          # 0
 
 Consider that other values than B<Some> or B<None> also return C<0> because
-an empty string for example is not an optional to begin with. Currently I will
-consider if those cases also should return C<1>.
+an empty string for example is not an optional.
 
 =head2 match($opt, Some => sub($value){ ... }, None => sub(){ ... })
 
