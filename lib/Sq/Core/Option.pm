@@ -34,17 +34,11 @@ sub is_opt($, $any) {
 }
 
 sub is_some($any) {
-    return
-        ref $any eq 'Option' && $any->[0] == $Some
-        ? 1
-        : 0;
+    return ref $any eq 'Option' && $any->[0] == $Some ? 1 : 0;
 }
 
 sub is_none($any) {
-    return
-        ref $any eq 'Option' && $any->[0] == 0
-        ? 1
-        : 0;
+    return ref $any eq 'Option' && $any->[0] == 0 ? 1 : 0;
 }
 
 sub match($opt, %args) {
