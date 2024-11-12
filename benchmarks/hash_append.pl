@@ -19,6 +19,14 @@ sub append_2($hash, $other) {
     return Hash::union($hash, $other, $second);
 }
 
+# this does not work
+sub append_3($hashA, $hashB) {
+    my %new = %$hashA;
+    # this overwrites %new
+       %new = %$hashB;
+    return bless(\%new, 'Hash');
+}
+
 # initializing of hashes for testing
 my $hashA = Hash->init(1000, sub($idx) {
     return rand_string(4), rand 10_000;
