@@ -95,8 +95,11 @@ my $is_even = sub($x)    { $x % 2 == 0 };
 
 # map, mapErr
 {
-    is(Ok(10) ->map($add1), Ok(11),  'map');
+    is(Ok(10) ->map($add1), Ok(11),  'map on Ok');
     is(Err(10)->map($add1), Err(10), 'map on Err');
+
+    is(Ok(10) ->mapErr($add1), Ok(10),  'mapErr on Ok');
+    is(Err(10)->mapErr($add1), Err(11), 'mapErr on Err');
 }
 
 done_testing;

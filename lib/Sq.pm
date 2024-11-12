@@ -104,7 +104,7 @@ returns a truish value if C<$str> is a string.
 
 =head2 Some($x) : $opt_x
 
-generates an optional value containing $x. See L<Sq::Core::Option>.
+Creates an optional value containing $x. See L<Sq::Core::Option>.
 The value C<undef> returns C<None>.
 
     my $opt = Some(10);         # Some(10)
@@ -113,10 +113,29 @@ The value C<undef> returns C<None>.
 
 =head2 None : $opt
 
-generates an optional value that indicates the absence of any value.
+Creates an optional value that indicates the absence of any value.
 
     my $opt = None();
     my $opt = None;
+
+=head2 Ok($x) : $result_x
+
+Creates a value that additionally contains the information of beeing
+sucessful/valid/ok. See L<Sq::Core::Result>. This is very similar to C<Some>.
+The difference is that the B<Err> case also can contain a value.
+
+    my $result = Ok(10);
+    my $result = Ok([]);
+    my $result = Ok("data found");
+
+=head2 Err($x) : $result_x
+
+Creates a value that additionally contains the information of beeing
+an error.
+
+    my $result = Err(10);
+    my $result = Err([]);
+    my $result = Err("data not found");
 
 =head2 id($x) : $x
 
@@ -168,6 +187,8 @@ Same as
 =over 4
 
 =item L<Sq::Core::Option>
+
+=item L<Sq::Core::Result>
 
 =item L<Sq::Io>
 
