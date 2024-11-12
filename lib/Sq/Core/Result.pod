@@ -1,0 +1,109 @@
+# PODNAME: Sq::Core::Result
+# ABSTRACT: Result functions
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Sq::Core::Result - Result functions
+
+This module is automatically loaded and accessible under C<Result> by loading C<Sq>.
+
+=head1 DESCRIPTION
+
+A Result value is an explicit way to represent the idea of either being succesfull
+or being an Error and additionally containing a value.
+
+Error handling is a common problem in computing. We usually have functions that
+do some computation but maybe can fail. This especially happens with functions
+doing side-effects.
+
+For example we could create a function that loads an entire file and returns it
+as a string. With a Result type we can return C<Ok($string)> in the successfull
+state and something like C<Err($error_value)> if it fails.
+
+Like an optional value we must extract the value or check if we have an B<Ok> or
+B<Err> value. This design avoids common problems with other kinds of error handling.
+
+=over 4
+
+=item C-Style out parameter
+
+In a C-style environment usually a function returns an int used as an error-code,
+but this design means we must usually pass a reference to the function that is used
+as an out parameter. I think this design is flawed it basically reduces all return
+values to be error codes only.
+
+It also makes it somehow flawed that an B<IN> argument for calling the function is
+used as an B<OUT> parameter.
+
+=item undef/null
+
+In Perl we could return C<undef> as an error case like a lot of built-in functions
+already do. But we are not forced to check if something was succesfull. Like
+we can open a file, not check if it failed, and just use the file-handle.
+Typically it creates a lot of error/warnings, crashes the program or makes
+the program does something it should not do.
+
+Additionally when we want an explicit error in Perl we need to access a global
+variable like C<$!>, or maybe another variable. For example C<DBI> uses
+C<$DBI::err> and so on. It works but isn't really fine. Having the error as an
+explicit local variable makes things easier.
+
+=item returning tuples
+
+We could return two values. For example a boolean value indicating if something
+is succesfull or not, and the second value as either the ok or the error value.
+This can easily be done in Perl as we can return many arguments, not just one
+value, but I have never seen a Perl module does this. B<Go> as a programming
+language does this kind of thing but overall I think it's just a crap design.
+
+Result does exactly the same by returning one value, and we have one value
+with a lot of useful helper functions to work with.
+
+=item exceptions
+
+From my experience this is the worst solution of all. Even if it has become
+the most common solution in most languages. Silently a function can throw an
+exception but we never know why and when. Also in Perl it is not always documented
+if a function throws an error.
+
+Also adding an exception in some kind of code can cause code to suddenly break
+that worked before.
+
+It has the problem of code that jumps somewhere like goto. We also must capture
+an exception and up until the latest Perl version we only had poor support
+for catching exceptions.
+
+And most of all, at least me, i don't want code to crash. Code should work not
+maybe crash or maybe not. An explicit Result Error type don't have those problems.
+
+=back
+
+=head1 CONSTRUCTORS
+
+These function creates result values.
+
+=head2 Ok($x) : $result_x
+
+The C<Ok> function is automatically imported by loading C<Sq>. Every value turns
+into a C<Ok> value.
+
+    my $result = Ok(10);
+    my $result = Ok([]);
+    my $result = Ok({ a => 1, b => 2});
+    my $result = Ok(undef);
+
+=head2 Err($x) : $result_x
+
+The C<Err> function is automatically imported by loading C<Sq>. This indicates
+an Error value.
+
+    my $result = Err(10);
+    my $result = Err([]);
+    my $result = Err({ a => 1, b => 2});
+    my $result = Err(undef);
