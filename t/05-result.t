@@ -99,7 +99,64 @@ my $is_even = sub($x)    { $x % 2 == 0 };
     is(Err(10)->map($add1), Err(10), 'map on Err');
 
     is(Ok(10) ->mapErr($add1), Ok(10),  'mapErr on Ok');
-    is(Err(10)->mapErr($add1), Err(11), 'mapErr on Err');
+        is(Err(10)->mapErr($add1), Err(11), 'mapErr on Err');
+}
+
+# is_result / is_ok / is_err
+{
+
+    is(Result::is_result(Ok(1)),  1, 'is_result 1');
+    is(Result::is_result(Err(1)), 1, 'is_result 2');
+    is(Result::is_result(""),     0, 'is_result 3');
+    is(Result::is_result([]),     0, 'is_result 4');
+
+    is(Result::is_ok(Ok(10)),   1, 'is_ok 1');
+    is(Result::is_ok(Err(10)),  0, 'is_ok 2');
+    is(Result::is_ok(""),       0, 'is_ok 3');
+    is(Result::is_ok([]),       0, 'is_ok 4');
+    is(Ok(10) ->is_ok,          1, 'is_ok 5');
+    is(Err(10)->is_ok,          0, 'is_ok 6');
+
+    is(Result::is_err(Ok(10)),  0, 'is_err 1');
+    is(Result::is_err(Err(10)), 1, 'is_err 2');
+    is(Result::is_err(""),      0, 'is_err 3');
+    is(Result::is_err([]),      0, 'is_err 4');
+    is(Ok(10) ->is_err,         0, 'is_err 5');
+    is(Err(10)->is_err,         1, 'is_err 6');
+}
+
+# match
+{
+    my $fetch = sub($path) {
+        state $content = Hash->new(
+            '/'             => Ok('root'),
+            '/etc/passwd'   => Err('invalid access'),
+            '/var/log/text' => Ok('some text'),
+        );
+        return $content->get($path)->or(Err('404'));
+    };
+
+    is($fetch->('/'),              Ok('root'),            'fetching /');
+    is($fetch->('/etc/passwd'),    Err('invalid access'), 'fetching /etc/passwd');
+    is($fetch->('/var/log/text'),  Ok('some text'),       'fetching /var/log/text');
+    is($fetch->('/home/Foo/text'), Err('404'),            'fetching /home/Foo/text');
+
+    my @fetches = (
+        $fetch->('/'),             $fetch->('/etc/passwd'),
+        $fetch->('/var/log/text'), $fetch->('/home/Foo/text'),
+    );
+
+    my $oks  = 0;
+    my $errs = 0;
+    for my $fetch ( @fetches ) {
+        $fetch->match(
+            Ok  => sub($str) { $oks++ },
+            Err => sub($str) { $errs++ },
+        );
+    }
+
+    is($oks,  2, '2 oks');
+    is($errs, 2, '2 errs');
 }
 
 done_testing;

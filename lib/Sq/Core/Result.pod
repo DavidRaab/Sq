@@ -154,3 +154,68 @@ functional-style. This means you always can do both calling styles.
 
     $result->map(sub($x) { ... });
     Result::map($result, sub($x) { ... });
+
+=head2 is_result($any) : $bool
+
+Returns a truish value when C<$any> is a C<Result> type. Usually this function
+only really makes sense when you call it in a functional-style.
+
+    if ( Result::is_result($any) ) {
+        ...
+    }
+
+    my $bool = Result::is_result(Ok(10));  # 1
+    my $bool = Result::is_result(Err(10)); # 1
+    my $bool = Result::is_result("");      # 0
+    my $bool = Result::is_result([]);      # 0
+
+=head2 is_ok($any) : $bool
+
+Returns a truish value when C<$any> is a C<Result> and is C<Ok>.
+
+    my $bool = $result->is_ok;
+
+    my $bool = Result::is_ok(Ok(10));  # 1
+    my $bool = Result::is_ok(Err(10)); # 0
+    my $bool = Result::is_ok("");      # 0
+    my $bool = Result::is_ok([]);      # 0
+
+=head2 is_err($any) : $bool
+
+Returns a truish value when C<$any> is a C<Result> and is C<Err>.
+
+    my $bool = $result->is_err;
+
+    my $bool = Result::is_err(Ok(10));  # 0
+    my $bool = Result::is_err(Err(10)); # 1
+    my $bool = Result::is_err("");      # 0
+    my $bool = Result::is_err([]);      # 0
+
+=head2 match($result, Ok => sub($x) { $y }, Err => sub($x) { $y }) : $y
+
+Pattern matches against the C<Result> value expecting that you pass in a function
+for the B<Ok> and the B<Err> case. Executes either the B<Ok> or the B<Err> function
+and passes the value to it. C<match> returns whatever those functions returns.
+
+Instead of checking with C<is_ok> or C<is_err> you should use this function instead.
+
+    sub fetch($path) {
+        state $content = Hash->new(
+            '/'             => Ok('root'),
+            '/etc/passwd'   => Err('invalid access'),
+            '/var/log/text' => Ok('some text'),
+        );
+        return $content->get($path)->or(Err('404'));
+    };
+
+    my @fetches = (
+        fetch('/'),             fetch('/etc/passwd'),
+        fetch('/var/log/text'), fetch('/home/Foo/text'),
+    );
+
+    for my $fetch ( @fetches ) {
+        $fetch->match(
+            Ok  => sub($str) { printf "Ok\n"    },
+            Err => sub($str) { printf "Error\n" },
+        );
+    }
