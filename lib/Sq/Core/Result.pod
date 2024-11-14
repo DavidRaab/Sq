@@ -16,7 +16,7 @@ This module is automatically loaded and accessible under C<Result> by loading C<
 =head1 DESCRIPTION
 
 A Result value is an explicit way to represent the idea of either being succesfull
-or being an Error and additionally containing a value.
+or being an Error and additionally containing a value in both cases.
 
 Error handling is a common problem in computing. We usually have functions that
 do some computation but maybe can fail. This especially happens with functions
@@ -41,6 +41,12 @@ values to be error codes only.
 It also makes it somehow flawed that an B<IN> argument for calling the function is
 used as an B<OUT> parameter.
 
+It also means that as a caller we usually must create some data before we can call
+a function. Like creating a struct that we then pass a pointer to a function.
+I rather like when the function just creates what is needed and returns it or some
+error. At least in a language with automatic memory-management this makes sense
+and is in general better to use.
+
 =item undef/null
 
 In Perl we could return C<undef> as an error case like a lot of built-in functions
@@ -49,49 +55,83 @@ we can open a file, not check if it failed, and just use the file-handle.
 Typically it creates a lot of error/warnings, crashes the program or makes
 the program does something it should not do.
 
-Additionally when we want an explicit error in Perl we need to access a global
-variable like C<$!>, or maybe another variable. For example C<DBI> uses
-C<$DBI::err> and so on. It works but isn't really fine. Having the error as an
-explicit local variable makes things easier.
+But returning C<undef> has the problem that we cannot pass information with it,
+like an error-code indicating what kind of error happened or maybe some other
+data. But if that is all you need than use C<Option> instead.
 
-=item returning tuples
+Perl avoids this problem be having some global accessible variables. For example
+we can access C<$!> that contains the error of the last called function that
+set this variable. But sometimes some module also use other gloabl variables, for
+example C<DBI> uses C<$DBI::err> and so on. It works, but isn't really fine. Having
+the error as an explicit local variable makes things easier and less error-prone.
+
+The same as in C-Style coding it also means we must check for errors after every
+function call, this can make code harder to read, and when we forget it, or
+maybe are not interested in it because we are lazy, we pay the price at a later
+time, wishing we would never have done that from the beginning.
+
+=item Returning tuples
 
 We could return two values. For example a boolean value indicating if something
-is succesfull or not, and the second value as either the ok or the error value.
+is succesfull or not, and the second value as either the B<Ok> or the B<Error> value.
 This can easily be done in Perl as we can return many arguments, not just one
 value, but I have never seen a Perl module does this. B<Go> as a programming
 language does this kind of thing but overall I think it's just a crap design.
 
-Result does exactly the same by returning one value, and we have one value
-with a lot of useful helper functions to work with.
+Returning two values is just a poor-mans version of C<Option> or C<Result>.
+Instead of having one value that contains all information we have two
+separated values instead.
 
-=item exceptions
+C<Result> captures both information in one value. Having them as one value also
+means we can work with them. Pass C<Result> values around and be able to use
+functions operating on C<Result> values.
+
+=item Exceptions
 
 From my experience this is the worst solution of all. Even if it has become
-the most common solution in most languages. Silently a function can throw an
+the most common solution in most "modern" languages. Silently a function can throw an
 exception but we never know why and when. Also in Perl it is not always documented
-if a function throws an error.
+if a function throws an error, like in most languages.
 
-Also adding an exception in some kind of code can cause code to suddenly break
-that worked before.
+The worst thing that can happen is when people suddenly expect you to cath exceptions
+and use them as some kind of flow-control. Exceptions are also usually extremely
+slow when they happen. They need to capture a stack and do some kind of weird magic,
+and I don't like magic.
 
-It has the problem of code that jumps somewhere like goto. We also must capture
-an exception and up until the latest Perl version we only had poor support
-for catching exceptions.
+Okay I would like to shoot kamehameha like Goku, be able to fly or be able todo
+other stuff, but I don't like magic in my source code.
 
-And most of all, at least me, i don't want code to crash. Code should work not
-maybe crash or maybe not. An explicit Result Error type don't have those problems.
+Also in Perl try/catch syntax was poorly supported for a long time and only became
+available since Perl 5.40. When you forget to catch exceptions, because you either
+don't know if a function throws one or you are just lazy, then your code crashes,
+usually when you don't excpect it.
+
+A function returning a C<Result> means you always know when a function can throw
+an error. You can pass values around in the error code. Those values are all
+lexically scoped and don't use global variables. You also can execute a bunch
+of functions gather all results into an array and then process the array like
+you want.
+
+For example consider you have a function downloading URLs that return the content
+of the URL as a string. You either get an C<Ok($content)> back or a C<Err($error_code)>.
+You can easily execute all of them in parallel, asnychronous and so on, gather
+all results and only then do processing of those who where B<Ok>, just log
+the B<Err> or do some other kind of stuff.
+
+Code becomes better when even your B<Errors> is just data that you can manipulate
+or work with like any other data instead of being a separated language feature
+with poor language features.
 
 =back
 
 =head1 CONSTRUCTORS
 
-These function creates result values.
+These function creates result values. C<Ok> and C<Err> are both automatically
+loaded with loading C<Sq>.
 
 =head2 Ok($x) : $result_x
 
-The C<Ok> function is automatically imported by loading C<Sq>. Every value turns
-into a C<Ok> value.
+Every value turns into an C<Ok> value.
 
     my $result = Ok(10);
     my $result = Ok([]);
@@ -100,8 +140,7 @@ into a C<Ok> value.
 
 =head2 Err($x) : $result_x
 
-The C<Err> function is automatically imported by loading C<Sq>. This indicates
-an Error value.
+Every value turns into an C<Err> value.
 
     my $result = Err(10);
     my $result = Err([]);
