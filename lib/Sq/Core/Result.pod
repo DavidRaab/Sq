@@ -59,9 +59,9 @@ But returning C<undef> has the problem that we cannot pass information with it,
 like an error-code indicating what kind of error happened or maybe some other
 data. But if that is all you need than use C<Option> instead.
 
-Perl avoids this problem be having some global accessible variables. For example
+Perl avoids this problem by having some global accessible variables. For example
 we can access C<$!> that contains the error of the last called function that
-set this variable. But sometimes some module also use other gloabl variables, for
+set this variable. But sometimes some module also use other global variables, for
 example C<DBI> uses C<$DBI::err> and so on. It works, but isn't really fine. Having
 the error as an explicit local variable makes things easier and less error-prone.
 
@@ -206,7 +206,7 @@ Instead of checking with C<is_ok> or C<is_err> you should use this function inst
             '/var/log/text' => Ok('some text'),
         );
         return $content->get($path)->or(Err('404'));
-    };
+    }
 
     my @fetches = (
         fetch('/'),             fetch('/etc/passwd'),
