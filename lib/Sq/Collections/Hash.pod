@@ -420,6 +420,16 @@ value otherwise returns C<None>.
     my $opt    = $hash->get('name');
     my $string = $hash->get('name')->or('Anne');
 
+An optional value is not wrapped again.
+
+    my $movie = Hash->new(
+        title  => 'Terminator 2',
+        rating => Some(5),
+    );
+
+    my $opt_title  = $movie->get('title');  # Some('Terminator 2')
+    my $opt_rating = $movie->get('rating'); # Some(5)
+
 =head2 extract($hash, @keys) : $array_of_opt
 
 Extracts many keys at once and returns them in an array in order they were specified.

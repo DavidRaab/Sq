@@ -901,4 +901,17 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     is($j, {name => 'Zola', hair_color => 'black'}, 'additional key');
 }
 
+# get doesn't wrap an optional again
+{
+    my $movie = Hash->new(
+        title  => 'Terminator 2',
+        rating => Some(5),
+        descr  => None,
+    );
+
+    is($movie->get('title'),  Some('Terminator 2'), 'fetch title');
+    is($movie->get('rating'), Some(5),              'fetch rating');
+    is($movie->get('descr'),  None,                 'fetch descr');
+}
+
 done_testing;

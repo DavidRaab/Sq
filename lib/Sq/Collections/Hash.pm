@@ -197,7 +197,9 @@ sub is_subset_of($hash, $other) {
 }
 
 sub get($hash, $key) {
-    return Option::Some($hash->{$key});
+    my $value = $hash->{$key};
+    return $value if ref $value eq 'Option';
+    return Option::Some($value);
 }
 
 # Hash<'a> -> 'a -> ListContext<'a> -> Array<'a>
