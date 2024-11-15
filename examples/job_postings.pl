@@ -32,7 +32,22 @@ sub gen_job {
 }
 
 # generates 1 mio random jobs
-my $jobs = Array->init(1_000_000, sub($idx) { gen_job });
+#
+# You can use Array->init or Seq->init here, and program runs without
+# further changes. The total running time with 'Seq' is a little bit
+# less compared to using an 'Array'. But computing $result is faster
+# with 'Array'.
+#
+# Explanation:
+#   Array: When using Array the whole Array has to be created first, this
+#          takes time and memory. Then after creation the array has to
+#          be iterated once again.
+#   Seq:   When using Seq nothing is computed/creates before iterating.
+#          Jobs are created while iterating, and while all jobs are iterated
+#          the result is already computed. Even though iterating with Seq
+#          is slower, not having the extra time of generating makes it faster
+#          overall.
+my $jobs = Seq->init(1_000_000, sub($idx) { gen_job });
 
 # Stopwatch - when it started
 my $start = time();
