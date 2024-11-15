@@ -99,7 +99,7 @@ my $is_even = sub($x)    { $x % 2 == 0 };
     is(Err(10)->map($add1), Err(10), 'map on Err');
 
     is(Ok(10) ->mapErr($add1), Ok(10),  'mapErr on Ok');
-        is(Err(10)->mapErr($add1), Err(11), 'mapErr on Err');
+    is(Err(10)->mapErr($add1), Err(11), 'mapErr on Err');
 }
 
 # is_result / is_ok / is_err

@@ -219,3 +219,23 @@ Instead of checking with C<is_ok> or C<is_err> you should use this function inst
             Err => sub($str) { printf "Error\n" },
         );
     }
+
+=head2 map($result, $f_y) : $result_y
+
+When C<$result> is an C<Ok> value it passes the inner value to C<$f_y> and then
+wraps the return value again into an B<Result> value.
+
+    my $add1 = sub($x) { $x + 1 };
+
+    my $result = Ok(10) ->map($add1); # Ok(11)
+    my $result = Err(10)->map($add1); # Err(10)
+
+=head2 mapErr($result, $f_y) : $result_y
+
+When C<$result> is an C<Err> value it passes the inner value to C<$f_y> and then
+wraps the return value again into an B<Result> value.
+
+    my $add1 = sub($x) { $x + 1 };
+
+    my $result = Ok(10) ->mapErr($add1); # Ok(10)
+    my $result = Err(10)->mapErr($add1); # Err(11)
