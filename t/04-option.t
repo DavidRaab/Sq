@@ -67,7 +67,7 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end 
 
     # fold
     {
-        my $add = sub($state, $x) { $state + $x };
+        my $add = sub($x, $state) { $x + $state };
         is(None       ->fold(100, $add),  100, 'fold 1');
         is(Some(undef)->fold(100, $add),  100, 'fold 2');
         is(Some(0)    ->fold(100, $add),  100, 'fold 3');
@@ -75,7 +75,7 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end 
 
         is(
             Option::fold(Some(10), 3, sub($x,$y){ $x - $y }),
-            -7,
+            7,
             'functional-style');
     }
 }
