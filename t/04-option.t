@@ -84,7 +84,7 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end 
 {
     is(Some("Hello")->or_else(Some 10), Some("Hello"), 'or_else 1');
     is(None         ->or_else(Some 10),      Some(10), 'or_else 2');
-    is(Some(undef)  ->or_else(Some 10),      Some(10), 'or_else 2');
+    is(Some(undef)  ->or_else(Some 10),      Some(10), 'or_else 3');
 
     my $calls = 0;
     my $next  = sub { Some(++$calls) };

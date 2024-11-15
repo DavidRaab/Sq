@@ -159,4 +159,46 @@ my $is_even = sub($x)    { $x % 2 == 0 };
     is($errs, 2, '2 errs');
 }
 
+
+# Extracting values
+{
+    my $a = Ok  'Hello';
+    my $b = Ok  10;
+    my $c = Err -1;
+
+    is($a->or('what'), 'Hello', '$a->or');
+    is($b->or(0),      10,      '$b->or');
+    is($c->or(10),     10,      '$c->or');
+
+    is($a->or_with(sub{ 10 }), 'Hello', '$a->or_with');
+    is($c->or_with(sub{ 10 }),      10, '$c->or_with');
+
+    # fold
+    {
+        my $add = sub($state, $x) { $state + $x };
+        is(Err(0)->fold(100, $add),  100, 'fold 1');
+        is(Ok(0) ->fold(100, $add),  100, 'fold 2');
+        is(Ok(10)->fold(100, $add),  110, 'fold 3');
+
+        is(
+            Result::fold(Ok(10), 3, sub($x,$y){ $x - $y }),
+            -7,
+            'functional-style');
+    }
+}
+
+# or_else
+{
+    is(Ok("Hello")->or_else(Ok 10), Ok("Hello"), 'or_else 1');
+    is(Err(0)     ->or_else(Ok 10),      Ok(10), 'or_else 2');
+
+    my $calls = 0;
+    my $next  = sub { Ok(++$calls) };
+
+    is(Ok("World")->or_else_with($next), Ok("World"), 'or_else_with 1');
+    is(Err(0)     ->or_else_with($next),       Ok(1), 'or_else_with 2');
+    is(Ok(10)     ->or_else_with($next),      Ok(10), 'or_else_with 3');
+    is(Err(0)     ->or_else_with($next),       Ok(2), 'or_else_with 4');
+}
+
 done_testing;

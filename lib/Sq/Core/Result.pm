@@ -44,14 +44,57 @@ sub match($result, %args) {
 
 sub map($result, $f) {
     return $result->[0] == $ok
-         ? return bless([$ok => $f->($result->[1])], 'Result')
+         ? bless([$ok => $f->($result->[1])], 'Result')
          : $result;
 }
 
 sub mapErr($result, $f) {
     return $result->[0] == $err
-         ? return bless([$err => $f->($result->[1])], 'Result')
+         ? bless([$err => $f->($result->[1])], 'Result')
          : $result;
+}
+
+sub fold($result, $state, $f_state) {
+    return $result->[0] == $ok
+         ? $f_state->($state, $result->[1])
+         : $state;
+}
+
+# or: Result<'a> -> 'a -> 'a
+sub or($result, $default) {
+    return $result->[0] == $ok ? $result->[1] : $default;
+}
+
+# or_with: Result<'a> -> (unit -> 'a) -> 'a
+sub or_with($result, $f) {
+    return $result->[0] == $ok ? $result->[1] : $f->();
+}
+
+# or_else: Result<'a> -> Result<'a> -> Result<'a>
+sub or_else($result, $default_result) {
+    return $result->[0] == $ok ? $result : $default_result;
+}
+
+# or_else_with: Result<'a> -> (unit -> Result<'a>) -> Result<'a>
+sub or_else_with($result, $f_result) {
+    return $result->[0] == $ok ? $result : $f_result->();
+}
+
+sub iter($result, $f) {
+    $f->($result->[1]) if $result->[0] == $ok;
+    return;
+}
+
+sub to_option($result) {
+    return $result->[0] == $ok
+         ? Option::Some($result->[1])
+         : Option::None();
+}
+
+sub to_array($result) {
+    return $result->[0] == $ok
+         ? Array->new($result->[1])
+         : Array->new();
 }
 
 1;
