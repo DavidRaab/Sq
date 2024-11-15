@@ -202,7 +202,7 @@ and returns the result of C<< $f_opt->() >> that should generate an optional val
     my $opt = Some([1])->or_else_with(sub { Some [] }) # Some [1]
     my $opt = None     ->or_else_with(sub { Some [] }) # Some []
 
-=head2 map($opt, $f) : $opt
+=head2 map($opt, $f_x) : $opt_x
 
 When you have a function that don't know about optionals then you use C<map>
 to let the function run of its value. When the optional is C<None> then
@@ -220,7 +220,7 @@ C<map> is good for functions with the signature C<< 'a -> 'b >>
     my $opt = Some(10)->map($incr); # Some(11)
     my $opt = None    ->map($incr); # None
 
-=head2 map2($optA, $optB, $f) : $opt
+=head2 map2($optA, $optB, $f_x) : $opt_x
 
 Whenever you have a function expecting two normal values, but you have two
 optional values, you use this function. Returns an optional value again.
@@ -234,7 +234,7 @@ optional values, you use this function. Returns an optional value again.
     my $opt = Some(10)->map2(Some(3), $add); # Some(13)
     my $opt = None    ->map2(Some(3), $add); # None
 
-=head2 map3($optA, $optB, $optC, $f) : $opt
+=head2 map3($optA, $optB, $optC, $f_x) : $opt_x
 
 Same as C<map2> but for three optional values.
 
@@ -245,7 +245,7 @@ Same as C<map2> but for three optional values.
             return $a + $b + $c;
         });
 
-=head2 map4($optA, $optB, $optC, $optD, $f) : $opt
+=head2 map4($optA, $optB, $optC, $optD, $f_x) : $opt_x
 
 Same as C<map3> but for four optional values.
 
@@ -256,7 +256,7 @@ Same as C<map3> but for four optional values.
             return $a + $b + $c + $d;
         });
 
-=head2 map_v(@opts, $f) : $opt
+=head2 map_v(@opts, $f_x) : $opt_x
 
 Expects a variable amount of optional values and a function as the last argument.
 Executes the function with all unpacked values when all optionals are C<Some> values.
@@ -275,12 +275,11 @@ directly calling C<map>, C<map2>, C<map3> or C<map4>.
         return $sum;
     });
 
-=head2 bind($opt, $f) : $opt
+=head2 bind($opt, $f_opt) : $opt
 
 C<bind> is also sometimes called C<chain> or C<then> (depending on language
 or module). It allows chaining together functions that expects a non optional
-value, but returns an optional value. It is good for functions with the
-signature C<<< 'a -> Option<'b> >>>
+value, but returns an optional value again.
 
     # this function parses a string and returns an optional. Either Some integer
     # when the functions succeeds or None if not.
@@ -306,7 +305,7 @@ signature C<<< 'a -> Option<'b> >>>
 
     # calling ->map($f)->flatten() will return the same result as using bind()
 
-=head2 bind2($optA, $optB, $f) : $opt
+=head2 bind2($optA, $optB, $f_opt) : $opt
 
 When you have two optional values to unpack and want them to pass it to
 a function that produces a new optional value.
@@ -329,10 +328,10 @@ a function that produces a new optional value.
             return None;
         });
 
-=head3 bind3($optA, $optB, $optC, $f) : $opt
+=head3 bind3($optA, $optB, $optC, $f_opt) : $opt
 
 Unpacks three optional values and when all three are C<Some> values passes
-them to C<$f> that returns an optional value.
+them to C<$f_opt> that returns an optional value.
 
     my $opt_sum =
         Option::bind3($optA, $optB, $optC, sub($a,$b,$c) {
@@ -342,10 +341,10 @@ them to C<$f> that returns an optional value.
             return None;
         });
 
-=head3 bind4($optA, $optB, $optC, $optD, $f) : $opt
+=head3 bind4($optA, $optB, $optC, $optD, $f_opt) : $opt
 
 Unpacks four optional values and when all three are C<Some> values passes
-them to C<$f> that returns an optional value.
+them to C<$f_opt> that returns an optional value.
 
     my $opt_sum =
         Option::bind4($optA, $optB, $optC, $optD, sub($a,$b,$c,$d) {
@@ -355,10 +354,10 @@ them to C<$f> that returns an optional value.
             return None;
         });
 
-=head2 bind_v(@opts, $f) : $opt
+=head2 bind_v(@opts, $f_opt) : $opt
 
 Unpacks all optionals and when all values are C<Some> value then passes all
-values to function C<$f> that returns an Optional value again.
+values to function C<$f_opt> that returns an Optional value again.
 
     my $sum_under_100 = sub {
         my $sum = 0;
