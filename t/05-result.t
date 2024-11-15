@@ -45,7 +45,7 @@ my $is_even = sub($x)    { $x % 2 == 0 };
     for my $test ( @tests ) {
         my ($value, $is_result, $is_ok, $is_err) = @$test;
 
-        is(Result::is_result($value), $is_result, "$idx functional-style is_result ");
+        is(Result->is_result($value), $is_result, "$idx functional-style is_result ");
         is(Result::is_ok($value),     $is_ok,     "$idx functional-style is_ok");
         is(Result::is_err($value),    $is_err,    "$idx functional-style is_err");
 
@@ -105,10 +105,10 @@ my $is_even = sub($x)    { $x % 2 == 0 };
 # is_result / is_ok / is_err
 {
 
-    is(Result::is_result(Ok(1)),  1, 'is_result 1');
-    is(Result::is_result(Err(1)), 1, 'is_result 2');
-    is(Result::is_result(""),     0, 'is_result 3');
-    is(Result::is_result([]),     0, 'is_result 4');
+    is(Result->is_result(Ok(1)),  1, 'is_result 1');
+    is(Result->is_result(Err(1)), 1, 'is_result 2');
+    is(Result->is_result(""),     0, 'is_result 3');
+    is(Result->is_result([]),     0, 'is_result 4');
 
     is(Result::is_ok(Ok(10)),   1, 'is_ok 1');
     is(Result::is_ok(Err(10)),  0, 'is_ok 2');
@@ -175,14 +175,14 @@ my $is_even = sub($x)    { $x % 2 == 0 };
 
     # fold
     {
-        my $add = sub($state, $x) { $state + $x };
+        my $add = sub($x, $state) { $x + $state };
         is(Err(0)->fold(100, $add),  100, 'fold 1');
         is(Ok(0) ->fold(100, $add),  100, 'fold 2');
         is(Ok(10)->fold(100, $add),  110, 'fold 3');
 
         is(
             Result::fold(Ok(10), 3, sub($x,$y){ $x - $y }),
-            -7,
+            7,
             'functional-style');
     }
 }

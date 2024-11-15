@@ -106,6 +106,8 @@ available since Perl 5.40. When you forget to catch exceptions, because you eith
 don't know if a function throws one or you are just lazy, then your code crashes,
 usually when you don't excpect it.
 
+=back
+
 A function returning a C<Result> means you always know when a function can throw
 an error. You can pass values around in the error code. Those values are all
 lexically scoped and don't use global variables. You also can execute a bunch
@@ -118,11 +120,10 @@ You can easily execute all of them in parallel, asnychronous and so on, gather
 all results and only then do processing of those who where B<Ok>, just log
 the B<Err> or do some other kind of stuff.
 
-Code becomes better when even your B<Errors> is just data that you can manipulate
-or work with like any other data instead of being a separated language feature
-with poor language features.
-
-=back
+Code becomes better when even your B<Errors> is just data that you can manipulate.
+C<Sq> but pretty much any programming language provides rich features to work
+and manipulate data. Because of this it makes sense that also Errors is just
+data instead of having a separated language feature with poor language features.
 
 =head1 CONSTRUCTORS
 
@@ -155,19 +156,7 @@ functional-style. This means you always can do both calling styles.
     $result->map(sub($x) { ... });
     Result::map($result, sub($x) { ... });
 
-=head2 is_result($any) : $bool
 
-Returns a truish value when C<$any> is a C<Result> type. Usually this function
-only really makes sense when you call it in a functional-style.
-
-    if ( Result::is_result($any) ) {
-        ...
-    }
-
-    my $bool = Result::is_result(Ok(10));  # 1
-    my $bool = Result::is_result(Err(10)); # 1
-    my $bool = Result::is_result("");      # 0
-    my $bool = Result::is_result([]);      # 0
 
 =head2 is_ok($any) : $bool
 
@@ -239,3 +228,21 @@ wraps the return value again into an B<Result> value.
 
     my $result = Ok(10) ->mapErr($add1); # Ok(10)
     my $result = Err(10)->mapErr($add1); # Err(11)
+
+=head1 MODULE FUNCTIONS
+
+These functions are concipated to be called from the module level because
+they don't make sense to be called as a method for various reasons.
+
+=head2 is_result($any) : $bool
+
+Returns a truish value when C<$any> is a C<Result> type.
+
+    if ( Result->is_result($any) ) {
+        ...
+    }
+
+    my $bool = Result->is_result(Ok(10));  # 1
+    my $bool = Result->is_result(Err(10)); # 1
+    my $bool = Result->is_result("");      # 0
+    my $bool = Result->is_result([]);      # 0

@@ -18,10 +18,6 @@ sub Err :prototype($) ($value) {
     return bless([$err => $value], 'Result');
 }
 
-sub is_result($any) {
-    return ref $any eq 'Result' ? 1 : 0;
-}
-
 sub is_ok($any) {
     return ref $any eq 'Result' && $any->[0] == $ok ? 1 : 0;
 }
@@ -95,6 +91,12 @@ sub to_array($result) {
     return $result->[0] == $ok
          ? Array->new($result->[1])
          : Array->new();
+}
+
+### MODULE FUNCTIONS
+
+sub is_result($, $any) {
+    return ref $any eq 'Result' ? 1 : 0;
 }
 
 1;
