@@ -56,14 +56,14 @@ sub or($opt, $default) {
     return $opt->[0] == $Some ? $opt->[1] : $default;
 }
 
-# or_else: Option<'a> -> Option<'a> -> Option<'a>
-sub or_else($opt, $defaultOpt) {
-    return $opt->[0] == $Some ? $opt : $defaultOpt;
-}
-
 # or_with: Option<'a> -> (unit -> Option<'a>) -> 'a
 sub or_with($opt, $f) {
     return $opt->[0] == $Some ? $opt->[1] : $f->();
+}
+
+# or_else: Option<'a> -> Option<'a> -> Option<'a>
+sub or_else($opt, $defaultOpt) {
+    return $opt->[0] == $Some ? $opt : $defaultOpt;
 }
 
 # or_else_with: Option<'a> -> (unit -> Option<'a>) -> Option<'a>
