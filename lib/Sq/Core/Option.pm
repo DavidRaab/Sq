@@ -57,8 +57,8 @@ sub or($opt, $default) {
 }
 
 # or_with: Option<'a> -> (unit -> Option<'a>) -> 'a
-sub or_with($opt, $f) {
-    return $opt->[0] == $Some ? $opt->[1] : $f->();
+sub or_with($opt, $f_x) {
+    return $opt->[0] == $Some ? $opt->[1] : $f_x->();
 }
 
 # or_else: Option<'a> -> Option<'a> -> Option<'a>
