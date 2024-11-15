@@ -118,7 +118,7 @@ back if the value is an optional and if it is a B<None> value.
 Consider that other values than B<Some> or B<None> also return C<0> because
 an empty string for example is not an optional.
 
-=head2 match($opt, Some => sub($value){ ... }, None => sub(){ ... })
+=head2 match($opt, Some => sub($value){ $y }, None => sub(){ $y }) : $y
 
 Pattern matches against the optional value. It either runs the function provided
 with the C<Some> argument or the C<None> argument. It's usually used to extract
@@ -146,7 +146,7 @@ C<or> instead.
             None => sub     { 0      },
         );
 
-=head2 or($optional, $value)
+=head2 or($opt, $default) : $x
 
 Returns the value when it is C<Some> value or the C<$default> value passed to it
 when it is C<None>.
@@ -156,16 +156,16 @@ when it is C<None>.
     my $c = None    ->or(0);      #  0
     my $d = Option::or($opt, 10);
 
-=head2 or_else($optional, $defaultOptional)
+=head2 or_else($opt, $default_opt) : $opt
 
-Similar to C<or> but returns C<$optional> as-is as long it is C<Some> value.
-Otherwise returns C<$defaultOptional> that is expected to be an optional.
+Similar to C<or> but returns C<$opt> as-is as long it is C<Some> value.
+Otherwise returns C<$default_opt> that is expected to be an optional.
 
     my $opt = $opt   ->or_else(Some("foo"));
     my $opt = Some(1)->or_else(Some 2);      # Some 1
     my $opt = None   ->or_else(Some 3);      # Some 3
 
-=head2 or_with($optional, $f)
+=head2 or_with($opt, $f_x) : $x
 
 Same as C<or> but instead of passing a value that is used in the None case, a
 function is expected and executed. This is useful in two cases.
@@ -194,15 +194,15 @@ that only should be executed when the value was C<None>.
     # returns current time in the case of None
     my $x = $opt->or_with(sub { scalar localtime });
 
-=head2 or_else_with($optional, $fopt)
+=head2 or_else_with($opt, $f_opt) : $opt
 
-When C<$optional> is C<Some> value returns C<$optional> as-is. Otherwise executes
-and returns the result of C<< $fopt->() >> that should generate an optional value.
+When C<$opt> is C<Some> value returns C<$opt> as-is. Otherwise executes
+and returns the result of C<< $f_opt->() >> that should generate an optional value.
 
     my $opt = Some([1])->or_else_with(sub { Some [] }) # Some [1]
     my $opt = None     ->or_else_with(sub { Some [] }) # Some []
 
-=head2 map($optional, $f)
+=head2 map($opt, $f) : $opt
 
 When you have a function that don't know about optionals then you use C<map>
 to let the function run of its value. When the optional is C<None> then
@@ -220,7 +220,7 @@ C<map> is good for functions with the signature C<< 'a -> 'b >>
     my $opt = Some(10)->map($incr); # Some(11)
     my $opt = None    ->map($incr); # None
 
-=head2 map2($optA, $optB, $f)
+=head2 map2($optA, $optB, $f) : $opt
 
 Whenever you have a function expecting two normal values, but you have two
 optional values, you use this function. Returns an optional value again.
@@ -234,7 +234,7 @@ optional values, you use this function. Returns an optional value again.
     my $opt = Some(10)->map2(Some(3), $add); # Some(13)
     my $opt = None    ->map2(Some(3), $add); # None
 
-=head2 map3($optA, $optB, $optC, $f)
+=head2 map3($optA, $optB, $optC, $f) : $opt
 
 Same as C<map2> but for three optional values.
 
@@ -245,7 +245,7 @@ Same as C<map2> but for three optional values.
             return $a + $b + $c;
         });
 
-=head2 map4($optA, $optB, $optC, $optD, $f)
+=head2 map4($optA, $optB, $optC, $optD, $f) : $opt
 
 Same as C<map3> but for four optional values.
 
@@ -256,7 +256,7 @@ Same as C<map3> but for four optional values.
             return $a + $b + $c + $d;
         });
 
-=head2 map_v(@opts, $f)
+=head2 map_v(@opts, $f) : $opt
 
 Expects a variable amount of optional values and a function as the last argument.
 Executes the function with all unpacked values when all optionals are C<Some> values.
@@ -267,7 +267,7 @@ this function is usually slower because of its implementation compared to
 directly calling C<map>, C<map2>, C<map3> or C<map4>.
 
     # Some(28)
-    Option::map_v(Some 1, Some 2, Some 3, Some 4, Some 5, Some 6, Some 7, sub {
+    my $opt = Option::map_v(Some 1, Some 2, Some 3, Some 4, Some 5, Some 6, Some 7, sub {
         my $sum = 0;
         for my $x ( @_ ) {
             $sum += $x;
@@ -275,7 +275,7 @@ directly calling C<map>, C<map2>, C<map3> or C<map4>.
         return $sum;
     });
 
-=head2 bind($optional, $f)
+=head2 bind($opt, $f) : $opt
 
 C<bind> is also sometimes called C<chain> or C<then> (depending on language
 or module). It allows chaining together functions that expects a non optional
@@ -306,7 +306,7 @@ signature C<<< 'a -> Option<'b> >>>
 
     # calling ->map($f)->flatten() will return the same result as using bind()
 
-=head2 bind2($optA, $optB, $f)
+=head2 bind2($optA, $optB, $f) : $opt
 
 When you have two optional values to unpack and want them to pass it to
 a function that produces a new optional value.
@@ -329,7 +329,7 @@ a function that produces a new optional value.
             return None;
         });
 
-=head3 bind3($optA, $optB, $optC, $f)
+=head3 bind3($optA, $optB, $optC, $f) : $opt
 
 Unpacks three optional values and when all three are C<Some> values passes
 them to C<$f> that returns an optional value.
@@ -342,7 +342,7 @@ them to C<$f> that returns an optional value.
             return None;
         });
 
-=head3 bind4($optA, $optB, $optC, $optD, $f)
+=head3 bind4($optA, $optB, $optC, $optD, $f) : $opt
 
 Unpacks four optional values and when all three are C<Some> values passes
 them to C<$f> that returns an optional value.
@@ -355,7 +355,7 @@ them to C<$f> that returns an optional value.
             return None;
         });
 
-=head2 bind_v(@opts, $f)
+=head2 bind_v(@opts, $f) : $opt
 
 Unpacks all optionals and when all values are C<Some> value then passes all
 values to function C<$f> that returns an Optional value again.
@@ -370,14 +370,14 @@ values to function C<$f> that returns an Optional value again.
              : None;
     };
 
-    Option::bind_v(Some 1, Some 2, Some 3, Some 4, Some 5, Some 6, $sum_under_100); # Some(21)
-    Option::bind_v(Some 30, Some 50, Some 40,                      $sum_under_100); # None
+    my $opt = Option::bind_v(Some 1, Some 2, Some 3, Some 4, Some 5, Some 6, $sum_under_100); # Some(21)
+    my $opt = Option::bind_v(Some 30, Some 50, Some 40,                      $sum_under_100); # None
 
-=head2 validate($optional, $predicate)
+=head2 validate($opt, $predicate) : $opt
 
 Runs a predicate function (a function returning a boolish value) on the value.
-When C<$optional> is Some value and the C<$predicate> function returns a truish
-value then C<$optional> will not change. Otherwise returns C<None> instead.
+When C<$opt> is Some value and the C<$predicate> function returns a truish
+value then C<$opt> will not change. Otherwise returns C<None> instead.
 
     my $is_normalized = sub($x) {
         return $x >= 0 && $x <= 1.0 ? 1 : 0;
@@ -388,7 +388,7 @@ value then C<$optional> will not change. Otherwise returns C<None> instead.
     my $opt = Some(2)  ->validate($is_normalized) # None
     my $opt = None     ->validate($is_normalized) # None
 
-=head2 check($optional, $predicate)
+=head2 check($opt, $predicate) : $bool
 
 Similar to C<validate>. But instead of returning an optional that contains
 the information if value was valid or not it directly returns the boolean
@@ -405,7 +405,7 @@ value. A C<None> value always return a falsish value.
     my $bool = Some("")     ->check(\&is_num) # 0
     my $bool = None         ->check(\&is_num) # 0
 
-=head2 flatten($optional)
+=head2 flatten($opt) : $opt
 
 Whenever you have multiple nested optionals you just call C<flatten> and it
 flattens its down to just a single optional value. One reason why you could
@@ -434,7 +434,9 @@ function hardly makes any sense.
     my $x = Some(10)->fold(100, $add); # $add->(10,100) -> 110
     my $x = None    ->fold(100, $add); # $state         -> 100
 
-=head2 iter($optional, $f)
+    my $x = Option::fold(Some(10), 3, sub($x,$y) { $x - $y }); # 10 - 3 = 7
+
+=head2 iter($opt, $f) : void
 
 Runs function C<$f> when there is C<Some> value otherwise does nothing when
 the value is C<None>. Usually this is done for side-effects as the funtion
@@ -443,7 +445,7 @@ returns nothing.
     Some("Hello")->iter(sub($str) { say $str }); # prints: "hello"
     None         ->iter(sub($str) { say $str }); # prints nothing
 
-=head2 to_array($optional)
+=head2 to_array($opt) : $array_x
 
 Converts the optional into an array. In the case of Some value it turns into
 an array of length 1 containing the value, otherwise it is an empty array.
@@ -453,7 +455,7 @@ Arrays are blessed into the Sq Array.
     my $array = Some(1)->to_array; # [1]
     my $array = None   ->to_array; # []
 
-=head2 get($optional)
+=head2 get($opt) : $x | EXCEPTION
 
 Returns the value inside of an optional, but only when the value is Some value,
 otherwise throws an exception. This function should be avoided as much as
@@ -466,7 +468,7 @@ to extract the value.
 
 =head1 MODULE FUNCTIONS
 
-The functions here are concipated to be called from the module level because
+These functions are concipated to be called from the module level because
 they don't make sense to be called as a method. Usually because the first argument
 is not just an option. Here we have a list of options. But they also wouldn't
 make sense to be added to an array, or maybe it will?
