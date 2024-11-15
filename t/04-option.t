@@ -143,17 +143,24 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end 
 
     is(Some(10)->map2(Some(3), $add), Some(13), 'map2 - 6');
 
-    # map3
-    is(
-        Option::map3(Some(1), Some(2), Some(3), sub($a,$b,$c) { $a + $b + $c }),
-        Some(6),
-        'map3');
+    # map3 - check None
+    my $add3 = sub($a,$b,$c) { $a + $b + $c };
+    is(Option::map3(Some(1), Some(2), Some(3), $add3), Some(6), 'map3');
+    is(Option::map3(None,    Some(2), Some(3), $add3),    None, 'map3 err 0');
+    is(Option::map3(Some(1), None,    Some(3), $add3),    None, 'map3 err 1');
+    is(Option::map3(Some(1), Some(2), None,    $add3),    None, 'map3 err 2');
 
-    # map4
-    is(
-        Option::map4(Some(1), Some(2), Some(3), Some(4), sub($a,$b,$c,$d) { $a + $b + $c + $d }),
-        Some(10),
-        'map4');
+    # map4 - check None
+    my $add4 = sub($a,$b,$c,$d) { $a + $b + $c + $d };
+    is(Option::map4(Some(1), Some(2), Some(3), Some(4), $add4), Some(10), 'map4');
+    is(Option::map4(None,    Some(2), Some(3), Some(4), $add4),     None, 'map4 err 0');
+    is(Option::map4(Some(1), None,    Some(3), Some(4), $add4),     None, 'map4 err 1');
+    is(Option::map4(Some(1), Some(2), None,    Some(4), $add4),     None, 'map4 err 2');
+    is(Option::map4(Some(1), Some(2), Some(3), None,    $add4),     None, 'map4 err 3');
+
+    # map2 without parens
+    my $opt_x = Option::map2 Some(10), Some(3), $add;
+    is($opt_x, Some(13), 'map2 without parens');
 }
 
 # validate

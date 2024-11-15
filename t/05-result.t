@@ -201,4 +201,42 @@ my $is_even = sub($x)    { $x % 2 == 0 };
     is(Err(0)     ->or_else_with($next),       Ok(2), 'or_else_with 4');
 }
 
+# map
+{
+    my $incr = sub($x) { $x + 1 };
+    my $dbl  = sub($x) { $x * 2 };
+
+    is(Ok(10)->map($incr), Ok(11), 'map incr');
+    is(Err(0)->map($dbl),  Err(0), 'map on None');
+    is(Ok(10)->map($dbl),  Ok(20), 'map with dbl');
+
+    my $add = sub($x,$y) { $x + $y };
+
+    # map2
+    is(Result::map2(Ok(10),     Ok(3), $add), Ok(13), 'map2 - 1');
+    is(Result::map2(Ok(10),    Err(0), $add), Err(0), 'map2 - 2');
+    is(Result::map2(Err(0),     Ok(3), $add), Err(0), 'map2 - 3');
+
+    is(Ok(10)->map2(Ok(3), $add), Ok(13), 'map2 - 6');
+
+    # map3
+    my $add3 = sub($a,$b,$c) { $a + $b + $c };
+    is(Result::map3( Ok(1),  Ok(2),  Ok(3), $add3),  Ok(6), 'map3');
+    is(Result::map3(Err(0),  Ok(2),  Ok(3), $add3), Err(0), 'map3 err 1');
+    is(Result::map3( Ok(1), Err(0),  Ok(3), $add3), Err(0), 'map3 err 2');
+    is(Result::map3( Ok(1),  Ok(2), Err(0), $add3), Err(0), 'map3 err 3');
+
+    # map4
+    my $add4 = sub($a,$b,$c,$d) { $a + $b + $c + $d };
+    is(Result::map4(Ok(1),   Ok(2),  Ok(3),  Ok(4), $add4), Ok(10), 'map4');
+    is(Result::map4(Err(0),  Ok(2),  Ok(3),  Ok(4), $add4), Err(0), 'map4 err 0');
+    is(Result::map4( Ok(1), Err(0),  Ok(3),  Ok(4), $add4), Err(0), 'map4 err 1');
+    is(Result::map4( Ok(1),  Ok(2), Err(0),  Ok(4), $add4), Err(0), 'map4 err 2');
+    is(Result::map4( Ok(1),  Ok(2),  Ok(3), Err(0), $add4), Err(0), 'map4 err 3');
+
+    # map2 without parens
+    my $opt_x = Result::map2 Ok(10), Ok(3), $add;
+    is($opt_x, Ok(13), 'map2 without parens');
+}
+
 done_testing;

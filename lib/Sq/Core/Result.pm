@@ -44,6 +44,28 @@ sub map($result, $f) {
          : $result;
 }
 
+# map2: Result<'a,'Err> -> Result<'b,'Err> -> ('a -> 'b -> 'c) -> Result<'c,'Err>
+sub map2($ra, $rb, $f) {
+    return $ra if $ra->[0] == $err;
+    return $rb if $rb->[0] == $err;
+    return bless([$ok => $f->($ra->[1], $rb->[1])], 'Result');
+}
+
+sub map3($ra, $rb, $rc, $f) {
+    return $ra if $ra->[0] == $err;
+    return $rb if $rb->[0] == $err;
+    return $rc if $rc->[0] == $err;
+    return bless([$ok => $f->($ra->[1], $rb->[1], $rc->[1])], 'Result');
+}
+
+sub map4($ra, $rb, $rc, $rd, $f) {
+    return $ra if $ra->[0] == $err;
+    return $rb if $rb->[0] == $err;
+    return $rc if $rc->[0] == $err;
+    return $rd if $rd->[0] == $err;
+    return bless([$ok => $f->($ra->[1], $rb->[1], $rc->[1], $rd->[1])], 'Result');
+}
+
 sub mapErr($result, $f) {
     return $result->[0] == $err
          ? bless([$err => $f->($result->[1])], 'Result')
