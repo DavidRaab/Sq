@@ -2,7 +2,6 @@
 use v5.36;
 use open ':std', ':encoding(UTF-8)';
 use Time::HiRes qw(time);
-use Data::Dumper qw(Dumper);
 
 # https://www.youtube.com/watch?v=HYv-gxDfRGo
 

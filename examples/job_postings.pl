@@ -3,7 +3,6 @@ use v5.36;
 use open ':std', ':encoding(UTF-8)';
 use Sq;
 use Time::HiRes qw(time);
-use Data::Dumper qw(Dumper);
 
 # https://www.youtube.com/watch?v=HYv-gxDfRGo
 
@@ -56,15 +55,13 @@ my $result = assign {
     my $data = Hash->new;
 
     $jobs->iter(sub($job) {
-        $job->get('detected_at')->match(
-            Some => sub($date) { $data->{$date}{pos}++ },
-            None => sub {},
-        );
+        $job->get('detected_at')->iter(sub($date) {
+            $data->{$date}{pos}++;
+        });
 
-        $job->get('disabled_at')->match(
-            Some => sub($date) { $data->{$date}{neg}++ },
-            None => sub {},
-        );
+        $job->get('disabled_at')->iter(sub($date) {
+            $data->{$date}{neg}++;
+        });
     });
 
     return $data;
