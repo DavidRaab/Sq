@@ -129,11 +129,11 @@ my $is_even = sub($x)    { $x % 2 == 0 };
 {
     my $fetch = sub($path) {
         state $content = Hash->new(
-            '/'             => Ok('root'),
-            '/etc/passwd'   => Err('invalid access'),
-            '/var/log/text' => Ok('some text'),
+            '/'             => Ok  'root',
+            '/etc/passwd'   => Err 'invalid access',
+            '/var/log/text' => Ok  'some text',
         );
-        return $content->get($path)->or(Err('404'));
+        return $content->get($path)->or(Err '404');
     };
 
     is($fetch->('/'),              Ok('root'),            'fetching /');

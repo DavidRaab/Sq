@@ -10,11 +10,11 @@ use Sub::Exporter -setup => {
 my $err = 0;
 my $ok  = 1;
 
-sub Ok($value) {
+sub Ok :prototype($) ($value) {
     return bless([$ok  => $value], 'Result');
 }
 
-sub Err($value) {
+sub Err :prototype($) ($value) {
     return bless([$err => $value], 'Result');
 }
 
