@@ -417,19 +417,21 @@ end up with multiple nested optionals is when you use C<map> instead of C<bind>.
     my $opt = Some(Some(Some(Some(10))))->flatten # Some(10)
     my $opt = Some(Some(Some(None)))    ->flatten # None
 
-=head2 fold($optional, $state, $f)
+=head2 fold($opt, $state, $f_state) : $state
 
 When you have a function expecting two normal values, but one value is an
 optional, then this function is probably what you wanna use. It either returns
-C<$state> when the optional is None. Otherwise it executes C<$f> by passing
-it the C<$state> and the extracted value of C<$optional>. The function either
-returns C<$state> or whatever C<$f> returns. The type of C<$state> and whatever
-C<$f> returns should be the same, oterwise this function hardly makes any sense.
+C<$state> when the optional is None. Otherwise it executes C<$f_state> by passing
+it the value of the C<$opt> and the C<$state>.
 
-    my $add = sub($state, $x) { $state + $x };
+This function either returns C<$state> or whatever C<$f_state> returns. The type
+of C<$state> and whatever C<$f_state> returns should be the same, oterwise this
+function hardly makes any sense.
+
+    my $add = sub($x, $state) { $x + $state };
 
     my $x = $opt    ->fold(100, $add);
-    my $x = Some(10)->fold(100, $add); # $add->(100,10) -> 110
+    my $x = Some(10)->fold(100, $add); # $add->(10,100) -> 110
     my $x = None    ->fold(100, $add); # $state         -> 100
 
 =head2 iter($optional, $f)

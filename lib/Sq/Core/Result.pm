@@ -56,7 +56,7 @@ sub mapErr($result, $f) {
 
 sub fold($result, $state, $f_state) {
     return $result->[0] == $ok
-         ? $f_state->($state, $result->[1])
+         ? $f_state->($result->[1], $state)
          : $state;
 }
 
