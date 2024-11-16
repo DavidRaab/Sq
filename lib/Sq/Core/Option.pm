@@ -69,9 +69,7 @@ sub or_else_with($opt, $fopt) {
 
 # bind : Option<'a> -> ('a -> Option<'b>) -> Option<'b>
 sub bind($opt, $f) {
-    return @$opt
-         ? $f->($opt->[0])
-         : $None;
+    return @$opt ? $f->($opt->[0]) : $None;
 }
 
 sub bind2($optA, $optB, $f) {
@@ -113,28 +111,33 @@ sub bind_v {
 }
 
 sub map($opt, $f) {
-    return @$opt
-         ? Some( $f->($opt->[0]) )
-         : $None;
+    if ( @$opt ) {
+        my $v = $f->($opt->[0]);
+        return defined $v ? bless([$v],'Option') : $None;
+    }
+    return $None;
 }
 
 sub map2($optA, $optB, $f) {
     if ( @$optA && @$optB ) {
-        return Some( $f->($optA->[0], $optB->[0]) );
+        my $v = $f->($optA->[0], $optB->[0]);
+        return defined $v ? bless([$v],'Option') : $None;
     }
     return $None;
 }
 
 sub map3($a, $b, $c, $f) {
     if ( @$a && @$b && @$c ) {
-        return Some( $f->($a->[0], $b->[0], $c->[0]) );
+        my $v = $f->($a->[0], $b->[0], $c->[0]);
+        return defined $v ? bless([$v],'Option') : $None;
     }
     return $None;
 }
 
 sub map4($a, $b, $c, $d, $f) {
     if ( @$a && @$b && @$c && @$d ) {
-        return Some( $f->($a->[0], $b->[0], $c->[0], $d->[0]) );
+        my $v = $f->($a->[0], $b->[0], $c->[0], $d->[0]);
+        return defined $v ? bless([$v],'Option') : $None;
     }
     return $None;
 }
@@ -183,9 +186,7 @@ sub fold($opt, $state, $f) {
 }
 
 sub iter($opt, $f) {
-    if ( @$opt ) {
-        $f->($opt->[0]);
-    }
+    $f->($opt->[0]) if @$opt;
     return;
 }
 
@@ -209,10 +210,10 @@ sub all_valid($, $array_of_opt) {
             push @$new, $opt->[0];
         }
         else {
-            return None;
+            return $None;
         }
     }
-    return Some($new);
+    return bless([$new], 'Option');
 }
 
 sub all_valid_by($, $array, $f) {
@@ -226,7 +227,7 @@ sub all_valid_by($, $array, $f) {
             return $None;
         }
     }
-    return Some($new);
+    return bless([$new], 'Option');
 }
 
 sub filter_valid($, $array_of_opt) {
