@@ -461,7 +461,7 @@ sub choose($seq, $f_opt) {
         return sub {
             while ( defined($x = $it->()) ) {
                 $opt = $f_opt->($x);
-                return $opt->[1] if $opt->[0] == 1;
+                return $opt->[0] if @$opt;
             }
             return undef;
         }

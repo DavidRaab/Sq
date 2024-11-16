@@ -9,16 +9,12 @@ use Sub::Exporter -setup => {
 # because this value never changes, or should change, we only need one
 # value of it, and we can share it. But if someone changes the None value
 # it will cause serious issues.
-my $None = bless([0], 'Option');
-
-# represents the some value. Before it was the string 'Some', but comparing
-# integers is faster
-my $Some = 1;
+my $None = bless([], 'Option');
 
 # Constructor functions that are importet by Sq
 sub Some :prototype($) ($value)  {
     return defined $value
-         ? bless([$Some, $value], 'Option')
+         ? bless([$value], 'Option')
          : $None;
 }
 
@@ -33,18 +29,18 @@ sub is_opt($, $any) {
 }
 
 sub is_some($any) {
-    return ref $any eq 'Option' && $any->[0] == $Some ? 1 : 0;
+    return ref $any eq 'Option' && @$any == 1 ? 1 : 0;
 }
 
 sub is_none($any) {
-    return ref $any eq 'Option' && $any->[0] == 0 ? 1 : 0;
+    return ref $any eq 'Option' && @$any == 0 ? 1 : 0;
 }
 
 sub match($opt, %args) {
     my $fSome = $args{Some} or Carp::croak "Some not defined";
     my $fNone = $args{None} or Carp::croak "None not defined";
-    if ($opt->[0] == $Some) {
-        return $fSome->($opt->[1]);
+    if ( @$opt ) {
+        return $fSome->($opt->[0]);
     }
     else {
         return $fNone->();
@@ -53,48 +49,48 @@ sub match($opt, %args) {
 
 # or: Option<'a> -> 'a -> 'a
 sub or($opt, $default) {
-    return $opt->[0] == $Some ? $opt->[1] : $default;
+    return @$opt ? $opt->[0] : $default;
 }
 
 # or_with: Option<'a> -> (unit -> Option<'a>) -> 'a
 sub or_with($opt, $f_x) {
-    return $opt->[0] == $Some ? $opt->[1] : $f_x->();
+    return @$opt ? $opt->[0] : $f_x->();
 }
 
 # or_else: Option<'a> -> Option<'a> -> Option<'a>
-sub or_else($opt, $defaultOpt) {
-    return $opt->[0] == $Some ? $opt : $defaultOpt;
+sub or_else($opt, $default_opt) {
+    return @$opt ? $opt : $default_opt;
 }
 
 # or_else_with: Option<'a> -> (unit -> Option<'a>) -> Option<'a>
 sub or_else_with($opt, $fopt) {
-    return $opt->[0] == $Some ? $opt : $fopt->();
+    return @$opt ? $opt : $fopt->();
 }
 
 # bind : Option<'a> -> ('a -> Option<'b>) -> Option<'b>
 sub bind($opt, $f) {
-    return $opt->[0] == $Some
-         ? $f->($opt->[1])
+    return @$opt
+         ? $f->($opt->[0])
          : $None;
 }
 
 sub bind2($optA, $optB, $f) {
-    if ( $optA->[0] == $Some && $optB->[0] == $Some ) {
-        return $f->($optA->[1], $optB->[1]);
+    if ( @$optA && @$optB ) {
+        return $f->($optA->[0], $optB->[0]);
     }
     return $None;
 }
 
 sub bind3($optA, $optB, $optC, $f) {
-    if ( $optA->[0] == $Some && $optB->[0] == $Some && $optC->[0] ) {
-        return $f->($optA->[1], $optB->[1], $optC->[1]);
+    if ( @$optA && @$optB && @$optC ) {
+        return $f->($optA->[0], $optB->[0], $optC->[0]);
     }
     return $None;
 }
 
 sub bind4($optA, $optB, $optC, $optD, $f) {
-    if ( $optA->[0] == $Some && $optB->[0] == $Some && $optC->[0] && $optD->[0] ) {
-        return $f->($optA->[1], $optB->[1], $optC->[1], $optD->[1]);
+    if ( @$optA && @$optB && @$optC && @$optD ) {
+        return $f->($optA->[0], $optB->[0], $optC->[0], $optD->[0]);
     }
     return $None;
 }
@@ -105,8 +101,8 @@ sub bind_v {
 
     my @unpack;
     for my $opt ( @opts ) {
-        if ( $opt->[0] == $Some ) {
-            push @unpack, $opt->[1];
+        if ( @$opt ) {
+            push @unpack, $opt->[0];
         }
         else {
             return $None;
@@ -117,37 +113,28 @@ sub bind_v {
 }
 
 sub map($opt, $f) {
-    return $opt->[0] == $Some
-         ? Some( $f->($opt->[1]) )
+    return @$opt
+         ? Some( $f->($opt->[0]) )
          : $None;
 }
 
 sub map2($optA, $optB, $f) {
-    if ( $optA->[0] == $Some && $optB->[0] == $Some ) {
-        return Some( $f->($optA->[1], $optB->[1]) );
+    if ( @$optA && @$optB ) {
+        return Some( $f->($optA->[0], $optB->[0]) );
     }
     return $None;
 }
 
 sub map3($a, $b, $c, $f) {
-    if (
-           $a->[0] == $Some
-        && $b->[0] == $Some
-        && $c->[0] == $Some
-    ) {
-        return Some( $f->($a->[1], $b->[1], $c->[1]) );
+    if ( @$a && @$b && @$c ) {
+        return Some( $f->($a->[0], $b->[0], $c->[0]) );
     }
     return $None;
 }
 
 sub map4($a, $b, $c, $d, $f) {
-    if (
-           $a->[0] == $Some
-        && $b->[0] == $Some
-        && $c->[0] == $Some
-        && $d->[0] == $Some
-    ) {
-        return Some( $f->($a->[1], $b->[1], $c->[1], $d->[1]) );
+    if ( @$a && @$b && @$c && @$d ) {
+        return Some( $f->($a->[0], $b->[0], $c->[0], $d->[0]) );
     }
     return $None;
 }
@@ -158,8 +145,8 @@ sub map_v {
 
     my @unpack;
     for my $opt ( @opts ) {
-        if ( $opt->[0] == $Some ) {
-            push @unpack, $opt->[1];
+        if ( @$opt ) {
+            push @unpack, $opt->[0];
         }
         else {
             return $None;
@@ -170,50 +157,46 @@ sub map_v {
 }
 
 sub validate($opt, $predicate) {
-    if ( $opt->[0] == $Some && $predicate->($opt->[1]) ) {
+    if ( @$opt && $predicate->($opt->[0]) ) {
         return $opt;
     }
     return $None;
 }
 
 sub check($opt, $predicate) {
-    if ( $opt->[0] == $Some ) {
-        return $predicate->($opt->[1]) ? 1 : 0;
+    if ( @$opt ) {
+        return $predicate->($opt->[0]) ? 1 : 0;
     }
     return 0;
 }
 
 sub flatten($opt) {
-    my $result = $opt;
-    while ( $result->[0] == $Some && ref $result->[1] eq 'Option' ) {
-        $result = $result->[1];
+    my $ret = $opt;
+    while ( @$ret && ref $ret->[0] eq 'Option' ) {
+        $ret = $ret->[0];
     }
-    return $result;
+    return $ret;
 }
 
 sub fold($opt, $state, $f) {
-    return $opt->[0] == $Some
-         ? $f->($opt->[1], $state)
-         : $state;
+    return @$opt ? $f->($opt->[0], $state) : $state;
 }
 
 sub iter($opt, $f) {
-    if ( $opt->[0] == $Some ) {
-        $f->($opt->[1]);
+    if ( @$opt ) {
+        $f->($opt->[0]);
     }
     return;
 }
 
 sub to_array($opt) {
-    return $opt->[0] == $Some
-         ? bless([$opt->[1]], 'Array')
+    return @$opt
+         ? bless([$opt->[0]], 'Array')
          : bless([],          'Array');
 }
 
 sub get($opt) {
-    if ( $opt->[0] == $Some ) {
-        return $opt->[1];
-    }
+    return $opt->[0] if @$opt;
     die "Cannot extract value of None\n";
 }
 
@@ -222,8 +205,8 @@ sub get($opt) {
 sub all_valid($, $array_of_opt) {
     my $new = Array->new;
     for my $opt ( @$array_of_opt ) {
-        if ( $opt->[0] == $Some ) {
-            push @$new, $opt->[1];
+        if ( @$opt ) {
+            push @$new, $opt->[0];
         }
         else {
             return None;
@@ -236,8 +219,8 @@ sub all_valid_by($, $array, $f) {
     my $new = Array->new;
     for my $x ( @$array ) {
         my $opt = $f->($x);
-        if ( $opt->[0] == $Some ) {
-            push @$new, $opt->[1];
+        if ( @$opt ) {
+            push @$new, $opt->[0];
         }
         else {
             return $None;
@@ -249,8 +232,8 @@ sub all_valid_by($, $array, $f) {
 sub filter_valid($, $array_of_opt) {
     my $new = Array->new;
     for my $opt ( @$array_of_opt ) {
-        if ( $opt->[0] == $Some ) {
-            push @$new, $opt->[1];
+        if ( @$opt ) {
+            push @$new, $opt->[0];
         }
     }
     return $new;
@@ -260,8 +243,8 @@ sub filter_valid_by($, $array, $f) {
     my $new = Array->new;
     for my $x ( @$array ) {
         my $opt = $f->($x);
-        if ( $opt->[0] == $Some ) {
-            push @$new, $opt->[1];
+        if ( @$opt ) {
+            push @$new, $opt->[0];
         }
     }
     return $new;

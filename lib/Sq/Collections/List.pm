@@ -240,8 +240,8 @@ sub choose($list, $f_opt) {
 
     iter($list, sub($x) {
         my $opt = $f_opt->($x);
-        if ( $opt->[0] == 1 ) {
-            $tail = $mut_append->($tail, $opt->[1]);
+        if ( @$opt ) {
+            $tail = $mut_append->($tail, $opt->[0]);
         }
     });
 

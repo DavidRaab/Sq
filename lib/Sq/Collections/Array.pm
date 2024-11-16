@@ -167,8 +167,8 @@ sub choose($array, $f_opt) {
     my $new = new('Array');
     for my $x ( @$array ) {
         my $opt = $f_opt->($x);
-        if ( $opt->[0] == 1 ) {
-            push @$new, $opt->[1];
+        if ( @$opt ) {
+            push @$new, $opt->[0];
         }
     }
     return $new;
