@@ -414,8 +414,9 @@ Check if C<@keys> exists and are defined in C<$hash>.
 
 =head2 get($hash, $key) : $opt_value
 
-Get C<$key> from C<$hash> as an optional value. If C<$key> exist returns C<Some>
-value otherwise returns C<None>.
+Get C<$key> as an optional value from C<$hash>. When the value already is an
+optional than it is returned as-is. When the key does not exists or is not
+defined a C<None> is returned. In all other cases C<Some> will be returned.
 
     my $opt    = $hash->get('name');
     my $string = $hash->get('name')->or('Anne');
