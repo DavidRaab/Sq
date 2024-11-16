@@ -22,8 +22,8 @@ use Benchmark qw(cmpthese);
 sub match_opt($opt, %args) {
     my $fSome = $args{Some} or Carp::croak "Some not defined";
     my $fNone = $args{None} or Carp::croak "None not defined";
-    if ($opt->[0] == 1) {
-        return $fSome->($opt->[1]);
+    if ( @$opt ) {
+        return $fSome->($opt->[0]);
     }
     else {
         return $fNone->();
@@ -34,8 +34,8 @@ sub match_goto {
     my ($opt, %args) = @_;
     my $fSome = $args{Some} or Carp::croak "Some not defined";
     my $fNone = $args{None} or Carp::croak "None not defined";
-    if ($opt->[0] == 1) {
-        @_ = $opt->[1];
+    if ( @$opt ) {
+        @_ = $opt->[0];
         goto $fSome;
     }
     else {

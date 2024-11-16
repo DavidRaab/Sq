@@ -7,24 +7,24 @@ use Test2::V0;
 
 ### map, map2 and map_v
 
-my $None = bless([0], 'Option');
+my $None = bless([], 'Option');
 
 sub map1($opt, $f) {
-    return $opt->[0] == 1
-         ? Some $f->($opt->[1])
+    return @$opt
+         ? Some $f->($opt->[0])
          : $None;
 }
 
 sub map2($optA, $optB, $f) {
-    if ( $optA->[0] == 1 && $optB->[0] == 1 ) {
-        return Some $f->($optA->[1], $optB->[1]);
+    if ( @$optA && @$optB ) {
+        return Some $f->($optA->[0], $optB->[0]);
     }
     return $None;
 }
 
 sub map3($optA, $optB, $optC, $f) {
-    if ( $optA->[0] == 1 && $optB->[0] == 1 && $optC->[0] == 1 ) {
-        return Some $f->($optA->[1], $optB->[1], $optC->[1]);
+    if ( @$optA && @$optB && @$optC ) {
+        return Some $f->($optA->[0], $optB->[0], $optC->[0]);
     }
     return $None;
 }
@@ -35,8 +35,8 @@ sub map_v {
 
     my @unpack;
     for my $opt ( @opts ) {
-        if ( $opt->[0] == 1 ) {
-            push @unpack, $opt->[1];
+        if ( @$opt ) {
+            push @unpack, $opt->[0];
         }
         else {
             return $None;
@@ -53,8 +53,8 @@ sub map_v2 {
     my $max = @_ - 2;
     my @unpack;
     for (my $idx=0; $idx <= $max; $idx++) {
-        if ( $_[$idx][0] == 1 ) {
-            push @unpack, $_[$idx][1];
+        if ( @{ $_[$idx] } ) {
+            push @unpack, $_[$idx][0];
         }
         else {
             return $None;
@@ -72,7 +72,6 @@ done_testing;
 
 ### Benchmarks
 
-printf("map vs map_v\n");
 my $test = Array->init(10_000, sub($idx) { Some($idx) });
 cmpthese(-1, {
     'map' => sub {
@@ -89,7 +88,7 @@ cmpthese(-1, {
     }
 });
 
-printf("\nmap2 vs map_v\n");
+say "";
 my $test2 = Array->init(10_000, sub($idx) { Some 1 });
 cmpthese(-1, {
     'map2' => sub {
@@ -112,7 +111,7 @@ cmpthese(-1, {
     }
 });
 
-printf("\nmap3 vs map_v\n");
+say "";
 my $test3 = Array->init(10_000, sub($idx) { Some 1 });
 cmpthese(-1, {
     'map3' => sub {
@@ -137,7 +136,7 @@ cmpthese(-1, {
     }
 });
 
-printf("\nmap_v vs map_v2\n");
+say "";
 cmpthese(-1, {
     map_v => sub {
         my $add1 = sub($x) { $x + 1 };
