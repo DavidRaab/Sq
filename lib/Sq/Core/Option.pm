@@ -251,4 +251,24 @@ sub filter_valid_by($, $array, $f) {
     return $new;
 }
 
+sub _data_printer {
+    my ($opt, $ddp) = @_;
+    if ( @$opt ) {
+        if ( ref $opt->[0] ) {
+            return 'Some(' . Data::Printer::np($opt->[0]) . ')';
+        }
+        else {
+            if ( Sq::is_num($opt->[0]) ) {
+                return 'Some(' . $opt->[0] . ')';
+            }
+            else {
+                return 'Some("' . quotemeta($opt->[0]) . '")';
+            }
+        }
+    }
+    else {
+        return 'None';
+    }
+}
+
 1;
