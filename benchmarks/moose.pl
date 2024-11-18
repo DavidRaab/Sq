@@ -17,20 +17,21 @@ package MoviePP;
 
 sub new($class, %args) {
     return bless({
-        title  => $args{title},
-        rating => $args{rating},
-        desc   => $args{desc},
+        title  => $args{title}  // "",
+        rating => $args{rating} // 0,
+        desc   => $args{desc}   // "",
     }, $class);
 }
 
-sub title($self, $title=undef) {
-    if ( defined $title ) {
-        $self->{title} = $title;
-        return;
-    }
-    else {
-        return $self->{title};
-    }
+# this is the fastest way i come up writing getter/setter. Not using shift,
+# perl signature or unpacking @_ makes it fast, but ugly code.
+# Avoiding the else{} branch makes a hhue performance impact. Don't really
+# understand why.
+sub title {
+    # checking for defined is faster than checking array-length, but now
+    # title cannot set to undef anymore.
+    $_[0]->{title} = $_[1] if defined $_[1]; #@_ >= 2;
+    return $_[0]->{title};
 }
 
 sub rating($self, $rating=undef) {
@@ -163,8 +164,19 @@ my $obj = MoviePP->new(
     desc   => 'Awesome',
 );
 
+my $moose = Movie->new(
+    title  => 'Terminator 2',
+    rating => 5,
+    desc   => 'Awesome',
+);
+
 printf "\nReading just title\n";
 cmpthese(-1, {
+    moose => sub {
+        for ( 1 .. 1_000 ) {
+            my $title = $moose->title;
+        }
+    },
     sq_locked => sub {
         for ( 1 .. 1_000 ) {
             my $title = $locked->{title};
@@ -184,6 +196,11 @@ cmpthese(-1, {
 
 printf "\nSetting title to a new value\n";
 cmpthese(-1, {
+    moose => sub {
+        for ( 1 .. 1_000 ) {
+            $moose->title('Terminator 3');
+        }
+    },
     sq_locked => sub {
         for ( 1 .. 1_000 ) {
             $locked->{title} = 'Terminator 3';
