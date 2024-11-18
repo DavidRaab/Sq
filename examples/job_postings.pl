@@ -51,21 +51,15 @@ my $jobs = Seq->init(1_000_000, sub($idx) { gen_job });
 # Stopwatch - when it started
 my $start = time();
 
-my $result = assign {
-    my $data = Hash->new;
-
-    $jobs->iter(sub($job) {
-        $job->get('detected_at')->iter(sub($date) {
-            $data->{$date}{pos}++;
-        });
-
-        $job->get('disabled_at')->iter(sub($date) {
-            $data->{$date}{neg}++;
-        });
+my $result = $jobs->fold_mut(Hash->new, sub($hash,$job) {
+    $job->get('detected_at')->iter(sub($date) {
+        $hash->{$date}{pos}++;
     });
 
-    return $data;
-};
+    $job->get('disabled_at')->iter(sub($date) {
+        $hash->{$date}{neg}++;
+    });
+});
 
 # stopwatch - when it stopped
 my $stop = time();
