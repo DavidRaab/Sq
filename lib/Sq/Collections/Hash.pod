@@ -552,9 +552,8 @@ but in a single operation.
 
 =head2 fold($hash, $state, $f_state) : $state
 
-Iterates through every ($key,$value) of a Hash and passes C<$state>, C<$key>
-and C<$value> to the function C<$f_state>. C<$f_state> then computes the next
-C<$state>.
+Iterates through every ($key,$value) of a Hash and passes C<$key,$value,$state> to
+the function C<$f_state>. C<$f_state> then computes the next C<$state>.
 
 When all (key,value) pairs are iterated, returns the last C<$state>.
 
@@ -565,12 +564,12 @@ When all (key,value) pairs are iterated, returns the last C<$state>.
     );
 
     # 400
-    my $total_money = $money->fold(0, sub($state,$name,$money) {
+    my $total_money = $money->fold(0, sub($name,$money,$state) {
         $state + $money;
     });
 
     # ['Anne', 'Marie', 'Frankenstein']  in any order
-    my $player_names = $money->fold(Array->new, sub($state,$name,$money) {
+    my $player_names = $money->fold(Array->new, sub($name,$money,$state) {
         $state->push($name);
         $state;
     });

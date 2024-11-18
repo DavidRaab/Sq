@@ -105,20 +105,20 @@ is(
 is($range->map(sub($x) { undef }), [], 'empty array');
 
 is(
-    $range->fold(0, sub($length, $x) { $length + 1 }),
+    $range->fold(0, sub($x,$length) { $length + 1 }),
     $range->length,
     'fold with non-reftype');
 is(
-    $range->fold([], sub($array, $x) { push @$array, $x; $array }),
+    $range->fold([], sub($x,$array) { push @$array, $x; $array }),
     $range,
     'fold with reftype 1');
 is(
-    $range->fold([], sub($array, $x) { [@$array, $x ] }),
+    $range->fold([], sub($x,$array) { [@$array, $x ] }),
     $range,
     'fold with reftype 2');
 is(
-    $range->fold    ([], sub($array, $x) { push @$array, $x; $array }),
-    $range->fold_mut([], sub($array, $x) { push @$array, $x         }),
+    $range->fold    ([], sub($x,$array) { push @$array, $x; $array }),
+    $range->fold_mut([], sub($x,$array) { push @$array, $x         }),
     'fold_mut');
 
 is($range->rev, check_isa('Array'), 'rev return Array');

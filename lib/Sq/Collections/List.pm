@@ -142,21 +142,21 @@ sub copy($list) {
     return $list;
 }
 
-sub fold($list, $state, $folder) {
+sub fold($list, $state, $f_state) {
     my $xs = $list;
     my $s  = $state;
     while ( @$xs != 0 ) {
-        $s  = $folder->($s, $xs->[0]);
+        $s  = $f_state->($xs->[0],$s);
         $xs = $xs->[1];
     }
     return $s;
 }
 
-sub fold_mut($list, $state, $folder) {
+sub fold_mut($list, $state, $f_state) {
     my $xs = $list;
     my $s  = $state;
     while ( @$xs != 0 ) {
-        $folder->($s, $xs->[0]);
+        $f_state->($xs->[0],$s);
         $xs = $xs->[1];
     }
     return $s;
@@ -189,7 +189,7 @@ sub append($listA, $listB) {
 }
 
 sub rev($list) {
-    state $folder = sub($state, $x) { cons(List => $x, $state) };
+    state $folder = sub($x,$state) { cons(List => $x, $state) };
     return fold($list, empty('List'), $folder);
 }
 
@@ -517,7 +517,7 @@ sub reduce($list, $default, $reducer) {
 }
 
 sub to_array($list) {
-    state $folder = sub($state, $x) { push @$state, $x };
+    state $folder = sub($x,$state) { push @$state, $x };
     return fold_mut($list, [], $folder);
 }
 
@@ -526,17 +526,17 @@ sub expand($list) {
 }
 
 sub length($list) {
-    state $folder = sub($state, $x) { $state + 1 };
+    state $folder = sub($x,$state) { $state + 1 };
     return fold($list, 0, $folder);
 }
 
 sub sum($list) {
-    state $folder = sub($state, $x) { $state + $x };
+    state $folder = sub($x,$state) { $state + $x };
     return fold($list, 0, $folder);
 }
 
 sub sum_by($list, $f) {
-    return fold($list, 0, sub($state, $x) { $state + $f->($x) });
+    return fold($list, 0, sub($x,$state) { $state + $f->($x) });
 }
 
 sub str_join($list, $sep) {
@@ -544,14 +544,14 @@ sub str_join($list, $sep) {
 }
 
 sub to_hash($list, $mapper) {
-    return fold_mut($list, {}, sub($hash, $x) {
+    return fold_mut($list, {}, sub($x,$hash) {
         my ($key, $value) = $mapper->($x);
         $hash->{$key} = $value;
     });
 }
 
 sub to_hash_of_array($list, $mapper) {
-    return fold_mut($list, {}, sub($hash, $x) {
+    return fold_mut($list, {}, sub($x,$hash) {
         my ($key, $value) = $mapper->($x);
         push $hash->{$key}->@*, $value;
     });

@@ -941,23 +941,23 @@ sub doi($seq, $f) {
 #         Those are functions converting Seq to none Seq types         #
 #----------------------------------------------------------------------#
 
-# fold : Seq<'a> -> 'State -> ('State -> 'a -> 'State) -> 'State
-sub fold($seq, $state, $folder) {
+# fold : Seq<'a> -> 'State -> ('a -> 'State -> 'State) -> 'State
+sub fold($seq, $state, $f_state) {
     my $it     = $seq->();
     my $result = $state;
     my $x;
     while ( defined($x = $it->()) ) {
-        $result = $folder->($result, $x);
+        $result = $f_state->($x,$result);
     }
     return $result;
 }
 
-# fold_mut : Seq<'a> -> 'State -> ('State -> 'a -> unit) -> 'State
-sub fold_mut($seq, $state, $folder) {
+# fold_mut : Seq<'a> -> 'State -> ('a -> 'State -> unit) -> 'State
+sub fold_mut($seq, $state, $f_state) {
     my $it = $seq->();
     my $x;
     while ( defined($x = $it->()) ) {
-        $folder->($state, $x);
+        $f_state->($x,$state);
     }
     return $state;
 }
@@ -1016,19 +1016,19 @@ sub expand($seq) {
 
 # length : Seq<'a> -> int
 sub length($seq) {
-    state $folder = sub($count, $x) { $count+1 };
+    state $folder = sub($x,$count) { $count+1 };
     return fold($seq, 0, $folder);
 }
 
 # sum : Seq<'a> -> float
 sub sum($seq) {
-    state $folder = sub($sum, $x) { $sum + $x };
+    state $folder = sub($x,$sum) { $sum + $x };
     return fold($seq, 0, $folder);
 }
 
 # sum_by : Seq<'a> -> (float -> 'a -> float) -> float
 sub sum_by($seq, $f) {
-    return fold($seq, 0, sub($sum, $x) {
+    return fold($seq, 0, sub($x,$sum) {
         return $sum + $f->($x);
     });
 }
@@ -1043,7 +1043,7 @@ sub min($seq, $default) {
 
 # min_by : Seq<a> -> ('a -> float) -> float -> float
 sub min_by($seq, $key, $default) {
-    return fold($seq, undef, sub($min, $x) {
+    return fold($seq, undef, sub($x,$min) {
         my $value = $key->($x);
         defined $min
             ? ($value < $min) ? $value : $min
@@ -1061,7 +1061,7 @@ sub min_str($seq, $default) {
 
 # min_str_by : Seq<'a> -> ('a -> string) -> string -> 'a
 sub min_str_by($seq, $key, $default) {
-    return fold($seq, undef, sub($min, $x) {
+    return fold($seq, undef, sub($x,$min) {
         my $value = $key->($x);
         defined $min
             ? ($value lt $min) ? $value : $min
@@ -1078,7 +1078,7 @@ sub max($seq, $default) {
 
 # max_by : Seq<'a> -> ('a -> float) -> float -> float
 sub max_by($seq, $key, $default) {
-    return fold($seq, undef, sub($max, $x) {
+    return fold($seq, undef, sub($x,$max) {
         my $value = $key->($x);
         defined $max
             ? ($value > $max) ? $value : $max
@@ -1093,7 +1093,7 @@ sub max_str($seq, $default) {
 
 # max_str_by : Seq<'a> -> ('a -> string) -> string -> string
 sub max_str_by($seq, $key, $default) {
-    return fold($seq, undef, sub($max, $x) {
+    return fold($seq, undef, sub($x,$max) {
         my $value = $key->($x);
         defined $max
             ? ($value gt $max) ? $value : $max

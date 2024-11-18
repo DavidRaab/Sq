@@ -816,15 +816,15 @@ C<as_hash> or C<to_hash> instead.
         ...
     });
 
-=head2 fold($seq, $state, $folder) : $state
+=head2 fold($seq, $state, $f_state) : $state
 
 fold is like a foreach-loop. You iterate through all items generating a new B<State>.
-The C<$folder> is passed the latest B<State> and one element from the sequence. You
-return the next B<State> that should be used. Once all elements of the sequence are
-processed the latest B<State> is returned.
+The C<$f_state> is passed one element from the sequence and the latest C<$state>.
+C<$f_state> then returns the next C<$state> that should be used. Once all elements of
+the sequence are processed the latest C<$state> is returned.
 
     my $seq = Seq->range(1,1000);
-    my $sum = $seq->fold(0, sub($state, $x) {
+    my $sum = $seq->fold(0, sub($x,$state) {
         $state + $x
     });
 
@@ -832,7 +832,7 @@ Above you can see that C<0> is passed as the starting B<State>. On the first ite
 the subroutine gets C<0> as C<$state> passed and C<1> as the first element of the
 sequence. It calculates C<0 + 1> and returns C<1> as the next B<State>.
 
-Then for the next iteration C<1> for C<$state> is used and C<2> as C<$x>. It returns
+Then for the next iteration C<2> for C<$x> and C<1> for C<$state> is used. It returns
 C<1 + 2> as the next C<$state> and continues until all elements of the sequence
 are iterated. The last calculated C<$state> is returned as the final result of
 C<fold>.
@@ -841,22 +841,22 @@ You can compare it to a foreach-loop because what you define as C<$state> is usu
 what you would define outside of a loop. Consider the following example with an
 Array as comparison to understand what C<fold> does.
 
-    my @seq = (1 .. 1000);
+    my @seq   = (1 .. 1000);
     my $state = 0;
     for my $x ( @seq ) {
         $state = $state + $x;
     }
     return $state;
 
-=head2 fold_mut($seq, $state, $folder) : $state
+=head2 fold_mut($seq, $state, $f_state) : $state
 
 C<fold_mut> is an optimization of C<fold>. C<fold> works by computing a new C<$state>
-on every call. Every time the C<$folder> function is executed the result of this
+on every call. Every time the C<$f_state> function is executed the result of this
 call is assigned to C<$state>. In a fully immutable programming environment
 this is usually fine and the only way to create immutable-data.
 
 Perl on the other hand is not an immutable language, don't provide immutable
-data-types by default and because of the lack like a JIT or a compiler with
+data-types by default and because of the lack of a JIT or a compiler with
 a dozens of compiler optimizations is in general slower. Because of that it
 is sometimes helpful to operate on mutable data as an optimization.
 
@@ -865,7 +865,7 @@ during every iteration. After all operations are finished, C<$state> is still
 returned.
 
     # this transforms a sequence into an array
-    my $array = Seq->range(1,1000)->fold_mut([], sub($array, $x) {
+    my $array = Seq->range(1,1000)->fold_mut([], sub($x,$array) {
         push @$array, $x;
         return;
         # the explicit return is not needed.It just shows that the return

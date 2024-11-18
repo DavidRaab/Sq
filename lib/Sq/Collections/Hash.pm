@@ -85,9 +85,9 @@ sub find($hash, $predicate) {
     return Option::None();
 }
 
-sub pick($hash, $mapping) {
+sub pick($hash, $f_opt) {
     for my $k ( CORE::keys %$hash ) {
-        my $opt = $mapping->($k,$hash->{$k});
+        my $opt = $f_opt->($k,$hash->{$k});
         return $opt if Option::is_some($opt);
     }
     return Option::None();
@@ -105,7 +105,7 @@ sub filter($hash, $predicate) {
 
 sub fold($hash, $state, $f) {
     while ( my ($key, $value) = each %$hash ) {
-        $state = $f->($state, $key, $value);
+        $state = $f->($key, $value, $state);
     }
     return $state;
 }

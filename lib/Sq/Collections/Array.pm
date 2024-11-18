@@ -244,10 +244,10 @@ sub length($array) {
     return scalar @{ $array };
 }
 
-# fold : Array<'a> -> 'State -> ('State -> 'a -> 'State) -> 'State
+# fold : Array<'a> -> 'State -> (a -> 'State -> 'State) -> 'State
 sub fold($array, $state, $folder) {
     for my $x ( @$array ) {
-        $state = $folder->($state, $x);
+        $state = $folder->($x,$state);
     }
     return $state;
 }
@@ -255,7 +255,7 @@ sub fold($array, $state, $folder) {
 # fold : Array<'a> -> 'State -> ('State -> 'a -> 'State) -> 'State
 sub fold_mut($array, $state, $folder) {
     for my $x ( @$array ) {
-        $folder->($state, $x);
+        $folder->($x,$state);
     }
     return $state;
 }

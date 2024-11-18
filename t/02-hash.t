@@ -137,8 +137,8 @@ is($data3, $ishash,                             '$data3 isa Hash');
 }
 
 # fold
-is($data->fold(0, sub($state, $k, $v) { $state + $v }), 16, 'fold 1');
-is($data->fold(1, sub($state, $k, $v) { $state + $v }), 17, 'fold 2');
+is($data->fold(0, sub($k,$v,$state) { $state + $v }), 16, 'fold 1');
+is($data->fold(1, sub($k,$v,$state) { $state + $v }), 17, 'fold 2');
 
 is($data->length, 3, 'length');
 
@@ -370,7 +370,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     is($data, $initial, 'reset');
 
     # otherwise it makes sense to use 'fold' to provide the initial new/empty element
-    my $entry2 = $data->fold(Hash->new, sub($state,$x) {
+    my $entry2 = $data->fold(Hash->new, sub($x,$state) {
         $state->set(
             id => $x->{id},
             name => $x->{name},
@@ -383,7 +383,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 
     # we also could use fold_mut instead as we anyway mutate a reference. so
     # we can omit the return statement in the lambda.
-    my $entry3 = $data->fold_mut(Hash->new, sub($state,$x) {
+    my $entry3 = $data->fold_mut(Hash->new, sub($x,$state) {
         $state->set(
             id => $x->{id},
             name => $x->{name},
@@ -397,7 +397,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     # to call ->set in the lambda
     my $entry4 = $data->fold_mut(
         $data->[0]->copy(qw/id name/), # creates inital $state as a copy of first Hash
-        sub($state,$x) {
+        sub($x,$state) {
             $state->push(tags => $x->{tags});
         }
     );
@@ -819,7 +819,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
         "on baz: string concat 1");
     is(
         $str_concat,
-        $data->{baz}->fold("", sub($str,$h) { $str .= $h->get('name')->or("") }),
+        $data->{baz}->fold("", sub($h,$str) { $str .= $h->get('name')->or("") }),
         "on baz: string concat 2");
 
     my $calls = 0;
@@ -861,12 +861,12 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
         Frankenstein => 250,
     );
 
-    my $total_money = $money->fold(0, sub($state,$name,$money) {
+    my $total_money = $money->fold(0, sub($name,$money,$state) {
         $state + $money;
     });
     is($total_money, 400, 'total money');
 
-    my $player_names = $money->fold(Array->new, sub($state,$name,$money) {
+    my $player_names = $money->fold(Array->new, sub($name,$money,$state) {
         $state->push($name);
         $state;
     });

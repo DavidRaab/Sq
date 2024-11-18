@@ -553,20 +553,38 @@ Returns the amount of elements in an array.
 
 =head2 fold($array, $state, $f_state) : $state
 
-Iterates through each element of an array. On first iteration it passes C<$state>
-and the first element of the array to the function C<$f_state>. C<$f_state> then returns
-the next state that is used in the next call to C<$f_state> and the next
+Iterates through each element of an array. On first iteration it passes the
+first element and state C<$x,$state> to the function C<$f_state>. C<$f_state>
+then returns the next state that is used in the next call to C<$f_state> and the next
 item of the array. This continues until all elements of an array are iterated. The
 last state of the last C<$f_state> function call is returned.
 
-When the array is empty C<$state> is immediately returned.
+When C<$array> is empty C<$state> is immediately returned.
 
     # 55
-    my $sum = Array->range(1,10)->fold(0, sub($state,$x) { $state + $x });
+    my $sum = Array->range(1,10)->fold(0, sub($x,$state) { $state + $x });
 
-=head2 fold_mut
+=head2 fold_mut($array, $state, $f) : $state
 
-TODO
+Same as C<fold> but it the function C<$f> is not supposed to return the new C<$state>.
+This function assumes that C<$state> is a mutable variable, for example an array,
+hash and so on that is mutated on every invocation. Once all elements are iterated
+C<$state> is returned. When C<$array> is empty than C<$state> is immediately returned.
+
+This version is usually faster when we build something through mutation.
+
+    # this basically creates a copy of "Array->range(1,10)"
+    my $array = Array->range(1,10)->fold(Array->new, sub($x,$array) {
+        $array->push($x)
+    });
+
+This is basically what C<fold_mut> looks like in pure perl.
+
+    my $array = [];
+    for my $x ( 1 .. 10 ) {
+        push @$array, $x;
+    }
+    return $array;
 
 =head2 reduce($array, $default, $f_x) : $x
 
