@@ -876,9 +876,9 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
         '3 names');
 
     my $is_name = sub($expected) { sub($got) { $got eq $expected } };
-    is($player_names->find(undef, $is_name->('Anne')),         'Anne',         'Contains Anne');
-    is($player_names->find(undef, $is_name->('Marie')),        'Marie',        'Contains Marie');
-    is($player_names->find(undef, $is_name->('Frankenstein')), 'Frankenstein', 'Contains Frankenstein');
+    is($player_names->find($is_name->('Anne')),         Some('Anne'),         'Contains Anne');
+    is($player_names->find($is_name->('Marie')),        Some('Marie'),        'Contains Marie');
+    is($player_names->find($is_name->('Frankenstein')), Some('Frankenstein'), 'Contains Frankenstein');
 }
 
 # init

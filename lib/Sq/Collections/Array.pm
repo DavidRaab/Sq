@@ -687,11 +687,11 @@ sub count_by($array, $f) {
     return $new;
 }
 
-sub find($array, $default, $predicate) {
+sub find($array, $predicate) {
     for my $x ( @$array ) {
-        return $x if $predicate->($x);
+        return Option::Some($x) if $predicate->($x);
     }
-    return $default;
+    return Option::None();
 }
 
 sub any($array, $predicate) {
