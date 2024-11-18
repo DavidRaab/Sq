@@ -1,6 +1,4 @@
-package Seq::Manual::Bind;
-
-=head1 Bind
+=head1 bind
 
 Bind is a very powerful function. You can do a lot with it. But instead
 of doing explanations of Monads and all the mathematical (bullshit) that
@@ -12,5 +10,3 @@ C<bind>. Or in that case compare it to code written in a lazy vs non-lazy
 way.
 
 =cut
-
-1;

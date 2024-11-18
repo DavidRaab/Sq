@@ -1,5 +1,4 @@
-
-=head1 Seq::Design::Wrap
+=head1 Sq::Design::Wrap
 
 Currently Seq->wrap stops at the first C<undef>.
 

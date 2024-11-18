@@ -1,4 +1,4 @@
-=head1 Seq::Design::MinMax
+=head1 Sq::Design::MinMax
 
 When I first started, all functions like C<min>, C<max> and and all of it
 variations that are present on C<Seq>, C<Array> or C<List> didn't expected

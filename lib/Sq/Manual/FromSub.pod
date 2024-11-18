@@ -1,9 +1,9 @@
-# PODNAME: Seq::Manual::FromSub
+# PODNAME: Sq::Manual::FromSub
 # ABSTRACT: Explanation of Seq->from_sub()
 
 __END__
 
-=head1 Seq::Manual::FromSub
+=head1 Sq::Manual::FromSub
 
 A deeper explanation how Seq->from_sub() works.
 
