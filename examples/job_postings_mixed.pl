@@ -23,11 +23,11 @@ sub gen_job {
         ? '20220213'
         : undef;
 
-    return Hash->new(
+    return Hash->bless({
         title       => $title,
         detected_at => $detected_at,
         disabled_at => $disabled_at,
-    );
+    });
 }
 
 # generates 1 mio random jobs
