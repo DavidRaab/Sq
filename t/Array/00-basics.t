@@ -122,6 +122,16 @@ is(
     $range->fold_mut([], sub($x,$array) { push @$array, $x         }),
     'fold_mut');
 
+is(
+    $range->fold(Array->new, sub($x,$new) { $new->push($x) }),
+    [1 .. 10],
+    'push returning array-ref again 1');
+
+is(
+    Array->empty->fold(Array->new, sub($x,$new) { $new->push($x) }),
+    [],
+    'push returning array-ref again 2');
+
 is($range->rev, check_isa('Array'), 'rev return Array');
 is($range->rev, [10,9,8,7,6,5,4,3,2,1], 'rev');
 is(

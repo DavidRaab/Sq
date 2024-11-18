@@ -795,11 +795,15 @@ want to extract a portion of an array into a new Array use C<slice>.
 
 The following methods mutate the array instead of creating a new one.
 
-=head2 push($array, @values) : void
+=head2 push($array, @values) : $array
 
 Adds elements to the end of the array. Like the built-in C<push> function
 but additionally stops at first C<undef>. If you want to push C<undef>
 into an array then use the perl built-in C<push @$array, undef>.
+
+This function returns C<$array> as-is. So you can immediately chain another
+method after calling C<push>. It also can help in some other functions that
+expect you to return a value.
 
     my $array = Array->new;
     $array->push(1,2,3);    # [1,2,3]

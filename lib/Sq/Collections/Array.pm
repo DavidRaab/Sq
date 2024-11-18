@@ -728,10 +728,10 @@ sub pick($array, $f_opt) {
 
 sub push($array, @values) {
     for my $x ( @values ) {
-        return if !defined $x;
+        return $array if !defined $x;
         CORE::push(@$array, $x);
     }
-    return;
+    return $array;
 }
 
 sub pop($array) {
