@@ -96,6 +96,15 @@ cmpthese(-1, {
             );
         }
     },
+    sq_func_inlined => sub {
+        for ( 1 .. 1_000 ) {
+            my $m = Hash->new->lock(qw/title rating desc/)->set(
+                title  => 'Terminator 2',
+                rating => 5,
+                desc   => 'Awesome',
+            );
+        }
+    },
     sq_bless_locked => sub {
         for ( 1 .. 1_000 ) {
             my $m = Hash->bless({
