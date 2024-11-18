@@ -4,7 +4,7 @@ use open ':std', ':encoding(UTF-8)';
 use POSIX qw(round);
 use Sq;
 
-# "Theoretical" finite sequence of prime numbers
+# "Theoretical" infinite sequence of prime numbers
 # "theoretical" because we only have 64 bit float
 # We could use Math::BigInt for bigger numbers (but its slower)
 my $primes =
