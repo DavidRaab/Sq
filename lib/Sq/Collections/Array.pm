@@ -548,14 +548,12 @@ sub expand($array) {
     return @$array;
 }
 
-sub first($array, $default) {
-    return $default if @$array == 0;
-    return $array->[0];
+sub first($array) {
+    return Option::Some($array->[0]);
 }
 
-sub last($array, $default) {
-    return $default if @$array == 0;
-    return $array->[-1];
+sub last($array) {
+    return Option::Some($array->[-1]);
 }
 
 sub reduce($array, $default, $f) {

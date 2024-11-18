@@ -469,15 +469,15 @@ is(Array->empty->reduce(undef, $add), U(), 'reduce on empty 1');
 is(Array->empty->reduce(0, $add),       0, 'reduce on empty 2');
 is(Array->wrap(1)->reduce(0, $add),     1, 'reduce on single element');
 
-is(Array->empty->first(undef), U(), 'first on empty is undef');
-is(Array->empty->first(0),       0, 'first with default value');
-is($range->first(-1),            1, 'first on non empty without default');
-is($range->first(0),             1, 'first on non empty with default');
+is(Array->empty->first,          None, 'first on empty');
+is(Array->empty->first->or(0),      0, 'first and optional');
+is($range->first,             Some(1), 'first on non empty');
+is($range->first->or(0),            1, 'first on non empty and option::or');
 
-is(Array->empty->last(undef), U(), 'last on empty is undef');
-is(Array->empty->last(0),       0, 'last with default value');
-is($range->last(undef),        10, 'last on non empty without default');
-is($range->last(0),            10, 'last on non empty with default');
+is(Array->empty->last,           None, 'last on empty');
+is(Array->empty->last->or(0),       0, 'last on empty with or');
+is($range->last,             Some(10), 'last on non empty');
+is($range->last->or(0),            10, 'last on non empty with option::or');
 
 is(
     Array->wrap(1,5,-3,10,9,-2)->sort(sub($x,$y) { $x <=> $y }),

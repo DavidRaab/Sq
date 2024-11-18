@@ -621,25 +621,23 @@ C<expand> is the same as writing C<@$array>.
     for my $x ( $array->@* )     { ... }
     for my $x ( @$array )        { ... }
 
-=head2 first($array, $default_x) : $x
+=head2 first($array) : $opt
 
-Returns the first element of an array or C<$default_x> if the array is empty.
+Returns the first element of an array as an optional. Returns C<None> if the Array
+is empty.
 
-    # 10
-    my $first = Array->range(1,10)->rev->first(0);
+    my $opt = Array->range(1,10)->rev->first; # Some(10)
+    my $opt = Array->empty->first;            # None
+    my $opt = Array->empty->first->or(100);   # 100
 
-    # 100
-    my $first = Array->empty->first(100);
+=head2 last($array) : $opt
 
-=head2 last($array, $default_x) : $x
+Returns the last element of an array as an optional. Returns C<None> if the
+Array is empty.
 
-Returns the last element of an array or C<$default_x> if the array is empty.
-
-    # 1
-    my $last = Array->range(1,10)->rev->last(0);
-
-    # 100
-    my $last = Array->empty->last(100);
+    my $opt = Array->empty->last;                   # None
+    my $opt = Array->range(1,10)->last;             # Some(10)
+    my $opt = Array->range(1,10)->rev->last->or(0); # 1
 
 =head2 sum($array_of_numbers) : $number
 
