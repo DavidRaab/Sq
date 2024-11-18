@@ -346,6 +346,21 @@ sub snds($array) {
     return CORE::bless(\@new, 'Array');
 }
 
+sub to_array($array, $count=undef) {
+    $count = Sq::is_num($count) ? int($count) : undef;
+    if ( defined $count && $count < @$array ) {
+        my $new     = new('Array');
+        my $current = 0;
+        for my $idx ( 0 .. $count-1 ) {
+            push @$new, $array->[$idx];
+        }
+        return $new;
+    }
+    else {
+        return $array;
+    }
+}
+
 # Does nothing. It is just here for API compatibility with Seq::to_array_of_array
 sub to_array_of_array($array) {
     return $array;

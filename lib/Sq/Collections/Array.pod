@@ -756,6 +756,31 @@ in the C<Hash> package and as a reference.
 
 =head2 pick
 
+=head2 to_array($array, $count=undef) : $array
+
+This function primarily exists because of API compatibility with C<Seq> and
+C<List>. But because of the optional argument C<$count> its behaviour
+depends on that argument.
+
+When C<$count> is not passed or is C<undef> than the C<$array> is just returned
+as-is without doing anything. This means you easily can change from C<Seq> or C<List>
+to C<Array> and for example do benchmarks without caring much about a C<to_array>
+call.
+
+But when C<$count> is being passed than a new Array must be created. When C<$count>
+is smaller or equal to C<0> than a new empty array is returned. Otherwise C<$count>
+elements are copied to a new array.
+
+It only copies as much entries as the original array has.
+
+    my $data = Array->range(1,100);
+
+    my $array = $data->to_array();     # noop: my $array = $data;
+    my $array = $data->to_array(0);    # []
+    my $array = $data->to_array(-1);   # []
+    my $array = $data->to_array(10);   # [1..10]
+    my $array = $data->to_array(1000); # [1..100]
+
 =head1 MUTATION
 
 The following methods mutate the array instead of creating a new one.

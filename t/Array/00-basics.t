@@ -1065,4 +1065,17 @@ is(
     is($target, [104,105,104,105,100,101,102,103,104,105], 'pod example 4');
 }
 
+# to_array
+{
+    my $data = Array->range(1,100);
+
+    my $same = $data->to_array;
+    is(+$same, +$data, 'same array/address');
+
+    is($data->to_array(0),    [],       'zero count');
+    is($data->to_array(-1),   [],       'negative count');
+    is($data->to_array(10),   [1..10],  'slice of array');
+    is($data->to_array(1000), [1..100], 'count bigger than array');
+}
+
 done_testing;
