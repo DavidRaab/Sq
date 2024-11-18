@@ -739,9 +739,25 @@ in the C<Hash> package and as a reference.
 
 =head2 group_by
 
-=head2 as_hash
+=head2 as_hash($array) : $hash
 
-=head2 find
+Turns array into a hash. Basically the same as you are used in Perl as assigning
+an array to a hash. But the returning Hash is blessed with the 'Hash' package.
+
+    my $hash = $array->as_hash;
+
+similar to, but without Hash blessing.
+
+    my $hash = { @$array };
+
+=head2 find($array, $predicate) : $opt
+
+Iterates through every element of C<$array> and passes the value to C<$predicate>.
+When this function returns a truish value it will return the first found value
+as B<Some value>. When no value could be found it returns B<None>.
+
+    my $opt = Array->range(1,10)->find(sub($x) { $x > 5  }); # Some(6)
+    my $opt = Array->range(1,10)->find(sub($x) { $x > 20 }); # None
 
 =head2 any
 
