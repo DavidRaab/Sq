@@ -963,24 +963,25 @@ sub fold_mut($seq, $state, $f_state) {
 }
 
 # reduce: Seq<'a> -> ('a -> 'a -> 'a) -> 'a
-sub reduce($seq, $default, $reducer) {
-    return fold(skip($seq, 1), first($seq, $default), $reducer);
+sub reduce($seq, $reducer) {
+    return first($seq)->map(sub($first) {
+        return fold(skip($seq, 1), $first, $reducer);
+    });
 }
 
-# first : Seq<'a> -> 'a -> 'a
-sub first($seq, $default) {
-    my $first = $seq->()();
-    return defined $first ? $first : $default;
+# first : Seq<'a> -> Option<'a>
+sub first($seq) {
+    return Option::Some($seq->()());
 }
 
-# last : Seq<'a> -> 'a -> 'a
-sub last($seq, $default) {
+# last : Seq<'a> -> Option<'a>
+sub last($seq) {
     my $it = $seq->();
     my ($last, $x);
     while ( defined($x = $it->()) ) {
         $last = $x;
     }
-    return defined $last ? $last : $default;
+    return Option::Some($last);
 }
 
 # TODO: first_match / last_match

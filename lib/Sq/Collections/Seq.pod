@@ -728,11 +728,9 @@ Repeats a whole sequence a given amount.
 
 =head1 CONVERTERS
 
-Implemented, but not documented yet:
-
-fold, reduce, first, last, to_list, count, sum, sum_by, min,
-min_by, min_by_str, max, max_str, max_by, max_by_str, str_join, to_hash,
-group_by, find
+Converts are normal methods that also can be called in a functional-style. They
+are called Converters because they usually transform a Sequence into something
+different than a sequence.
 
 =head2 to_array($seq, $count=undef) : $array
 
@@ -757,23 +755,25 @@ Concatenates all elements of a sequence to a string with C<$separator>.
     # "foo-bar"
     my $str = Seq->new("foo", "bar)->join(-);
 
-=head2 first($seq, $default) : $x
+=head2 first($seq) : $opt
 
-Returns first element of seq or C<$default> if sequence is empty.
+Returns first element of seq as an Option. Returns B<None> when the sequence is empty.
 
-    my $first = $seq->first(0);
+    my $opt = $seq->first;
 
-    my $one   = Seq->range(1,10)->first(0);
-    my $zero  = Seq->empty      ->first(0);
+    my $opt = Seq->range(1,10)->first;       # Some(1)
+    my $opt = Seq->empty      ->first;       # None
+    my $x   = Seq->empty      ->first->or(0) # 0
 
-=head2 last($seq, $default) : $x
+=head2 last($seq) : $opt
 
-Returns last element of seq or C<$default> if sequence is empty.
+Returns last element of seq as an Option. Returns B<None> when the sequence is empty.
 
-    my $last = $seq->first(0);
+    my $opt = $seq->last;
 
-    my $ten   = Seq->range(1,10)->last(0);
-    my $zero  = Seq->empty      ->last(0);
+    my $opt = Seq->range(1,10)->last;       # Some(10)
+    my $opt = Seq->empty      ->last;       # None
+    my $x   = Seq->empty      ->last->or(0) # 0
 
 =head2 as_hash($seq) : $hash
 

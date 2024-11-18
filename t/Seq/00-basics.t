@@ -365,20 +365,20 @@ is(Seq->wrap([1,1], [1,2])->to_array, [[1,1],[1,2]], 'wrap with arrays');
 is(Seq->wrap([1,1])       ->to_array, [[1,1]],       'wrap with array');
 is(Seq->from_array([1,1]) ->to_array, [1,1],         'from_array vs. wrap');
 
-is($range->reduce(undef, $add),      55, 'reduce');
-is(Seq->empty->reduce(undef, $add), U(), 'reduce on empty 1');
-is(Seq->empty->reduce(0, $add),       0, 'reduce on empty 2');
-is(Seq->wrap(1)->reduce(0, $add),     1, 'reduce on single element');
+is($range->reduce($add),           Some(55), 'reduce');
+is(Seq->empty->reduce($add),           None, 'reduce on empty 1');
+is(Seq->empty->reduce($add)->or(0),       0, 'reduce on empty 2');
+is(Seq->wrap(1)->reduce($add)->or(0),     1, 'reduce on single element');
 
-is(Seq->empty->first(undef), U(), 'first on empty is undef');
-is(Seq->empty->first(0),       0, 'first with default value');
-is($range->first(-1),          1, 'first on non empty without default');
-is($range->first(0),           1, 'first on non empty with default');
+is(Seq->empty->first,       None, 'first on empty');
+is(Seq->empty->first->or(0),   0, 'first on empty with option::or');
+is($range->first,        Some(1), 'first on non empty');
+is($range->first->or(0),       1, 'first on non empty with option::or');
 
-is(Seq->empty->last(undef),   U(), 'last on empty is undef');
-is(Seq->empty->last(0),         0, 'last with default value');
-is($range->last(undef),        10, 'last on non empty without default');
-is($range->last(0),            10, 'last on non empty with default');
+is(Seq->empty->last,         None, 'last on empty');
+is(Seq->empty->last->or(0),     0, 'last on empty with option:or');
+is($range->last ,        Some(10), 'last on non empty');
+is($range->last->or(0),        10, 'last on non empty with option::or');
 
 is(
     Seq->wrap(1,5,-3,10,9,-2)->sort(sub($x,$y) { $x <=> $y })->to_array,
