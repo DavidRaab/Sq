@@ -760,18 +760,18 @@ in the C<Hash> package and as a reference.
 
 This function primarily exists because of API compatibility with C<Seq> and
 C<List>. But because of the optional argument C<$count> its behaviour
-depends on that argument.
+depends on that argument. It's behavior is choosen to have zero-impact on
+performance when it is possible.
 
 When C<$count> is not passed or is C<undef> than the C<$array> is just returned
 as-is without doing anything. This means you easily can change from C<Seq> or C<List>
 to C<Array> and for example do benchmarks without caring much about a C<to_array>
-call.
+call creating a copy.
 
-But when C<$count> is being passed than a new Array must be created. When C<$count>
+But when C<$count> is being passed than a new Array is maybe created. When C<$count>
 is smaller or equal to C<0> than a new empty array is returned. Otherwise C<$count>
-elements are copied to a new array.
-
-It only copies as much entries as the original array has.
+elements are copied to a new array, expect when C<$count> is greater than the original
+array, than again C<$array> is just being returned as-is.
 
     my $data = Array->range(1,100);
 
@@ -779,7 +779,10 @@ It only copies as much entries as the original array has.
     my $array = $data->to_array(0);    # []
     my $array = $data->to_array(-1);   # []
     my $array = $data->to_array(10);   # [1..10]
-    my $array = $data->to_array(1000); # [1..100]
+    my $array = $data->to_array(1000); # noop: my $array = $data;
+
+If you really want to create a copy of an Array use C<copy>. If you
+want to extract a portion of an array into a new Array use C<slice>.
 
 =head1 MUTATION
 

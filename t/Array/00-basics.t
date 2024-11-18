@@ -1,6 +1,7 @@
 #!perl
 use 5.036;
 use List::Util qw(reduce);
+use Scalar::Util qw(refaddr);
 use Sq;
 use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end bag float U/;
 # use DDP;
@@ -1070,12 +1071,14 @@ is(
     my $data = Array->range(1,100);
 
     my $same = $data->to_array;
-    is(+$same, +$data, 'same array/address');
+    is(refaddr($same), refaddr($data), 'same array/address');
 
     is($data->to_array(0),    [],       'zero count');
     is($data->to_array(-1),   [],       'negative count');
     is($data->to_array(10),   [1..10],  'slice of array');
     is($data->to_array(1000), [1..100], 'count bigger than array');
+
+    is(refaddr($data->to_array(1000)), refaddr($data), 'same array/address');
 }
 
 done_testing;
