@@ -350,13 +350,13 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     );
 
     # we can reduce and use push
-    my $entry = $data->reduce(undef, sub($x,$y) { $x->push(tags => $y->{tags}); $x });
+    my $entry = $data->reduce(sub($x,$y) { $x->push(tags => $y->{tags}); $x });
 
-    is($entry, {
+    is($entry, Some({
         id   => 1,
         name => "foo",
         tags => [qw/one two three/],
-    }, 'reducing with a push');
+    }), 'reducing with a push');
 
     # but be aware that push mutates an entry, not creates a new element
     is($data, [

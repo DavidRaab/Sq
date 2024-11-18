@@ -464,10 +464,10 @@ is(Array->wrap([1,1], [1,2]), [[1,1],[1,2]], 'wrap with arrays');
 is(Array->wrap([1,1])       , [[1,1]],       'wrap with array');
 is(Array->from_array([1,1]) , [1,1],         'from_array vs. wrap');
 
-is($range->reduce(undef, $add),        55, 'reduce');
-is(Array->empty->reduce(undef, $add), U(), 'reduce on empty 1');
-is(Array->empty->reduce(0, $add),       0, 'reduce on empty 2');
-is(Array->wrap(1)->reduce(0, $add),     1, 'reduce on single element');
+is($range->reduce($add),         Some(55), 'reduce');
+is(Array->empty->reduce($add),       None, 'reduce on empty 1');
+is(Array->empty->reduce($add)->or(0),   0, 'reduce on empty 2');
+is(Array->wrap(1)->reduce($add),  Some(1), 'reduce on single element');
 
 is(Array->empty->first,          None, 'first on empty');
 is(Array->empty->first->or(0),      0, 'first and optional');

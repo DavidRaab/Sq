@@ -556,14 +556,14 @@ sub last($array) {
     return Option::Some($array->[-1]);
 }
 
-sub reduce($array, $default, $f) {
-    return $default    if @$array == 0;
-    return $array->[0] if @$array == 1;
+sub reduce($array, $f) {
+    return Option::None()            if @$array == 0;
+    return Option::Some($array->[0]) if @$array == 1;
     my $init = $array->[0];
     for (my $idx=1; $idx < @$array; $idx++) {
         $init = $f->($init, $array->[$idx]);
     }
-    return $init;
+    return Option::Some($init);
 }
 
 sub sum($array) {
