@@ -830,6 +830,29 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     is($calls, 0, 'on raz: lambda not called');
 }
 
+# on with multiple keys and functions
+{
+    my $movie = Hash->new(
+        title    => 'Terminator 2',
+        tags     => Array->new(qw/cool/),
+        liked_by => Array->new(qw/Anny/),
+    );
+
+    $movie->on(
+        tags     => sub($tags)  { $tags ->push("classic") },
+        liked_by => sub($liked) { $liked->push("Lilly")   },
+    );
+
+    is(
+        $movie,
+        {
+            title    => 'Terminator 2',
+            tags     => [qw/cool classic/],
+            liked_by => [qw/Anny Lilly/],
+        },
+        'on with multiple keys');
+}
+
 # fold
 {
     my $money = Hash->new(

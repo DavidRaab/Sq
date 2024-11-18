@@ -277,10 +277,13 @@ sub to_array($hash, $f) {
 # SIDE-EFFECTS
 #
 
-sub on($hash, $key, $f) {
-    if ( exists $hash->{$key} ) {
+sub on($hash, @kfs) {
+    my %kfs = @kfs;
+    for my $key ( CORE::keys %kfs ) {
         my $value = $hash->{$key};
-        $f->($value) if defined $value;
+        if ( defined $value ) {
+            $kfs{$key}($value);
+        }
     }
     return;
 }

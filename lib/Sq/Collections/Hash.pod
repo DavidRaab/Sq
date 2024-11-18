@@ -586,13 +586,14 @@ Mutation of values is still allowed.
     $person->{name}       = 'Candy'; # okay
     $person->{hair_color} = 'black'; # fine too
 
-=head2 on($hash, $key, $f) : void
+=head2 on($hash, @kfs) : void
 
-Similar to C<change>. It reads the value of C<$key> and passes it to C<$f>
-that then can do something with it. Any return value of C<$f> is ignored. Usually
-the idea is todo some kind of side-effect with the value of C<$key>. But consider
-that when the value is some kind of mutable value you also can use it to change
-the value.
+Similar to C<change>. It expects a list of B<key> and B<function>. It reads the
+value of the B<key> and passes it to the B<function> when the value is defined.
+
+Any return value of the function is ignored. Usually the idea is todo some kind
+of side-effect with the value of the B<keys>. But consider that when the value
+is some kind of mutable value you also can use it to change the value.
 
     my $hash = Hash->new(
         name => 'Anne',
@@ -613,6 +614,13 @@ the value.
 
     # Use 'push' as a shortcut for selecting an array and pushing values on it.
     $hash->push(tags => 'blue');
+
+Like C<change> or C<withf> it works with multiple keys.
+
+    $hash->on(
+        key1 => sub($value1) { ... },
+        key2 => sub($value2) { ... },
+    );
 
 =head2 iter($hash, $f) : void
 
