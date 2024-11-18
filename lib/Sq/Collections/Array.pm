@@ -265,7 +265,7 @@ sub indexed($array) {
     my $idx = 0;
     my @new;
     for my $x ( @$array ) {
-        push @new, [$idx++, $x];
+        push @new, [$x, $idx++];
     }
     return CORE::bless(\@new, 'Array');
 }
@@ -278,8 +278,8 @@ sub zip($array1, $array2) {
         my $x = $array1->[$idx];
         my $y = $array2->[$idx];
         last if !defined($x) or !defined($y);
-        $idx++;
         push @new, [$x,$y];
+        $idx++;
     }
     return CORE::bless(\@new, 'Array');
 }
@@ -670,8 +670,6 @@ sub group_by($array, $get_key) {
     return $hash;
 }
 
-# counts every array entry
-#
 # Array<'a> -> Hash<'a,int>
 sub count($array) {
     my $new = Hash->new;

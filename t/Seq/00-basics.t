@@ -108,15 +108,15 @@ is($range->sum, $range->rev->sum, 'sum 2');
 
 is(
     Seq::zip(
-        Seq->range(0, 1_000_000),
         Seq->wrap(qw/A B C D E F/),
+        Seq->range(0, 1_000_000),
     )->to_array,
     Seq->wrap(qw/A B C D E F/)->indexed->to_array,
     'indexed');
 
 is(
     $range->take(3)->indexed->to_array,
-    [[0,1], [1,2], [2,3]],
+    [[1,0], [2,1], [3,2]],
     'take->indexed');
 is(
     Seq->init(10, \&id)->map($add1)->to_array,
@@ -124,7 +124,7 @@ is(
     'init->map');
 is(
     Seq->range(1,10)->indexed->to_array,
-    Seq->init(10, sub($idx) { [$idx, $idx+1] })->to_array,
+    Seq->init(10, sub($idx) { [$idx+1,$idx ] })->to_array,
     'range->indexed vs. init');
 is(
     (reduce { $a->append($b) } map { Seq->wrap($_) } 1 .. 10)->to_array,

@@ -116,15 +116,15 @@ is(
 
 is(
     List::zip(
-        List->range(0, 100),
         List->wrap(qw/A B C D E F/),
+        List->range(0, 100),
     )->to_array,
     List->wrap(qw/A B C D E F/)->indexed->to_array,
     'indexed');
 
 is(
     $range->take(3)->indexed->to_array,
-    [[0,1], [1,2], [2,3]],
+    [[1,0], [2,1], [3,2]],
     'take->indexed');
 is(
     List->init(10, \&id)->map($add1)->to_array,
@@ -132,7 +132,7 @@ is(
     'init->map');
 is(
     List->range(1,10)->indexed->to_array,
-    List->init(10, sub($idx) { [$idx, $idx+1] })->to_array,
+    List->init(10, sub($idx) { [$idx+1,$idx] })->to_array,
     'range->indexed vs. init');
 is(
     (reduce { $a->append($b) } map { List->wrap($_) } 1 .. 10)->to_array,

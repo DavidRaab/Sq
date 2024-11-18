@@ -153,15 +153,15 @@ is($range->sum, $range->rev->sum, 'sum 2');
 
 is(
     Array::zip(
-        Array->range(0, 1_000_000),
         Array->wrap(qw/A B C D E F/),
+        Array->range(0, 1_000_000),
     ),
     Array->wrap(qw/A B C D E F/)->indexed,
     'indexed');
 
 is(
     $range->take(3)->indexed,
-    [[0,1], [1,2], [2,3]],
+    [[1,0], [2,1], [3,2]],
     'take->indexed');
 
 
@@ -177,7 +177,7 @@ is(
 
 is(
     Array->range(1,10)->indexed,
-    Array->init(10, sub($idx) { [$idx, $idx+1] }),
+    Array->init(10, sub($idx) { [$idx+1, $idx] }),
     'range->indexed vs. init');
 
 is(

@@ -317,7 +317,7 @@ sub zip($listA, $listB) {
 
 sub indexed($list) {
     my $idx = 0;
-    return List::map($list, sub($x) { [$idx++, $x] });
+    return List::map($list, sub($x) { [$x, $idx++] });
 }
 
 sub distinct_by($list, $mapper) {

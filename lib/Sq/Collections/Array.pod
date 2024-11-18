@@ -475,14 +475,14 @@ array just returns the whole array again. Always returns a new array.
     # [1,2,3,4,5]
     my $five = Array->range(1,100)->take(5);
 
-=head2 indexed($array) : [[$index,$x], [$index,$x], ...]
+=head2 indexed($array) : [[$x,$index], [$x,$index], ...]
 
 Returns a new array where each element is put together with its index inside
 another array. Consider using C<mapi> or C<iteri> if they are more appropiated
 for whatever you wanna do.
 
-    # [[0,1], [1,2], [2,3], [3,4], [4,5]]
-    my $array = Array->range(1,5)->indexed;
+    # [[5,0], [6,1], [7,2], [8,3], [9,4], [10,5]]
+    my $array = Array->range(5,10)->indexed;
 
 =head2 zip
 

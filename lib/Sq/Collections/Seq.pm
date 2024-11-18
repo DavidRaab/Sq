@@ -578,7 +578,7 @@ sub skip_while($seq, $predicate) {
 sub indexed($seq) {
     my $index = 0;
     return Seq::map($seq, sub($x) {
-        return Array->new($index++, $x);
+        return Array->new($x, $index++);
     });
 }
 
