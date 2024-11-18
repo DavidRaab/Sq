@@ -754,7 +754,19 @@ in the C<Hash> package and as a reference.
 
 =head2 none
 
-=head2 pick
+=head2 pick($array, $f_opt) : $opt
+
+C<pick> is like C<find> and C<map> in one operation. Every item in the
+array is passed to C<$f_opt>. When C<$f_opt> returns B<Some> value then this
+value is returned as an optional. When C<$f_opt> returned B<None> for every value
+then B<None> is returned.
+
+    my $opt = $array->pick(sub($x) { $x > 100 ? Some($x*$x) : None });
+
+    my $r   = Array->range(1,10);
+    my $opt = $r->pick(sub($x) { $x >  5 ? Some($x*$x) : None });          # Some(36)
+    my $opt = $r->pick(sub($x) { $x > 10 ? Some($x*$x) : None });          # None
+    my $x   = $r->pick(sub($x) { $x > 10 ? Some($x*$x) : None })->or(100); # 100
 
 =head2 to_array($array, $count=undef) : $array
 

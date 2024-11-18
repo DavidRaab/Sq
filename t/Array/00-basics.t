@@ -613,22 +613,30 @@ is($range->all (sub($x) { $x < 11  }), 1, 'all values smaller 1');
 is($range->none(sub($x) { $x > 1   }), 0, 'none value greater 1');
 is($range->none(sub($x) { $x > 10  }), 1, 'none value greater 10');
 
-is(
-    $range->pick(undef, sub($x) { $x*$x > 1000 ? $x*$x : undef }),
-    undef,
-    'pick squared element that is greater 1000');
-is(
-    $range->pick("NO", sub($x) { $x*$x > 1000 ? $x*$x : undef }),
-    "NO",
-    'pick squared element that is greater 1000');
-is(
-    $range->pick(undef, sub($x) { $x*$x > 50 ? $x*$x : undef }),
-    64,
-    'pick squared element that is greater 50');
-is(
-    $range->pick("NO", sub($x) { $x*$x > 50 ? $x*$x : undef }),
-    64,
-    'pick squared element that is greater 50');
+{
+    is(
+        $range->pick(sub($x) { $x*$x > 1000 ? Some($x*$x) : None }),
+        None,
+        'pick squared element that is greater 1000');
+    is(
+        $range->pick(sub($x) { $x*$x > 1000 ? Some($x*$x) : None })->or('NO'),
+        "NO",
+        'pick squared element that is greater 1000');
+    is(
+        $range->pick(sub($x) { $x*$x > 50 ? Some($x*$x) : None }),
+        Some(64),
+        'pick squared element that is greater 50');
+    is(
+        $range->pick(sub($x) { $x*$x > 50 ? Some($x*$x) : None })->or('No'),
+        64,
+        'pick squared element that is greater 50');
+
+    # pod examples
+    my $r   = Array->range(1,10);
+    is($r->pick(sub($x) { $x >  5 ? Some($x*$x) : None }),     Some(36), 'pod example 1');
+    is($r->pick(sub($x) { $x > 10 ? Some($x*$x) : None }),         None, 'pod example 2');
+    is($r->pick(sub($x) { $x > 10 ? Some($x*$x) : None })->or(100), 100, 'pod example 3');
+}
 
 # regex_match
 {

@@ -715,12 +715,12 @@ sub none($array, $predicate) {
     return 1;
 }
 
-sub pick($array, $default, $map) {
+sub pick($array, $f_opt) {
     for my $x ( @$array ) {
-        my $value = $map->($x);
-        return $value if defined $value;
+        my $opt = $f_opt->($x);
+        return $opt if Option::is_some($opt);
     }
-    return $default;
+    return Option::None();
 }
 
 #-----------------------------------------------------------------------------#
