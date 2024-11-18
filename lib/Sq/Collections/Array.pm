@@ -278,7 +278,7 @@ sub zip($array1, $array2) {
         my $x = $array1->[$idx];
         my $y = $array2->[$idx];
         last if !defined($x) or !defined($y);
-        push @new, [$x,$y];
+        push @new, CORE::bless([$x,$y], 'Array');
         $idx++;
     }
     return CORE::bless(\@new, 'Array');

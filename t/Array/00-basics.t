@@ -167,7 +167,12 @@ is(
         Array->range(0, 1_000_000),
     ),
     Array->wrap(qw/A B C D E F/)->indexed,
-    'indexed');
+    'zip and indexed');
+
+is(
+    Array::zip([1 .. 10],['a' .. 'c']),
+    [[1,'a'], [2,'b'], [3,'c']],
+    'zip');
 
 is(
     $range->take(3)->indexed,

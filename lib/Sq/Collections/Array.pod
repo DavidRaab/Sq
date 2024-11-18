@@ -484,7 +484,21 @@ for whatever you wanna do.
     # [[5,0], [6,1], [7,2], [8,3], [9,4], [10,5]]
     my $array = Array->range(5,10)->indexed;
 
-=head2 zip
+=head2 zip($arrayA, $arrayB) : $array_of_tuple
+
+Iterates through both arrays at the same time. Always puts the same index elements
+from both arrays into a tuple. When C<$arrayA> and C<$arrayB> are of different
+size then only iterates for the shortest length array. Also stops when an C<undef>
+is encountered somewhere.
+
+    # [[1,'a'], [2,'b'], [3,'c']]
+    my $array_of_tuple = Array::zip(
+        [1 .. 10],
+        ['a' .. 'c']
+    );
+
+The word tuple is just used for clarification what it does. A tuple here is just
+an Array and is also blessed in the C<Array> package.
 
 =head2 sort
 
@@ -737,18 +751,11 @@ in the C<Hash> package and as a reference.
 
 =head2 keyed_by
 
+TODO
+
 =head2 group_by
 
-=head2 as_hash($array) : $hash
-
-Turns array into a hash. Basically the same as you are used in Perl as assigning
-an array to a hash. But the returning Hash is blessed with the 'Hash' package.
-
-    my $hash = $array->as_hash;
-
-similar to, but without Hash blessing.
-
-    my $hash = { @$array };
+TODO
 
 =head2 find($array, $predicate) : $opt
 
@@ -761,9 +768,15 @@ as B<Some value>. When no value could be found it returns B<None>.
 
 =head2 any
 
+TODO
+
 =head2 all
 
+TODO
+
 =head2 none
+
+TODO
 
 =head2 pick($array, $f_opt) : $opt
 
