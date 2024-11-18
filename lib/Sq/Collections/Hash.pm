@@ -29,6 +29,12 @@ sub bless($, $href) {
     }
 }
 
+sub locked($, $href) {
+    CORE::bless($href, 'Hash');
+    Hash::Util::lock_keys(%$href);
+    return $href;
+}
+
 sub init($, $amount, $f) {
     my $hash = new('Hash');
     for my $idx ( 0 .. $amount-1 ) {
@@ -301,8 +307,7 @@ sub foreach($hash, $f) {
 }
 
 sub lock($hash, @keys) {
-    Hash::Util::lock_keys_plus(%$hash, @keys);
-    return $hash;
+    return Hash::Util::lock_keys_plus(%$hash, @keys);
 }
 
 #

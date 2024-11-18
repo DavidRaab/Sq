@@ -108,6 +108,35 @@ hash-ref, or use it as initialization.
 
     my $hash = Hash->bless({ foo => 1, bar => 2 });
 
+=head2 Hash->locked($href) : $hash
+
+This creates a locked hash. You must provide a hash-reference. Best is to
+create the Hash directly in the method call. The hash is blessed in the C<Hash>
+package and all its keys are locked. This is the fastest way to create a
+locked hash.
+
+Any attempt to read or write a not allowed key throws an exception.
+
+    my $hash = Hash->locked({
+        title  => 'Terminator 2',
+        rating => 5,
+        desc   => 'Awesome',
+    });
+
+    # throws an exception
+    my $title = $hash->{Title}
+
+    # also throws an exception
+    $hash->{ttitle} = 'Terminator 16';
+
+This is the same as below, but faster.
+
+    my $hash = Hash->new(
+        title  => 'Terminator 2',
+        rating => 5,
+        desc   => 'Awesome',
+    )->lock;
+
 =head2 Hash->empty() : $hash
 
 returns a new empty Sq Hash.

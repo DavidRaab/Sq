@@ -55,6 +55,10 @@ sub desc($self, $desc=undef) {
 
 package main;
 
+sub movie(@args) {
+    return Hash->new->lock(qw/title rating desc/)->set(@args);
+}
+
 cmpthese(-1, {
     moose => sub {
         for ( 1 .. 1_000 ) {
@@ -77,6 +81,33 @@ cmpthese(-1, {
     sq_bless => sub {
         for ( 1 .. 1_000 ) {
             my $m = Hash->bless({
+                title  => 'Terminator 2',
+                rating => 5,
+                desc   => 'Awesome',
+            });
+        }
+    },
+    sq_func => sub {
+        for ( 1 .. 1_000 ) {
+            my $m = movie(
+                title  => 'Terminator 2',
+                rating => 5,
+                desc   => 'Awesome',
+            );
+        }
+    },
+    sq_bless_locked => sub {
+        for ( 1 .. 1_000 ) {
+            my $m = Hash->bless({
+                title  => 'Terminator 2',
+                rating => 5,
+                desc   => 'Awesome',
+            })->lock;
+        }
+    },
+    sq_locked => sub {
+        for ( 1 .. 1_000 ) {
+            my $m = Hash->locked({
                 title  => 'Terminator 2',
                 rating => 5,
                 desc   => 'Awesome',
