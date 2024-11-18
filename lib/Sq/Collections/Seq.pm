@@ -95,11 +95,17 @@ sub unfold($class, $state, $f) {
 }
 
 # Seq->init : int -> (int -> 'a) -> Seq<'a>
-sub init($class, $count, $f) {
-    return unfold('Seq', 0, sub($index) {
-        return $f->($index), $index+1 if $index < $count;
-        return undef;
-    });
+sub init($, $count, $f) {
+    bless(sub {
+        my $abort   = 0;
+        my $current = 0;
+        return sub {
+            return undef if $abort;
+            return $f->($current++) if $current < $count;
+            $abort = 1;
+            return undef;
+        }
+    }, 'Seq');
 }
 
 # Seq->range_step : float -> float -> float -> Seq<float>
