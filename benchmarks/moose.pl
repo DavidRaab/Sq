@@ -59,6 +59,7 @@ sub movie(@args) {
     return Hash->new->lock(qw/title rating desc/)->set(@args);
 }
 
+printf "Benchmarking initialization\n";
 cmpthese(-1, {
     moose => sub {
         for ( 1 .. 1_000 ) {
@@ -141,4 +142,61 @@ cmpthese(-1, {
             };
         }
     }
+});
+
+# examples for benchmarks
+my $hash = {
+    title  => 'Terminator 2',
+    rating => 5,
+    desc   => 'Awesome',
+};
+
+my $locked = Hash->locked({
+    title  => 'Terminator 2',
+    rating => 5,
+    desc   => 'Awesome',
+});
+
+my $obj = MoviePP->new(
+    title  => 'Terminator 2',
+    rating => 5,
+    desc   => 'Awesome',
+);
+
+printf "\nReading just title\n";
+cmpthese(-1, {
+    sq_locked => sub {
+        for ( 1 .. 1_000 ) {
+            my $title = $locked->{title};
+        }
+    },
+    perl_class => sub {
+        for ( 1 .. 1_000 ) {
+            my $title = $obj->title;
+        }
+    },
+    perl_hash => sub {
+        for ( 1 .. 1_000 ) {
+            my $title = $hash->{title};
+        }
+    },
+});
+
+printf "\nSetting title to a new value\n";
+cmpthese(-1, {
+    sq_locked => sub {
+        for ( 1 .. 1_000 ) {
+            $locked->{title} = 'Terminator 3';
+        }
+    },
+    perl_class => sub {
+        for ( 1 .. 1_000 ) {
+            $obj->title('Terminator 3');
+        }
+    },
+    perl_hash => sub {
+        for ( 1 .. 1_000 ) {
+            $hash->{title} = 'Terminator 3';
+        }
+    },
 });
