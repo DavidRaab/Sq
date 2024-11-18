@@ -586,7 +586,7 @@ Mutation of values is still allowed.
     $person->{name}       = 'Candy'; # okay
     $person->{hair_color} = 'black'; # fine too
 
-=head2 on($hash, @kfs) : void
+=head2 on($hash, %kfs) : void
 
 Similar to C<change>. It expects a list of B<key> and B<function>. It reads the
 value of the B<key> and passes it to the B<function> when the value is defined.
@@ -655,7 +655,7 @@ Allows you to add/set multiple keys at once. This is the mutable version of C<wi
         points => 100,
     );
 
-=head2 change($hash, @kfs) : void
+=head2 change($hash, %kfs) : void
 
 Similar to C<set> but instead of just providing a value you pass in a function
 and that function gets the current value of the key returning the new value

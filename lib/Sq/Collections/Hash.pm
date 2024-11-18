@@ -233,13 +233,12 @@ sub with($hash, @kvs) {
     return $new;
 }
 
-sub withf($hash, @kfs) {
-    my %input = @kfs;
+sub withf($hash, %kfs) {
     my $new   = Hash->new;
     for my $key ( CORE::keys %$hash ) {
         my $value = $hash->{$key};
         if ( defined $value ) {
-            my $f = $input{$key};
+            my $f = $kfs{$key};
             $new->{$key} = defined $f ? $f->($value) : $value;
         }
     }
@@ -277,8 +276,7 @@ sub to_array($hash, $f) {
 # SIDE-EFFECTS
 #
 
-sub on($hash, @kfs) {
-    my %kfs = @kfs;
+sub on($hash, %kfs) {
     for my $key ( CORE::keys %kfs ) {
         my $value = $hash->{$key};
         if ( defined $value ) {
@@ -324,8 +322,7 @@ sub set($hash, @kvs) {
     return;
 }
 
-sub change($hash, $key, $f, @kfs) {
-    my %kfs = ($key, $f, @kfs);
+sub change($hash, %kfs) {
     while ( my ($key, $f) = each %kfs ) {
         my $value = $hash->{$key};
         $hash->{$key} = $f->($value) if defined $value;
