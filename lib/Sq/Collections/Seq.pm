@@ -349,7 +349,7 @@ sub flatten_array($seq) {
 sub cartesian($seqA, $seqB) {
     bind($seqA, sub($a) {
     bind($seqB, sub($b) {
-        new('Seq', [$a, $b]);
+        new('Seq', CORE::bless([$a, $b], 'Array'));
     })});
 }
 

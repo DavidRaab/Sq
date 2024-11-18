@@ -134,7 +134,7 @@ sub cartesian($as, $bs) {
     my $new = new('Array');
     for my $a ( @$as ) {
         for my $b ( @$bs ) {
-            push @$new, new('Array', $a, $b);
+            push @$new, CORE::bless([$a, $b], 'Array');
         }
     }
     return $new;
