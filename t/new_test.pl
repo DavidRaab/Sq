@@ -29,11 +29,11 @@ $usage->die if $opt->help;
 # get the maximum id from test-files so far
 my $maximum_id =
     Seq
-    ->wrap( path($opt->folder)->children )
-    ->map(  sub($x) { $x->basename })
+    ->new( path($opt->folder)->children )
+    ->map( sub($x) { $x->basename })
     ->regex_match( qr/\A(\d+) .* \.t\z/xms, [1])
     ->fsts
-    ->max(-1);
+    ->max->or(-1);
 
 # Load DATA into array
 my @content = <DATA>;
