@@ -5,21 +5,21 @@ and in which cases you don't want to use? Let my try to explain.
 
 =head2 Reading a file
 
-Let's say we wanna read a file from disk. We assume it is maybe in a format
-like CSV, or could be any other format. Line based, maybe it is byte based.
-The format itself doesn't matter, but for processing you decide.
+Let's say we wanna read a file from disk. We assume it is some kind of format
+we maybe need to parse or process somehow. Then we use every line to create
+or generate some accumulated data from it. So overall we do.
 
 =over 4
 
-=item Read the whole file into memory
+=item * Read the whole file into memory
 
-=item Do a computation/transformation on every entry
+=item * Do a computation/transformation on every entry
 
-=item Maybe do some kind of accumulation
+=item * Maybe do some kind of accumulation
 
 =back
 
-In pure Perl, code could somehow look like this.
+A pure perl solution would look similar to this.
 
     use File::Slurp;
 
@@ -31,20 +31,18 @@ In pure Perl, code could somehow look like this.
 
     my $accum = ...;
     for my $t ( @transform ) {
-        # do something with $accum
+        # do something with $t & $accum
     }
 
-This kind of code works but this kind of code can have some serious
-drawbacks.
+This kind of code works but it also has some drawbacks.
 
 =over 4
 
 =item Memory consumption
 
 The whole file needs to be read into memory. When you have a relative small
-file this is maybe fine. But when you need to process very big amount of
-data. Maybe files with several gigabytes of size, or data from a database
-this approach can fail.
+file this is fine. But this changes when you need to process very large files
+of several gigabytes in size or query millions of data from a database.
 
 =item Execution Order
 
@@ -132,6 +130,17 @@ function call needs to push values onto a stack, needs jump instructions
 and so on. Calling functions can become a serious overhead, especially when
 we have code in loops and process/iterate millions of items.
 
+Still performance mustn't be bad. Functions in C<Sq> are written to be
+as efficent as possible, usually trying to benchmark things, selection
+of proper algorithm and so on. So you can depend on having functions
+that are reasonable fast. The only overhead you usually pay is the price
+of calling lambda functions.
+
+Maybe your hand written implementation could be faster, maybe not. It is still
+a good thing relying on written and tested solutions and writing just one
+line of code instead of trying to unroll every function call to 10+ lines of
+code again and again.
+
 =item No forced paradigma
 
 But consider the following thing. C<Sq> does not try to enforce a paradigm on
@@ -142,6 +151,8 @@ You can start using C<Sq>, create code that is fast written for you, does
 what it should do and is maybe fast enough. If not, you maybe can Profile your
 code and always create the Pure Perl versions of those operations that
 needs to be faster because they are critical.
+
+It is better to only unroll code at places where it really matters.
 
 =back
 
@@ -209,16 +220,20 @@ a file. Instead that the processor now waits a lot of time for data
 to arrive, we immediately execute some code and create/process data to
 create C<$accum> instead of just waiting for data to arrive.
 
-Reading something line based, then doing something with it is a great way
-to speed up all kind of I/O processing, because in the meantime our code
-already process data our operating system is not sleeping.
+Reading something line based and directly doing something with it is a
+great way to speed up all kind of I/O processing, because while our code
+processes data our operating system is not sleeping. Usually the operating
+system starts to fill buffers so when a program ask for the next line it
+immediately can deliver that line without waiting.
 
-In the background different kind of IO Layers back down to the operating
-system will fill buffers, so the overal time our program needs to run will
-very likely become less. The waiting time is used to compute things instead of
-idling our processor.
+This kind of buffers not only exists in different Perl IO Layers but also
+goes down back to the operating system, so the overal time our program
+needs to run will very likely become shorter. Instead of idling/waiting we
+now use that time to already process data.
 
 =back
+
+=head2 Sequence based solution
 
 But you know what I didn't liked at all? It's how different we need to write
 code. I like writing code with C<map> and C<grep> and some kind of helper
@@ -230,9 +245,7 @@ looks like primitive C code.
 
 Now let's look what happens when we replace it with C<Seq>.
 
-=head2 Sequence based solution
-
-Again, let's start with the Sq Array solution. We had the following code.
+Here again is the code we had using C<Array> from C<Sq>.
 
     use Sq;
     use File::Slurp;
@@ -246,7 +259,7 @@ Again, let's start with the Sq Array solution. We had the following code.
                 # do something with $t & $state
             });
 
-And now here is the sequence based solution that don't need to read everything
+And here is the sequence based solution that don't need to read the whole file
 into memory all at once.
 
     use Sq;
@@ -261,7 +274,7 @@ into memory all at once.
             });
 
 So what changed? Well not much. C<< Sq->io->open_text >> returns a sequence
-that iterates line by line through a file. But C<Seq> has the same API
+that iterates line by line through a file. But C<Seq> has the same API*
 as C<Array>. So the code looks exactly the same, but it has all the benefits
 of the B<Line Based Code>.
 
@@ -290,3 +303,24 @@ into pure perl.
 But it helps having code written with C<Seq> or C<Array> and then turn it into
 a series of single steps. Especially when you have a test-suite, tested your
 abstract code and then re-write some functions for speed.
+
+=head2 *Same API
+
+It is not quite true that C<Seq> and C<Array> have the same API. Some operation
+only makes sense on the one or the other. For example C<Array> provides functions
+like blitting and also some mutation that are not present on C<Seq> and cannot
+really implemented for an iterative solution.
+
+Same goes the other way around as C<Seq> has the ability to handle infinite
+sequences that cannot be handled with an C<Array>.
+
+But this is not an disadvantage. Some operations only really makes sense
+on different kind of data-structures, when you need them, you can use them.
+
+But most functions exists on both data-structures and you can easily swap
+between the data-structures. On top also consider that you always can use
+methods like C<to_array> to transform a sequence to an array if needed,
+or use C<< Seq->from_array >> to turn an Array efficently into a C<Seq>.
+
+So it is up to you to pick the right data-structure at the right place to
+create good performing programs.
