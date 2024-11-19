@@ -94,3 +94,6 @@
 
 # avoid own script-file
 ^new_test.pl$
+
+# Avoid VS Code
+.vscode/

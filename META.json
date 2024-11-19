@@ -34,8 +34,29 @@
       }
    },
    "provides" : {
+      "Array" : {
+         "file" : "lib/Sq/Collections/Array.pm"
+      },
+      "Hash" : {
+         "file" : "lib/Sq/Collections/Hash.pm"
+      },
+      "Heap" : {
+         "file" : "lib/Sq/Collections/Heap.pm"
+      },
+      "List" : {
+         "file" : "lib/Sq/Collections/List.pm"
+      },
       "Measure" : {
          "file" : "lib/Sq/Core/Measure.pm"
+      },
+      "Option" : {
+         "file" : "lib/Sq/Core/Option.pm"
+      },
+      "Queue" : {
+         "file" : "lib/Sq/Collections/Queue.pm"
+      },
+      "Result" : {
+         "file" : "lib/Sq/Core/Result.pm"
       },
       "Seq" : {
          "file" : "lib/Sq/Collections/Seq.pm"
