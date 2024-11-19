@@ -1071,22 +1071,29 @@ sub min_by($seq, $f_number) {
     return Option::Some($min);
 }
 
-# returns the min value or $default on empty sequence
-# min value is compared using lt
-#
-# min_str : Seq<string> -> string -> string
-sub min_str($seq, $default) {
-    min_str_by($seq, \&Sq::id, $default);
+# min_str : Seq<string> -> string -> Option<string>
+sub min_str($seq) {
+    min_str_by($seq, \&Sq::id);
 }
 
-# min_str_by : Seq<'a> -> ('a -> string) -> string -> 'a
-sub min_str_by($seq, $key, $default) {
-    return fold($seq, undef, sub($x,$min) {
-        my $value = $key->($x);
-        defined $min
-            ? ($value lt $min) ? $value : $min
-            : $value;
-    }) // $default;
+# min_str_by : Seq<'a> -> ('a -> string) -> Option<'a>
+sub min_str_by($seq, $f_str) {
+    my $min     = undef;
+    my $min_key = undef;
+    iter($seq, sub($x) {
+        my $key = $f_str->($x);
+        if ( defined $min ) {
+            if ( $key lt $min_key ) {
+                $min     = $x;
+                $min_key = $key;
+            }
+        }
+        else {
+            $min     = $x;
+            $min_key = $key;
+        }
+    });
+    return Option::Some($min);
 }
 
 # max : Seq<float> -> Option<float>
@@ -1115,18 +1122,28 @@ sub max_by($seq, $f_number) {
 }
 
 # max_str : Seq<string> -> string -> string
-sub max_str($seq, $default) {
-    max_str_by($seq, \&Sq::id, $default);
+sub max_str($seq) {
+    max_str_by($seq, \&Sq::id);
 }
 
 # max_str_by : Seq<'a> -> ('a -> string) -> string -> string
-sub max_str_by($seq, $key, $default) {
-    return fold($seq, undef, sub($x,$max) {
-        my $value = $key->($x);
-        defined $max
-            ? ($value gt $max) ? $value : $max
-            : $value;
-    }) // $default;
+sub max_str_by($seq, $f_str) {
+    my $max     = undef;
+    my $max_key = undef;
+    iter($seq, sub($x) {
+        my $key = $f_str->($x);
+        if ( defined $max ) {
+            if ( $key gt $max_key ) {
+                $max     = $x;
+                $max_key = $key;
+            }
+        }
+        else {
+            $max     = $x;
+            $max_key = $key;
+        }
+    });
+    return Option::Some($max);
 }
 
 # str_join : Seq<string> -> string -> string

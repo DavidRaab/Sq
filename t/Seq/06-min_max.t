@@ -37,16 +37,16 @@ is(Seq->empty->max->or(0),               0, 'max on empty with option::or');
 my $words = Seq->wrap(qw/Hello World you Are welcome/);
 
 # min_str
-is($words->min_str(undef),        'Are', 'min_str');
-is($words->min_str('AAA'),        'Are', 'min_str with default');
-is(Seq->empty->min_str(undef),      U(), 'min_str on empty');
-is(Seq->empty->min_str('Z'),        'Z', 'min_str on empty with default');
+is($words->min_str,              Some('Are'), 'min_str');
+is($words->min_str->or('dope'),       'Are' , 'min_str with option::or');
+is(Seq->empty->min_str,                 None, 'min_str on empty');
+is(Seq->empty->min_str->or('Z'),         'Z', 'min_str on empty with option::ot');
 
 # max_str
-is($words->max_str(undef),        'you', 'max_str');
-is($words->max_str('foo'),        'you', 'max_str with default');
-is(Seq->empty->max_str(undef),      U(), 'max_str on empty');
-is(Seq->empty->max_str('A'),        'A', 'max_str on empty with default');
+is($words->max_str,             Some('you'), 'max_str');
+is($words->max_str->or('foo'),        'you', 'max_str with option::ot');
+is(Seq->empty->max_str,                None, 'max_str on empty');
+is(Seq->empty->max_str->or('A'),        'A', 'max_str on empty with option::or');
 
 
 # --- ---
@@ -64,14 +64,14 @@ my $by_name = key "name";
 # min_by
 is($data->min_by(key "id"),        Some({id => 1, name => 'A'}), 'min_by');
 is($data->min_by(key "id")->or(1),      {id => 1, name => 'A'} , 'min_by with default');
-is(Seq->empty->min_by(key "id"),           None, 'min_by on empty');
-is(Seq->empty->min_by(key "id")->or(0),       0, 'min_by on empty with default');
+is(Seq->empty->min_by(key "id"),                           None, 'min_by on empty');
+is(Seq->empty->min_by(key "id")->or(0),                       0, 'min_by on empty with default');
 
 # min_by_str
-is($data->min_str_by($by_name, undef),      'A', 'min_by_str');
-is($data->min_str_by($by_name, '0'),        'A', 'min_by_str with default');
-is(Seq->empty->min_str_by($by_name, undef), U(), 'min_by_str on empty');
-is(Seq->empty->min_str_by($by_name, '0'),     0, 'min_by_str on empty with default');
+is($data->min_str_by($by_name),       Some({ id => 1, name => 'A' }), 'min_by_str');
+is($data->min_str_by($by_name)->or(0),     { id => 1, name => 'A' } , 'min_by_str with option::or');
+is(Seq->empty->min_str_by($by_name),                            None, 'min_by_str on empty');
+is(Seq->empty->min_str_by($by_name)->or(0),                        0, 'min_by_str on empty with option::or');
 
 # max_by
 is($data->max_by($by_id),      Some({ id => 3, name => 'C' }), 'max_by');
@@ -80,9 +80,9 @@ is(Seq->empty->max_by($by_id),                           None, 'max_by on empty'
 is(Seq->empty->max_by($by_id)->or(0),                       0, 'max_by on empty with default');
 
 # max_by_str
-is($data->max_str_by($by_name, undef),      'C', 'max_by_str');
-is($data->max_str_by($by_name, '0'),        'C', 'max_by_str with default');
-is(Seq->empty->max_str_by($by_name, undef), U(), 'max_by_str on empty');
-is(Seq->empty->max_str_by($by_name, '0'),     0, 'max_by_str on empty with default');
+is($data->max_str_by($by_name),       Some({ id => 3, name => 'C' }), 'max_by_str');
+is($data->max_str_by($by_name)->or(0),     { id => 3, name => 'C' } , 'max_by_str with option::or');
+is(Seq->empty->max_str_by($by_name),                            None, 'max_by_str on empty');
+is(Seq->empty->max_str_by($by_name)->or(0),                        0, 'max_by_str on empty with option::or');
 
 done_testing;

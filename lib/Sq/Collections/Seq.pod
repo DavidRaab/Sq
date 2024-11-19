@@ -777,6 +777,9 @@ Returns last element of seq as an Option. Returns B<None> when the sequence is e
 Returns the smallest number in a sequence as an optional. When the sequence is empty
 a B<None> is returned.
 
+C<min> uses numeric C<< < >> operator to compare items. So any object that
+overloads C<< < >> will also work.
+
     my $opt = Seq->range(100,200)->min; # Some(100)
     my $opt = Seq->empty->min;          # None
 
@@ -788,6 +791,9 @@ for comparision. The C<$x> with the minimum C<$num> is returned as a result.
 
 Returns an optional because in the case of an empty sequence there
 can be no min value and B<None> is being returned.
+
+C<min_by> uses numeric C<< < >> operator to compare items. So any object that
+overloads C<< < >> will also work.
 
     my $data = Seq->new(
         { id => 1, name => 'A' },
@@ -805,6 +811,9 @@ generates a function that selects a specific entry from a hash.
 Returns the maximum number in a sequence as an optional. When the sequence is empty
 a B<None> is returned.
 
+C<max> uses numeric C<< > >> operator to compare items. So any object that
+overloads C<< > >> will also work.
+
     my $opt = Seq->range(100,200)->max; # Some(200)
     my $opt = Seq->empty->max;          # None
 
@@ -817,6 +826,9 @@ for comparision. The C<$x> with the maximum C<$num> is returned as a result.
 Returns an optional because in the case of an empty sequence there
 can be no max value and B<None> is being returned.
 
+C<max_by> uses numeric C<< > >> operator to compare items. So any object that
+overloads C<< > >> will also work.
+
     my $data = Seq->new(
         { id => 1, name => 'A' },
         { id => 2, name => 'B' },
@@ -827,6 +839,46 @@ can be no max value and B<None> is being returned.
 
 The function C<key> is automatically loaded/imported by loading C<Sq>. C<key>
 generates a function that selects a specific entry from a hash.
+
+=head2 min_str($seq) : $opt
+
+The same as C<min> but uses string comparison C<< lt >> to compare items. Any
+object that overloads C<< lt >> will also work.
+
+    my $opt = Seq->new(qw/c b a/)->min_str; # Some('a')
+    my $opt = Seq->empty->min_str;          # None
+
+=head2 min_str_by($seq_x, $f_str) : $opt_x
+
+Same as C<min_by> but uses string comparison C<< lt >> to compare items. Any
+object that overloads C<< lt >> will also work.
+
+    my $data = Seq->new(
+        { id => 1, name => 'A' },
+        { id => 2, name => 'B' },
+        { id => 3, name => 'C' },
+    );
+
+    my $opt = $data->min_str_by(key 'name'); # Some({ id => 1, name => 'A' })
+
+=head2 max_str($seq) : $opt
+
+Same as C<max> but uses string comparison C<< gt >> to compare items.
+
+    my $opt = Seq->new(qw/c b a/)->max_str; # Some('c')
+    my $opt = Seq->empty->max_str;          # None
+
+=head2 max_str_by($seq_x, $f_str) : $opt_x
+
+Same as C<max_by> but uses string comparison C<< gt >> to compare items.
+
+    my $data = Seq->new(
+        { id => 1, name => 'A' },
+        { id => 2, name => 'B' },
+        { id => 3, name => 'C' },
+    );
+
+    my $opt = $data->max_str_by(key 'name'); # Some({ id => 3, name => 'C' })
 
 =head2 as_hash($seq) : $hash
 
