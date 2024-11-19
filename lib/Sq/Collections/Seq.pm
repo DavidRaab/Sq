@@ -1034,9 +1034,6 @@ sub sum_by($seq, $f) {
     });
 }
 
-# returns the min value or undef on empty sequence
-# min value is compared with numerical <
-#
 # min : Seq<float> -> float -> Option<float>
 sub min($seq) {
     my $min = undef;
@@ -1121,12 +1118,12 @@ sub max_by($seq, $f_number) {
     return Option::Some($max);
 }
 
-# max_str : Seq<string> -> string -> string
+# max_str : Seq<string> -> Option<string>
 sub max_str($seq) {
     max_str_by($seq, \&Sq::id);
 }
 
-# max_str_by : Seq<'a> -> ('a -> string) -> string -> string
+# max_str_by : Seq<'a> -> ('a -> string) -> Option<'a>
 sub max_str_by($seq, $f_str) {
     my $max     = undef;
     my $max_key = undef;
