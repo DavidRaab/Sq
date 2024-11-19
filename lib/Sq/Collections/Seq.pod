@@ -780,9 +780,25 @@ a B<None> is returned.
     my $opt = Seq->range(100,200)->min; # Some(100)
     my $opt = Seq->empty->min;          # None
 
-=head2 min_by($seq, $f_key) : $opt_min
+=head2 min_by($seq_x, $f_number) : $opt_x
 
-TODO
+Iterates through a sequence to find the minimum element C<$x>. While iterating
+C<< my $num = $f_number->($x) >> is called to get the C<$num> that is used
+for comparision. The C<$x> with the minimum C<$num> is returned as a result.
+
+Returns an optional because in the case of an empty sequence there
+can be no min value and B<None> is being returned.
+
+    my $data = Seq->new(
+        { id => 1, name => 'A' },
+        { id => 2, name => 'B' },
+        { id => 3, name => 'C' },
+    );
+
+    my $opt = $data->min_by(key 'id'); # Some({ id => 1, name => 'A' })
+
+The function C<key> is automatically loaded/imported by loading C<Sq>. C<key>
+generates a function that selects a specific entry from a hash.
 
 =head2 max($seq) : $opt_number
 
@@ -792,9 +808,25 @@ a B<None> is returned.
     my $opt = Seq->range(100,200)->max; # Some(200)
     my $opt = Seq->empty->max;          # None
 
-=head2 max_by($seq, $f_key) : $opt_max
+=head2 max_by($seq_x, $f_number) : $opt_x
 
-TODO
+Iterates through a sequence to find the maximum element C<$x>. While iterating
+C<< my $num = $f_number->($x) >> is called to get the C<$num> that is used
+for comparision. The C<$x> with the maximum C<$num> is returned as a result.
+
+Returns an optional because in the case of an empty sequence there
+can be no max value and B<None> is being returned.
+
+    my $data = Seq->new(
+        { id => 1, name => 'A' },
+        { id => 2, name => 'B' },
+        { id => 3, name => 'C' },
+    );
+
+    my $opt = $data->max_by(key 'id'); # Some({ id => 3, name => 'C' })
+
+The function C<key> is automatically loaded/imported by loading C<Sq>. C<key>
+generates a function that selects a specific entry from a hash.
 
 =head2 as_hash($seq) : $hash
 

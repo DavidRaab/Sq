@@ -1052,11 +1052,11 @@ sub min($seq) {
 }
 
 # min_by : Seq<'a> -> ('a -> float) -> Option<'a>
-sub min_by($seq, $f_key) {
+sub min_by($seq, $f_number) {
     my $min     = undef;
     my $min_key = undef;
     iter($seq, sub($x) {
-        my $key     = $f_key->($x);
+        my $key = $f_number->($x);
         if ( defined $min ) {
             if ( $key < $min_key ) {
                 $min     = $x;
@@ -1095,11 +1095,11 @@ sub max($seq) {
 }
 
 # max_by : Seq<'a> -> ('a -> float) -> float -> float
-sub max_by($seq, $f_key) {
+sub max_by($seq, $f_number) {
     my $max     = undef;
     my $max_key = undef;
     iter($seq, sub($x) {
-        my $key = $f_key->($x);
+        my $key = $f_number->($x);
         if ( defined $max ) {
             if ( $key > $max_key ) {
                 $max     = $x;
