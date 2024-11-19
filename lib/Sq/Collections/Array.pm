@@ -592,6 +592,31 @@ sub split($array, $regex) {
     ], 'Array');
 }
 
+# max : Array<float> -> Option<float>
+sub max($array) {
+    max_by($array, \&Sq::id);
+}
+
+# max_by : Array<'a> -> ('a -> float) -> Option<'a>
+sub max_by($array, $f_number) {
+    my $max     = undef;
+    my $max_key = undef;
+    for my $x ( @$array ) {
+        my $key = $f_number->($x);
+        if ( defined $max ) {
+            if ( $key > $max_key ) {
+                $max     = $x;
+                $max_key = $key;
+            }
+        }
+        else {
+            $max     = $x;
+            $max_key = $key;
+        }
+    }
+    return Option::Some($max);
+}
+
 # Combines grouping and folding in one operation. All elements of a sequence
 # are grouped together by a key. The $folder function than can combine
 # multiple elements of the same key. For the first element found for a

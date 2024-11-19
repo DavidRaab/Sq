@@ -569,10 +569,28 @@ is(Option::is_none(Some(1)),     0, 'is_none 2');
 is(Option::is_none(None),        1, 'is_none 3');
 is(Option::is_none(Some(undef)), 1, 'is_none 4');
 
-# TODO: THINK ABOUT: should is_none return 1 for those cases or not?
 is(Option::is_none(""),          0, 'is_none 5');
 is(Option::is_none(0),           0, 'is_none 6');
 is(Option::is_none([]),          0, 'is_none 7');
 is(Option::is_none({}),          0, 'is_none 8');
+
+# Extract max of Array of Array
+{
+    my $data = Array->new(
+        Array->range(10,100),
+        Array->new(50, 10, 16),
+        Array->new(100,1000),
+        Array->empty,
+        Array->new(1,2,3),
+        Array->new(3,2,1),
+    );
+
+    my $maxs = $data->choose(sub($array) { $array->max });
+
+    is(
+        $maxs,
+        [100, 50, 1000, 3, 3],
+        'Option with Array::choose');
+}
 
 done_testing;
