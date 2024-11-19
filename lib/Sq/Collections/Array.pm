@@ -592,6 +592,65 @@ sub split($array, $regex) {
     ], 'Array');
 }
 
+# min : Array<float> -> float -> Option<float>
+sub min($array) {
+    my $min = undef;
+    for my $x ( @$array ) {
+        if ( defined $min ) {
+            $min = $x if $x < $min;
+        }
+        else {
+            $min = $x;
+        }
+    }
+    return Option::Some($min);
+}
+
+# min_by : Array<'a> -> ('a -> float) -> Option<'a>
+sub min_by($array, $f_number) {
+    my $min     = undef;
+    my $min_key = undef;
+    for my $x ( @$array ) {
+        my $key = $f_number->($x);
+        if ( defined $min ) {
+            if ( $key < $min_key ) {
+                $min     = $x;
+                $min_key = $key;
+            }
+        }
+        else {
+            $min     = $x;
+            $min_key = $key;
+        }
+    }
+    return Option::Some($min);
+}
+
+# min_str : Seq<string> -> string -> Option<string>
+sub min_str($array) {
+    min_str_by($array, \&Sq::id);
+}
+
+# min_str_by : Seq<'a> -> ('a -> string) -> Option<'a>
+sub min_str_by($array, $f_str) {
+    my $min     = undef;
+    my $min_key = undef;
+    for my $x ( @$array ) {
+        my $key = $f_str->($x);
+        if ( defined $min ) {
+            if ( $key lt $min_key ) {
+                $min     = $x;
+                $min_key = $key;
+            }
+        }
+        else {
+            $min     = $x;
+            $min_key = $key;
+        }
+    }
+    return Option::Some($min);
+}
+
 # max : Array<float> -> Option<float>
 sub max($array) {
     max_by($array, \&Sq::id);
@@ -605,6 +664,31 @@ sub max_by($array, $f_number) {
         my $key = $f_number->($x);
         if ( defined $max ) {
             if ( $key > $max_key ) {
+                $max     = $x;
+                $max_key = $key;
+            }
+        }
+        else {
+            $max     = $x;
+            $max_key = $key;
+        }
+    }
+    return Option::Some($max);
+}
+
+# max_str : Array<string> -> string
+sub max_str($array) {
+    max_str_by($array, \&Sq::id);
+}
+
+# max_str_by : Array<'a> -> ('a -> string) -> Option<'a>
+sub max_str_by($array, $f_str) {
+    my $max     = undef;
+    my $max_key = undef;
+    for my $x ( @$array ) {
+        my $key = $f_str->($x);
+        if ( defined $max ) {
+            if ( $key gt $max_key ) {
                 $max     = $x;
                 $max_key = $key;
             }
