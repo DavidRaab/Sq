@@ -22,12 +22,12 @@ We could do:
 
 =back
 
-I choosed to pick the option to expect a default parameter because I think it
-is the most useful one.
+I started returning C<undef>, then I switched to using a default parameter
+and now finally re-writte everything using an optional value.
 
 =head2 Exceptions
 
-First I don't like exceptions at all. They are basically a pain in the ass. The
+I don't like exceptions at all. They are basically a pain in the ass. It
 only causes your program to crash when you never expect it. They are just a source
 of hidden bugs you didn't encountered yet because you maybe forgot to write
 the tests for it.
@@ -38,10 +38,11 @@ For a short time I returned C<undef>. I actually used C<Sq> already by myself
 and in some script that helped me to create new test files I used C<max> to get
 the highest number of all test-script files, so i knew which number to pick next.
 
-When I had written the script this was okay. Script files where already presents
+When I had written the script this was okay. Script files were already present
 so i knew that calling C<max> could never fail. Then things happened. I copied
 the same file to another project and boooom. The program crashed because I had
-no test files yet.
+no test files yet. It returned C<undef> and this somehow caused the program
+to somewhere crash.
 
 Now, i could easily fixed this problem by writing
 
@@ -52,7 +53,8 @@ But still, you are not enforced to write this code/check.
 
 =head2 expect default parameter
 
-With expecting a C<$default> parameter you are now forced to write.
+Then I switched to using a C<$default> parameter. But you were forced to pass
+some argument in. You had to write.
 
     my $max = $seq->max(0);
 
@@ -60,32 +62,78 @@ Maybe this is sometimes annoying to write? Good, you really should think
 about what happens when the sequence is empty and which value should
 be choosen instead. It's part of writing useful and bug-free code.
 
-You cannot forget to pass that argument as Sq will complain about missing
-arguments.
-
-Consider that you still want to return C<undef>, maybe because you are lazy
+You still could return C<undef> when needed, maybe because you are lazy
 or want to differentate if a number was returned. In that case you still
-can write.
+could write.
 
     my $max = $seq->max(undef);
 
-It's maybe even more painful to write, but you will later be grateful that you
-just can search your source code for C<undef> and find all occurences where
-you were lazy.
+But after I implemented the C<Option> type and started using it more and more
+the whole API and how you used things didn't fell right in place.
 
 =head2 returning an optional
 
-Instead of expecting the default argument it would also be possible to return
-an optional value instead. This would be the approach seen in ML languages like
-F#. There it makes sense because of either restriction of static-typing or
-the difference of Value-types vs. Reference-types. But in Perl it's less dramatic,
-you always can return C<undef> for every value, also for numbers.
+That's why I started to return C<Option> instead. It also looks and feel
+nice working this way. Consider with a default argument we needed to write
+the following code.
 
-Returning an optional would have some other benefits. The optionals module
-have quite some functions you can use that are pretty handy. But still, I think
-most of the time functions like C<max> or C<min> are used on simple types/objects
-and providing the default value as an argument is what you probably expect
-for most of the time.
+    my $max = $seq->max(0);
 
-If not. You can still pass in C<undef> as the default argument and then do
-an explicit check against C<undef>.
+It meant we either get the maximum or C<0>. But sometimes we really don't
+know of a default value. We could use C<undef> but somehow it felt out of
+place. Now it is back to.
+
+    my $opt = $seq->max;
+
+But now everything is represented as an optional value that maybe contains
+a value, maybe not. Let's say you want to extract the value or get a default
+value. Now you can just write.
+
+    my $max = $seq->max->or(0);
+
+So this resembles a lot what we had before by using a default value. But
+an option has some other advantages. It is not restricted to just extracting
+a value.
+
+Let's consider you wanna extract the maximum and for some reason want to
+square the maximum. You can write.
+
+    my $max = $seq->max->or(undef);
+    if ( defined $max ) {
+        $max = $max * $max;
+    }
+
+or you just can use C<Option::map> instead.
+
+    my $opt = $seq->max->map(sub($x) { $x * $x });
+
+Now C<$opt> represents either B<Some value> that is the squared result or
+B<None>.
+
+But because C<Option> now becomes more and more used it also works fine
+together with other functions. Here is an example. Let's assume we have
+an Array of Array and want to extract only the maximum values of each inner
+Array.
+
+We could achive that easily with C<choose> that combines the idea of C<map>
+and C<filter>.
+
+    my $data = Array->new(
+        Array->range(10,100),
+        Array->new(50, 10, 16),
+        Array->new(100,1000),
+        Array->empty,
+        Array->new(1,2,3),
+        Array->new(3,2,1),
+    );
+
+    # [100, 50, 1000, 3, 3]
+    my $maxs = $data->choose(sub($array) { $array->max });
+
+Here you can see how nicely it all plays together. C<< $array->max >> returns
+an optional maximum value. The function C<choose> on the other hand expects
+that it's lambda function returns an Option and decides from it if it should
+pick that value or skip.
+
+Calling C<max> on an C<< Array->empty >> will return a B<None> value and finally
+that B<None> value will be skipped in the creation of C<$maxs>.
