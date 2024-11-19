@@ -1038,18 +1038,37 @@ sub sum_by($seq, $f) {
 # min value is compared with numerical <
 #
 # min : Seq<float> -> float -> float
-sub min($seq, $default) {
-    min_by($seq, \&Sq::id, $default);
+sub min($seq) {
+    my $min = undef;
+    iter($seq, sub($x) {
+        if ( defined $min ) {
+            $min = $x if $x < $min;
+        }
+        else {
+            $min = $x;
+        }
+    });
+    return Option::Some($min);
 }
 
-# min_by : Seq<a> -> ('a -> float) -> float -> float
-sub min_by($seq, $key, $default) {
-    return fold($seq, undef, sub($x,$min) {
-        my $value = $key->($x);
-        defined $min
-            ? ($value < $min) ? $value : $min
-            : $value;
-    }) // $default;
+# min_by : Seq<'a> -> ('a -> float) -> Option<'a>
+sub min_by($seq, $f_key) {
+    my $min     = undef;
+    my $min_key = undef;
+    iter($seq, sub($x) {
+        my $key     = $f_key->($x);
+        if ( defined $min ) {
+            if ( $key < $min_key ) {
+                $min     = $x;
+                $min_key = $key;
+            }
+        }
+        else {
+            $min     = $x;
+            $min_key = $key;
+        }
+    });
+    return Option::Some($min);
 }
 
 # returns the min value or $default on empty sequence
@@ -1070,21 +1089,29 @@ sub min_str_by($seq, $key, $default) {
     }) // $default;
 }
 
-# returns the max value or $default when sequence is empty
-#
 # max : Seq<float> -> float -> float
-sub max($seq, $default) {
-    max_by($seq, \&Sq::id, $default);
+sub max($seq) {
+    max_by($seq, \&Sq::id);
 }
 
 # max_by : Seq<'a> -> ('a -> float) -> float -> float
-sub max_by($seq, $key, $default) {
-    return fold($seq, undef, sub($x,$max) {
-        my $value = $key->($x);
-        defined $max
-            ? ($value > $max) ? $value : $max
-            : $value;
-    }) // $default;
+sub max_by($seq, $f_key) {
+    my $max     = undef;
+    my $max_key = undef;
+    iter($seq, sub($x) {
+        my $key = $f_key->($x);
+        if ( defined $max ) {
+            if ( $key > $max_key ) {
+                $max     = $x;
+                $max_key = $key;
+            }
+        }
+        else {
+            $max     = $x;
+            $max_key = $key;
+        }
+    });
+    return Option::Some($max);
 }
 
 # max_str : Seq<string> -> string -> string

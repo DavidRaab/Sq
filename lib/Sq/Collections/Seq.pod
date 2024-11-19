@@ -316,12 +316,6 @@ could be implemented this way.
         ->take(5)
         ->to_array;
 
-=head2 MISSING DOC
-
-Implemented, but not documented yet:
-
-from_list
-
 =head1 METHODS
 
 Implemented, but not documented yet:
@@ -732,6 +726,10 @@ Converts are normal methods that also can be called in a functional-style. They
 are called Converters because they usually transform a Sequence into something
 different than a sequence.
 
+Converters usually needs to iterate some or all values of a sequence to produce
+its output. Calling some of them on an infinite sequence can maybe cause unwanted
+problems.
+
 =head2 to_array($seq, $count=undef) : $array
 
 Converts the whole sequence into an array. This causes the sequence to compute
@@ -752,8 +750,7 @@ and then iterate through that array just use C<iter> instead.
 
 Concatenates all elements of a sequence to a string with C<$separator>.
 
-    # "foo-bar"
-    my $str = Seq->new("foo", "bar)->join(-);
+    my $str = Seq->new("foo", "bar)->join("-"); # "foo-bar"
 
 =head2 first($seq) : $opt
 
@@ -774,6 +771,30 @@ Returns last element of seq as an Option. Returns B<None> when the sequence is e
     my $opt = Seq->range(1,10)->last;       # Some(10)
     my $opt = Seq->empty      ->last;       # None
     my $x   = Seq->empty      ->last->or(0) # 0
+
+=head2 min($seq) : $opt_number
+
+Returns the smallest number in a sequence as an optional. When the sequence is empty
+a B<None> is returned.
+
+    my $opt = Seq->range(100,200)->min; # Some(100)
+    my $opt = Seq->empty->min;          # None
+
+=head2 min_by($seq, $f_key) : $opt_min
+
+TODO
+
+=head2 max($seq) : $opt_number
+
+Returns the maximum number in a sequence as an optional. When the sequence is empty
+a B<None> is returned.
+
+    my $opt = Seq->range(100,200)->max; # Some(200)
+    my $opt = Seq->empty->max;          # None
+
+=head2 max_by($seq, $f_key) : $opt_max
+
+TODO
 
 =head2 as_hash($seq) : $hash
 
