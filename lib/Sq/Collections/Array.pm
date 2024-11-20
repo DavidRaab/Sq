@@ -752,14 +752,11 @@ sub as_hash($array) {
     return CORE::bless({ @$array }, 'Hash');
 }
 
-# Applies $get_key to each array entry and put the entry into a hash
-# under the key. Entries with the same key overrides previous ones.
-#
 # Array<'a> -> ('a -> 'Key) -> Hash<'Key, 'a>
-sub keyed_by($array, $get_key) {
+sub keyed_by($array, $f_key) {
     my %hash;
     for my $x ( @$array ) {
-        $hash{$get_key->($x)} = $x;
+        $hash{$f_key->($x)} = $x;
     }
     return CORE::bless(\%hash, 'Hash');
 }
