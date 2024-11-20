@@ -1,0 +1,697 @@
+=head1 Moose Traits vs. Sq (Explicit language)
+
+Did you ever hear of the B<Law of Demeter> in object-orientation? Here
+is the idea behind it. Let's assume we have a class, and that class has
+a property named C<options>. This C<options> is an array.
+
+In procedural or functional programming we would just access that array
+and do whatever we wanna do with it. But somehow in object-orientation
+land people think this is bad. What you should instead do, that's what
+they are telling, is you should create B<methods> that modify that attribute.
+
+Let's see some Perl Code to understand better. We have that simple class.
+
+    package Stuff;
+    use 5.036;
+
+    sub new($class) {
+        return bless({options => []}, $class);
+    }
+
+    # getter
+    sub options($self) {
+        return $self->{options};
+    }
+
+With just that class we could do something like that.
+
+    my $stuff = Stuff->new;
+    push @{ $stuff->options }, 'whatever';
+
+we could get a reference to the Array, then push values onto it. But
+"B<proper>" object-orientation and the B<Law of Demeter> tells you, you
+shouldn't do that. So how do we solve the issue to add a new option to
+the C<options> field? Of course we need to write another method that does
+that.
+
+    sub add_option($self, @args) {
+        push @{ $stuff->options }, @args;
+    }
+
+Now with this method we finally can do.
+
+    $stuff->add_option('whatever', 'yes', 'no');
+
+But this kind of code is actually kind of silly to say at least. It basically
+just wraps our C<push ...> code we anyway could write into a method.
+
+You know what i think is funny? Object-orientation always tells you that it
+somehow delivers re-usable code, but it doesn't. This is just one example.
+Now for every array you have and you want to add a field you have to write
+the same method again and again.
+
+You have another field that is an array and you wanna be able to add something
+to it? Yeah, write that method again. Just with another name.
+
+    sub add_flag($self, @args) {
+        push @{ $stuff->flags }, @args;
+    }
+
+How often do you wanna write crap code like that? Maybe after your thousands
+object you created and thousands of such properties, maybe you finally will
+release how idiotic this kind of coding becomes.
+
+So, what is a better alternative? Well, i don't know if it is better, but in
+Perl we easily can create the methods through code. For example we could
+generate the following function, that returns such a method.
+
+    sub gen_push_array($field) {
+        return sub($self, @args) {
+            push @{ $self->{$field} }, @args;
+        }
+    }
+
+With such a function we now can write.
+
+    no warnings;
+    *add_option = gen_push_array('options');
+    *add_flag   = gen_push_array('flags');
+
+So the function C<gen_push_array> actually creates the method for us and
+when Perl's compilation stage ends it creates the methods for us by installing
+the methods to the symbol table.
+
+It reduces the code we have to write a lot. We still have to write a single
+line to add such a method, but this one line is better than always writing
+the whole method again and again, or not?
+
+When we are just pushing a value onto an array then it doesn't seems like
+a great win. But this rapidly will change once you have more complex logic.
+
+What is about sorting that array? Finding a value in that array? how about
+getting the minimum or maximum value? How about summing all values, iterating
+that array and so on.
+
+Do you always want to re-write the same logic again and again? Don't you have
+more important stuff todo as a programmer as writing those silly functions
+again and again?
+
+=head2 Moose to the Rescue?
+
+Now we could write our own library and put functions like C<gen_push_array>
+into it. Functions that when you call them create the apropiate methods for
+you. But we already have those libraries. C<Moose> is one of them.
+
+But before we delve into that, here is one important question you can think
+of. What is wrong about just having a utility library?
+
+Let's assume we want the minimum value of an array, we just can write.
+
+    sub min($array) {
+        my $min_so_far = undef;
+        for my $x ( @$array ) {
+            if ( defined $min_so_far ) {
+                $min_so_far = $x if $x < $min_so_far;
+            }
+            else {
+                $min_so_far = $x;
+            }
+        }
+    }
+
+when we want the minimum value of an array i now can write.
+
+    my $min = min( $object->method_arrayrref );
+
+why the hell do think object-oriented programmers think that this C<min>
+function must be part as some method on every damn object?
+
+    my $min = $object->min_method
+
+Just think clearly for a moment and forget all that OO superior bullshit you
+are wrongly teached.
+
+A procedural function like C<min> would be re-usable and you only have
+to implement it a single time. While in object-oriented land you basically
+have to write such a min function for every damn array field in every damn
+class you ever create.
+
+And while you do that. They are lying into your face and telling you
+how object-orientation helps in writing re-usable code. Re-usable my ass!
+
+Okay, let's go to B<Moose>. They way how B<Moose> "fixes" our problem is
+by giving you traits and creating delegate methods for you. It looks like
+this.
+
+    package Stuff;
+    use Moose;
+
+    has 'options' => (
+        traits  => ['Array'],
+        is      => 'ro',
+        isa     => 'ArrayRef[Str]',
+        default => sub { [] },
+        handles => {
+            all_options    => 'elements',
+            add_option     => 'push',
+            map_options    => 'map',
+            filter_options => 'grep',
+            find_option    => 'first',
+            get_option     => 'get',
+            join_options   => 'join',
+            count_options  => 'count',
+            has_options    => 'count',
+            has_no_options => 'is_empty',
+            sorted_options => 'sort',
+        },
+    );
+
+So what this code does is the following. It creates a class with the field
+C<options> that by default is an empty array. It also does a type checking
+of just accepting strings.
+
+Additionally it creates methods like C<add_option>, C<map_options>, C<filter_options>
+and so on as methods on C<Stuff>, so you don't have to write that crap again
+and again.
+
+You can use that C<Stuff> class like this.
+
+    my $stuff = Stuff->new;
+
+    $stuff->add_option('whatever', 'foo');
+    my $foo   = $stuff->get_option(1);
+    my @fs    = $stuff->filter_options(sub { m/\Af/ });
+    my $count = $stuff->count_options;
+
+Seems nice, now we don't need to at least rewrite that whole functions again
+and again.
+
+=head2 Doing it the Sq way
+
+So now let's look at how we work with C<Sq>. First of, we don't think in
+objects. We go back down at how Perl started, we think and divide things
+into data and code. We have code that operate on data. Data itself
+is just data. And because we are in Perl it's dynamic typed.
+
+Dynamic typing surely also has some drawbacks, but it also has some advantages
+as it let's us built data in a very clean way without thinking about the
+structure too much. We also can do multiple transformation steps with
+intermediate data representation until we reach our final representation,
+but forget about it here, this post is not about dynamic typing or static
+typing.
+
+So that C<Stuff> class will be represensetd like this in C<Sq>.
+
+    my $stuff = Hash->new(
+        options => Array->new,
+    );
+
+and voila, that's all. This code is very much just like writing.
+
+    my $stuff = {
+        options => [],
+    };
+
+So what does C<Hash> and C<Array> does? First of, they are just normal
+Perl Hashes and Arrays, you just can use them as a normal Perl Hash
+and Array, the typical idea that you shouldn't acces the internals
+of an object are not valid here.
+
+You are supposed to work with them like any Hash or Perl. So why is
+there are blessing added?
+
+The idea is simple. Let's go back to the C<min> example. Sq provides
+a function named C<Array::min>, and you can call this function in this
+way
+
+    my $opt_min = Array::min([1, 10, -3]); # Some(-3)
+
+As you can see it is basically just a helper function in the procedural
+way. C<min> is implemented once, no need to re-write it a thousand times.
+
+But Perls object orientation is unique that by adding a blessing to a package
+we basically can call it as a method. Now consider the following. While it looks
+object-oriented but it isn't. To it's core C<Sq> just uses Perl OO feature
+so you also can write.
+
+    my $opt_min = Array->new(1, 10, -3)->min; # Some(-3)
+
+It's just about having a better syntax that allows chaining operation.
+
+So let's go back to our C<Stuff> example. Here look at the comparison again.
+This is Moose.
+
+    my $stuff = Stuff->new;
+
+    $stuff->add_option('whatever', 'foo');
+    my $foo   = $stuff->get_option(1);                  # foo
+    my @fs    = $stuff->filter_options(sub { m/\Af/ });
+    my $count = $stuff->count_options;
+
+This is Sq.
+
+    my $stuff = Hash->new(
+        options => Array->new,
+    );
+
+    $stuff->{options}->push('whatever', 'foo');
+    my $foo    = $stuff->{options}[1];
+    my $fs     = $stuff->{options}->filter(sub($str) { $str =~ m/\Af/ });
+    my $length = $stuff->{options}->length;
+
+So what basically changes is
+
+    $stuff->add_option('whatever', 'foo');      # Moose
+    $stuff->{options}->push('whatever', 'foo'); # Sq
+
+So all it does is change from C<add_option> to a C<option_add> instead.
+
+But, there is one big difference. You don't need to install those delegates.
+Not only that, we don't even need to create a class. I mean to
+work with C<Stuff> and just the C<option> field we had to create a package
+and write nearly 20 lines of code just for the C<option> field.
+
+In C<Sq> all of it is done in 3 lines and no package/class is needed. And not
+only do you have the same advantages, it provides a lot more functions too!
+
+Here are just some functions/methods that are currently written for the
+Array package: all, any, append, map, bind, cartesian, blit, copy, count, as_hash,
+choose, distinct, sort, sort_by, min, max, filter, find, first, last, fold,
+iter, intersperse, index, join, mapi, zip, push, pop, pick, repeat, reduce,
+replicate, rev, skip, take, slice, split, sum, sum_by, windowed
+
+Those are not all functions, just to list the most important one. On top
+it also provides a lot of functions that helps in creating arrays in various
+ways. Those supposed to be called as constructors like C<< Array->new >>.
+We have: new, init, unfold, range, rage_step, replicate, concat
+
+=head2 Validation?
+
+One reason why we created methods in object-orientation was because of
+validation. In some sense and for Perl this meant we can add type-checking.
+
+And I don't think that fits Perl good. Look I absolutely like type-checking.
+This module is actually created and brings idea from B<F#> or in general
+B<ML> languages to Perl. But still it doesn't try to add type-checking.
+
+Why? Because if that is what you want, i guess you better use a language like
+B<F#>. Dynamic typing has it's benefits and this module tries to use those
+benefits and not trying to work against them.
+
+In Moose we add least had the ability to add some types, for example
+C<add_option> checks if everything we add is a C<string>. But this has it's
+price because this kind of type-checking happens whenever you call any
+method and is a runtime type-check.
+
+C<Sq> in the future will provide a function based type-checking simply based
+on predicates. That means you can create just a simple function that either
+returns a boolean value if some kind of data-structure fullfills a type, or
+don't.
+
+You are supposed to work with data. Transform your data as much you want
+and only after everything is done, you maybe check if whatever you created
+is valid. You don't try to type-check every damn modification, especially
+not when it implies a lot of cpu performance.
+
+Further down the road C<Sq> will provide an AOP (Aspect-Oriented-Programing)
+mechanism to add type-checking to function calls. That means you can add
+or remove type-checking at will.
+
+For example as long as you develop you can add the type-checking and ensure your
+code is correct and run your test-suite with it. But in production code when
+speed matters those type-checks are removed.
+
+=head2 Another Example
+
+Let's look at another example on why I think this programming model us superior.
+Here is some data. Can you guess what it is just from seeing the data?
+
+    my $album = Hash->new(
+        artist => 'Michael Jackson',
+        title  => 'Thriller',
+        tracks => Array->new(
+            Hash->new(title => "Wanna Be Startin’ Somethin", duration => 363),
+            Hash->new(title => "Baby Be Mine",               duration => 260),
+            Hash->new(title => "The Girl Is Mine",           duration => 242),
+            Hash->new(title => "Thriller",                   duration => 357),
+            Hash->new(title => "Beat It",                    duration => 258),
+            Hash->new(title => "Billie Jean",                duration => 294),
+            Hash->new(title => "Human Nature",               duration => 246),
+            Hash->new(title => "P.Y.T.",                     duration => 239),
+            Hash->new(title => "The Lady in My Life",        duration => 300),
+        ),
+    );
+
+Now let's assume i want to get the title with the maximum running time. I
+would write something like that.
+
+    my $opt_longest_track = $album->{tracks}->max_by(sub($track) {
+        $track->{duration}
+    });
+
+This just gives me the longest track as an optional value. What is an
+optional value you may ask? It's a value that contains the direct representation
+of either having a value or don't, but with methods on it. See L<Sq::Core::Option>
+for further information. I now could do the following.
+
+    $opt_longest_track->match(
+        None => sub {
+            printf "No longest Track found. No Tracks defined?\n";
+        },
+        Some => sub($track) {
+            printf "Longest track is %s with %d seconds",
+                $track->{title},
+                $track->{duration};
+        },
+    );
+
+Now consider the following. OO fanatics tells you that directly accessing C<tracks>
+is bad. So how would you get the longest Track from a album?
+
+I hope that class already implements that logic for you to access it. If not,
+maybe it implements iterating through that array? When you are the one
+who writes the class. Well than you have to implement at least a function
+that iterates through tracks or get the maximum. Maybe both.
+
+But again. Why the hell do you wanna do that? USE YOUR FUNCTION LANGUAGE
+FEATURES!!!
+
+So here is a next improvement. You know, in Perl we work a lot with hashes,
+one thing we often need is to select a key from a hash. And because C<Sq>
+heavily works with lambda it provides a helper function creating such functions.
+Here is what you also can write.
+
+    my $opt_longest_track = $album->{tracks}->max_by(sub($track) {
+        $track->{duration}
+    });
+
+    # with 'key' function
+    my $opt_longest_track = $album->{tracks}->max_by(key 'duration');
+
+In the above example I used C<match>. Actually C<match> is an expression
+and returns whatever those Some/None functions return. But it is also fine to just
+do some side-effects like printing. But let's assume you only want
+to execute some piece of code when you had some value, otherwise nothing
+should print. Then you can use C<iter> instead. The C<iter> here comes
+from C<Option::iter> as C<max_by> returns an C<Option> value.
+
+    $album->{tracks}->max_by(key 'duration')->iter(sub($track) {
+        printf "Longest track is %s with %d seconds",
+                $track->{title},
+                $track->{duration};
+    });
+
+This piece of code searches for the longest track, and if it found one,
+usually this is the case as long the array is not empty, then it will print it.
+Otherwise nothing will happen.
+
+=head2 Classes/Methods are bad
+
+You see what the biggest problem on classes or methods are? By default
+"proper good" OO tells you, you never should access data directly. It goes
+by the name B<encapsulation>. But this kind of thinking brings you into a
+corner that you only can do things that the class implemented for you.
+
+But what do you do if you want todo something that is not present/implemented
+by the class?
+
+You see, when you just have data, it is completly up to you whatever you
+want todo with your data. Having a great utility belt with hundreds of function
+on Hash/Array provides you with all kind of tasks you need todo.
+
+Let's say for comparison someone would have returned me C<Album> class
+but didn't provided me a proper iteration for the C<tracks> field nor a
+C<longest_track> method. Then how am i supposed to work with that object?
+
+At least some kind of iteration would be good, but you know, i don't want to
+speed writing a C<max> function to pick the longest track for the thousand
+time.
+
+Let's assume I am the one who have written the C<Album> class, usually I then
+write code at least for my needs. So what happens if I share my code and
+now someone needs a function for also getting the C<min> track?
+
+Do i really seriously have to write it again and again? Does it mean that
+whenever i create a class with an array field i better have to implement
+like 50 functions again and again for every damn field so hopefully everyone
+using my class can do whatever they need todo?
+
+Isn't that a real bad and completely inefficent way to write code? Can it
+get any more worse?
+
+By exposing data, and just data, and giving everyone full access to data you
+can assume the following.
+
+=over 4
+
+=item * Fast
+
+Accessing just data without method overhead. Calling a method is not for free
+even if that method literally does nothing. In the distribution there is
+a B<benchmarks/moose.pl> file you can look into and execute. The fastest
+getter/setter in pure Perl i could come up still was three times slower
+than just accessing a field in a hash directly.
+
+    $obj->title;
+    $obj->{title};
+
+So you basically just get 1/3 of the performance so you don't need to write
+those curly braces. Setting is even more worse.
+
+    $obj->title('whatever');
+    $obj->{title} = 'whatever';
+
+So setting means we replaced curly braces with parenthesis! Awesome! But at
+least Lisp people will like that! And everything just costs us 2/3 of
+performance and we have to use a big library with all kinds of code
+generation because otherwise we go insane writing the millionst getter/setter!
+
+=item * Re-Use
+
+By just exposing Array/Hash and providing methods/functions on it you get
+real re-use of code. No need to re-write the same old boring array/hash
+transformations or extraction functions you already have written a thousand
+times or maybe even more.
+
+=item * No Limitations
+
+By exposing the data directly with all of it's functionality I let whoever
+use that data do whatever they like to it. They can extract and transform
+everything as they like. And i don't have to care a single bit anymore in
+implementing all kinds of methods because Array/Hash already ships with
+the implementation. Let those people just use the data as they want. It's
+good for everyone!
+
+=back
+
+=head2 Disadvantages?
+
+Everything has its advantages and disadvantages. Exposing data directly,
+especially mutable data can have some problems.
+
+I don't think having invalid data in itself is so bad as people always claim,
+but this is maybe a topic on it's own. The Moose example had one advantage
+that it also checked for a string when we called C<add_option>. So only
+strings get added.
+
+By exposing data directly you don't have that ability anymore to do
+type-checking. For example someone could do
+
+    $album->{tracks}->push(Hash->new(foo => 1));
+
+Someone just can add a silly hash like C<{foo => 1}> that doesn't really
+represent a Track. Is that a problem?
+
+Yes and no.
+
+Yes i can write code, return data that represent an album and someone else
+can put garbage in it. It's possible but. Why should i care? If people wanna
+do stupid things just let them do that. It's not my problem when they invalidate
+that data!
+
+Maybe it also can have some reason why they put that into it? I mean maybe after
+I returned my data a user does some transformation on it. Should i prohibit
+as a programmer that he can do that? Why should I?
+
+As a user of your own system all you usually need is just a function that helps
+you in the creation of your hashes. If you need type-checking, just add a function!
+
+    sub track($title, $duration) {
+        return Hash->new(
+            title    => $title,
+            duration => $duration,
+        );
+    }
+
+When you want to add some more type checking. Fine! Do whatever you want.
+You don't need more than a function to add this. But still consider that
+C<track> just returns a Hash that allows you to freely change or modify
+its data. Why should it be a problem? It doesn't have to be a C<Track> class
+with poor functionality!
+
+Another way in how it is usually resolved is to sticking to B<immutable> data
+instead. This means once data is created, you cannot modify it anymore. Any
+modification returns new data.
+
+In some sense C<Sq> is written in that way, because most function you write
+create new data instead of modifying it's data. Even when Array or Hash
+are mutable you use them like you do immutable programming.
+
+But again. The above shows one problem. It's too much the way of object
+thinking. Why even create a C<track> function. Why not directly create a
+C<add_track> function that expects an C<$album> as a whole?
+
+    sub add_track($album, $title, $duration) {
+        $album->push(tracks => Hash->new(
+            title    => $title,
+            duration => $duration,
+        ));
+    }
+
+    add_track($album, 'Bonus Track', 240);
+
+Stop thinking in the small and trying to make every field its own object,
+consider the whole data-structure, no matter how deep that structure is with
+hashes/arrays, as a whole unit that gets modified.
+
+This way you come up with useful functions that really saves you time.
+Don't do
+
+    add_track($album, track('Bonus Track', 240));
+
+Even if that is also totally fine sometimes! But here it doesn't really makes
+sense. A single B<Track> is not something that really exists on its own, its
+part of an B<Album>.
+
+Maybe you need the total runtime of an album?
+
+    sub album_total_runtime($album) {
+        return $album->{tracks}->sum_by(key 'duration');
+    }
+
+    my $total_time = album_total_runtime($album);
+
+Sure C<Sq> also can come with speed penality. Even when I think that it usually
+will outperform any kind of OO module it still has some overhead. It
+heavily rely on creating lambdas all over the place and also expecting
+and calling lambda functions. Calling functions is not for free!
+
+As you can see in the B<moose.pl> benchmark you already loose 2/3 of performance
+just because you use a getter/setter to access a hash field!
+
+So what do you do when you encounter performance problems? Well you always
+can rewrite those functions in a pure perl version. In profiling
+you measured that C<album_total_runtime> causes most problems? No problem
+just rewrite it!
+
+    sub album_total_runtime($album) {
+        my $sum = 0;
+        for my $track ( @{ $album->{tracks} } ) {
+            $sum += $track->{duration};
+        }
+        return $sum;
+    }
+
+The very fact that we threat C<$album> just as pure data and we always have
+access to everything is also the reason why we can do that kind of approach!
+
+It's also up to you how much C<Sq> you wanna use. We also can write.
+
+    sub album_total_runtime($album) {
+        return $album->get('tracks')->map(sub($tracks) {
+            my $sum = 0;
+            for my $track ( @$tracks ) {
+                $sum += $track->{duration};
+            }
+            return $sum;
+        })->or(0);
+    }
+
+The C<Hash::get> function we call on C<$album> returns the field as an
+optional. That means we either get B<Some value> with the value in it,
+or it turns B<None> when the key C<tracks> in the Hash does not exists
+or is not defined.
+
+It then calls C<Option::map> on that result. Either executing our sum
+function when we have C<$tracks> or don't. The final C<< ->or(0) >> call
+comes from C<Option::or> and either returns the calculated sum or C<0> when
+we had no C<tracks> field.
+
+But the crucial loop that actually creates the most performance impact is
+written without overhead. The above code translates to.
+
+    sub album_total_runtime($album) {
+        my $sum = 0;
+        if ( defined $album->{tracks} ) {
+            for my $track ( @{ $album->{tracks} } ) {
+                $sum += $track->{duration};
+            }
+        }
+        return $sum;
+    }
+
+=head2 Getter/Setters are bad
+
+But you know which lesson I have learned the most through all kinds of
+languages and using typical OO code?
+
+That all kinds of getters/setters are bad. Usually in OO they tell you
+that it is good. When you have that getter/setter you can just do
+that B<one additional thing> while you get/set it.
+
+Oh gosh, and you know what. Whenever that happens and a getter/setter does
+more than just getting or setting a variable, it ALWAYS CAUSES PROBLEMS!
+
+You just think you retrieve that one thing, or set one kind of field, but
+not it does not.
+
+Suddenly a callback is called, some kind of other hidden piece of data is changed.
+Maybe you call a getter and think you just retrieve a field, but no, instead
+it just calculates a whole value again and again whenever you call it and you
+don't have a fucking clue that it does that!
+
+I mean look at C<Moose>. When you create classes with C<Moose> what do you
+do 99% percent of the time with those getters/setters? Right you do absolute
+nothing. You just use it as a convenience way so you don't need to write
+the C<new> method and just use every field to just set/get the value,
+you maybe like it that it does some basic type validation. And that's it.
+
+But again, why? Most of the time classes are just wrappers around hashes.
+And those getters/setters are just functions to get and set a value in a
+hash, that's it. But it comes at a high price you pay just you can
+maybe type two characters less. Remember
+
+    my $time = $obj ->time;
+    my $time = $hash->{time};
+
+One reason why we used classes in Perl is because its dynamic typing nature
+of a Hash on how Perl works it is prone to typing errors. Let's assume we
+would have written. C<ttime> instead of C<time>.
+
+    my $time = $obj ->ttime;   # throws exception
+    my $time = $hash->{ttime}; # returns undef
+
+Yeah, i get it. In that case it is really good that we get an exception,
+because what we have hear is basically a programming error. We try to
+access a field that doesn't exists.
+
+It's like not using C<use strict> and suddenly every variable you use
+that was not defined is not even an error anymore. Horrible. But Python
+developers will tell you it's not a problem.
+
+But do you know that Perl added something like B<restricted hashes> since
+Perl 5.8? You actually can restrict a Hash to certain kinds of keys. So
+whenever you try to read/write a key that is not allowed it throws an exception.
+In L<Hash::Util> you will find those functions to restrict a hash. Also those
+abilities are built into C<Sq>. You can write.
+
+    my $hash = Hash->new(
+        title    => 'whatever',
+        duration => 1,
+    )->lock;
+
+    my $title = $hash->{tile}; # throws exception
+
+The C<Hash::lock> method restricts the Hash to its current fields. So only
+getting or setting C<title> or C<duration> is now allowed. Everything else
+turns into an exception.
