@@ -1,3 +1,5 @@
+=encoding UTF-8
+
 =head1 Moose Traits vs. Sq (Explicit language)
 
 Did you ever hear of the B<Law of Demeter> in object-orientation? Here
@@ -342,7 +344,7 @@ Here is some data. Can you guess what it is just from seeing the data?
         ),
     );
 
-Now let's assume i want to get the title with the maximum running time. I
+Now let's assume i want to get the track with the maximum running time. I
 would write something like that.
 
     my $opt_longest_track = $album->{tracks}->max_by(sub($track) {
@@ -373,7 +375,7 @@ maybe it implements iterating through that array? When you are the one
 who writes the class. Well than you have to implement at least a function
 that iterates through tracks or get the maximum. Maybe both.
 
-But again. Why the hell do you wanna do that? USE YOUR FUNCTION LANGUAGE
+But again. Why the hell do you wanna do that? USE YOUR FUCKING LANGUAGE
 FEATURES!!!
 
 So here is a next improvement. You know, in Perl we work a lot with hashes,
@@ -424,8 +426,7 @@ but didn't provided me a proper iteration for the C<tracks> field nor a
 C<longest_track> method. Then how am i supposed to work with that object?
 
 At least some kind of iteration would be good, but you know, i don't want to
-speed writing a C<max> function to pick the longest track for the thousand
-time.
+write a C<max> function to pick the longest track for the thousand time.
 
 Let's assume I am the one who have written the C<Album> class, usually I then
 write code at least for my needs. So what happens if I share my code and
@@ -499,7 +500,7 @@ type-checking. For example someone could do
 
     $album->{tracks}->push(Hash->new(foo => 1));
 
-Someone just can add a silly hash like C<{foo => 1}> that doesn't really
+Someone just can add a silly hash like C<< {foo => 1} >> that doesn't really
 represent a Track. Is that a problem?
 
 Yes and no.
@@ -535,7 +536,9 @@ modification returns new data.
 
 In some sense C<Sq> is written in that way, because most function you write
 create new data instead of modifying it's data. Even when Array or Hash
-are mutable you use them like you do immutable programming.
+are mutable you use them like you do in immutable programming. The idea
+is that you built up data, even in a mutable way, and once done you usually
+don't change them anymore.
 
 But again. The above shows one problem. It's too much the way of object
 thinking. Why even create a C<track> function. Why not directly create a
@@ -609,7 +612,7 @@ It's also up to you how much C<Sq> you wanna use. We also can write.
 
 The C<Hash::get> function we call on C<$album> returns the field as an
 optional. That means we either get B<Some value> with the value in it,
-or it turns B<None> when the key C<tracks> in the Hash does not exists
+or it returns B<None> when the key C<tracks> in the Hash does not exists
 or is not defined.
 
 It then calls C<Option::map> on that result. Either executing our sum
@@ -643,12 +646,13 @@ Oh gosh, and you know what. Whenever that happens and a getter/setter does
 more than just getting or setting a variable, it ALWAYS CAUSES PROBLEMS!
 
 You just think you retrieve that one thing, or set one kind of field, but
-not it does not.
+noooooo it does not.
 
 Suddenly a callback is called, some kind of other hidden piece of data is changed.
 Maybe you call a getter and think you just retrieve a field, but no, instead
-it just calculates a whole value again and again whenever you call it and you
-don't have a fucking clue that it does that!
+it just calculates a whole value again and again whenever you call it
+causing serious performance issues and you don't have a fucking clue that it
+does that!
 
 I mean look at C<Moose>. When you create classes with C<Moose> what do you
 do 99% percent of the time with those getters/setters? Right you do absolute
@@ -675,9 +679,10 @@ Yeah, i get it. In that case it is really good that we get an exception,
 because what we have hear is basically a programming error. We try to
 access a field that doesn't exists.
 
-It's like not using C<use strict> and suddenly every variable you use
-that was not defined is not even an error anymore. Horrible. But Python
-developers will tell you it's not a problem.
+It's like not using C<use strict> and suddenly every variable you not
+explicitly define is not even an error anymore. Horrible. But Python
+developers that have that mantra about explicit is better than implicit
+will tell you that this is not a problem.
 
 But do you know that Perl added something like B<restricted hashes> since
 Perl 5.8? You actually can restrict a Hash to certain kinds of keys. So
