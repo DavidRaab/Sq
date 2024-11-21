@@ -367,4 +367,38 @@ sub delete($hash, $key, @keys) {
     return;
 }
 
+sub dump($hash, $depth = 0) {
+    state $quote = sub($str) {
+        $str =~ s/\r/\\r/;
+        $str =~ s/\n/\\n/;
+        $str =~ s/\t/\\t/;
+        $str;
+    };
+
+    my $str = "{\n";
+    for my $key ( sort { $a cmp $b } CORE::keys %$hash ) {
+        my $indent = " " x ($depth + 2);
+        my $value  = $hash->{$key};
+        my $type   = ref $value;
+        if ( Sq::is_num($value) ) {
+            $str .= $indent . sprintf "%s => %f,\n", $key, $value;
+        }
+        elsif ( Sq::is_str($value) ) {
+            $str .= $indent . sprintf "%s => \"%s\",\n", $key, $quote->($value);
+        }
+        elsif ( $type eq 'Hash'  || $type eq 'HASH' ) {
+            $str .= $indent . sprintf "%s => %s,\n", $key, Hash::dump($value, $depth+2);
+        }
+        elsif ( $type eq 'Array' || $type eq 'ARRAY' ) {
+            $str .= $indent . sprintf "%s => %s,\n", $key, Array::dump($value, $depth+2);
+        }
+        else {
+            $str .= $indent . sprintf "%s => NOT_IMPLEMENTED,\n", $key;
+        }
+    }
+    $str =~ s/,\n\z/\n/;
+    $str .= (" " x $depth) . "}";
+    return $str;
+}
+
 1;

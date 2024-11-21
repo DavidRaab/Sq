@@ -820,6 +820,18 @@ array, than again C<$array> is just being returned as-is.
 If you really want to create a copy of an Array use C<copy>. If you
 want to extract a portion of an array into a new Array use C<slice>.
 
+=head2 dump($array, $depth=0) : $str
+
+Recursivly traverses data-structures and creates a human readable dump from it.
+
+Currently it is not perfect. It only works with Perl Array/Hash and Sq Array/Hash.
+Sq Array/Hash are just dumped as normal Perl Array/Hash. No other object is
+being dumped. It also does not dump any other object and has no configuration.
+Also doesn't detect cyclic data-structures. But for most "practical" data-structures
+it works good enough at the moment. Get's improved in the future.
+
+    printf "%s\n", $array->dump;
+
 =head1 MUTATION
 
 The following methods mutate the array instead of creating a new one.

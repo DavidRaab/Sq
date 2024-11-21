@@ -860,4 +860,37 @@ sub unshift($array, @values) {
     return;
 }
 
+sub dump($array, $depth = 0) {
+    state $quote = sub($str) {
+        $str =~ s/\r/\\r/;
+        $str =~ s/\n/\\n/;
+        $str =~ s/\t/\\t/;
+        $str;
+    };
+
+    my $str = "[\n";
+    for my $x ( @$array ) {
+        my $indent = " " x ($depth + 2);
+        my $type   = ref $x;
+        if ( Sq::is_num($x) ) {
+            $str .= $indent . sprintf "%f,\n", $x;
+        }
+        elsif ( Sq::is_str($x) ) {
+            $str .= $indent . sprintf "%s,\n", $quote->($x);
+        }
+        elsif ( $type eq 'Hash' || $type eq 'HASH' ) {
+            $str .= $indent . Hash::dump($x, $depth+2) . ",\n";
+        }
+        elsif ( $type eq 'Array' || $type eq 'ARRAY' ) {
+            $str .= $indent . Array::dump($x, $depth+2) . ",\n";
+        }
+        else {
+            $str .= $indent . sprintf "NOT_IMPLEMENTED,\n";
+        }
+    }
+    $str =~ s/,\n\z/\n/;
+    $str .= (" " x $depth) . "]";
+    return $str;
+}
+
 1;
