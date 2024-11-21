@@ -277,15 +277,15 @@ In C<Sq> all of it is done in 3 lines and no package/class is needed. And not
 only do you have the same advantages, it provides a lot more functions too!
 
 Here are just some functions/methods that are currently written for the
-Array package: all, any, append, map, bind, cartesian, blit, copy, count, as_hash,
+Array package: B<all, any, append, map, bind, cartesian, blit, copy, count, as_hash,
 choose, distinct, sort, sort_by, min, max, filter, find, first, last, fold,
 iter, intersperse, index, join, mapi, zip, push, pop, pick, repeat, reduce,
-replicate, rev, skip, take, slice, split, sum, sum_by, windowed
+rev, skip, take, slice, split, sum, sum_by, windowed>
 
 Those are not all functions, just to list the most important one. On top
 it also provides a lot of functions that helps in creating arrays in various
 ways. Those supposed to be called as constructors like C<< Array->new >>.
-We have: new, init, unfold, range, rage_step, replicate, concat
+We have: B<new, init, unfold, range, range_step, replicate, concat>
 
 =head2 Validation?
 
