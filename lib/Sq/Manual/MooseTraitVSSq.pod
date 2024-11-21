@@ -747,7 +747,7 @@ Maybe you wanna have a better representation of that?
 
     sub seconds_to_str($seconds) {
         my $minutes = int ($seconds / 60);
-        $seconds = $seconds - ($minutes * 60);
+           $seconds = $seconds - ($minutes * 60);
         sprintf "%02d:%02d", $minutes, $seconds;
     }
 
