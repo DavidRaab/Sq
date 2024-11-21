@@ -774,14 +774,14 @@ Okay, this example is a little bit made up. Because, why should you change
 that value when you have a function like C<seconds_to_str> to just compute
 the value?
 
-But there exists cases where this is helpfull especially when we iterate a
-certain kind of data-structure multiple times. Then we only need to compute
+But there are cases where this is helpfull, like when we iterate a
+certain kind of data-structure multiple times, then we only need to compute
 the value once.
 
 What you see here is also the abilities C<Sq> offers when working with Hashes.
 In this case we mutated the Hash, but we also can easily get a whole
-new C<$album> value with all our changes applies without changing
-C<$album>
+new C<$album> value with all our changes applied without changing
+C<$album>.
 
     my $update =
         $album->withf(tracks => sub($tracks) {
@@ -804,7 +804,7 @@ the current C<$track>. Here again on C<$track> we select C<duration>
 with C<withf> to just change the duration and create a new Hash.
 
 Now C<$update> has all changes applied without that C<$album> got modified!
-It is up to you when you want to create new values or mutate objects.
+It is up to you when you want to create new values or mutate data.
 
 Sure in a static typed language you could create a new type representing
 your new data structure. And doing this kind of immutable transformation is
