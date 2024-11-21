@@ -292,9 +292,13 @@ We have: B<new, init, unfold, range, range_step, replicate, concat>
 One reason why we created methods in object-orientation was because of
 validation. In some sense and for Perl this meant we can add type-checking.
 
-And I don't think that fits Perl good. Look I absolutely like type-checking.
-This module is actually created and brings idea from B<F#> or in general
-B<ML> languages to Perl. But still it doesn't try to add type-checking.
+And I don't think that fits Perl good. Look I absolutely like types in general,
+as I like working with F#. They have they benefits and sometimes they are also
+annoying.
+
+With C<Sq> i actually try to bring ideas from B<F#> or in general B<ML>
+languages to Perl that heavily rely on types. But still I don't try to add
+type-checking (everywhere) or the idea of fixed data-structures.
 
 Why? Because if that is what you want, i guess you better use a language like
 B<F#>. Dynamic typing has it's benefits and this module tries to use those
@@ -305,10 +309,20 @@ C<add_option> checks if everything we add is a C<string>. But this has it's
 price because this kind of type-checking happens whenever you call any
 method and is a runtime type-check.
 
+Consider that the typical type-checking a static typed language has happens
+at compilation time, not at runtime. That is what B<static> actually means.
+So those languages have type-checking at the compilation step but those are
+removed when the program runs. That's one reason why those languages are faster.
+
+But you can see why adding runtime type checks into a language like Perl
+that has no separated heavily optimized compiler steps or a Just-in-Time
+compiler to optimize further is maybe not the best idea?
+
 C<Sq> in the future will provide a function based type-checking simply based
 on predicates. That means you can create just a simple function that either
 returns a boolean value if some kind of data-structure fullfills a type, or
-don't.
+don't. But this kind of type-checking leads to a different way on how you
+work and build things.
 
 You are supposed to work with data. Transform your data as much you want
 and only after everything is done, you maybe check if whatever you created
@@ -319,13 +333,14 @@ Further down the road C<Sq> will provide an AOP (Aspect-Oriented-Programing)
 mechanism to add type-checking to function calls. That means you can add
 or remove type-checking at will.
 
-For example as long as you develop you can add the type-checking and ensure your
+For example as long as you develope you can add the type-checking and ensure your
 code is correct and run your test-suite with it. But in production code when
-speed matters those type-checks are removed.
+speed matters those type-checks are removed. Very much like a B<static> compiled
+language.
 
 =head2 Another Example
 
-Let's look at another example on why I think this programming model us superior.
+Let's look at another example on why I think this programming model is superior.
 Here is some data. Can you guess what it is just from seeing the data?
 
     my $album = Hash->new(
@@ -640,43 +655,42 @@ languages and using typical OO code?
 
 That all kinds of getters/setters are bad. Usually in OO they tell you
 that it is good. When you have that getter/setter you can just do
-that B<one additional thing> while you get/set it.
+that B<one additional thing> while you get/set a value.
 
-Oh gosh, and you know what. Whenever that happens and a getter/setter does
-more than just getting or setting a variable, it ALWAYS CAUSES PROBLEMS!
-
-You just think you retrieve that one thing, or set one kind of field, but
+Oh gosh, and you know what? Whenever that happens and a getter/setter does
+more than just getting or setting a variable, it ALWAYS CAUSES PROBLEMS! You
+just think you retrieve that one thing, or set one kind of field, but
 noooooo it does not.
 
 Suddenly a callback is called, some kind of other hidden piece of data is changed.
 Maybe you call a getter and think you just retrieve a field, but no, instead
 it just calculates a whole value again and again whenever you call it
 causing serious performance issues and you don't have a fucking clue that it
-does that!
+does that because you think it is just a stupid getter!
 
-I mean look at C<Moose>. When you create classes with C<Moose> what do you
-do 99% percent of the time with those getters/setters? Right you do absolute
-nothing. You just use it as a convenience way so you don't need to write
-the C<new> method and just use every field to just set/get the value,
-you maybe like it that it does some basic type validation. And that's it.
+I mean look at C<Moose>. When you create classes with C<Moose> what do 99% of
+your field do you create? I guess not much, you just set a field to either 'ro'
+or 'rw' and maybe add a type constraint. That's what 99% of your fields look
+like. Moose is just there because it's a pain to always write the full
+C<new> and all the getters/setters yourself!
 
-But again, why? Most of the time classes are just wrappers around hashes.
-And those getters/setters are just functions to get and set a value in a
-hash, that's it. But it comes at a high price you pay just you can
-maybe type two characters less. Remember
+But again, why bother with getter/setters? Most of the time classes are just
+wrappers around hashes. And those getters/setters are just functions to get
+and set a value in a hash, that's it. But it comes at a high price you pay so
+you can maybe type two characters less. Remember.
 
     my $time = $obj ->time;
     my $time = $hash->{time};
 
 One reason why we used classes in Perl is because its dynamic typing nature
-of a Hash on how Perl works it is prone to typing errors. Let's assume we
+of a Hash and how Perl works is prone to typing errors. Let's assume we
 would have written. C<ttime> instead of C<time>.
 
     my $time = $obj ->ttime;   # throws exception
     my $time = $hash->{ttime}; # returns undef
 
 Yeah, i get it. In that case it is really good that we get an exception,
-because what we have hear is basically a programming error. We try to
+because what we have here is basically a programming error. We try to
 access a field that doesn't exists.
 
 It's like not using C<use strict> and suddenly every variable you not
@@ -700,3 +714,101 @@ abilities are built into C<Sq>. You can write.
 The C<Hash::lock> method restricts the Hash to its current fields. So only
 getting or setting C<title> or C<duration> is now allowed. Everything else
 turns into an exception.
+
+=head2 Dynamic Typing
+
+Let's go quickly about some advantages you can do in a dynamic-typed language.
+Something you can do when you just treat data as data. Consider our Album again.
+
+Somewhere we have written code and we call
+
+    my $album = $whatever->search("Michael Jackson Thriller");
+
+and the result we get is our data-structure we had above.
+
+    my $album = Hash->new(
+        artist => 'Michael Jackson',
+        title  => 'Thriller',
+        tracks => Array->new(
+            Hash->new(title => "Wanna Be Startin’ Somethin", duration => 363),
+            Hash->new(title => "Baby Be Mine",               duration => 260),
+            Hash->new(title => "The Girl Is Mine",           duration => 242),
+            Hash->new(title => "Thriller",                   duration => 357),
+            Hash->new(title => "Beat It",                    duration => 258),
+            Hash->new(title => "Billie Jean",                duration => 294),
+            Hash->new(title => "Human Nature",               duration => 246),
+            Hash->new(title => "P.Y.T.",                     duration => 239),
+            Hash->new(title => "The Lady in My Life",        duration => 300),
+        ),
+    );
+
+But you know, just working with the duration as seconds is not the best way.
+Maybe you wanna have a better representation of that?
+
+    sub seconds_to_str($seconds) {
+        my $minutes = int ($seconds / 60);
+        $seconds = $seconds - ($minutes * 60);
+        sprintf "%02d:%02d", $minutes, $seconds;
+    }
+
+    $album->on(tracks => sub($tracks) {
+        for my $track ( @$tracks ) {
+            my $dur = $track->{duration};
+            $track->{duration} = Hash->new(
+                seconds   => $dur,
+                as_string => seconds_to_str($dur),
+            );
+        }
+    });
+
+This is something that is basically not possible in a static typed language.
+We just iterate through the C<tracks> array and changing the duration
+field.
+
+We replace every duration with a new Hash that now contains two pieces of
+information. For example a C<< duration => 240 >> now turns into.
+
+    { seconds => 240, as_string => '04:03' }
+
+Okay, this example is a little bit made up. Because, why should you change
+that value when you have a function like C<seconds_to_str> to just compute
+the value?
+
+But there exists cases where this is helpfull especially when we iterate a
+certain kind of data-structure multiple times. Then we only need to compute
+the value once.
+
+What you see here is also the abilities C<Sq> offers when working with Hashes.
+In this case we mutated the Hash, but we also can easily get a whole
+new C<$album> value with all our changes applies without changing
+C<$album>
+
+    my $update =
+        $album->withf(tracks => sub($tracks) {
+            $tracks->map(sub($track) {
+                $track->withf(duration => sub($dur) {
+                    Hash->new(
+                        seconds   => $dur,
+                        as_string => seconds_to_str($dur),
+                    );
+                });
+            });
+        });
+
+C<withf> is a function that allows us to create a copy of a hash with
+some fields changed. On C<$album> we select C<tracks> field to change
+and pass it a function that computes a new value from the current one.
+
+Then we just call C<< $tracks->map >> and create a new Array by using
+the current C<$track>. Here again on C<$track> we select C<duration>
+with C<withf> to just change the duration and create a new Hash.
+
+Now C<$update> has all changes applied without that C<$album> got modified!
+It is up to you when you want to create new values or mutate objects.
+
+Sure in a static typed language you could create a new type representing
+your new data structure. And doing this kind of immutable transformation is
+also very easy in a ML-like language like F#. But the direct in-place mutation
+is not really possible. Consider that while you do a mutation
+there is a time when some C<duration> fields will contain just an C<int>
+while other are already updated with a C<Hash>.
