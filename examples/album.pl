@@ -22,22 +22,7 @@ my $album = Hash->new(
         Hash->new(title => "P.Y.T.",                     duration => 239),
         Hash->new(title => "The Lady in My Life",        duration => 300),
     ),
-    bonus  => "with\nnewline",
-    opt1 => Some(10),
-    opt2 => None,
-    opt3 => Some([]),
-    opt4 => Some({}),
-    opt5 => Some([
-        [qw/a b c/],
-        {
-            foo => [
-                Some(1), Some(2), Some({
-                    what => [qw/cool and blue/]
-                })
-            ]
-        }
-    ]),
-    opt6 => Some("text"),
+
 );
 
 my $update =
