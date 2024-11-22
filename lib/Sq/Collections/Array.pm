@@ -895,13 +895,13 @@ sub dump($array, $inline=60, $depth=0) {
         my $indent = " " x ($depth + 2);
         my $type   = ref $x;
         if ( Sq::is_num($x) ) {
-            $str .= $indent . sprintf "%f,\n", $x;
+            $str .= $indent . $x . ",\n";
         }
         elsif ( Sq::is_str($x) ) {
             $str .= $indent . sprintf "\"%s\",\n", $quote->($x);
         }
         elsif ( $type eq 'Option' ) {
-            $str .= $indent . sprintf "%s,\n", $compact->($inline, Option::dump($x, $inline, $depth+2));
+            $str .= $indent . $compact->($inline, Option::dump($x, $inline, $depth+2)) . ",\n";
         }
         elsif ( $type eq 'Hash' || $type eq 'HASH' ) {
             $str .= $indent . $compact->($inline, Hash::dump($x, $inline, $depth+2)) . ",\n";

@@ -403,7 +403,7 @@ sub dump($hash, $inline=60, $depth=0) {
         my $value  = $hash->{$key};
         my $type   = ref $value;
         if ( Sq::is_num($value) ) {
-            $str .= $indent . sprintf "%s => %f,\n", $key, $value;
+            $str .= $indent . sprintf "%s => %s,\n", $key, $value;
         }
         elsif ( Sq::is_str($value) ) {
             $str .= $indent . sprintf "%s => \"%s\",\n", $key, $quote->($value);

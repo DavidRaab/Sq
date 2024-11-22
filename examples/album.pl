@@ -53,4 +53,4 @@ my $update =
     });
 
 printf "Album:\n%s\n",  $album->dump();
-printf "Update:\n%s\n", $update->dump(80);
+printf "Update:\n%s\n", $update->dump(100);
