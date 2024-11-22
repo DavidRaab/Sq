@@ -820,15 +820,19 @@ array, than again C<$array> is just being returned as-is.
 If you really want to create a copy of an Array use C<copy>. If you
 want to extract a portion of an array into a new Array use C<slice>.
 
-=head2 dump($array, $depth=0) : $str
+=head2 dump($array, $inline=60, $depth=0) : $str
 
 Recursivly traverses data-structures and creates a human readable dump from it.
 
-Currently it is not perfect. It only works with Perl Array/Hash and Sq Array/Hash.
-Sq Array/Hash are just dumped as normal Perl Array/Hash. No other object is
-being dumped. It also does not dump any other object and has no configuration.
-Also doesn't detect cyclic data-structures. But for most "practical" data-structures
-it works good enough at the moment. Get's improved in the future.
+C<$inline> controls the amount of characters a data-structure is completely
+inlined into a single string without newlines. The higher the number the more
+compact your dump will be.
+
+Currently it is not perfect. It only works with Perl Array/Hash and Sq Array/Hash
+and the Option type. Sq Array/Hash are just dumped as normal Perl Array/Hash. No
+other object is being dumped. It also does not dump any other object and has no
+configuration. Also doesn't detect cyclic data-structures. But for most I<practical>
+data-structures it works good enough at the moment. Get's improved in the future.
 
     printf "%s\n", $array->dump;
 

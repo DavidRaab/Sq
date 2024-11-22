@@ -251,24 +251,60 @@ sub filter_valid_by($, $array, $f) {
     return $new;
 }
 
-sub _data_printer {
-    my ($opt, $ddp) = @_;
+sub dump($opt, $inline=60, $depth=0) {
+    state $quote = sub($str) {
+        $str =~ s/\r/\\r/;
+        $str =~ s/\n/\\n/;
+        $str =~ s/\t/\\t/;
+        $str;
+    };
+    state $compact = sub($max, $str) {
+        my $no_ws = $str =~ s/\s+//gr;
+        if ( CORE::length $no_ws < $max ) {
+            my $indent = 0;
+            if ( $str =~ m/\A(\s+)/ ) {
+                $indent = CORE::length $1;
+            }
+            $str =~ s/\A\s+//;
+            $str =~ s/\s+/ /g;
+            $str = (" " x $indent) . $str;
+        }
+        $str = '[]' if $str =~ m/\A\s*\[\s*\]\z/;
+        $str = '{}' if $str =~ m/\A\s*\{\s*\}\z/;
+        return $str;
+    };
+
+    my $str = "";
     if ( @$opt ) {
-        if ( ref $opt->[0] ) {
-            return 'Some(' . Data::Printer::np($opt->[0]) . ')';
+        $str = 'Some(';
+
+        my $x    = $opt->[0];
+        my $type = ref $x;
+        if ( Sq::is_num($x) ) {
+            $str .= $x;
+        }
+        elsif ( Sq::is_str($x) ) {
+            $str .= '"' . $quote->($x) . '"';
+        }
+        elsif ( $type eq 'Option' ) {
+            $str .= $compact->($inline, Option::dump($x, $inline, $depth+2));
+        }
+        elsif ( $type eq 'Hash' || $type eq 'HASH' ) {
+            $str .= $compact->($inline, Hash::dump($x, $inline, $depth+2));
+        }
+        elsif ( $type eq 'Array' || $type eq 'ARRAY' ) {
+            $str .= $compact->($inline, Array::dump($x, $inline, $depth+2));
         }
         else {
-            if ( Sq::is_num($opt->[0]) ) {
-                return 'Some(' . $opt->[0] . ')';
-            }
-            else {
-                return 'Some("' . quotemeta($opt->[0]) . '")';
-            }
+            $str .= "NOT_IMPLEMENTED";
         }
+
+        $str .= ')';
     }
     else {
-        return 'None';
+        $str = 'None';
     }
+    return $compact->($inline, $str);
 }
 
 1;

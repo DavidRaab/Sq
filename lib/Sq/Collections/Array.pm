@@ -860,12 +860,27 @@ sub unshift($array, @values) {
     return;
 }
 
-sub dump($array, $depth = 0) {
+sub dump($array, $inline=60, $depth=0) {
     state $quote = sub($str) {
         $str =~ s/\r/\\r/;
         $str =~ s/\n/\\n/;
         $str =~ s/\t/\\t/;
         $str;
+    };
+    state $compact = sub($max, $str) {
+        my $no_ws = $str =~ s/\s+//gr;
+        if ( CORE::length $no_ws < $max ) {
+            my $indent = 0;
+            if ( $str =~ m/\A(\s+)/ ) {
+                $indent = CORE::length $1;
+            }
+            $str =~ s/\A\s+//;
+            $str =~ s/\s+/ /g;
+            $str = (" " x $indent) . $str;
+        }
+        $str = '[]' if $str =~ m/\A\s*\[\s*\]\z/;
+        $str = '{}' if $str =~ m/\A\s*\{\s*\}\z/;
+        return $str;
     };
 
     my $str = "[\n";
@@ -876,21 +891,24 @@ sub dump($array, $depth = 0) {
             $str .= $indent . sprintf "%f,\n", $x;
         }
         elsif ( Sq::is_str($x) ) {
-            $str .= $indent . sprintf "%s,\n", $quote->($x);
+            $str .= $indent . sprintf "\"%s\",\n", $quote->($x);
+        }
+        elsif ( $type eq 'Option' ) {
+            $str .= $indent . sprintf "%s,\n", $compact->($inline, Option::dump($x, $inline, $depth+2));
         }
         elsif ( $type eq 'Hash' || $type eq 'HASH' ) {
-            $str .= $indent . Hash::dump($x, $depth+2) . ",\n";
+            $str .= $indent . $compact->($inline, Hash::dump($x, $inline, $depth+2)) . ",\n";
         }
         elsif ( $type eq 'Array' || $type eq 'ARRAY' ) {
-            $str .= $indent . Array::dump($x, $depth+2) . ",\n";
+            $str .= $indent . $compact->($inline, Array::dump($x, $inline, $depth+2)) . ",\n";
         }
         else {
-            $str .= $indent . sprintf "NOT_IMPLEMENTED,\n";
+            $str .= $indent . "NOT_IMPLEMENTED,\n";
         }
     }
     $str =~ s/,\n\z/\n/;
     $str .= (" " x $depth) . "]";
-    return $str;
+    return $compact->($inline, $str);
 }
 
 1;

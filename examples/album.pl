@@ -1,6 +1,5 @@
 #!/usr/bin/env perl
 use v5.36;
-use Data::Dumper qw(Dumper);
 use Sq;
 
 sub seconds_to_str($seconds) {
@@ -23,6 +22,21 @@ my $album = Hash->new(
         Hash->new(title => "P.Y.T.",                     duration => 239),
         Hash->new(title => "The Lady in My Life",        duration => 300),
     ),
+    bonus  => "with\nnewline",
+    opt1 => Some(10),
+    opt2 => None,
+    opt3 => Some([]),
+    opt4 => Some({}),
+    opt5 => Some([
+        [qw/a b c/],
+        {
+            foo => [
+                Some(1), Some(2), Some({
+                    what => [qw/cool and blue/]
+                })
+            ]
+        }
+    ]),
 );
 
 my $update =
@@ -37,5 +51,8 @@ my $update =
         });
     });
 
-printf "Album: %s\n",  $album->dump;
-printf "Update: %s\n", $update->dump;
+printf "Album:\n%s\n",  $album->dump;
+printf "Update:\n%s\n", $update->dump(80);
+
+#printf "Album: %s\n",  Dumper($album);
+#printf "Update: %s\n", Dumper($update);

@@ -465,6 +465,22 @@ to extract the value.
     my $x = Some(10)->get; # 10
     my $x = None    ->get; # throws exception
 
+=head2 dump($opt, $inline=60, $depth=0) : $str
+
+Recursivly traverses data-structures and creates a human readable dump from it.
+
+C<$inline> controls the amount of characters a data-structure is completely
+inlined into a single string without newlines. The higher the number the more
+compact your dump will be.
+
+Currently it is not perfect. It only works with Perl Array/Hash and Sq Array/Hash
+and the Option type. Sq Array/Hash are just dumped as normal Perl Array/Hash. No
+other object is being dumped. It also does not dump any other object and has no
+configuration. Also doesn't detect cyclic data-structures. But for most I<practical>
+data-structures it works good enough at the moment. Get's improved in the future.
+
+    printf "%s\n", $opt->dump;
+
 =head1 MODULE FUNCTIONS
 
 These functions are concipated to be called from the module level because
