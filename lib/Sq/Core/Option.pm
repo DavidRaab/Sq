@@ -259,6 +259,10 @@ sub dump($opt, $inline=60, $depth=0) {
         $str;
     };
     state $compact = sub($max, $str) {
+        # replace empty string/array
+        return '[]' if $str =~ m/\A\s*\[\s*\]\z/;
+        return '{}' if $str =~ m/\A\s*\{\s*\}\z/;
+
         # get indentation length
         my $indent = $str =~ m/\A(\s+)/ ? CORE::length $1 : 0;
 
@@ -275,9 +279,6 @@ sub dump($opt, $inline=60, $depth=0) {
             $str = (" " x $indent) . $no_ws;
         }
 
-        # replace empty string/array
-        $str = '[]' if $str =~ m/\A\s*\[\s*\]\z/;
-        $str = '{}' if $str =~ m/\A\s*\{\s*\}\z/;
         return $str;
     };
 

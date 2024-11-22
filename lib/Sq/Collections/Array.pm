@@ -868,6 +868,10 @@ sub dump($array, $inline=60, $depth=0) {
         $str;
     };
     state $compact = sub($max, $str) {
+        # replace empty string/array
+        return '[]' if $str =~ m/\A\s*\[\s*\]\z/;
+        return '{}' if $str =~ m/\A\s*\{\s*\}\z/;
+
         # get indentation length
         my $indent = $str =~ m/\A(\s+)/ ? CORE::length $1 : 0;
 
@@ -884,9 +888,6 @@ sub dump($array, $inline=60, $depth=0) {
             $str = (" " x $indent) . $no_ws;
         }
 
-        # replace empty string/array
-        $str = '[]' if $str =~ m/\A\s*\[\s*\]\z/;
-        $str = '{}' if $str =~ m/\A\s*\{\s*\}\z/;
         return $str;
     };
 
@@ -894,7 +895,10 @@ sub dump($array, $inline=60, $depth=0) {
     for my $x ( @$array ) {
         my $indent = " " x ($depth + 2);
         my $type   = ref $x;
-        if ( Sq::is_num($x) ) {
+        if ( !defined $x ) {
+            $str .= $indent . 'undef' . ",\n";
+        }
+        elsif ( Sq::is_num($x) ) {
             $str .= $indent . $x . ",\n";
         }
         elsif ( Sq::is_str($x) ) {
