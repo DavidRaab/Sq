@@ -473,6 +473,11 @@ C<$inline> controls the amount of characters a data-structure is completely
 inlined into a single string without newlines. The higher the number the more
 compact your dump will be.
 
+It currently has a bug as it also collaps whitespace in a string and it shouldn't
+do that. This could be avoided by setting C<$inline> to C<0>. But consider that
+dumping in its current form is considered for debugging purposes, not for
+serializing data.
+
 Currently it is not perfect. It only works with Perl Array/Hash and Sq Array/Hash
 and the Option type. Sq Array/Hash are just dumped as normal Perl Array/Hash. No
 other object is being dumped. It also does not dump any other object and has no
