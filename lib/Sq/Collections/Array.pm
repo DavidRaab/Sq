@@ -868,16 +868,23 @@ sub dump($array, $inline=60, $depth=0) {
         $str;
     };
     state $compact = sub($max, $str) {
-        my $no_ws = $str =~ s/\s+//gr;
-        if ( CORE::length $no_ws < $max ) {
-            my $indent = 0;
-            if ( $str =~ m/\A(\s+)/ ) {
-                $indent = CORE::length $1;
-            }
-            $str =~ s/\A\s+//;
-            $str =~ s/\s+/ /g;
-            $str = (" " x $indent) . $str;
+        # get indentation length
+        my $indent = $str =~ m/\A(\s+)/ ? CORE::length $1 : 0;
+
+        # remove whitespace at start/end and replace all whitespace with
+        # a single space
+        my $no_ws = $str;
+        $no_ws =~ s/\A\s+//;
+        $no_ws =~ s/\s+\z//;
+        $no_ws =~ s/\s+/ /g;
+
+        # when $no_ws is smaller than $max we keep that string but we
+        # need to add $ident again
+        if ( CORE::length $no_ws <= $max ) {
+            $str = (" " x $indent) . $no_ws;
         }
+
+        # replace empty string/array
         $str = '[]' if $str =~ m/\A\s*\[\s*\]\z/;
         $str = '{}' if $str =~ m/\A\s*\{\s*\}\z/;
         return $str;

@@ -37,6 +37,7 @@ my $album = Hash->new(
             ]
         }
     ]),
+    opt6 => Some("text"),
 );
 
 my $update =
@@ -51,8 +52,5 @@ my $update =
         });
     });
 
-printf "Album:\n%s\n",  $album->dump;
+printf "Album:\n%s\n",  $album->dump();
 printf "Update:\n%s\n", $update->dump(80);
-
-#printf "Album: %s\n",  Dumper($album);
-#printf "Update: %s\n", Dumper($update);
