@@ -4,7 +4,6 @@ use subs 'bind', 'join', 'select', 'last', 'sort', 'map', 'foreach', 'length';
 use Scalar::Util ();
 use List::Util ();
 use Carp ();
-use Sq::Collections::Array;
 
 # TODO:
 #       Find another name for 'from_list'
