@@ -1099,4 +1099,13 @@ is(
     is(refaddr($data->to_array(1000)), refaddr($data), 'same array/address');
 }
 
+# to_seq
+{
+    my $data = Array->range(1,3)->to_seq->infinity->to_array(25);
+    is(
+        $data,
+        [1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1],
+        'to_seq on array');
+}
+
 done_testing;

@@ -1045,6 +1045,11 @@ sub to_array($seq, $count=undef) {
     return $new;
 }
 
+# to_seq: Seq<'a> -> Seq<'a>
+sub to_seq($seq) {
+    return $seq;
+}
+
 # expand : Seq<'a> -> ListContext<'a>
 sub expand($seq) {
     return @{ to_array($seq) };

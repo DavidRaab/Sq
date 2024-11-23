@@ -385,6 +385,11 @@ sub to_array($array, $count=undef) {
     }
 }
 
+# to_seq: Array<'a> -> Seq<'a>
+sub to_seq($array) {
+    return Seq->from_array($array);
+}
+
 # Does nothing. It is just here for API compatibility with Seq::to_array_of_array
 sub to_array_of_array($array) {
     return $array;
