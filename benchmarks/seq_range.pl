@@ -4,11 +4,11 @@ use open ':std', ':encoding(UTF-8)';
 use Sq;
 use Benchmark qw(cmpthese);
 
-sub range_old($, $start, $stop) {
+sub range1($, $start, $stop) {
     return Seq::range_step(undef, $start, 1, $stop);
 }
 
-sub range_new($, $start, $stop) {
+sub range2($, $start, $stop) {
     $start = int $start;
     $stop  = int $stop;
 
@@ -48,12 +48,12 @@ sub range_new($, $start, $stop) {
 }
 
 cmpthese(-1, {
-    old_implementation => sub {
-        range_old(undef, 1, 10_000)->to_array;
-        range_old(undef, 10_000, 1)->to_array;
+    range1 => sub {
+        range1(undef, 1, 10_000)->to_array;
+        range1(undef, 10_000, 1)->to_array;
     },
-    new_implementation => sub {
-        range_new(undef, 1, 10_000)->to_array;
-        range_new(undef, 10_000, 1)->to_array;
+    range2 => sub {
+        range2(undef, 1, 10_000)->to_array;
+        range2(undef, 10_000, 1)->to_array;
     }
 });
