@@ -1247,14 +1247,14 @@ sub none($seq, $predicate) {
 }
 
 # pick : Seq<'a> -> ('a -> option<'b>) -> 'b
-sub pick($seq, $default, $chooser) {
+sub pick($seq, $f_opt) {
     my $it = $seq->();
-    my $x;
+    my ($x, $is_some, $v);
     while ( defined($x = $it->()) ) {
-        my $optional = $chooser->($x);
-        return $optional if defined $optional;
+        my $opt = Option::Some($f_opt->($x));
+        return $opt if @$opt;
     }
-    return $default;
+    return Option::None();
 }
 
 1;
