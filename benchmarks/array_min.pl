@@ -41,22 +41,21 @@ sub min3($array) {
 }
 
 # Testing
+my @funcs = qw(min1 min2 min3);
 my $data = Array->range(1,10_000);
 $data->shuffle;
-
-is(min1($data), min2($data), 'min1 same as min2');
-is(min2($data), min3($data), 'min2 same as min3');
+for my $func ( @funcs ) {
+    no strict 'refs';
+    my $fn = *{$func}{CODE};
+    is($fn->([]),       None, "check $func on []");
+    is($fn->($data), Some(1), "check $func");
+}
 done_testing;
 
 # Benchmarking
 cmpthese(-2, {
-    min1 => sub {
-        my $min = min1($data);
-    },
-    min2 => sub {
-        my $min = min2($data);
-    },
-    min3 => sub {
-        my $min = min3($data);
-    },
+    min1    => sub { my $min = min1($data) },
+    min2    => sub { my $min = min2($data) },
+    min3    => sub { my $min = min3($data) },
+    current => sub { my $min = Array::min($data) },
 });
