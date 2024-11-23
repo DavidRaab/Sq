@@ -419,14 +419,14 @@ sub distinct($array) {
 # $get_key function that must return a unique string for deciding uniqueness
 #
 # Array<'a> -> ('a -> string) -> Array<'a>
-sub distinct_by($array, $get_key) {
+sub distinct_by($array, $f_str) {
     my %seen;
     my @new;
     for my $value ( @$array ) {
-        my $key = $get_key->($value);
-        if ( not exists $seen{$key} ) {
+        my $str = $f_str->($value);
+        if ( not exists $seen{$str} ) {
             push @new, $value;
-            $seen{$key} = 1;
+            $seen{$str} = 1;
         }
     }
     return CORE::bless(\@new, 'Array');
