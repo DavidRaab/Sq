@@ -1170,11 +1170,11 @@ sub as_hash($seq) {
     return $h;
 }
 
-# to_hash : Seq<'a> -> ('a -> 'Key,'Value) -> Hash<'Key * 'a>
-sub to_hash($seq, $mapper) {
+# to_hash : Seq<'a> -> ('a -> string,'b) -> Hash<'b>
+sub to_hash($seq, $f_map) {
     my $hash = Hash->new;
     iter($seq, sub($x) {
-        my ($key, $value) = $mapper->($x);
+        my ($key, $value) = $f_map->($x);
         $hash->{$key} = $value;
     });
     return $hash;
@@ -1185,10 +1185,10 @@ sub to_hash($seq, $mapper) {
 # all values for the same key
 #
 # to_hash_of_array: Seq<'a> -> ('a -> 'Key) -> Hash<'Key, Array<'a>>
-sub to_hash_of_array($seq, $mapper) {
+sub to_hash_of_array($seq, $f_map) {
     my $hash = Hash->new;
     iter($seq, sub($x) {
-        my ($key, $value) = $mapper->($x);
+        my ($key, $value) = $f_map->($x);
         Hash::push($hash, $key, $value);
     });
     return $hash;
