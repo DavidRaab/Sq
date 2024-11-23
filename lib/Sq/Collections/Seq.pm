@@ -564,8 +564,9 @@ sub take($seq, $amount) {
 sub take_while($seq, $predicate) {
     from_sub('Seq', sub {
         my $it = $seq->();
+        my $value;
         return sub {
-            my $value = $it->();
+            $value = $it->();
             return $value if $predicate->($value);
             return undef;
         };
