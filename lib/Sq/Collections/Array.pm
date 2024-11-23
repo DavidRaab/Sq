@@ -79,28 +79,56 @@ sub unfold($, $state, $f_opt) {
 }
 
 # Array->range_step : float -> float -> float -> Array<float>
-sub range_step($class, $start, $step, $stop) {
+sub range_step($, $start, $step, $stop) {
     Carp::croak '$step is 0. Will run forever.' if $step == 0;
+    return CORE::bless([$start], 'Array') if $start == $stop;
 
     # Ascending Order
-    if ( $start <= $stop ) {
-        return unfold('Array', $start, sub($current) {
-            return $current, $current+$step if $current <= $stop;
-            return undef;
-        });
+    my @new;
+    if ( $start < $stop ) {
+        my $current = $start;
+        while (1) {
+            push @new, $current;
+            $current += $step;
+            last if $current > $stop;
+        }
     }
     # Descending Order
     else {
-        return unfold('Array', $start, sub($current) {
-            return $current, $current-$step if $current >= $stop;
-            return undef;
-        });
+        my $current = $start;
+        while (1) {
+            push @new, $current;
+            $current -= $step;
+            last if $current < $stop;
+        }
     }
+    return CORE::bless(\@new, 'Array');
 }
 
-# Array->range : float -> float -> Array<float>
-sub range($class, $start, $stop) {
-    return range_step('Array', $start, 1, $stop);
+# Array->range : int -> int -> Array<int>
+sub range($, $start, $stop) {
+    $start = int $start;
+    $stop  = int $stop;
+    return CORE::bless([$start], 'Array') if $start == $stop;
+
+    my @new;
+    # Ascending
+    if ( $start < $stop ) {
+        my $current = $start;
+        while (1) {
+            push @new, $current++;
+            last if $current > $stop;
+        }
+    }
+    # Descending
+    else {
+        my $current = $start;
+        while (1) {
+            push @new, $current--;
+            last if $current < $stop;
+        }
+    }
+    return CORE::bless(\@new, 'Array');
 }
 
 #-----------------------------------------------------------------------------#
