@@ -47,12 +47,17 @@ These function creates optional values.
 =head2 Some($x) : $opt_x
 
 The C<Some> function is automatically imported by loading C<Sq>. Every value
-except C<undef> turns into a valid value.
+except C<undef> turns into a valid value. C<Some> has a detection that prohibits
+creating nested optional values. When you pass an optional to C<Some> then this
+optional is returned as-is.
 
     my $opt = Some(10);
     my $opt = Some([]);
     my $opt = Some({ a => 1, b => 2});
-    my $opt = Some(undef);             # None
+    my $opt = Some(undef);         # None
+    my $opt = Some(Some(10))       # Some(10)
+    my $opt = Some(None)           # None
+    my $opt = Some(Some(Some([]))) # Some([])
 
 =head2 None() : $opt
 
@@ -406,6 +411,12 @@ value. A C<None> value always return a falsish value.
 
 =head2 flatten($opt) : $opt
 
+Since the latest changes to C<Option> this method has become B<DEPRECATED>.
+It still exists, but usually is not needed anymore, as you cannot create
+nested options anymore. You will get the result shown here without calling
+C<flatten>. Currently I am in an evaluation stage and see if that change
+creates any problem. If not, then this function will be removed in the future.
+
 Whenever you have multiple nested optionals you just call C<flatten> and it
 flattens its down to just a single optional value. One reason why you could
 end up with multiple nested optionals is when you use C<map> instead of C<bind>.
@@ -519,7 +530,6 @@ use it like this.
     if ( Option->is_opt($any) && $any->is_some ) {
         my $value = $any->get;
     }
-
 
 B<Don't do that.>
 
@@ -672,3 +682,109 @@ element of C<$array> to create an option value first.
     my $nums = Option->filter_valid   (Array->range(1,3)      ->map($some_num)); # [1,2,3]
     my $nums = Option->filter_valid   (Array->new(qw/1 foo 2/)->map($some_num)); # [1,2]
     my $nums = Option->filter_valid_by([qw/1 foo 2/], $some_num);                # [1,2]
+
+=head2 Option->extract($any=undef) : ($bool, $x)
+
+This is a helper function used when you want to create functions that expects
+anonymous functions that can return B<optional values> or B<undef> and still
+behaves correctly.
+
+As an example look at Array::choose, you can use it in three ways.
+
+    my $array = $range->choose(sub($x) { $x % 2 == 0 ? Some($x*2) : None  });
+    my $array = $range->choose(sub($x) { $x % 2 == 0 ? $x*2       : undef });
+    my $array = $range->choose(sub($x) { $x % 2 == 0 ? $x*2       : ()    });
+
+The lambda you pass to C<choose> either can return B<Some/None> or just
+a normal value or (undef/empty list) and C<choose> still behaves correctly.
+
+Here is the implementation of Array::choose that uses C<< Option->extract >>
+to implement this kind of behaviour.
+
+    sub choose($array, $f_opt) {
+        my $new = Array->new;
+        my ($is_some, $v);
+        for my $x ( @$array ) {
+            ($is_some, $v) = Option->extract($f_opt->($x));
+            push @$new, $v if $is_some;
+        }
+        return $new;
+    }
+
+It basically works the following. Whatever value you pass to C<extract> it
+returns a boolean flag indicating if you have some value or not, and the second
+value it returns is the actual value either directly or extracted from the
+optional.
+
+Since the latest changes to C<Option>, C<choose> also could have been
+implemented this way.
+
+    sub choose($array, $f_opt) {
+        my $new = Array->new;
+        for my $x ( @$array ) {
+            my $opt = Some($f_opt->($x));
+            push @$new, $opt->get if $opt->is_some;
+        }
+        return $new;
+    }
+
+because a call to C<Some> doesn't wrap an option again and again now you just
+can wrap any function call that should return an optional in a C<Some> call
+and then work with it like any optional value.
+
+C<< Option->extract >> is a slightly faster version of this because no creation
+of an optional value is involved.
+
+=head2 Option->extract_array(@args) : ($bool, @xs)
+
+This works like C<extract> but with a lambda that is supposed to return multiple
+values, or an optional value containing an array. It is used as an example
+in C<< Array->unfold >>.
+
+    # the lambda returns two values or undef
+    my $nums_def = Array->unfold(0, sub($x) {
+        if ( $x < 20 ) {
+            return $x, $x+1;
+        }
+        return undef;
+    });
+
+    # returns Some/None but in the Some case it needs to wrap values in an array.
+    my $nums_opt = Array->unfold(0, sub($x) {
+        if ( $x < 20 ) {
+            return Some([$x, $x+1]);
+        }
+        return None;
+    });
+
+    # returns two values or nothing
+    my $nums_list = Array->unfold(0, sub($x) {
+        if ( $x < 20 ) {
+            return $x, $x+1;
+        }
+        return;
+    });
+
+When you want to create functions that also behave in such a way, then you
+use C<< Option->extract_array >>. Here is how C<unfold> is implemented.
+
+    sub unfold($, $state, $f_opt) {
+        my @array;
+
+        my ($is_some, $x);
+        while (1) {
+            ($is_some, $x, $state) = Option->extract_array($f_opt->($state));
+            last if !$is_some;
+            push @array, $x;
+        }
+
+        return CORE::bless(\@array, 'Array');
+    }
+
+Here C<$f_opt> is supposed to either return a defined value or C<undef>. Or
+it should return C<Some($array)> or C<None>.
+
+Passing the result to C<< Option->extract_array >> does the magic for you,
+it first returns a boolean flag indicating if you got Some value or not,
+all extra parameters are whatever the lambda returned in list context or
+the extracted values from C<Some($array)>.

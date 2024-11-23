@@ -178,23 +178,36 @@ C<undef> values are skipped.
     my $array = Array->init(3, sub($idx) { 1, 1     });     # [1,1,1,1,1,1]
     my $array = Array->init(3, sub($idx) { 1, undef });     # [1,1,1]
 
-=head2 Array->unfold($state, $f_x_state) : $array_x
+=head2 Array->unfold($state, $f_opt_x_state) : $array_x
 
-Generates a new Array by passing the function C<$f_x_state> the C<$state>. C<$f_x_state>
-then must return a value to be used in an array and the next state for the
-next call to C<$f_x_state>. This keeps on as long C<$f_x_state> returns a defined value.
+Generates a new Array by passing the function C<$f_opt_x_state> the C<$state>.
+C<$f_opt_x_state> must return either an optional value containing C<[$x,$state]>
+where C<$x> is the value to be used and C<$state> the next state to be used.
+
+Instead of an optional you also can return the values in list context. Then
+the empty list or the return of C<undef> is used to indicate the B<None>
+case and this abortion of creation of new values. See C<< Option->extract_array() >>
+for further details.
 
     # [1..99]
     my $array = Array->unfold(1, sub($state) {
-        if ( $state < 100 ) {
-            return $state, $state+1;
-        }
-        else {
-            return;
-        }
+        if ( $state < 100 ) { return Some([$state, $state+1]) }
+        else                { return None                     }
     });
 
-The above generates an array containing the numbers from B<1> to B<99>. It works
+    # [1..99]
+    my $array = Array->unfold(1, sub($state) {
+        if ( $state < 100 ) { return $state, $state+1 }
+        else                { return                  }
+    });
+
+    # [1..99]
+    my $array = Array->unfold(1, sub($state) {
+        if ( $state < 100 ) { return $state, $state+1 }
+        else                { return undef            }
+    });
+
+All cases generates an array containing the numbers from B<1> to B<99>. It works
 the following.
 
 =over
@@ -437,10 +450,19 @@ array. B<None> values are skipped.
     my $data = Array->range(1,10);
 
     # [4,16,36,64,100]
-    my $evens_squared =
-        $data->choose(sub($x) {
-            $x % 2 == 0 ? Some($x * $x) : None
-        });
+    my $evens_squared = $data->choose(sub($x) {
+        $x % 2 == 0 ? Some($x * $x) : None
+    });
+
+    # [4,16,36,64,100]
+    my $evens_squared = $data->choose(sub($x) {
+        $x % 2 == 0 ? $x * $x : undef
+    });
+
+    # [4,16,36,64,100]
+    my $evens_squared = $data->choose(sub($x) {
+        $x % 2 == 0 ? $x * $x : ()
+    });
 
 =head2 filter($array, $predicate) : $array
 
@@ -791,6 +813,10 @@ then B<None> is returned.
     my $opt = $r->pick(sub($x) { $x >  5 ? Some($x*$x) : None });          # Some(36)
     my $opt = $r->pick(sub($x) { $x > 10 ? Some($x*$x) : None });          # None
     my $x   = $r->pick(sub($x) { $x > 10 ? Some($x*$x) : None })->or(100); # 100
+
+    # you also can return normal values/undef
+    my $opt = $r->pick(sub($x) { $x >  5 ? $x*$x : undef }); # Some(36)
+    my $opt = $r->pick(sub($x) { $x >  5 ? $x*$x : ()    }); # Some(36)
 
 =head2 to_array($array, $count=undef) : $array
 

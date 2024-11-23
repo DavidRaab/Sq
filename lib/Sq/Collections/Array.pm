@@ -64,15 +64,14 @@ sub init($class, $count, $f) {
     ], 'Array');
 }
 
-# Array->unfold : 'State -> ('State -> Option<ListContext<'a, 'State>>) -> Array<'a>
-sub unfold($class, $state, $f) {
-    my $s = $state;
-    my $x;
+# Array->unfold : 'State -> ('State -> Option<['a, 'State]>) -> Array<'a>
+sub unfold($, $state, $f_opt) {
     my @array;
 
+    my ($is_some, $x);
     while (1) {
-        ($x, $s) = $f->($s);
-        last if not defined $x;
+        ($is_some, $x, $state) = Option->extract_array($f_opt->($state));
+        last if !$is_some;
         push @array, $x;
     }
 
@@ -165,11 +164,10 @@ sub map_e($array, $expr) {
 
 sub choose($array, $f_opt) {
     my $new = new('Array');
+    my ($is_some, $v);
     for my $x ( @$array ) {
-        my $opt = $f_opt->($x);
-        if ( @$opt ) {
-            push @$new, $opt->[0];
-        }
+        ($is_some, $v) = Option->extract($f_opt->($x));
+        push @$new, $v if $is_some;
     }
     return $new;
 }
@@ -290,24 +288,22 @@ sub sort($array, $comparer) {
     return CORE::bless(\@sorted, 'Array');
 }
 
-sub sort_by($array, $comparer, $get_key) {
+sub sort_by($array, $comparer, $f_key) {
     local ($a, $b, $_);
     my @sorted =
         CORE::map  { $_->[1] }
         CORE::sort { $comparer->($a->[0], $b->[0]) }
-        CORE::map  { [$get_key->($_), $_] }
+        CORE::map  { [$f_key->($_), $_] }
             @$array;
     return CORE::bless(\@sorted, 'Array');
 }
 
 sub sort_num($array) {
-    state $comp = sub($x,$y) { $x <=> $y };
-    return Array::sort($array, $comp);
+    return CORE::bless([sort { $a <=> $b } @$array], 'Array');
 }
 
 sub sort_str($array) {
-    state $comp = sub($x,$y) { $x cmp $y };
-    return Array::sort($array, $comp);
+    return CORE::bless([sort { $a cmp $b } @$array], 'Array');
 }
 
 # Sorts an array of hashes by just providing the key to be used. Keys
@@ -574,10 +570,10 @@ sub sum($array) {
     return $sum;
 }
 
-sub sum_by($array, $mapper) {
+sub sum_by($array, $f_map) {
     my $sum = 0;
     for my $x ( @$array ) {
-        $sum += $mapper->($x);
+        $sum += $f_map->($x);
     }
     return $sum;
 }
@@ -594,14 +590,10 @@ sub split($array, $regex) {
 
 # min : Array<float> -> float -> Option<float>
 sub min($array) {
-    my $min = undef;
+    return Option::None() if @$array == 0;
+    my $min = $array->[0];
     for my $x ( @$array ) {
-        if ( defined $min ) {
-            $min = $x if $x < $min;
-        }
-        else {
-            $min = $x;
-        }
+        $min = $x if $x < $min;
     }
     return Option::Some($min);
 }
@@ -653,7 +645,12 @@ sub min_str_by($array, $f_str) {
 
 # max : Array<float> -> Option<float>
 sub max($array) {
-    max_by($array, \&Sq::id);
+    return Option::None() if @$array == 0;
+    my $max = $array->[0];
+    for my $x ( @$array ) {
+        $max = $x if $x > $max;
+    }
+    return Option::Some($max);
 }
 
 # max_by : Array<'a> -> ('a -> float) -> Option<'a>
@@ -713,35 +710,35 @@ sub max_str_by($array, $f_str) {
 # -> ('a -> 'Key)
 # -> ('State -> 'a -> 'State)
 # -> Hash<'key, 'State>
-sub group_fold($array, $get_state, $get_key, $folder) {
+sub group_fold($array, $f_init, $f_key, $f_state) {
     my $new = Hash->new;
     for my $x ( @$array ) {
-        my $key = $get_key->($x);
+        my $key = $f_key->($x);
         if ( exists $new->{$key} ) {
-            $new->{$key} = $folder->($new->{$key}, $x);
+            $new->{$key} = $f_state->($new->{$key}, $x);
         }
         else {
-            $new->{$key} = $folder->($get_state->(), $x);
+            $new->{$key} = $f_state->($f_init->(), $x);
         }
     }
     return $new;
 }
 
 # Array<'a> -> ('a -> ('Key,'Value)) -> Hash<'Key, 'Value>
-sub to_hash($array, $mapper) {
+sub to_hash($array, $f_map) {
     my %hash;
     for my $x ( @$array ) {
-        my ($key, $value) = $mapper->($x);
+        my ($key, $value) = $f_map->($x);
         $hash{$key} = $value;
     }
     return CORE::bless(\%hash, 'Hash');
 }
 
 # Array<'a> -> ('a -> ('Key,'Value)) -> Hash<'Key, Array<'Value>>
-sub to_hash_of_array($array, $mapper) {
+sub to_hash_of_array($array, $f_map) {
     my $hash = Hash->new;
     for my $x ( @$array ) {
-        my ($key, $value) = $mapper->($x);
+        my ($key, $value) = $f_map->($x);
         $hash->push($key, $value);
     }
     return $hash;
@@ -765,10 +762,10 @@ sub keyed_by($array, $f_key) {
 # with the same 'Key.
 #
 # Array<'a> -> ('a -> 'Key) -> Hash<'Key, Array<'a>>
-sub group_by($array, $get_key) {
+sub group_by($array, $f_key) {
     my $hash = Hash->new;
     for my $x ( @$array ) {
-        my $key = $get_key->($x);
+        my $key = $f_key->($x);
         $hash->push($key, $x);
     }
     return $hash;
@@ -783,10 +780,10 @@ sub count($array) {
     return $new;
 }
 
-sub count_by($array, $f) {
+sub count_by($array, $f_key) {
     my $new = Hash->new;
     for my $x ( @$array ) {
-        $new->{$f->($x)}++;
+        $new->{$f_key->($x)}++;
     }
     return $new;
 }
@@ -821,8 +818,8 @@ sub none($array, $predicate) {
 
 sub pick($array, $f_opt) {
     for my $x ( @$array ) {
-        my $opt = $f_opt->($x);
-        return $opt if Option::is_some($opt);
+        my $opt = Option::Some($f_opt->($x));
+        return $opt if @$opt;
     }
     return Option::None();
 }

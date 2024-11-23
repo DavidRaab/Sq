@@ -25,6 +25,9 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end 
     my @tests = (
         [None,              0],
         [Some(undef),       0],
+        [Some(None),        0],
+        [Some(Some(undef)), 0],
+        [Some(Some(None)),  0],
         [Some("Hello"),     1],
         [Some(10),          1],
         [Some(0),           1],
@@ -32,9 +35,7 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end 
         [Some("0E0"),       1],
         [Some([]),          1],
         [Some({}),          1],
-        [Some(None),        1],
         [Some(Some(1)),     1],
-        [Some(Some(undef)), 1],
     );
 
     my $idx = 0;
@@ -225,6 +226,17 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end 
     is(Some(Some(Some([])))->flatten, Some([]), 'Some array');
     is(Some(1)             ->flatten, Some(1),  'Some 1');
     is(None                ->flatten, None,     'None')
+}
+
+# flatten is now built-into Some()
+{
+    is(Some(Some(Some(10))), Some(10), 'flatten 10');
+    is(Some(Some(None))    , None,     'flatten None');
+    is(Some(None)          , None,     'flatten None 2');
+    is(Some(Some(undef))   , None,     'flatten None 2');
+    is(Some(Some(Some([]))), Some([]), 'Some array');
+    is(Some(1)             , Some(1),  'Some 1');
+    is(None                , None,     'None')
 }
 
 # iter

@@ -2,22 +2,6 @@
 use 5.036;
 use Sq;
 use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end bag float/;
-# use DDP;
-
-# Some values, functions, ... for testing
-my $range     = Seq->range(1, 10);
-my $rangeDesc = Seq->range(10, 1);
-
-my $id      = sub($x) { $x          };
-my $add1    = sub($x) { $x + 1      };
-my $double  = sub($x) { $x * 2      };
-my $square  = sub($x) { $x * $x     };
-my $is_even = sub($x) { $x % 2 == 0 };
-
-my $fst     = sub($array) { $array->[0] };
-my $snd     = sub($array) { $array->[1] };
-
-#----------
 
 # lazy
 my $data1 =
@@ -62,8 +46,8 @@ my $bind = sub($s, $f) {
 
 # check if bind is same as map->flatten
 is(
-    $data1->bind($id)->to_array,
-    $bind->($data1, $id)->to_array,
+    $data1->bind(\&id)->to_array,
+    $bind->($data1, \&id)->to_array,
     'bind implemented with map and flatten');
 
 done_testing;

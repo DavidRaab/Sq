@@ -12,10 +12,12 @@ use Sub::Exporter -setup => {
 my $None = bless([], 'Option');
 
 # Constructor functions that are importet by Sq
-sub Some :prototype($) ($value)  {
-    return defined $value
-         ? bless([$value], 'Option')
-         : $None;
+sub Some :prototype($) ($value=undef) {
+    if ( defined $value ) {
+        return $value if ref $value eq 'Option';
+        return bless([$value], 'Option');
+    }
+    return $None;
 }
 
 sub None :prototype() () {
@@ -249,6 +251,37 @@ sub filter_valid_by($, $array, $f) {
         }
     }
     return $new;
+}
+
+sub extract($, $any=undef) {
+    if ( defined $any ) {
+        if ( ref $any eq 'Option' ) {
+            return 1, $any->[0] if @$any;
+            return 0, undef;
+        }
+        return 1, $any;
+    }
+    return 0, undef;
+}
+
+sub extract_array($, @args) {
+    if ( @args == 0 ) {
+        return 0;
+    }
+    elsif ( @args == 1 ) {
+        my $any = $args[0];
+        if ( defined $any ) {
+            if ( ref $any eq 'Option' ) {
+                return 1, @{$any->[0]} if @$any;
+                return 0;
+            }
+            return 1, $any;
+        }
+        return 0;
+    }
+    else {
+        return 1, @args;
+    }
 }
 
 sub dump($opt, $inline=60, $depth=0) {

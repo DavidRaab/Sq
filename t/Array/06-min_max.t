@@ -8,14 +8,10 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash array item end bag fl
 my $range     = Array->range(1, 10);
 my $rangeDesc = Array->range(10, 1);
 
-my $id      = sub($x) { $x          };
 my $add1    = sub($x) { $x + 1      };
 my $double  = sub($x) { $x * 2      };
 my $square  = sub($x) { $x * $x     };
 my $is_even = sub($x) { $x % 2 == 0 };
-
-my $fst     = sub($array) { $array->[0] };
-my $snd     = sub($array) { $array->[1] };
 
 
 #----------

@@ -13,10 +13,6 @@ my $double  = sub($x) { $x * 2      };
 my $square  = sub($x) { $x * $x     };
 my $is_even = sub($x) { $x % 2 == 0 };
 
-my $fst     = sub($array) { $array->[0] };
-my $snd     = sub($array) { $array->[1] };
-
-
 #--- ---
 
 my $cards =
