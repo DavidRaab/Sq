@@ -1081,22 +1081,19 @@ sub min($seq) {
 }
 
 # min_by : Seq<'a> -> ('a -> float) -> Option<'a>
-sub min_by($seq, $f_number) {
-    my $min     = undef;
-    my $min_key = undef;
-    iter($seq, sub($x) {
-        my $key = $f_number->($x);
-        if ( defined $min ) {
-            if ( $key < $min_key ) {
-                $min     = $x;
-                $min_key = $key;
-            }
-        }
-        else {
+sub min_by($seq, $f_num) {
+    my $it  = $seq->();
+    my $min = $it->();
+    return Option::None() if !defined $min;
+    my $min_num = $f_num->($min);
+    my ($x, $num);
+    while ( defined($x = $it->()) ) {
+        $num = $f_num->($x);
+        if ( $num < $min_num ) {
             $min     = $x;
-            $min_key = $key;
+            $min_num = $num;
         }
-    });
+    }
     return Option::Some($min);
 }
 
@@ -1138,22 +1135,19 @@ sub max($seq) {
 }
 
 # max_by : Seq<'a> -> ('a -> float) -> Option<'a>
-sub max_by($seq, $f_number) {
-    my $max     = undef;
-    my $max_key = undef;
-    iter($seq, sub($x) {
-        my $key = $f_number->($x);
-        if ( defined $max ) {
-            if ( $key > $max_key ) {
-                $max     = $x;
-                $max_key = $key;
-            }
-        }
-        else {
+sub max_by($seq, $f_num) {
+    my $it = $seq->();
+    my $max = $it->();
+    return Option::None() if !defined $max;
+    my $max_num = $f_num->($max);
+    my ($x, $num);
+    while ( defined($x = $it->()) ) {
+        $num = $f_num->($x);
+        if ( $num > $max_num ) {
             $max     = $x;
-            $max_key = $key;
+            $max_num = $num;
         }
-    });
+    }
     return Option::Some($max);
 }
 
