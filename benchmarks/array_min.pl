@@ -3,6 +3,7 @@ use v5.36;
 use open ':std', ':encoding(UTF-8)';
 use Sq;
 use Benchmark qw(cmpthese);
+use Test2::V0;
 
 sub min1($array) {
     my $len = @$array;
@@ -39,7 +40,15 @@ sub min3($array) {
     return Option::Some($min);
 }
 
+# Testing
 my $data = Array->range(1,10_000);
+$data->shuffle;
+
+is(min1($data), min2($data), 'min1 same as min2');
+is(min2($data), min3($data), 'min2 same as min3');
+done_testing;
+
+# Benchmarking
 cmpthese(-2, {
     min1 => sub {
         my $min = min1($data);

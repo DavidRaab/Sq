@@ -949,3 +949,10 @@ Same as C<iter>, just an alias.
 =head2 foreachi($array, $f) : void
 
 Same as C<iteri>, just an alias.
+
+=head2 shuffle($array) : void
+
+Randomly shuffles array in-place;
+
+    my $array = Array->range(1,10);
+    $array->shuffle; # values now in random order
