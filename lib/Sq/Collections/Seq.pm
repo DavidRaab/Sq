@@ -1099,7 +1099,14 @@ sub min_by($seq, $f_num) {
 
 # min_str : Seq<string> -> string -> Option<string>
 sub min_str($seq) {
-    min_str_by($seq, \&Sq::id);
+    my $it  = $seq->();
+    my $min = $it->();
+    return Option::None() if !defined $min;
+    my $x;
+    while ( defined($x = $it->()) ) {
+        $min = $x if $x lt $min;
+    }
+    return Option::Some($min);
 }
 
 # min_str_by : Seq<'a> -> ('a -> string) -> Option<'a>
@@ -1153,7 +1160,14 @@ sub max_by($seq, $f_num) {
 
 # max_str : Seq<string> -> Option<string>
 sub max_str($seq) {
-    max_str_by($seq, \&Sq::id);
+    my $it  = $seq->();
+    my $max = $it->();
+    return Option::None() if !defined $max;
+    my $x;
+    while ( defined($x = $it->()) ) {
+        $max = $x if $x gt $max;
+    }
+    return Option::Some($max);
 }
 
 # max_str_by : Seq<'a> -> ('a -> string) -> Option<'a>
