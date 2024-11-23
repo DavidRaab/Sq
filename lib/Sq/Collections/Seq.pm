@@ -1070,15 +1070,13 @@ sub sum_by($seq, $f) {
 
 # min : Seq<float> -> float -> Option<float>
 sub min($seq) {
-    my $min = undef;
-    iter($seq, sub($x) {
-        if ( defined $min ) {
-            $min = $x if $x < $min;
-        }
-        else {
-            $min = $x;
-        }
-    });
+    my $it  = $seq->();
+    my $min = $it->();
+    return Option::None() if !defined $min;
+    my $x;
+    while ( defined($x = $it->()) ) {
+        $min = $x if $x < $min;
+    }
     return Option::Some($min);
 }
 
@@ -1129,7 +1127,14 @@ sub min_str_by($seq, $f_str) {
 
 # max : Seq<float> -> Option<float>
 sub max($seq) {
-    max_by($seq, \&Sq::id);
+    my $it  = $seq->();
+    my $max = $it->();
+    return Option::None() if !defined $max;
+    my $x;
+    while ( defined($x = $it->()) ) {
+        $max = $x if $x > $max;
+    }
+    return Option::Some($max);
 }
 
 # max_by : Seq<'a> -> ('a -> float) -> Option<'a>
