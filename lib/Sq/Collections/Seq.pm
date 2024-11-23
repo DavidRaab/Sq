@@ -147,11 +147,6 @@ sub range_step($class, $start, $step, $stop) {
     }
 }
 
-# Seq->range : int -> int -> Seq<int>
-sub range($class, $start, $stop) {
-    return range_step('Seq', $start, 1, $stop);
-}
-
 # Seq->new : List<'a> -> Seq<'a>
 sub new($class, @xs) {
     return bless(sub {
@@ -169,6 +164,46 @@ sub new($class, @xs) {
 
 sub wrap($class, @xs) {
     return new('Seq', @xs);
+}
+
+# Seq->range : int -> int -> Seq<int>
+sub range($, $start, $stop) {
+    $start = int $start;
+    $stop  = int $stop;
+
+    # when same return seq with one item
+    return new('Seq', $start) if $start == $stop;
+
+    # ascending order
+    if ( $start < $stop ) {
+        return bless(sub {
+            my $abort   = 0;
+            my $current = $start;
+            return sub {
+                return undef if $abort;
+                if ( $current > $stop ) {
+                    $abort = 1;
+                    return undef;
+                }
+                return $current++;
+            }
+        }, 'Seq');
+    }
+    # descending order
+    else {
+        return bless(sub {
+            my $abort   = 0;
+            my $current = $start;
+            return sub {
+                return undef if $abort;
+                if ( $current < $stop ) {
+                    $abort = 1;
+                    return undef;
+                }
+                return $current--;
+            }
+        }, 'Seq');
+    }
 }
 
 # Seq->from_array : Array<'a> -> Seq<'a>
