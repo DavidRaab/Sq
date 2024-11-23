@@ -1111,21 +1111,18 @@ sub min_str($seq) {
 
 # min_str_by : Seq<'a> -> ('a -> string) -> Option<'a>
 sub min_str_by($seq, $f_str) {
-    my $min     = undef;
-    my $min_key = undef;
-    iter($seq, sub($x) {
-        my $key = $f_str->($x);
-        if ( defined $min ) {
-            if ( $key lt $min_key ) {
-                $min     = $x;
-                $min_key = $key;
-            }
-        }
-        else {
+    my $it  = $seq->();
+    my $min = $it->();
+    return Option::None() if !defined $min;
+    my $min_str = $f_str->($min);
+    my ($x, $str);
+    while ( defined($x = $it->()) ) {
+        $str = $f_str->($x);
+        if ( $str lt $min_str ) {
             $min     = $x;
-            $min_key = $key;
+            $min_str = $str;
         }
-    });
+    }
     return Option::Some($min);
 }
 
@@ -1172,21 +1169,18 @@ sub max_str($seq) {
 
 # max_str_by : Seq<'a> -> ('a -> string) -> Option<'a>
 sub max_str_by($seq, $f_str) {
-    my $max     = undef;
-    my $max_key = undef;
-    iter($seq, sub($x) {
-        my $key = $f_str->($x);
-        if ( defined $max ) {
-            if ( $key gt $max_key ) {
-                $max     = $x;
-                $max_key = $key;
-            }
-        }
-        else {
+    my $it  = $seq->();
+    my $max = $it->();
+    return Option::None() if !defined $max;
+    my $max_str = $f_str->($max);
+    my ($x, $str);
+    while ( defined($x = $it->()) ) {
+        $str = $f_str->($x);
+        if ( $str gt $max_str ) {
             $max     = $x;
-            $max_key = $key;
+            $max_str = $str;
         }
-    });
+    }
     return Option::Some($max);
 }
 
