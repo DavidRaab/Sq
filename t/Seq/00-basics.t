@@ -344,9 +344,9 @@ is(
     'Non Lazy Perl implementation of choose');
 
 
-is($range->find(undef, sub($x) { $x > 5  }),     6, 'find 1');
-is($range->find(undef, sub($x) { $x > 10 }), undef, 'find 2');
-is($range->find(0,     sub($x) { $x > 10 }),     0, 'find 3');
+is($range->find(sub($x) { $x > 5  }),   Some(6), 'find 1');
+is($range->find(sub($x) { $x > 10 }),      None, 'find 2');
+is($range->find(sub($x) { $x > 10 })->or(0),  0, 'find 3');
 
 is(
     $range->bind(sub($x) { Seq->wrap($x) })->to_array,

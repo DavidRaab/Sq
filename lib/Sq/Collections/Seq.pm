@@ -1205,14 +1205,14 @@ sub to_array_of_array($seq) {
 
 # returns first element for which the given $predicate returns true
 #
-# find : Seq<'a> -> ('a -> bool) -> 'a
-sub find($seq, $default, $predicate) {
+# find : Seq<'a> -> ('a -> bool) -> Option<'a>
+sub find($seq, $predicate) {
     my $it = $seq->();
     my $x;
     while ( defined($x = $it->()) ) {
-        return $x if $predicate->($x);
+        return Option::Some($x) if $predicate->($x);
     }
-    return $default;
+    return Option::None();
 }
 
 # any : Seq<'a> -> ('a -> bool) -> bool
