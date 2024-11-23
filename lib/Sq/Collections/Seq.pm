@@ -33,7 +33,7 @@ use Carp ();
 #-----------------------------------------------------------------------------#
 
 # creates a sequence from a subroutine
-sub from_sub($class, $f) {
+sub from_sub($, $f) {
     return bless(sub {
         my $abort = 0;
         my $it    = $f->();
@@ -50,18 +50,18 @@ sub from_sub($class, $f) {
 }
 
 # always return $x
-sub always($class, $x) {
+sub always($, $x) {
     bless(sub { sub { $x } }, 'Seq');
 }
 
 # empty sequence
-sub empty($class) {
+sub empty($) {
     state $empty = bless(sub { sub { undef } }, 'Seq');
     return $empty;
 }
 
 # replicates an $initial value $count times
-sub replicate($class, $count, $initial) {
+sub replicate($, $count, $initial) {
     from_sub(Seq => sub {
         my $amount = 0;
         return sub {
@@ -74,7 +74,7 @@ sub replicate($class, $count, $initial) {
 # TODO: When $state is a reference. Same handling as in fold?
 #
 # Seq->unfold : 'State -> ('State -> Option<'a,'State>) -> Seq<'a>
-sub unfold($class, $state, $f_opt) {
+sub unfold($, $state, $f_opt) {
     bless(sub {
         my $abort = 0;
         # IMPORTANT: Perl signatures are aliases. As we assign
@@ -93,7 +93,7 @@ sub unfold($class, $state, $f_opt) {
     }, 'Seq');
 }
 
-# Seq->init : int -> (int -> 'a) -> Seq<'a>
+# Seq->init: int -> (int -> 'a) -> Seq<'a>
 sub init($, $count, $f) {
     bless(sub {
         my $abort   = 0;
@@ -107,8 +107,8 @@ sub init($, $count, $f) {
     }, 'Seq');
 }
 
-# Seq->range_step : float -> float -> float -> Seq<float>
-sub range_step($class, $start, $step, $stop) {
+# Seq->range_step: float -> float -> float -> Seq<float>
+sub range_step($, $start, $step, $stop) {
     Carp::croak '$step is 0. Will run forever.' if $step == 0;
 
     # Ascending order
@@ -148,7 +148,7 @@ sub range_step($class, $start, $step, $stop) {
 }
 
 # Seq->new : List<'a> -> Seq<'a>
-sub new($class, @xs) {
+sub new($, @xs) {
     return bless(sub {
         my $abort = 0;
         my $idx   = 0;
@@ -162,7 +162,7 @@ sub new($class, @xs) {
     }, 'Seq');
 }
 
-sub wrap($class, @xs) {
+sub wrap($, @xs) {
     return new('Seq', @xs);
 }
 
@@ -207,7 +207,7 @@ sub range($, $start, $stop) {
 }
 
 # Seq->from_array : Array<'a> -> Seq<'a>
-sub from_array($class, $xs) {
+sub from_array($, $xs) {
     return bless(sub {
         my $abort = 0;
         my $idx   = 0;
@@ -222,7 +222,7 @@ sub from_array($class, $xs) {
 }
 
 # Seq->from_hash : Hash<'Key, 'Value> -> ('Key -> 'Value -> 'a) -> Seq<'a>
-sub from_hash($class, $hashref, $f) {
+sub from_hash($, $hashref, $f) {
     from_sub('Seq', sub {
         my $idx  = 0;
         my @keys = keys %$hashref;
@@ -237,7 +237,7 @@ sub from_hash($class, $hashref, $f) {
 }
 
 # Seq->concat : List<Seq<'a>> -> Seq<'a>
-sub concat($class, @seqs) {
+sub concat($, @seqs) {
     my $count = @seqs;
 
     # with no values to concat, return an empty iterator
