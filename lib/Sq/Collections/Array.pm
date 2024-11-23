@@ -824,39 +824,6 @@ sub pick($array, $f_opt) {
     return Option::None();
 }
 
-#-----------------------------------------------------------------------------#
-# MUTATION                                                                    #
-#         Those are functions mutating an array                               #
-#-----------------------------------------------------------------------------#
-
-sub push($array, @values) {
-    for my $x ( @values ) {
-        return if !defined $x;
-        CORE::push(@$array, $x);
-    }
-    return;
-}
-
-sub pop($array) {
-    return CORE::pop @$array;
-}
-
-sub shift($array) {
-    return CORE::shift @$array;
-}
-
-sub unshift($array, @values) {
-    # we need to built a new array, otherwise typical unshift order
-    # is not preserved
-    my @unshift;
-    for my $x ( @values ) {
-        last if !defined $x;
-        CORE::push @unshift, $x;
-    }
-    CORE::unshift @$array, @unshift;
-    return;
-}
-
 sub dump($array, $inline=60, $depth=0) {
     state $quote = sub($str) {
         $str =~ s/\r/\\r/;
@@ -917,6 +884,39 @@ sub dump($array, $inline=60, $depth=0) {
     $str =~ s/,\n\z/\n/;
     $str .= (" " x $depth) . "]";
     return $compact->($inline, $str);
+}
+
+#-----------------------------------------------------------------------------#
+# MUTATION                                                                    #
+#         Those are functions mutating an array                               #
+#-----------------------------------------------------------------------------#
+
+sub push($array, @values) {
+    for my $x ( @values ) {
+        return if !defined $x;
+        CORE::push(@$array, $x);
+    }
+    return;
+}
+
+sub pop($array) {
+    return CORE::pop @$array;
+}
+
+sub shift($array) {
+    return CORE::shift @$array;
+}
+
+sub unshift($array, @values) {
+    # we need to built a new array, otherwise typical unshift order
+    # is not preserved
+    my @unshift;
+    for my $x ( @values ) {
+        last if !defined $x;
+        CORE::push @unshift, $x;
+    }
+    CORE::unshift @$array, @unshift;
+    return;
 }
 
 1;
