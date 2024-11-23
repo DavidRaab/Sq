@@ -135,7 +135,8 @@ Creates a new I<Array> that contains C<$value> C<$count> times.
 =head2 Array->range($start, $stop) : $array
 
 Generates a new array from C<$start> to C<$stop> inclusive. It also supports
-counting downwards.
+counting downwards. C<$start> and C<$stop> are converted to B<int> before
+function starts. When you need floating values use C<range_step> instead.
 
     my $array = Array->range(1,10); # [1..10]
     my $array = Array->range(10,1); # [10,9,8,7,6,5,4,3,2,1]
@@ -276,16 +277,6 @@ this code roughly translates to
 
 =head1 METHODS
 
-=head2 copy($array) : $array
-
-Creates a shallow copy of an array, up until the first undef. This behaviour
-is choosen to avoid `undef` as being as data and being consistent to all
-other data-structures.
-
-    # both are [1,2,3]
-    my $copy = Array::copy([1,2,3]);
-    my $copy = Array::copy([1,2,3,undef,4,5,6]);
-
 All methods can be called as a method on an C<Array> (hence the name method),
 but calling every method in a functional-style is also supported and not
 discouraged. Every method listed here returns a new array as a result and
@@ -327,6 +318,17 @@ But whatever you do. All methods will always return a blessed C<Array>
 reference. So you always can chain methods even if you started without any.
 
     my $array = Array::append([1..10], [11..20])->rev # Array->range(20,1)
+
+=head2 copy($array) : $array
+
+Creates a shallow copy of an array, up until the first C<undef>. This behaviour
+is choosen to avoid C<undef> in data and also being consisten to the C<Seq>
+data-structure that uses C<undef> for aborting a sequence. Also C<< Array->unfold >>
+uses C<undef> for aborting and other function expectin B<optional values>.
+
+    # both are [1,2,3]
+    my $copy = Array::copy([1,2,3]);
+    my $copy = Array::copy([1,2,3,undef,4,5,6]);
 
 =head2 append($array1, $array2) : $array
 

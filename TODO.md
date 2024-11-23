@@ -5,4 +5,3 @@ no interest at the moment todo. So i don't forget them.
 
 * update all min/max function to latest fastest min/max version. See benchmarks/array_min.pl
 * update Seq/List to latest Option changes
-* Seq: Replace all function taking a $default parameter with option
