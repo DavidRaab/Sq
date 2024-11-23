@@ -4,7 +4,7 @@ use open ':std', ':encoding(UTF-8)';
 use Sq;
 use Benchmark qw(cmpthese);
 
-sub range_step_old($start, $step, $stop) {
+sub range_step1($start, $step, $stop) {
     Carp::croak '$step is 0. Will run forever.' if $step == 0;
 
     # Ascending order
@@ -23,7 +23,7 @@ sub range_step_old($start, $step, $stop) {
     }
 }
 
-sub range_step_new($start, $step, $stop) {
+sub range_step2($start, $step, $stop) {
     Carp::croak '$step is 0. Will run forever.' if $step == 0;
 
     # Ascending order
@@ -63,10 +63,6 @@ sub range_step_new($start, $step, $stop) {
 }
 
 cmpthese(-1, {
-    old_implementation => sub {
-        range_step_old(1, 1, 10_000)->to_array;
-    },
-    new_implementation => sub {
-        range_step_new(1, 1, 10_000)->to_array;
-    }
+    range_step1 => sub { range_step1(1, 1, 10_000)->to_array },
+    range_step2 => sub { range_step2(1, 1, 10_000)->to_array },
 });
