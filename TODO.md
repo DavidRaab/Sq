@@ -4,4 +4,5 @@ Here I describe some stuff like improvements that i later want todo, but usually
 no interest at the moment todo. So i don't forget them.
 
 * update all min/max function to latest fastest min/max version. See benchmarks/array_min.pl
-* Update Seq/List to latest Option changes
+* update Seq/List to latest Option changes
+* Seq: Replace all function taking a $default parameter with option
