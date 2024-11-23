@@ -73,19 +73,19 @@ sub replicate($class, $count, $initial) {
 
 # TODO: When $state is a reference. Same handling as in fold?
 #
-# Seq->unfold : 'State -> ('State -> Option<ListContext<'a,'State>>) -> Seq<'a>
-sub unfold($class, $state, $f) {
+# Seq->unfold : 'State -> ('State -> Option<'a,'State>) -> Seq<'a>
+sub unfold($class, $state, $f_opt) {
     bless(sub {
         my $abort = 0;
         # IMPORTANT: Perl signatures are aliases. As we assign
         # to $state later, we need to make a copy here.
         # Removing this lines causes bugs.
         my $state = $state;
-        my $x;
+        my ($is_some, $x);
         return sub {
             return undef if $abort;
-            ($x, $state) = $f->($state);
-            return $x if defined $x;
+            ($is_some, $x, $state) = Option->extract_array($f_opt->($state));
+            return $x if $is_some;
             $abort = 1;
             undef $state;
             undef $x;
