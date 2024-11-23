@@ -1,5 +1,6 @@
 #!perl
 use 5.036;
+use Scalar::Util qw(refaddr);
 use List::Util qw(reduce);
 use Sq;
 use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end bag float U/;
@@ -814,6 +815,13 @@ is(
         $seq->to_array,
         [1,1.3, 1.6, 1.9],
         'does not overshoot');
+}
+
+# to_seq
+{
+    my $seq1 = Seq->range(1,3);
+    my $seq2 = $seq1->to_seq;
+    is(refaddr($seq1), refaddr($seq2), 'to_seq returns same $seq');
 }
 
 done_testing;
