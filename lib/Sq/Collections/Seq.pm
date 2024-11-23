@@ -463,11 +463,11 @@ sub select($seq, $mapA, $mapB) {
 sub choose($seq, $f_opt) {
     from_sub('Seq', sub {
         my $it = $seq->();
-        my ($x, $opt);
+        my ($x, $is_some, $v);
         return sub {
             while ( defined($x = $it->()) ) {
-                $opt = $f_opt->($x);
-                return $opt->[0] if @$opt;
+                ($is_some, $v) = Option->extract($f_opt->($x));
+                return $v if $is_some;
             }
             return undef;
         }
