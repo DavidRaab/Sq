@@ -1119,4 +1119,31 @@ is(
     is($range->slice(10,-11),        [10,0],        'slice exact bounds');
 }
 
+# distinct_by POD example
+{
+    my $data = Array->new(
+        {id => 1, name => "foo"},
+        {id => 3, name => "foo"},
+        {id => 1, name => "bar"},
+        {id => 2, name => "bar"},
+    );
+
+    is(
+        $data->distinct_by(key 'id'),
+        [
+            {id => 1, name => "foo"},
+            {id => 3, name => "foo"},
+            {id => 2, name => "bar"},
+        ],
+        'distinct_by pod example 1');
+
+    is(
+        $data->distinct_by(key 'name'),
+        [
+            {id => 1, name => "foo"},
+            {id => 1, name => "bar"},
+        ],
+        'distinct_by pod example 2');
+}
+
 done_testing;

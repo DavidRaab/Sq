@@ -223,32 +223,6 @@ sub filter_e($array, $expr) {
     return CORE::bless($data, 'Array');
 }
 
-sub blit($source_array, $source_index, $target_array, $target_index, $amount) {
-    # allow negative indexing
-    $source_index =
-        $source_index < 0
-        ? @$source_array + $source_index
-        : $source_index;
-
-    # allows negativ indexing
-    $target_index =
-        $target_index < 0
-        ? @$target_array + $target_index
-        : $target_index;
-
-    # copy only as much values as available in source
-    my $max_amount = @$source_array - $source_index;
-    $amount = $amount < $max_amount ? $amount : $max_amount;
-
-    # actual copying
-    for ( 1 .. $amount ) {
-        $target_array->[$target_index] = $source_array->[$source_index];
-        $source_index++;
-        $target_index++;
-    }
-    return;
-}
-
 sub skip($array, $amount) {
     return CORE::bless([@$array], 'Array') if $amount <= 0;
     return CORE::bless([$array->@[$amount .. $array->$#*]], 'Array');
@@ -263,27 +237,6 @@ sub take($array, $amount) {
         push @array, $x;
     }
     return CORE::bless(\@array, 'Array');
-}
-
-# length : Array<'a> -> int
-sub length($array) {
-    return scalar @{ $array };
-}
-
-# fold : Array<'a> -> 'State -> (a -> 'State -> 'State) -> 'State
-sub fold($array, $state, $folder) {
-    for my $x ( @$array ) {
-        $state = $folder->($x,$state);
-    }
-    return $state;
-}
-
-# fold : Array<'a> -> 'State -> ('State -> 'a -> 'State) -> 'State
-sub fold_mut($array, $state, $folder) {
-    for my $x ( @$array ) {
-        $folder->($x,$state);
-    }
-    return $state;
 }
 
 # adds index to an array
@@ -334,9 +287,6 @@ sub sort_str($array) {
     return CORE::bless([sort { $a cmp $b } @$array], 'Array');
 }
 
-# Sorts an array of hashes by just providing the key to be used. Keys
-# are string compared.
-#
 # Array<Hash<'Key,'a>> -> 'Key -> Array<Hash<'Key,'a>>
 sub sort_hash_str($array, $key) {
     return Array::sort($array, sub($x,$y) {
@@ -386,17 +336,10 @@ sub to_array($array, $count=undef) {
 }
 
 # Does nothing. It is just here for API compatibility with Seq::to_array_of_array
-sub to_array_of_array($array) {
-    return $array;
+sub to_array_of_array($array_of_array) {
+    return $array_of_array;
 }
 
-# Returns an array with distinct values. Only works properly when
-# array entries can be turned into strings. Under the hood a hash is used
-# to keep track of seen values. If used on objects other than string or numbers
-# it will properly not work correctly unless a string overload is defined.
-# If that is not the case use `distinct_by` to generate a unique key to
-# decide how entries are unique.
-#
 # Array<'a> -> Array<'a>
 sub distinct($array) {
     my %seen;
@@ -574,16 +517,20 @@ sub foreachi($array, $f) {
 #         Those are functions converting Array to none Array types            #
 #-----------------------------------------------------------------------------#
 
-sub expand($array) {
-    return @$array;
+# fold : Array<'a> -> 'State -> (a -> 'State -> 'State) -> 'State
+sub fold($array, $state, $folder) {
+    for my $x ( @$array ) {
+        $state = $folder->($x,$state);
+    }
+    return $state;
 }
 
-sub first($array) {
-    return Option::Some($array->[0]);
-}
-
-sub last($array) {
-    return Option::Some($array->[-1]);
+# fold : Array<'a> -> 'State -> ('State -> 'a -> 'State) -> 'State
+sub fold_mut($array, $state, $folder) {
+    for my $x ( @$array ) {
+        $folder->($x,$state);
+    }
+    return $state;
 }
 
 sub reduce($array, $f) {
@@ -594,6 +541,23 @@ sub reduce($array, $f) {
         $init = $f->($init, $array->[$idx]);
     }
     return Option::Some($init);
+}
+
+# length : Array<'a> -> int
+sub length($array) {
+    return scalar @{ $array };
+}
+
+sub expand($array) {
+    return @$array;
+}
+
+sub first($array) {
+    return Option::Some($array->[0]);
+}
+
+sub last($array) {
+    return Option::Some($array->[-1]);
 }
 
 sub sum($array) {
@@ -955,6 +919,32 @@ sub unshift($array, @values) {
         CORE::push @unshift, $x;
     }
     CORE::unshift @$array, @unshift;
+    return;
+}
+
+sub blit($source_array, $source_index, $target_array, $target_index, $amount) {
+    # allow negative indexing
+    $source_index =
+        $source_index < 0
+        ? @$source_array + $source_index
+        : $source_index;
+
+    # allows negativ indexing
+    $target_index =
+        $target_index < 0
+        ? @$target_array + $target_index
+        : $target_index;
+
+    # copy only as much values as available in source
+    my $max_amount = @$source_array - $source_index;
+    $amount = $amount < $max_amount ? $amount : $max_amount;
+
+    # actual copying
+    for ( 1 .. $amount ) {
+        $target_array->[$target_index] = $source_array->[$source_index];
+        $source_index++;
+        $target_index++;
+    }
     return;
 }
 

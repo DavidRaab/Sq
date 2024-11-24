@@ -433,6 +433,10 @@ in a single function call.
         ->map(   sub($x) { $x * $x     })
         ->filter(sub($x) { $x % 2 == 0 });
 
+=head2 map_e($array, $expr) : $array
+
+TODO
+
 =head2 mapi($array_a, $f_b) : $array_b
 
 Same as C<map> but the function C<$f> additionally gets an index passed.
@@ -476,6 +480,10 @@ is returned in a new array. Works like the perl built-in C<grep>.
     my $evens =
         Array->range(1,10)
         ->filter(sub($x) { $x % 2 == 0 });
+
+=head2 filter_e($array, $expr) : $array
+
+TODO
 
 =head2 skip($array, $amount) : $array
 
@@ -524,39 +532,178 @@ is encountered somewhere.
 The word tuple is just used for clarification what it does. A tuple here is just
 an Array and is also blessed in the C<Array> package.
 
-=head2 sort
+=head2 sort($array, $comparer) : $array
 
-=head2 sort_by
+TODO
 
-=head2 sort_num
+=head2 sort_by($array, $comparer, $f_key) : $array
 
-=head2 sort_str
+TODO
 
-=head2 sort_hash_str
+=head2 sort_num($array) : $array
 
-=head2 sort_hash_num
+Sorts an array by number.
 
-=head2 fsts
+    my $sorted = Array->new(6,4,2,10)->sort_num; # [2,4,6,10]
 
-=head2 snds
+=head2 sort_str($array) : $array
 
-=head2 to_array_of_array
+Sorts an array by strings.
 
-=head2 distinct
+    my $sorted = Array->new(qw/c a b/)->sort_str; # [qw/a b c/]
 
-=head2 distinct_by
+=head2 sort_hash_str($array, $key) : $array
 
-=head2 regex_match
+Sorts an array of hashes by selecting which key should be used for sorting.
+Values are string compared.
 
-=head2 windowed
+    my $data = Array->new(
+        {id => 3, name => "foo"},
+        {id => 1, name => "bar"},
+        {id => 2, name => "alf"},
+    );
 
-=head2 intersperse
+    my $sorted = $data->sort_hash_str('name');
+    # [
+    #     {id => 2, name => "alf"},
+    #     {id => 1, name => "bar"},
+    #     {id => 3, name => "foo"},
+    # ];
 
-=head2 repeat
+=head2 sort_hash_num($array, $key) : $array
 
-=head2 take_while
+Sorts an array of hashes by selecting which key should be used for sorting.
+Values are number compared.
 
-=head2 skip_while
+    my $data = Array->new(
+        {id => 3, name => "foo"},
+        {id => 1, name => "bar"},
+        {id => 2, name => "alf"},
+    );
+
+    my $sorted = $data->sort_hash_str('id');
+    # [
+    #     {id => 1, name => "bar"},
+    #     {id => 2, name => "alf"},
+    #     {id => 3, name => "foo"},
+    # ];
+
+=head2 fsts($array_of_array) : $array
+
+returns a new array by just selection the first elements of the inner array.
+
+    my $data = Array->new(
+        [1,2],
+        [3,4],
+        [5,6],
+    );
+
+    my $array = $data->fsts; # [1,3,5]
+
+=head2 snds($array_of_array) : $array
+
+returns a new array by just selection the second elements of the inner array.
+
+    my $data = Array->new(
+        [1,2],
+        [3,4],
+        [5,6],
+    );
+
+    my $array = $data->snds; # [2,4,6]
+
+=head2 to_array($array, $count=undef) : $array
+
+This function primarily exists because of API compatibility with C<Seq> and
+C<List>. But because of the optional argument C<$count> its behaviour
+depends on that argument. It's behavior is choosen to have zero-impact on
+performance when it is possible.
+
+When C<$count> is not passed or is C<undef> than the C<$array> is just returned
+as-is without doing anything. This means you easily can change from C<Seq> or C<List>
+to C<Array> and for example do benchmarks without caring much about a C<to_array>
+call creating a copy.
+
+But when C<$count> is being passed than a new Array is maybe created. When C<$count>
+is smaller or equal to C<0> than a new empty array is returned. Otherwise C<$count>
+elements are copied to a new array, expect when C<$count> is greater than the original
+array, than again C<$array> is just being returned as-is.
+
+    my $data = Array->range(1,100);
+
+    my $array = $data->to_array();     # noop: my $array = $data;
+    my $array = $data->to_array(0);    # []
+    my $array = $data->to_array(-1);   # []
+    my $array = $data->to_array(10);   # [1..10]
+    my $array = $data->to_array(1000); # noop: my $array = $data;
+
+If you really want to create a copy of an Array use C<copy>. If you
+want to extract a portion of an array into a new Array use C<slice>.
+
+=head2 to_array_of_array($array_of_array) : $array_of_array
+
+Does nothing. Only here because of API compaitbility with C<< $seq->to_array_of_array >>.
+Also does no type-checking if you passed in an array of array.
+
+=head2 distinct($array) : $array
+
+Returns an array with distinct values. Only works properly when array entries can
+be turned into strings. Under the hood a hash is used to keep track of seen values.
+
+If used on objects other than string or numbers it will properly not work
+correctly unless a string overload is defined. In those cases use C<distinct_by>.
+
+    my $array = Array->new(1,2,1,"foo",3,2,"bar")->distinct; # [1,2,"foo",3,"bar"]
+
+=head2 distinct_by($array, $f_str) : $array
+
+Returns an array with distinct values. A Hash is used to keep track of seen
+values. Every value is passed to C<$f_str> to compute the string used in the
+hash of seen values.
+
+    my $data = Array->new(
+        {id => 1, name => "foo"},
+        {id => 3, name => "foo"},
+        {id => 1, name => "bar"},
+        {id => 2, name => "bar"},
+    );
+
+    my $array = $data->distinct_by(key 'id');
+    # [
+    #     {id => 1, name => "foo"},
+    #     {id => 3, name => "foo"},
+    #     {id => 2, name => "bar"},
+    # ]
+
+    my $array = $data->distinct_by(key 'name');
+    # [
+    #    {id => 1, name => "foo"},
+    #    {id => 1, name => "bar"},
+    # ]
+
+=head2 regex_match($array, $regex, $picks) : $array
+
+TODO
+
+=head2 windowed($array, $window_size) : $array
+
+TODO
+
+=head2 intersperse($array, $value) : $array
+
+TODO
+
+=head2 repeat($array, $count) : $array
+
+TODO
+
+=head2 take_while($array, $predicate) : $array
+
+TODO
+
+=head2 skip_while($array, $predicate) : $array
+
+TODO
 
 =head2 slice($array, @idxs) : $array
 
@@ -693,11 +840,11 @@ warnings and weird results.
     # 55
     my $sum = Array->range(1,10)->sum;
 
-=head2 sum_by($array, $f_number) : $number
+=head2 sum_by($array, $f_map) : $number
 
 A lot like C<sum> but every value of an array is first passed to the function
-C<$f_number>. That function then should return a number that is used for adding. You
-could achive the same by calling C<< $array->map($f_number)->sum >> but this version
+C<$f_map>. That function then should return a number that is used for adding. You
+could achive the same by calling C<< $array->map($f_map)->sum >> but this version
 is faster because it doesn't need to create an intermediate array.
 
     my $value = sub($hash) { $hash->{value} };
@@ -737,6 +884,38 @@ this version is faster.
     my $data = Array->new("1-2-3", "4-5-6")->map(sub($str) {
         Array->new(split /-/, $str)
     });
+
+=head2 min($array_x) : $opt_x
+
+TODO
+
+=head2 min_by($array_x, $f_number) : $opt_x
+
+TODO
+
+=head2 min_str($array_x) : $opt_x
+
+TODO
+
+=head2 min_str_by($array_x, $f_str) : $opt_x
+
+TODO
+
+=head2 max($array_x) : $opt_x
+
+TODO
+
+=head2 max_by($array_x, $f_number) : $opt_x
+
+TODO
+
+=head2 max_str($array_x) : $opt_x
+
+TODO
+
+=head2 max_str_by($array_x, $f_str) : $opt_x
+
+TODO
 
 =head2 group_fold
 
@@ -783,11 +962,19 @@ in the C<Hash> package and as a reference.
     my %hash = @$array;
     my $hash = $array->as_hash;
 
-=head2 keyed_by
+=head2 keyed_by($array, $f_key) : $hash
 
 TODO
 
-=head2 group_by
+=head2 group_by($array, $f_key) : $hash
+
+TODO
+
+=head2 count($array) : $hash
+
+TODO
+
+=head2 count_by($array, $f_key) : $hash
 
 TODO
 
@@ -839,33 +1026,12 @@ then B<None> is returned.
     my $opt = $r->pick(sub($x) { $x >  5 ? $x*$x : undef }); # Some(36)
     my $opt = $r->pick(sub($x) { $x >  5 ? $x*$x : ()    }); # Some(36)
 
-=head2 to_array($array, $count=undef) : $array
+=head2 to_seq($array) : $seq
 
-This function primarily exists because of API compatibility with C<Seq> and
-C<List>. But because of the optional argument C<$count> its behaviour
-depends on that argument. It's behavior is choosen to have zero-impact on
-performance when it is possible.
+Transform an array into a sequence. Same as calling C<< Seq->from_array($array) >>
+but does it in a chain.
 
-When C<$count> is not passed or is C<undef> than the C<$array> is just returned
-as-is without doing anything. This means you easily can change from C<Seq> or C<List>
-to C<Array> and for example do benchmarks without caring much about a C<to_array>
-call creating a copy.
-
-But when C<$count> is being passed than a new Array is maybe created. When C<$count>
-is smaller or equal to C<0> than a new empty array is returned. Otherwise C<$count>
-elements are copied to a new array, expect when C<$count> is greater than the original
-array, than again C<$array> is just being returned as-is.
-
-    my $data = Array->range(1,100);
-
-    my $array = $data->to_array();     # noop: my $array = $data;
-    my $array = $data->to_array(0);    # []
-    my $array = $data->to_array(-1);   # []
-    my $array = $data->to_array(10);   # [1..10]
-    my $array = $data->to_array(1000); # noop: my $array = $data;
-
-If you really want to create a copy of an Array use C<copy>. If you
-want to extract a portion of an array into a new Array use C<slice>.
+    my $seq = Array->range(1,10)->to_seq;
 
 =head2 dump($array, $inline=60, $depth=0) : $str
 
@@ -942,6 +1108,13 @@ Only copies as much values that are present in C<$source_array>.
     $source->blit(4,  $target, -3,   2); # $target -> [104,105,104,105,5]
     $source->blit(0,  $target, -1, 100); # $target -> [104,105,104,105,100,101,102,103,104,105]
 
+=head2 shuffle($array) : void
+
+Randomly shuffles array in-place;
+
+    my $array = Array->range(1,10);
+    $array->shuffle; # values now in random order
+
 =head1 SIDE-Effects
 
 The following methods have no return value and exists for various kind
@@ -970,10 +1143,3 @@ Same as C<iter>, just an alias.
 =head2 foreachi($array, $f) : void
 
 Same as C<iteri>, just an alias.
-
-=head2 shuffle($array) : void
-
-Randomly shuffles array in-place;
-
-    my $array = Array->range(1,10);
-    $array->shuffle; # values now in random order
