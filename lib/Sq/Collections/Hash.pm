@@ -208,7 +208,7 @@ sub get($hash, $key) {
     return Option::Some($value);
 }
 
-# Hash<'a> -> 'a -> ListContext<'a> -> Array<'a>
+# Hash<'a> -> ListContext<string> -> Array<Option<'a>>
 sub extract($hash, @keys) {
     my $array = Array->new;
     for my $key ( @keys ) {
@@ -217,20 +217,17 @@ sub extract($hash, @keys) {
     return $array;
 }
 
-sub copy($hash, @keys) {
-    # copy the whole hash when no keys are defined
-    if ( @keys == 0 ) {
-        return CORE::bless({%$hash}, 'Hash');
+sub copy($hash) {
+    return CORE::bless({%$hash}, 'Hash');
+}
+
+sub slice($hash, @keys) {
+    my $new = Hash->new;
+    for my $key ( @keys ) {
+        my $v = $hash->{$key};
+        $new->{$key} = $v if defined $v;
     }
-    # otherwise copy just the keys specified in new hash
-    else {
-        my $new = Hash->new;
-        for my $key ( @keys ) {
-            my $v = $hash->{$key};
-            $new->{$key} = $v if defined $v;
-        }
-        return $new;
-    }
+    return $new;
 }
 
 sub with($hash, @kvs) {

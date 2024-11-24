@@ -185,21 +185,33 @@ or C<$array> returned by any C<Hash> function should always be blessed in
 the package C<Hash> or C<Array>. None of those methods mutate a Hash, all of
 them return a new hash.
 
-=head2 copy($hash, @keys) : $hash
+=head2 copy($hash) : $hash
 
-Creates a shallow copy of the Hash. You can additionally specify which keys
-are copied to the new hash only copying certain keys. When you try to copy a
-key that doesn't exists then the key will not appear on the result.
+Creates a shallow copy of the Hash.
 
     my $h = Hash->new(
         foo => 1, bar => 2,
         baz => 3, maz => 4,
     );
 
-    my $hash = $h->copy;              # { foo => 1, bar => 2, baz => 3, maz => 4 }
-    my $hash = $h->copy(qw/foo bar/); # { foo => 1, bar => 2 }
-    my $hash = $h->copy(qw/foo baz/); # { foo => 1, baz => 3 }
-    my $hash = $h->copy('maz');       # { maz => 4 }
+    my $hash = $h->copy;
+
+=head2 slice($hash, @keys) : $hash
+
+Hash slice, similar to built-in Hash slice in Perl, but doesn't copy fields
+that are not defined.
+
+    my $h = Hash->new(
+        foo => 1, bar => 2,
+        baz => 3, maz => 4,
+    );
+
+    my $hash = $h->slice(qw/foo bar/); # { foo => 1, bar => 2 }
+    my $hash = $h->slice(qw/foo baz/); # { foo => 1, baz => 3 }
+    my $hash = $h->slice('maz');       # { maz => 4 }
+
+    # Perl built-in
+    my %hash = $h->%{qw/foo bar/};
 
 =head2 with($hash, @kvs) : $hash
 

@@ -396,7 +396,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     # we also could copy those fields that we think that don't change. so we don't need
     # to call ->set in the lambda
     my $entry4 = $data->fold_mut(
-        $data->[0]->copy(qw/id name/), # creates inital $state as a copy of first Hash
+        $data->[0]->slice(qw/id name/), # creates inital $state as a copy of first Hash
         sub($x,$state) {
             $state->push(tags => $x->{tags});
         }
@@ -518,7 +518,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     is($i, {foo => 2}, 'copy 2');
 }
 
-# copy with limited keys
+# slice
 {
     my $h = Hash->new(
         foo => 1, bar => 2,
@@ -526,21 +526,21 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     );
 
     is(
-        $h->copy(qw/foo bar/),
+        $h->slice(qw/foo bar/),
         { foo => 1, bar => 2 },
         'copy foo & bar');
 
     is(
-        $h->copy(qw/foo baz/),
+        $h->slice(qw/foo baz/),
         { foo => 1, baz => 3 },
         'copy foo & baz');
 
-    is( $h->copy('maz'),
+    is( $h->slice('maz'),
         { maz => 4 },
         'copy only maz');
 
     is(
-        $h->copy(qw/foo barr/),
+        $h->slice(qw/foo barr/),
         { foo => 1 },
         'copy with a missing key');
 }
