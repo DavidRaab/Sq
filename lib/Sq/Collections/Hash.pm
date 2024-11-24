@@ -5,7 +5,6 @@ use Carp ();
 use subs 'bind', 'keys', 'values', 'bless', 'map', 'foreach', 'delete', 'length';
 
 # TODO: equal, eual_values, is_disjoint
-#       change, push
 
 ### CONSTRUCTORS
 
