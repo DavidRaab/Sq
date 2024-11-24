@@ -857,6 +857,11 @@ sub pick($array, $f_opt) {
     return Option::None();
 }
 
+# to_seq: Array<'a> -> Seq<'a>
+sub to_seq($array) {
+    return Seq->from_array($array);
+}
+
 sub dump($array, $inline=60, $depth=0) {
     state $quote = sub($str) {
         $str =~ s/\r/\\r/;
