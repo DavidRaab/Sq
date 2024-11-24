@@ -778,10 +778,10 @@ sub count($array) {
     return $new;
 }
 
-sub count_by($array, $f_key) {
+sub count_by($array, $f_str) {
     my $new = Hash->new;
     for my $x ( @$array ) {
-        $new->{$f_key->($x)}++;
+        $new->{$f_str->($x)}++;
     }
     return $new;
 }
