@@ -385,11 +385,6 @@ sub to_array($array, $count=undef) {
     }
 }
 
-# to_seq: Array<'a> -> Seq<'a>
-sub to_seq($array) {
-    return Seq->from_array($array);
-}
-
 # Does nothing. It is just here for API compatibility with Seq::to_array_of_array
 sub to_array_of_array($array) {
     return $array;
@@ -527,7 +522,13 @@ sub skip_while($array, $predicate) {
     return CORE::bless([$array->@[$index .. $array->$#*]], 'Array');
 }
 
-sub slice($array, $pos, $length) {
+sub slice($array, @idxs) {
+    my $max = @$array;
+    my $min = (-$max) - 1;
+    return CORE::bless([$array->@[grep {$_ < $max && $_ > $min} @idxs]], 'Array');
+}
+
+sub extract($array, $pos, $length) {
     return CORE::bless([], 'Array') if $length <= 0;
     return CORE::bless([], 'Array') if $pos > @$array;
 

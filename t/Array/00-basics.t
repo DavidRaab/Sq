@@ -948,26 +948,26 @@ is(
     is($data, [15,16,1,8,2..7,11,12], 'unshift only up to first undef');
 }
 
-# slice
+# extract
 {
     # index: 0 1 2 3 4 5 6 7 8 9
     # data:   1 2 3 4 5 6 7 8 9 10
     my $data = Array->range(1,10);
-    is($data->slice(0,3),   [1,2,3],      'slice at beginning');
-    is($data->slice(1,3),   [2,3,4],      'slice skipping first');
-    is($data->slice(20,10), [],           'slice empty');
-    is($data->slice(5,100), [6,7,8,9,10], 'slice to the end');
-    is($data->slice(3,3),   [4,5,6],      'slice of 3');
-    is($data->slice(9,1),   [10],         'slice at end');
-    is($data->slice(9,10),  [10],         'slice at end');
-    is($data->slice(10,1),  [],           'slice out of bound');
-    is($data->slice(0,0),   [],           'slice with zero length');
-    is($data->slice(0,-10), [],           'slice with negative length');
-    is($data->slice(-3,3),  [8,9,10],     'slice with negative position 1');
-    is($data->slice(-3,2),  [8,9],        'slice with negative position 2');
-    is($data->slice(-3,0),  [],           'slice with negative position and 0 length');
-    is($data->slice(-3,-3), [],           'slice both values negative');
-    is($data->slice(1,3), $data->skip(1)->take(3), 'slice is like skip->take');
+    is($data->extract(0,3),   [1,2,3],      'extract at beginning');
+    is($data->extract(1,3),   [2,3,4],      'extract skipping first');
+    is($data->extract(20,10), [],           'extract empty');
+    is($data->extract(5,100), [6,7,8,9,10], 'extract to the end');
+    is($data->extract(3,3),   [4,5,6],      'extract of 3');
+    is($data->extract(9,1),   [10],         'extract at end');
+    is($data->extract(9,10),  [10],         'extract at end');
+    is($data->extract(10,1),  [],           'extract out of bound');
+    is($data->extract(0,0),   [],           'extract with zero length');
+    is($data->extract(0,-10), [],           'extract with negative length');
+    is($data->extract(-3,3),  [8,9,10],     'extract with negative position 1');
+    is($data->extract(-3,2),  [8,9],        'extract with negative position 2');
+    is($data->extract(-3,0),  [],           'extract with negative position and 0 length');
+    is($data->extract(-3,-3), [],           'extract both values negative');
+    is($data->extract(1,3), $data->skip(1)->take(3), 'extract is like skip->take');
 }
 
 # copy of array-ref
@@ -1106,6 +1106,17 @@ is(
         $data,
         [1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1],
         'to_seq on array');
+}
+
+# slice
+{
+    my $range = Array->range(0,10);
+    is($range->slice(),              [],            'slice wo args');
+    is($range->slice(1,5,5,2,3,9),   [1,5,5,2,3,9], 'slice');
+    is($range->slice(-1, -2, -3),    [10,9,8],      'slice with negative index');
+    is($range->slice(20,30),         [],            'slice with out of bound 1');
+    is($range->slice(1,20,2,-20,3),  [1,2,3],       'slice with out of bound 2');
+    is($range->slice(10,-11),        [10,0],        'slice exact bounds');
 }
 
 done_testing;

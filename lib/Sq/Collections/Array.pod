@@ -558,7 +558,17 @@ an Array and is also blessed in the C<Array> package.
 
 =head2 skip_while
 
-=head2 slice($array, $pos, $length) : $array
+=head2 slice($array, @idxs) : $array
+
+Similar to an Array slice in Perl. But indexes that are out-of-bound don't
+return an C<undef> value, they are just skipped.
+
+    my $array = Array->range(0,10);
+
+    my $slice = $array->slice(-1,20,0,5,-20); # [10,0,5]
+    my @slice = $array->@[-1,20,0,5,20,-20];  # (10,undef,0,5,undef)
+
+=head2 extract($array, $pos, $length) : $array
 
 Extracts a portion of values into a new array. The values are a shallow copy,
 but the array is a new array. If C<$pos> is negative than it is considered
