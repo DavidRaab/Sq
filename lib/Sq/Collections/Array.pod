@@ -800,17 +800,26 @@ as B<Some value>. When no value could be found it returns B<None>.
     my $opt = Array->range(1,10)->find(sub($x) { $x > 5  }); # Some(6)
     my $opt = Array->range(1,10)->find(sub($x) { $x > 20 }); # None
 
-=head2 any
+=head2 any($array, $predicate) : $bool
 
-TODO
+Checks if any value in C<$array> satisfies a predicate.
 
-=head2 all
+    my $bool = Array->range(1,10)->any(sub($x) { $x >   5 }); # 1
+    my $bool = Array->range(1,10)->any(sub($x) { $x > 100 }); # 0
 
-TODO
+=head2 all($array, $predicate) : $bool
 
-=head2 none
+Checks if all values in C<$array> satisfies a predicate.
 
-TODO
+    my $bool = Array->range(1,10)->all(sub($x) { $x > 0 }); # 1
+    my $bool = Array->range(1,10)->all(sub($x) { $x < 9 }); # 0
+
+=head2 none($array, $predicate) : $bool
+
+Checks if no value in C<$array> satisfies a predicate.
+
+    my $bool = Array->range(1,10)->none(sub($x) { $x < 0 }); # 1
+    my $bool = Array->range(1,10)->none(sub($x) { $x > 9 }); # 0
 
 =head2 pick($array, $f_opt) : $opt
 
