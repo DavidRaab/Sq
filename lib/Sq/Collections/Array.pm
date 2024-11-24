@@ -597,20 +597,16 @@ sub min($array) {
 }
 
 # min_by : Array<'a> -> ('a -> float) -> Option<'a>
-sub min_by($array, $f_number) {
-    my $min     = undef;
-    my $min_key = undef;
+sub min_by($array, $f_num) {
+    return Option::None() if @$array == 0;
+    my $min     = $array->[0];
+    my $min_num = $f_num->($min);
+    my ($x, $num);
     for my $x ( @$array ) {
-        my $key = $f_number->($x);
-        if ( defined $min ) {
-            if ( $key < $min_key ) {
-                $min     = $x;
-                $min_key = $key;
-            }
-        }
-        else {
+        $num = $f_num->($x);
+        if ( $num < $min_num ) {
             $min     = $x;
-            $min_key = $key;
+            $min_num = $num;
         }
     }
     return Option::Some($min);
@@ -618,24 +614,26 @@ sub min_by($array, $f_number) {
 
 # min_str : Seq<string> -> string -> Option<string>
 sub min_str($array) {
-    min_str_by($array, \&Sq::id);
+    return Option::None() if @$array == 0;
+    my $min = $array->[0];
+    my $x;
+    for my $x ( @$array ) {
+        $min = $x if $x lt $min;
+    }
+    return Option::Some($min);
 }
 
 # min_str_by : Seq<'a> -> ('a -> string) -> Option<'a>
 sub min_str_by($array, $f_str) {
-    my $min     = undef;
-    my $min_key = undef;
+    return Option::None() if @$array == 0;
+    my $min     = $array->[0];
+    my $min_str = $f_str->($min);
+    my ($x, $str);
     for my $x ( @$array ) {
-        my $key = $f_str->($x);
-        if ( defined $min ) {
-            if ( $key lt $min_key ) {
-                $min     = $x;
-                $min_key = $key;
-            }
-        }
-        else {
+        $str = $f_str->($x);
+        if ( $str lt $min_str ) {
             $min     = $x;
-            $min_key = $key;
+            $min_str = $str;
         }
     }
     return Option::Some($min);
@@ -652,20 +650,16 @@ sub max($array) {
 }
 
 # max_by : Array<'a> -> ('a -> float) -> Option<'a>
-sub max_by($array, $f_number) {
-    my $max     = undef;
-    my $max_key = undef;
+sub max_by($array, $f_num) {
+    return Option::None() if @$array == 0;
+    my $max     = $array->[0];
+    my $max_num = $f_num->($max);
+    my ($x, $num);
     for my $x ( @$array ) {
-        my $key = $f_number->($x);
-        if ( defined $max ) {
-            if ( $key > $max_key ) {
-                $max     = $x;
-                $max_key = $key;
-            }
-        }
-        else {
+        $num = $f_num->($x);
+        if ( $num > $max_num ) {
             $max     = $x;
-            $max_key = $key;
+            $max_num = $num;
         }
     }
     return Option::Some($max);
@@ -673,24 +667,26 @@ sub max_by($array, $f_number) {
 
 # max_str : Array<string> -> string
 sub max_str($array) {
-    max_str_by($array, \&Sq::id);
+    return Option::None() if @$array == 0;
+    my $max = $array->[0];
+    my $x;
+    for my $x ( @$array ) {
+        $max = $x if $x gt $max;
+    }
+    return Option::Some($max);
 }
 
 # max_str_by : Array<'a> -> ('a -> string) -> Option<'a>
 sub max_str_by($array, $f_str) {
-    my $max     = undef;
-    my $max_key = undef;
+    return Option::None() if @$array == 0;
+    my $max     = $array->[0];
+    my $max_str = $f_str->($max);
+    my ($x, $str);
     for my $x ( @$array ) {
-        my $key = $f_str->($x);
-        if ( defined $max ) {
-            if ( $key gt $max_key ) {
-                $max     = $x;
-                $max_key = $key;
-            }
-        }
-        else {
+        $str = $f_str->($x);
+        if ( $str gt $max_str ) {
             $max     = $x;
-            $max_key = $key;
+            $max_str = $str;
         }
     }
     return Option::Some($max);
@@ -708,15 +704,15 @@ sub max_str_by($array, $f_str) {
 # -> ('a -> 'Key)
 # -> ('State -> 'a -> 'State)
 # -> Hash<'key, 'State>
-sub group_fold($array, $f_init, $f_key, $f_state) {
+sub group_fold($array, $f_init, $f_str, $f_state) {
     my $new = Hash->new;
     for my $x ( @$array ) {
-        my $key = $f_key->($x);
-        if ( exists $new->{$key} ) {
-            $new->{$key} = $f_state->($new->{$key}, $x);
+        my $str = $f_str->($x);
+        if ( exists $new->{$str} ) {
+            $new->{$str} = $f_state->($new->{$str}, $x);
         }
         else {
-            $new->{$key} = $f_state->($f_init->(), $x);
+            $new->{$str} = $f_state->($f_init->(), $x);
         }
     }
     return $new;
@@ -748,10 +744,10 @@ sub as_hash($array) {
 }
 
 # Array<'a> -> ('a -> 'Key) -> Hash<'Key, 'a>
-sub keyed_by($array, $f_key) {
+sub keyed_by($array, $f_str) {
     my %hash;
     for my $x ( @$array ) {
-        $hash{$f_key->($x)} = $x;
+        $hash{$f_str->($x)} = $x;
     }
     return CORE::bless(\%hash, 'Hash');
 }
@@ -760,11 +756,11 @@ sub keyed_by($array, $f_key) {
 # with the same 'Key.
 #
 # Array<'a> -> ('a -> 'Key) -> Hash<'Key, Array<'a>>
-sub group_by($array, $f_key) {
+sub group_by($array, $f_str) {
     my $hash = Hash->new;
     for my $x ( @$array ) {
-        my $key = $f_key->($x);
-        $hash->push($key, $x);
+        my $str = $f_str->($x);
+        $hash->push($str, $x);
     }
     return $hash;
 }
