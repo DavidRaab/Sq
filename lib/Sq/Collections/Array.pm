@@ -192,14 +192,14 @@ sub map($array, $f) {
 
 sub map_e($array, $expr) {
     local $_;
-    my $new = eval qq<
-        my (\@new, \$value);
-        for ( \@\$array ) {
-            \$value = $expr;
-            last if !defined \$value;
-            CORE::push \@new, \$value;
+    my $new = eval q<
+        my (@new, $value);
+        for ( @$array ) {
+            $value = > . $expr . q<;
+            last if !defined $value;
+            CORE::push @new, $value;
         }
-        return \\\@new;
+        return \@new;
     >;
     die $@ if !defined $new;
     return CORE::bless($new, 'Array');
