@@ -64,18 +64,18 @@ sub sq($any) {
 
     $type = ref $any;
     # recursively go through each data-structure
-    if ( $type eq 'Option' ) {
-        sq($any->[0]) if @$any;
+    if ( $type eq 'Hash' ) {
+        for my $key ( keys %$any ) {
+            sq($any->{$key});
+        }
     }
     elsif ( $type eq 'Array' ) {
         for my $x ( @$any ) {
             sq($x);
         }
     }
-    elsif ( $type eq 'Hash' ) {
-        for my $key ( keys %$any ) {
-            sq($any->{$key});
-        }
+    elsif ( $type eq 'Option' ) {
+        sq($any->[0]) if @$any;
     }
     else {
         # Do nothing for unknown type
