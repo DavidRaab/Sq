@@ -481,7 +481,7 @@ Same as C<map> but the function C<$f> additionally gets an index passed.
 
 =head2 choose($array, $f_opt) : $array
 
-C<choose> combines C<filter> and C<map> in a single operation. Every value
+C<choose> combines C<map> and C<filter> in a single operation. Every value
 of C<$array> is passed to C<$f_opt>. C<$f_opt> is supposed to return an optional
 value. When it is B<Some> value than this value is added to the newly returned
 array. B<None> values are skipped.
@@ -502,6 +502,12 @@ array. B<None> values are skipped.
     my $evens_squared = $data->choose(sub($x) {
         $x % 2 == 0 ? $x * $x : ()
     });
+
+    # [4,16,36,64,100]
+    my $evens_squared =
+        $data
+        ->map(   sub($x) { $x * $x     })
+        ->filter(sub($x) { $x % 2 == 0 });
 
 =head2 filter($array, $predicate) : $array
 
