@@ -4,6 +4,9 @@ use open ':std', ':encoding(UTF-8)';
 use Benchmark qw(cmpthese);
 use Test2::V0;
 
+# Benchmark for checking implementation of either array-ref or
+# scalar-ref
+
 # using array to represent option
 my $aNone = bless([], 'Option');
 

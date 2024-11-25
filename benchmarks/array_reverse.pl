@@ -1,10 +1,11 @@
 #!/usr/bin/env perl
 use v5.36;
 use open ':std', ':encoding(UTF-8)';
+use Sq;
 use Benchmark qw(cmpthese);
 use Test2::V0;
 
-sub rev($array) {
+sub rev1($array) {
     my @array;
     my $idx  = $array->$#*;
     while ( $idx >= 0 ) {
@@ -13,31 +14,39 @@ sub rev($array) {
     return \@array;
 }
 
-my $a1 = [1..100];
-my $a2 = [1..10_000];
-my $a3 = [1..100_000];
+sub rev2($array) {
+    return CORE::bless([reverse @$array], 'Array');
+}
+
+sub rev3($array) {
+    my $new = [reverse @$array];
+    return CORE::bless($new, 'Array');
+}
+
+sub rev4($array) {
+    my @new = reverse @$array;
+    return CORE::bless(\@new, 'Array');
+}
+
+my $data = [1..10_000];
 
 # check if it is really the same
-is(rev($a1), [reverse @$a1], 'rev 1');
-is(rev($a2), [reverse @$a2], 'rev 2');
-is(rev($a3), [reverse @$a3], 'rev 3');
-
-# short check that array did not change
-is($a1, [1..100],     'same 1');
-is($a2, [1..10_000],  'same 2');
-is($a3, [1..100_000], 'same 3');
-
+my @funcs = (qw/rev1 rev2 rev3 rev4/);
+for my $func ( @funcs ) {
+    no strict 'refs';
+    my $fn = *{$func}{CODE};
+    is($fn->($data), [reverse @$data], "check $func");
+    # short check that array did not change
+    is($data, [1..10_000], '$data did not change');
+}
 done_testing();
 
+# Benchmarking
 cmpthese(-1, {
-    'own_implementation' => sub {
-        my $n1 = rev($a1);
-        my $n2 = rev($a2);
-        my $n3 = rev($a3);
-    },
-    'built-in' => sub {
-        my $n1 = [ reverse @$a1 ];
-        my $n2 = [ reverse @$a2 ];
-        my $n3 = [ reverse @$a3 ];
-    },
+    rev1       => sub { my $n2 = rev1($data)       },
+    rev2       => sub { my $n2 = rev2($data)       },
+    rev3       => sub { my $n2 = rev3($data)       },
+    rev4       => sub { my $n2 = rev4($data)       },
+    current    => sub { my $n2 = Array::rev($data) },
+    'built-in' => sub { my $n2 = [ reverse @$data ]  },
 });

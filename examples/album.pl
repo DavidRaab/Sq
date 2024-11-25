@@ -8,22 +8,21 @@ sub seconds_to_str($seconds) {
     sprintf "%02d:%02d", $minutes, $seconds;
 }
 
-my $album = Hash->new(
+my $album = sq {
     artist => 'Michael Jackson',
     title  => 'Thriller',
-    tracks => Array->new(
-        Hash->new(title => "Wanna Be Startin’ Somethin", duration => 363),
-        Hash->new(title => "Baby Be Mine",               duration => 260),
-        Hash->new(title => "The Girl Is Mine",           duration => 242),
-        Hash->new(title => "Thriller",                   duration => 357),
-        Hash->new(title => "Beat It",                    duration => 258),
-        Hash->new(title => "Billie Jean",                duration => 294),
-        Hash->new(title => "Human Nature",               duration => 246),
-        Hash->new(title => "P.Y.T.",                     duration => 239),
-        Hash->new(title => "The Lady in My Life",        duration => 300),
-    ),
-
-);
+    tracks => [
+        {title => "Wanna Be Startin’ Somethin", duration => 363},
+        {title => "Baby Be Mine",               duration => 260},
+        {title => "The Girl Is Mine",           duration => 242},
+        {title => "Thriller",                   duration => 357},
+        {title => "Beat It",                    duration => 258},
+        {title => "Billie Jean",                duration => 294},
+        {title => "Human Nature",               duration => 246},
+        {title => "P.Y.T.",                     duration => 239},
+        {title => "The Lady in My Life",        duration => 300},
+    ],
+};
 
 my $update =
     $album->withf(tracks => sub($tracks) {

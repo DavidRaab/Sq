@@ -301,7 +301,7 @@ done_testing;
 # Benchmarking
 print "\nBenchmarking foldBack implementations\n";
 cmpthese(-1, {
-    'List->map' => sub { my $xs = $list->map($double) },
+    'current' => sub { my $xs = $list->map($double) },
     'map_v1'  => sub { my $xs = map_v1($list, $double) },
     'map_v2'  => sub { my $xs = map_v2($list, $double) },
     'map_v7'  => sub { my $xs = map_v7($list, $double) },
@@ -313,11 +313,11 @@ print "\n";
 
 print "Benchmarking map implementations\n";
 cmpthese(-1, {
-    'List->map' => sub { my $xs = $list->map($double) },
-    'map_v3' => sub { my $xs = map_v3($list, $double) },
-    'map_v4' => sub { my $xs = map_v4($list, $double) },
-    'map_v5' => sub { my $xs = map_v5($list, $double) },
-    'map_v6' => sub { my $xs = map_v6($list, $double) },
+    'current' => sub { my $xs = $list->map($double) },
+    'map_v3'  => sub { my $xs = map_v3($list, $double) },
+    'map_v4'  => sub { my $xs = map_v4($list, $double) },
+    'map_v5'  => sub { my $xs = map_v5($list, $double) },
+    'map_v6'  => sub { my $xs = map_v6($list, $double) },
     'map_v11' => sub { my $xs = map_v11($list, $double) },
 });
 
