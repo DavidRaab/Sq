@@ -506,8 +506,8 @@ array. B<None> values are skipped.
     # [4,16,36,64,100]
     my $evens_squared =
         $data
-        ->map(   sub($x) { $x * $x     })
         ->filter(sub($x) { $x % 2 == 0 });
+        ->map(   sub($x) { $x * $x     })
 
 =head2 filter($array, $predicate) : $array
 
