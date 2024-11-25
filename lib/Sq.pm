@@ -4,14 +4,14 @@ our $VERSION = '0.006';
 use Scalar::Util ();
 use Sub::Exporter -setup => {
     exports => [
-        qw(id fst snd key assign is_str is_num),
+        qw(id fst snd key assign is_str is_num sq),
         Some => sub { \&Option::Some },
         None => sub { \&Option::None },
         Ok   => sub { \&Result::Ok   },
         Err  => sub { \&Result::Err  },
     ],
     groups => {
-        default => [qw(id fst snd key assign is_str is_num Some None Ok Err)],
+        default => [qw(id fst snd key assign is_str is_num Some None sq Ok Err)],
     },
 };
 
@@ -54,6 +54,35 @@ sub is_num :prototype($) {
     return Scalar::Util::looks_like_number($_[0]);
 }
 
+# recursively traverse a data-structure and add Array/Hash blessings
+sub sq($any) {
+    my $type = ref $any;
+
+    # Add Array/Hash blessing to current ref
+    CORE::bless($any, 'Array') if $type eq 'ARRAY';
+    CORE::bless($any, 'Hash')  if $type eq 'HASH';
+
+    $type = ref $any;
+    # recursively go through each data-structure
+    if ( $type eq 'Option' ) {
+        sq($any->[0]) if @$any;
+    }
+    elsif ( $type eq 'Array' ) {
+        for my $x ( @$any ) {
+            sq($x);
+        }
+    }
+    elsif ( $type eq 'Hash' ) {
+        for my $key ( keys %$any ) {
+            sq($any->{$key});
+        }
+    }
+    else {
+        # Do nothing for unknown type
+    }
+    return $any;
+}
+
 # Access to Sq::Io
 sub io($class) { return 'Sq::Io' }
 
@@ -93,6 +122,44 @@ File System operations or reading and writing from files like CSV or JSON that
 uses the data-structures of this module.
 
 =head1 IMPORTED FUNCTIONS
+
+=head2 sq($any) : $any
+
+Recursively traverses through a data-structure and adds Array/Hash blessings to
+the data-structure. Also traverses into Option values.
+
+    my $album = sq {
+        artist => 'Michael Jackson',
+        title  => 'Thriller',
+        tracks => [
+            {title => "Wanna Be Startin’ Somethin", duration => 363},
+            {title => "Baby Be Mine",               duration => 260},
+            {title => "The Girl Is Mine",           duration => 242},
+            {title => "Thriller",                   duration => 357},
+            {title => "Beat It",                    duration => 258},
+            {title => "Billie Jean",                duration => 294},
+            {title => "Human Nature",               duration => 246},
+            {title => "P.Y.T.",                     duration => 239},
+            {title => "The Lady in My Life",        duration => 300},
+        ],
+    };
+
+    # 3
+    my $length = $album->length;
+
+    # 2559
+    my $album_runtime = $album->get('tracks')->map(sub ($tracks) {
+        $tracks->sum_by(key 'duration');
+    })->or(0);
+
+    # same as
+    my $album_runtime = 0;
+    my $tracks = $album->{tracks};
+    if ( defined $tracks ) {
+        for my $track ( @$tracks ) {
+            $sum += $track->{duration};
+        }
+    }
 
 =head2 is_num($str) : $bool
 
