@@ -64,18 +64,23 @@ is(
 
 is(
     Array->range(1,3)->map(sub($x) { ($x) x 3 }),
-    [1,1,1, 2,2,2, 3,3,3],
-    'map can return a list');
+    ["111", "222", "333"],
+    'map executes lambda in scalar context');
+
+is(
+    Array->range(1,1000)->map_e('$_ < 10 ? $_*2 : undef'),
+    Array->range(1,1000)->map(sub { $_ < 10 ? $_*2 : undef }),
+    'map_e same as map');
 
 is(
     Array->range(1,3)->map_e('($_) x 3'),
-    [1,1,1, 2,2,2, 3,3,3],
+    ["111", "222", "333"],
     'map_e with a list');
 
 is(
-    Array->new(qw/Hello World One Two/)->map(sub($str) { $str => length $str }),
-    ["Hello", 5, "World", 5, "One", 3, "Two", 3],
-    'map with multiple return values');
+    Array->range(1,10)->map(sub($x) { $x < 5 ? $x*$x : undef }),
+    [1,4,9,16],
+    'map with early exit');
 
 # choose
 {
@@ -88,9 +93,9 @@ is(
         'choose');
 }
 
-# as_hash
+# to_hash
 {
-    my $h = Array->new(qw/Hello World One Two/)->map(sub($str) { $str => length $str })->as_hash;
+    my $h = Array->new(qw/Hello World One Two/)->to_hash(sub($str) { $str => length $str });
 
     is(
         $h,
@@ -425,24 +430,16 @@ like(
 
 is(
     $range->map($square)->filter($is_even),
-    $range->map(sub($x) {
+    $range->choose(sub($x) {
         my $s = $x * $x;
         $s % 2 == 0 ? $s : undef
     }),
-    'map already can filter');
-
-is(
-    $range->map(sub($x) {
-        my $s = $x * $x;
-        $s % 2 == 0 ? $s : undef
-    }),
-    [grep { $_ % 2 == 0 } map { $_ * $_ } 1 .. 10],
-    'Perl implementation of ->map');
+    'choose instead of map filtering');
 
 is(
     Array
         ->range(1,5)
-        ->map(sub($x) {
+        ->choose(sub($x) {
             my $square = $x * $x;
             return $square % 2 == 0 ? $square : undef
         }),

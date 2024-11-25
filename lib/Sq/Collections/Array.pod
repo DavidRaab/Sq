@@ -407,35 +407,68 @@ C<$arrayB>.
         printf "A=%s B=%s\n", $a, $b;
     });
 
-=head2 map($array_a, $f_b) : $array_b
+=head2 map($array, $f_map) : $array
 
-Iterates through an array and passes each element to the function C<$f_b>. It
-constructs a new array with the result of the function call. Different
-to built-in C<map> it has special behaviour when C<undef> is returned. In this
-case C<map> skips the element and does not add it to the resulting
-array. This way C<map> behaves like a C<<->map($f)->filter($predicate)>>
-in a single function call.
+Similar to Perl built-in C<map>. But with few changes.
+
+=over 4
+
+=item * Expects C<$f_map> to return a single value instead of a list.
+
+=item * Passes the current value as an argument to the function.
+
+=item * Aborts when C<undef> is returned.
+
+=back
 
     # [1, 4, 9, 16, 25]
     my $squared = Array->range(1,5)->map(sub($x) { $x * $x });
+    my $squared = Array->range(1,5)->map(sub     { $_ * $_ }); # 20% faster
 
-    # [4, 16]
-    my $squaredAndEven =
-        Array->range(1,5)->map(sub($x) {
-            my $square = $x * $x;
-            return $square % 2 == 0 ? $square : undef
-        });
+These changes are made for compatibility with the C<Seq> data-structure.
+When you use this function instead of C< map { ... } @array > then you can switch
+to C<Seq> or other data-structures supporting a C<map> without further changes.
 
-    # [4, 16]
-    my $squaredAndEven =
-        Array
-        ->range(1,5)
-        ->map(   sub($x) { $x * $x     })
-        ->filter(sub($x) { $x % 2 == 0 });
+These changes makes C<Array::map> slower compared to perl built-in C<map> but
+gives you the flexibility to switch data-structure more easily. On the other
+side I could have re-implemented the whole C<map> logic in C<Seq::map> but that
+would have made C<Seq::map> very slow and hard to implement and isn't really
+worth it because instead of one functions that does B<$number> things, we have
+B<$number> functions instead.
+
+    my %hash = map { $_ => 1 } @array;
+    my $hash = $array->count;
+
+    my %hash = map { function($_) => 1 } @array;
+    my $hash = $array->count_by(\&function);
+
+    my %hash = map { key($_), value($_) } @array;
+    my $hash = $array->to_hash(sub($x) {
+        return key($x), value($x);
+    });
+
+    my @array = map { $_ > 10 ? $x : () } @array;
+    my $array = $array->choose(sub($x) { $x > 10 ? Some($x) : None });
+
+Because C<Array::map> aborts on C<undef> it now allows too early exit processing
+of an Array that is not possible with C<map { ... } @array>.
+
+    # [1,4,9,16]
+    my $array = Array->range(1,10)->map(sub($x) { $x < 5 ? $x*$x : undef })
+
+Instead of using perl built-in C<map> consider if another method does not fit
+your use-case better. Otherwise you always can use C<map { ... } @array>. Never
+forget that this whole Module is an optional addition and you always can threat
+an C<Array> as a perl array. But you will lose some flexibility when you do.
 
 =head2 map_e($array, $expr) : $array
 
-TODO
+This is the same as C<Array::map> but uses string-eval to build the final code. Why
+string-eval? It is the fastest solution because it avoids calling a lambda.
+When using this version you must use C<$_> in your string.
+
+    Array->range(1,1000)->map_e(   '$_ < 10 ? $_*2 : undef' );
+    Array->range(1,1000)->map(sub { $_ < 10 ? $_*2 : undef });
 
 =head2 mapi($array_a, $f_b) : $array_b
 

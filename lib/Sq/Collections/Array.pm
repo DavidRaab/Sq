@@ -178,15 +178,30 @@ sub rev($array) {
 }
 
 # map : Array<'a> -> ('a -> 'b) -> Array<'b>
+# for_defined
 sub map($array, $f) {
-    return CORE::bless([
-        grep { defined  }
-        map  { $f->($_) } @$array
-    ], 'Array');
+    local $_;
+    my (@new, $value);
+    for ( @$array ) {
+        $value = $f->($_);
+        last if !defined $value;
+        CORE::push @new, $value;
+    }
+    return CORE::bless(\@new, 'Array');
 }
 
 sub map_e($array, $expr) {
-    my $new = eval "[grep { defined } map { $expr } \@\$array]";
+    local $_;
+    my $new = eval qq<
+        my (\@new, \$value);
+        for ( \@\$array ) {
+            \$value = $expr;
+            last if !defined \$value;
+            CORE::push \@new, \$value;
+        }
+        return \\\@new;
+    >;
+    die $@ if !defined $new;
     return CORE::bless($new, 'Array');
 }
 
