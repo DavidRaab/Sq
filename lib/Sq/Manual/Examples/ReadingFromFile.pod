@@ -1,5 +1,5 @@
 
-=head1 Seq::Examples::ReadingFromFile
+=head1 Creating a Seq Iterator
 
 A file-handle is an iterator by default. So it is very easily to
 connect a filehandle to the Seq module.
