@@ -235,6 +235,7 @@ sub filter($array, $predicate) {
 sub filter_e($array, $expr) {
     local $_;
     my $data = eval "[grep { $expr } \@\$array]";
+    Carp::croak $@ if !defined $data;
     return CORE::bless($data, 'Array');
 }
 
