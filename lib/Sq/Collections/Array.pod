@@ -467,7 +467,7 @@ This is the same as C<Array::map> but uses string-eval to build the final code. 
 string-eval? It is the fastest solution because it avoids calling a lambda.
 When using this version you must use C<$_> in your string.
 
-    Array->range(1,1000)->map_e(   '$_ < 10 ? $_*2 : undef' );
+    Array->range(1,1000)->map_e(   '$_ < 10 ? $_*2 : undef' ); # 100% faster
     Array->range(1,1000)->map(sub { $_ < 10 ? $_*2 : undef });
 
 =head2 mapi($array_a, $f_b) : $array_b
@@ -516,13 +516,17 @@ function. When the C<$predicate> function returns a truish value then the value
 is returned in a new array. Works like the perl built-in C<grep>.
 
     # [2,4,6,8,10]
-    my $evens =
-        Array->range(1,10)
-        ->filter(sub($x) { $x % 2 == 0 });
+    my $evens = Array->range(1,10)->filter(sub($x) { $x % 2 == 0 });
 
 =head2 filter_e($array, $expr) : $array
 
-TODO
+Same as C<filter> but expects a string as C<$expr>. It uses string-eval to build
+the final filtering instead of calling a lamda function. This overall results
+into a big performance boost. You must use C<$_> in C<$expr> to acces the current
+value. Has the same performance as a manual C<grep> call.
+
+    my $evens = Array->range(1,10)->filter_e(       '$_ % 2 == 0');  # 250% faster
+    my $evens = Array->range(1,10)->filter(sub($x) { $x % 2 == 0 });
 
 =head2 skip($array, $amount) : $array
 
@@ -573,11 +577,38 @@ an Array and is also blessed in the C<Array> package.
 
 =head2 sort($array, $comparer) : $array
 
-TODO
+Sorts an Array. Basically the same as just calling built-in C<sort> but passes
+two values of the array to the C<$comparer> function instead of using global
+variables C<$a,$b>.
+
+    my $sorted = sq([10,3,11,4,10])->sort(sub($x,$y) { $x <=> $y });
 
 =head2 sort_by($array, $comparer, $f_key) : $array
 
-TODO
+Does a Schwartzian Transformation. It first computes all keys by passing every
+element of C<$array> to C<$f_key>. Then it uses those keys in combination
+with C<$comparer> to sort the array. Then it throws the key away and gives you
+the sorted list back.
+
+The additional step of computing the key once makes it faster, because otherwise
+C<$f_key> would be called B<O(log n)> times for every key. It comes at the expense
+of using more memory.
+
+    my $data = sq [
+        { id => 2, name => 'Frank'  },
+        { id => 1, name => 'Anne'   },
+        { id => 3, name => 'Zander' },
+    ];
+
+    my $id_sorted   = $data->sort_by(sub($x,$y) { $x <=> $y }, key 'id');
+    my $name_sorted = $data->sort_by(sub($x,$y) { $x cmp $y }, key 'name');
+
+    # Pure Perl Version of id sorted
+    my @id_sorted =
+        map  { $_->[0]             }
+        sort { $a->[1] <=> $b->[1] }
+        map  { [ $_, $_->{id} ]    }
+            @$data;
 
 =head2 sort_num($array) : $array
 

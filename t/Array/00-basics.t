@@ -1143,4 +1143,46 @@ is(
         'distinct_by pod example 2');
 }
 
+# pod example
+{
+    my $data = sq [
+        { id => 2, name => 'Frank'  },
+        { id => 1, name => 'Anne'   },
+        { id => 3, name => 'Zander' },
+    ];
+
+    is(
+        $data->sort_by(sub($x,$y) { $x <=> $y }, key 'id'),
+        [
+            { id => 1, name => 'Anne'   },
+            { id => 2, name => 'Frank'  },
+            { id => 3, name => 'Zander' },
+        ],
+        'pod example 1. id sorted');
+
+    is(
+        $data->sort_by(sub($x,$y) { $x cmp $y }, key 'name'),
+        [
+            { id => 1, name => 'Anne'   },
+            { id => 2, name => 'Frank'  },
+            { id => 3, name => 'Zander' },
+        ],
+        'pod example 2. name sorted');
+
+    is(
+        [
+            map  { $_->[0]             }
+            sort { $a->[1] <=> $b->[1] }
+            map  { [ $_, $_->{id} ]    }
+                @$data
+        ],
+        [
+            { id => 1, name => 'Anne'   },
+            { id => 2, name => 'Frank'  },
+            { id => 3, name => 'Zander' },
+        ],
+        'pod example. pure perl');
+}
+
+
 done_testing;
