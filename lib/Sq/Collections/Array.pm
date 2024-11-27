@@ -201,7 +201,7 @@ sub map_e($array, $expr) {
         }
         return \@new;
     >;
-    die $@ if !defined $new;
+    Carp::croak $@ if !defined $new;
     return CORE::bless($new, 'Array');
 }
 
