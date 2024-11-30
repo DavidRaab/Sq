@@ -1,6 +1,14 @@
 package Sq::Dump;
 use 5.036;
 
+my $dispatch = {
+    'Array'  => \&array,
+    'ARRAY'  => \&array,
+    'Hash'   => \&hash,
+    'HASH'   => \&hash,
+    'Option' => \&option,
+};
+
 sub quote($str) {
     $str =~ s/\r/\\r/;
     $str =~ s/\n/\\n/;
@@ -47,13 +55,13 @@ sub array($array, $inline=60, $depth=0) {
             $str .= $indent . sprintf "\"%s\",\n", quote($x);
         }
         elsif ( $type eq 'Option' ) {
-            $str .= $indent . compact($inline, option($x, $inline, $depth+2)) . ",\n";
+            $str .= $indent . option($x, $inline, $depth+2) . ",\n";
         }
         elsif ( $type eq 'Hash' || $type eq 'HASH' ) {
-            $str .= $indent . compact($inline, hash($x, $inline, $depth+2)) . ",\n";
+            $str .= $indent . hash($x, $inline, $depth+2) . ",\n";
         }
         elsif ( $type eq 'Array' || $type eq 'ARRAY' ) {
-            $str .= $indent . compact($inline, array($x, $inline, $depth+2)) . ",\n";
+            $str .= $indent . array($x, $inline, $depth+2) . ",\n";
         }
         else {
             $str .= $indent . "NOT_IMPLEMENTED,\n";
@@ -80,13 +88,13 @@ sub hash($hash, $inline=60, $depth=0) {
             $str .= $indent . sprintf "%s => \"%s\",\n", $key, quote($value);
         }
         elsif ( $type eq 'Option' ) {
-            $str .= $indent . sprintf "%s => %s,\n", $key, compact($inline, option($value, $inline, $depth+2));
+            $str .= $indent . sprintf "%s => %s,\n", $key, option($value, $inline, $depth+2);
         }
         elsif ( $type eq 'Hash'  || $type eq 'HASH' ) {
-            $str .= $indent . sprintf "%s => %s,\n", $key, compact($inline, hash($value, $inline, $depth+2));
+            $str .= $indent . sprintf "%s => %s,\n", $key, hash($value, $inline, $depth+2);
         }
         elsif ( $type eq 'Array' || $type eq 'ARRAY' ) {
-            $str .= $indent . sprintf "%s => %s,\n", $key, compact($inline, array($value, $inline, $depth+2));
+            $str .= $indent . sprintf "%s => %s,\n", $key, array($value, $inline, $depth+2);
         }
         else {
             $str .= $indent . sprintf "%s => NOT_IMPLEMENTED,\n", $key;
@@ -111,13 +119,13 @@ sub option($opt, $inline=60, $depth=0) {
             $str .= '"' . quote($x) . '"';
         }
         elsif ( $type eq 'Option' ) {
-            $str .= compact($inline, option($x, $inline, $depth+2));
+            $str .= option($x, $inline, $depth+2);
         }
         elsif ( $type eq 'Hash' || $type eq 'HASH' ) {
-            $str .= compact($inline, hash($x, $inline, $depth+2));
+            $str .= hash($x, $inline, $depth+2);
         }
         elsif ( $type eq 'Array' || $type eq 'ARRAY' ) {
-            $str .= compact($inline, array($x, $inline, $depth+2));
+            $str .= array($x, $inline, $depth+2);
         }
         else {
             $str .= "NOT_IMPLEMENTED";
@@ -130,14 +138,6 @@ sub option($opt, $inline=60, $depth=0) {
     }
     return compact($inline, $str);
 }
-
-my $dispatch = {
-    'HASH'   => \&hash,
-    'Hash'   => \&hash,
-    'Option' => \&option,
-    'Array'  => \&array,
-    'ARRAY'  => \&array,
-};
 
 sub dump($any, $inline=60, $depth=0) {
     return $dispatch->{ref $any}($any, $inline, $depth);
