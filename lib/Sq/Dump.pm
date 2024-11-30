@@ -1,6 +1,58 @@
 package Sq::Dump;
 use 5.036;
 
+# Dumping functions for types
+sub array($array, $inline=60, $depth=0) {
+    my $str    = "[\n";
+    my $indent = " " x ($depth + 2);
+    for my $x ( @$array ) {
+        $str .= $indent . to_string($x, $inline, $depth+2) . ",\n";
+    }
+    $str =~ s/,\n\z/\n/;
+    $str .= (" " x $depth) . "]";
+    return compact($inline, $str);
+}
+
+sub hash($hash, $inline=60, $depth=0) {
+    my $str    = "{\n";
+    my $indent = " " x ($depth + 2);
+    for my $key ( sort { $a cmp $b } CORE::keys %$hash ) {
+        my $value  = $hash->{$key};
+        $str .= $indent . sprintf("%s => %s,\n", $key, to_string($value,$inline,$depth+2));
+    }
+    $str =~ s/,\n\z/\n/;
+    $str .= (" " x $depth) . "}";
+    return compact($inline, $str);
+}
+
+sub option($opt, $inline=60, $depth=0) {
+    my $str = @$opt
+        ? 'Some(' . to_string($opt->[0], $inline, $depth+2) . ')'
+        : 'None';
+    return compact($inline, $str);
+}
+
+sub seq($seq, $inline=60, $depth=0) {
+    my $str    = "seq {\n";
+    my $indent = " " x ($depth + 2);
+    my $array  = $seq->to_array(21);
+    my $max    = @$array == 21 ? 21 : @$array;
+    # only put 20 elements into seq {} string
+    for (my $idx=0; $idx < $max; $idx++ ) {
+        $str .= $indent . to_string($array->[$idx] , $inline, $depth+2) . ",\n";
+    }
+    # when they are more than 20 elements
+    if ( @$array == 21 ) {
+        $str .= $indent . '...' . "\n" . $indent . "}";
+    }
+    else {
+        $str =~ s/,\n\z/\n/;
+        $str .= (" " x $depth) . '}';
+    }
+    return compact($inline, $str);
+}
+
+# Dumping Logic
 my $dispatch = {
     'UNDEF'  => sub { return 'undef'                        },
     'NUM'    => sub { return sprintf "%s", $_[0]            },
@@ -8,6 +60,7 @@ my $dispatch = {
     'ARRAY'  => \&array,
     'HASH'   => \&hash,
     'OPTION' => \&option,
+    'SEQ'    => \&seq,
 };
 
 sub to_string($any, $inline=60, $depth=0) {
@@ -54,35 +107,6 @@ sub compact($max, $str) {
     return $str;
 };
 
-sub array($array, $inline=60, $depth=0) {
-    my $str    = "[\n";
-    my $indent = " " x ($depth + 2);
-    for my $x ( @$array ) {
-        $str .= $indent . to_string($x, $inline, $depth+2) . ",\n";
-    }
-    $str =~ s/,\n\z/\n/;
-    $str .= (" " x $depth) . "]";
-    return compact($inline, $str);
-}
-
-sub hash($hash, $inline=60, $depth=0) {
-    my $str    = "{\n";
-    my $indent = " " x ($depth + 2);
-    for my $key ( sort { $a cmp $b } CORE::keys %$hash ) {
-        my $value  = $hash->{$key};
-        $str .= $indent . sprintf("%s => %s,\n", $key, to_string($value,$inline,$depth+2));
-    }
-    $str =~ s/,\n\z/\n/;
-    $str .= (" " x $depth) . "}";
-    return compact($inline, $str);
-}
-
-sub option($opt, $inline=60, $depth=0) {
-    my $str = @$opt
-        ? 'Some(' . to_string($opt->[0], $inline, $depth+2) . ')'
-        : 'None';
-    return compact($inline, $str);
-}
 
 sub dump($any, $inline=60, $depth=0) {
     return to_string($any, $inline, $depth);
