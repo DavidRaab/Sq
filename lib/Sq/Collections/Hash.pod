@@ -623,6 +623,14 @@ data-structures it works good enough at the moment. Get's improved in the future
 
     printf "%s\n", $hash->dump;
 
+=head2 dumpw($hash, $inline=60, $depth=0) : void
+
+Same as C<dump> but instead of returning the dump as a string, automatically
+prints it using C<warn>.
+
+    $hash->dumpw;
+    warn $hash->dump, "\n";
+
 =head1 SIDE-EFFECTS
 
 =head2 lock($hash, @keys) : $hash

@@ -1126,6 +1126,14 @@ data-structures it works good enough at the moment. Get's improved in the future
 
     printf "%s\n", $array->dump;
 
+=head2 dumpw($array, $inline=60, $depth=0) : void
+
+Same as C<dump> but instead of returning the dump as a string, automatically
+prints it using C<warn>.
+
+    $array->dumpw;
+    warn $array->dump, "\n";
+
 =head1 MUTATION
 
 The following methods mutate the array instead of creating a new one.

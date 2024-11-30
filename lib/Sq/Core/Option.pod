@@ -497,6 +497,14 @@ data-structures it works good enough at the moment. Get's improved in the future
 
     printf "%s\n", $opt->dump;
 
+=head2 dumpw($opt, $inline=60, $depth=0) : void
+
+Same as C<dump> but instead of returning the dump as a string, automatically
+prints it using C<warn>.
+
+    $opt->dumpw;
+    warn $opt->dump, "\n";
+
 =head1 MODULE FUNCTIONS
 
 These functions are concipated to be called from the module level because
