@@ -27,6 +27,9 @@ use Sq::Collections::List;
 use Sq::Collections::Seq;
 use Sq::Collections::Heap;
 
+# Load Dumping
+use Sq::Dump;
+
 # IO
 use Sq::Io;
 

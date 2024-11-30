@@ -285,67 +285,7 @@ sub extract_array($, @args) {
 }
 
 sub dump($opt, $inline=60, $depth=0) {
-    state $quote = sub($str) {
-        $str =~ s/\r/\\r/;
-        $str =~ s/\n/\\n/;
-        $str =~ s/\t/\\t/;
-        $str;
-    };
-    state $compact = sub($max, $str) {
-        # replace empty string/array
-        return '[]' if $str =~ m/\A\s*\[\s*\]\z/;
-        return '{}' if $str =~ m/\A\s*\{\s*\}\z/;
-
-        # get indentation length
-        my $indent = $str =~ m/\A(\s+)/ ? CORE::length $1 : 0;
-
-        # remove whitespace at start/end and replace all whitespace with
-        # a single space
-        my $no_ws = $str;
-        $no_ws =~ s/\A\s+//;
-        $no_ws =~ s/\s+\z//;
-        $no_ws =~ s/\s+/ /g;
-
-        # when $no_ws is smaller than $max we keep that string but we
-        # need to add $ident again
-        if ( CORE::length $no_ws <= $max ) {
-            $str = (" " x $indent) . $no_ws;
-        }
-
-        return $str;
-    };
-
-    my $str = "";
-    if ( @$opt ) {
-        $str = 'Some(';
-
-        my $x    = $opt->[0];
-        my $type = ref $x;
-        if ( Sq::is_num($x) ) {
-            $str .= $x;
-        }
-        elsif ( Sq::is_str($x) ) {
-            $str .= '"' . $quote->($x) . '"';
-        }
-        elsif ( $type eq 'Option' ) {
-            $str .= $compact->($inline, Option::dump($x, $inline, $depth+2));
-        }
-        elsif ( $type eq 'Hash' || $type eq 'HASH' ) {
-            $str .= $compact->($inline, Hash::dump($x, $inline, $depth+2));
-        }
-        elsif ( $type eq 'Array' || $type eq 'ARRAY' ) {
-            $str .= $compact->($inline, Array::dump($x, $inline, $depth+2));
-        }
-        else {
-            $str .= "NOT_IMPLEMENTED";
-        }
-
-        $str .= ')';
-    }
-    else {
-        $str = 'None';
-    }
-    return $compact->($inline, $str);
+    return Sq::Dump::dump($opt, $inline, $depth);
 }
 
 1;

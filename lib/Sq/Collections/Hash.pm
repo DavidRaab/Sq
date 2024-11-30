@@ -364,66 +364,7 @@ sub delete($hash, $key, @keys) {
 }
 
 sub dump($hash, $inline=60, $depth=0) {
-    state $quote = sub($str) {
-        $str =~ s/\r/\\r/;
-        $str =~ s/\n/\\n/;
-        $str =~ s/\t/\\t/;
-        $str;
-    };
-    state $compact = sub($max, $str) {
-        # replace empty string/array
-        return '[]' if $str =~ m/\A\s*\[\s*\]\z/;
-        return '{}' if $str =~ m/\A\s*\{\s*\}\z/;
-
-        # get indentation length
-        my $indent = $str =~ m/\A(\s+)/ ? CORE::length $1 : 0;
-
-        # remove whitespace at start/end and replace all whitespace with
-        # a single space
-        my $no_ws = $str;
-        $no_ws =~ s/\A\s+//;
-        $no_ws =~ s/\s+\z//;
-        $no_ws =~ s/\s+/ /g;
-
-        # when $no_ws is smaller than $max we keep that string but we
-        # need to add $ident again
-        if ( CORE::length $no_ws <= $max ) {
-            $str = (" " x $indent) . $no_ws;
-        }
-
-        return $str;
-    };
-
-    my $str = "{\n";
-    for my $key ( sort { $a cmp $b } CORE::keys %$hash ) {
-        my $indent = " " x ($depth + 2);
-        my $value  = $hash->{$key};
-        my $type   = ref $value;
-        if ( !defined $value ) {
-            $str .= $indent . sprintf "%s => undef,\n", $key;
-        }
-        elsif ( Sq::is_num($value) ) {
-            $str .= $indent . sprintf "%s => %s,\n", $key, $value;
-        }
-        elsif ( Sq::is_str($value) ) {
-            $str .= $indent . sprintf "%s => \"%s\",\n", $key, $quote->($value);
-        }
-        elsif ( $type eq 'Option' ) {
-            $str .= $indent . sprintf "%s => %s,\n", $key, $compact->($inline, Option::dump($value, $inline, $depth+2));
-        }
-        elsif ( $type eq 'Hash'  || $type eq 'HASH' ) {
-            $str .= $indent . sprintf "%s => %s,\n", $key, $compact->($inline, Hash::dump($value, $inline, $depth+2));
-        }
-        elsif ( $type eq 'Array' || $type eq 'ARRAY' ) {
-            $str .= $indent . sprintf "%s => %s,\n", $key, $compact->($inline, Array::dump($value, $inline, $depth+2));
-        }
-        else {
-            $str .= $indent . sprintf "%s => NOT_IMPLEMENTED,\n", $key;
-        }
-    }
-    $str =~ s/,\n\z/\n/;
-    $str .= (" " x $depth) . "}";
-    return $compact->($inline, $str);
+    return Sq::Dump::dump($hash, $inline, $depth);
 }
 
 1;
