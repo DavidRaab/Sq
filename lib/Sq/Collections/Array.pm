@@ -216,11 +216,13 @@ sub choose($array, $f_opt) {
 }
 
 sub mapi($array, $f) {
-    my @new;
+    local $_;
+    my (@new, $value);
     my $idx = 0;
-    for my $x ( @$array ) {
-        my $value = $f->($x, $idx++);
-        push @new, $value if defined $value;
+    for ( @$array ) {
+        $value = $f->($_, $idx++);
+        last if !defined $value;
+        push @new, $value;
     }
     return CORE::bless(\@new, 'Array');
 }

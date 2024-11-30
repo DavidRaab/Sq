@@ -405,7 +405,7 @@ is(
 
 is(
     Array->wrap(qw/A B C D E F/)->mapi(sub($x,$i) {
-        return undef if $x eq 'C';
+        return undef if $x eq 'D';
         return [$x,$i]
     }),
     [[A => 0], [B => 1], [C => 2]],
@@ -413,7 +413,7 @@ is(
 
 is(
     Array->wrap(qw/A B C D E F/)->mapi(sub($x,$i) {
-        return undef if $x eq 'C';
+        return undef if $x eq 'D';
         return [$_,$i]
     }),
     [[A => 0], [B => 1], [C => 2]],
