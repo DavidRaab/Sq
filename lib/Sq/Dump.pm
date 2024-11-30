@@ -2,12 +2,26 @@ package Sq::Dump;
 use 5.036;
 
 my $dispatch = {
-    'Array'  => \&array,
+    'UNDEF'  => sub { return 'undef'                        },
+    'NUM'    => sub { return sprintf "%s", $_[0]            },
+    'STRING' => sub { return sprintf "\"%s\"", quote($_[0]) },
     'ARRAY'  => \&array,
-    'Hash'   => \&hash,
     'HASH'   => \&hash,
-    'Option' => \&option,
+    'OPTION' => \&option,
 };
+
+sub to_string($any, $inline=60, $depth=0) {
+    my $type =
+        !defined $any    ? 'UNDEF'  :
+        Sq::is_num($any) ? 'NUM'    :
+        Sq::is_str($any) ? 'STRING' :
+        uc ref $any;
+
+    my $func = $dispatch->{$type};
+    return defined $func
+         ? $func->($any, $inline, $depth)
+         : 'NOT_IMPLEMENTED';
+}
 
 sub quote($str) {
     $str =~ s/\r/\\r/;
@@ -41,31 +55,10 @@ sub compact($max, $str) {
 };
 
 sub array($array, $inline=60, $depth=0) {
-    my $str = "[\n";
+    my $str    = "[\n";
+    my $indent = " " x ($depth + 2);
     for my $x ( @$array ) {
-        my $indent = " " x ($depth + 2);
-        my $type   = ref $x;
-        if ( !defined $x ) {
-            $str .= $indent . 'undef' . ",\n";
-        }
-        elsif ( Sq::is_num($x) ) {
-            $str .= $indent . $x . ",\n";
-        }
-        elsif ( Sq::is_str($x) ) {
-            $str .= $indent . sprintf "\"%s\",\n", quote($x);
-        }
-        elsif ( $type eq 'Option' ) {
-            $str .= $indent . option($x, $inline, $depth+2) . ",\n";
-        }
-        elsif ( $type eq 'Hash' || $type eq 'HASH' ) {
-            $str .= $indent . hash($x, $inline, $depth+2) . ",\n";
-        }
-        elsif ( $type eq 'Array' || $type eq 'ARRAY' ) {
-            $str .= $indent . array($x, $inline, $depth+2) . ",\n";
-        }
-        else {
-            $str .= $indent . "NOT_IMPLEMENTED,\n";
-        }
+        $str .= $indent . to_string($x, $inline, $depth+2) . ",\n";
     }
     $str =~ s/,\n\z/\n/;
     $str .= (" " x $depth) . "]";
@@ -73,32 +66,11 @@ sub array($array, $inline=60, $depth=0) {
 }
 
 sub hash($hash, $inline=60, $depth=0) {
-    my $str = "{\n";
+    my $str    = "{\n";
+    my $indent = " " x ($depth + 2);
     for my $key ( sort { $a cmp $b } CORE::keys %$hash ) {
-        my $indent = " " x ($depth + 2);
         my $value  = $hash->{$key};
-        my $type   = ref $value;
-        if ( !defined $value ) {
-            $str .= $indent . sprintf "%s => undef,\n", $key;
-        }
-        elsif ( Sq::is_num($value) ) {
-            $str .= $indent . sprintf "%s => %s,\n", $key, $value;
-        }
-        elsif ( Sq::is_str($value) ) {
-            $str .= $indent . sprintf "%s => \"%s\",\n", $key, quote($value);
-        }
-        elsif ( $type eq 'Option' ) {
-            $str .= $indent . sprintf "%s => %s,\n", $key, option($value, $inline, $depth+2);
-        }
-        elsif ( $type eq 'Hash'  || $type eq 'HASH' ) {
-            $str .= $indent . sprintf "%s => %s,\n", $key, hash($value, $inline, $depth+2);
-        }
-        elsif ( $type eq 'Array' || $type eq 'ARRAY' ) {
-            $str .= $indent . sprintf "%s => %s,\n", $key, array($value, $inline, $depth+2);
-        }
-        else {
-            $str .= $indent . sprintf "%s => NOT_IMPLEMENTED,\n", $key;
-        }
+        $str .= $indent . sprintf("%s => %s,\n", $key, to_string($value,$inline,$depth+2));
     }
     $str =~ s/,\n\z/\n/;
     $str .= (" " x $depth) . "}";
@@ -106,45 +78,18 @@ sub hash($hash, $inline=60, $depth=0) {
 }
 
 sub option($opt, $inline=60, $depth=0) {
-    my $str = "";
-    if ( @$opt ) {
-        $str = 'Some(';
-
-        my $x    = $opt->[0];
-        my $type = ref $x;
-        if ( Sq::is_num($x) ) {
-            $str .= $x;
-        }
-        elsif ( Sq::is_str($x) ) {
-            $str .= '"' . quote($x) . '"';
-        }
-        elsif ( $type eq 'Option' ) {
-            $str .= option($x, $inline, $depth+2);
-        }
-        elsif ( $type eq 'Hash' || $type eq 'HASH' ) {
-            $str .= hash($x, $inline, $depth+2);
-        }
-        elsif ( $type eq 'Array' || $type eq 'ARRAY' ) {
-            $str .= array($x, $inline, $depth+2);
-        }
-        else {
-            $str .= "NOT_IMPLEMENTED";
-        }
-
-        $str .= ')';
-    }
-    else {
-        $str = 'None';
-    }
+    my $str = @$opt
+        ? 'Some(' . to_string($opt->[0], $inline, $depth+2) . ')'
+        : 'None';
     return compact($inline, $str);
 }
 
 sub dump($any, $inline=60, $depth=0) {
-    return $dispatch->{ref $any}($any, $inline, $depth);
+    return to_string($any, $inline, $depth);
 }
 
 sub dumpw($any, $inline=60, $depth=0) {
-    warn $dispatch->{ref $any}($any, $inline, $depth), "\n";
+    warn to_string($any, $inline, $depth), "\n";
 }
 
 1;
