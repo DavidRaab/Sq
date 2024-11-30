@@ -405,10 +405,19 @@ is(
 
 is(
     Array->wrap(qw/A B C D E F/)->mapi(sub($x,$i) {
-        $i < 3 ? [$x,$i] : undef
+        return undef if $x eq 'C';
+        return [$x,$i]
     }),
     [[A => 0], [B => 1], [C => 2]],
-    'mapi with filtering');
+    'mapi with early abort');
+
+is(
+    Array->wrap(qw/A B C D E F/)->mapi(sub($x,$i) {
+        return undef if $x eq 'C';
+        return [$_,$i]
+    }),
+    [[A => 0], [B => 1], [C => 2]],
+    'mapi with default variable');
 
 is(Array->init( 0,  sub($idx) { $idx }), [], 'init with length 0');
 is(Array->init(-1,  sub($idx) { $idx }), [], 'init with length -1');
