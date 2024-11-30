@@ -472,7 +472,9 @@ When using this version you must use C<$_> in your string.
 
 =head2 mapi($array_a, $f_b) : $array_b
 
-Same as C<map> but the function C<$f> additionally gets an index passed.
+Same as C<map> but the function C<$f_b> additionally gets an index passed. You
+also can use C<$_> to access the current value, and C<undef> also aborts the
+creation of the new array.
 
     # [[0,"foo"], [1,"bar"], [2,"baz"]]
     my $array =
