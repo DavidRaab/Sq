@@ -143,4 +143,8 @@ sub dump($any, $inline=60, $depth=0) {
     return $dispatch->{ref $any}($any, $inline, $depth);
 }
 
+sub dumpw($any, $inline=60, $depth=0) {
+    warn $dispatch->{ref $any}($any, $inline, $depth), "\n";
+}
+
 1;

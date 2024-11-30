@@ -845,6 +845,11 @@ sub dump($array, $inline=60, $depth=0) {
     return Sq::Dump::dump($array, $inline, $depth);
 }
 
+sub dumpw($array, $inline=60, $depth=0) {
+    Sq::Dump::dumpw($array, $inline, $depth);
+    return;
+}
+
 #-----------------------------------------------------------------------------#
 # MUTATION                                                                    #
 #         Those are functions mutating an array                               #

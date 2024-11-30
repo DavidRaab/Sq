@@ -367,4 +367,9 @@ sub dump($hash, $inline=60, $depth=0) {
     return Sq::Dump::dump($hash, $inline, $depth);
 }
 
+sub dumpw($hash, $inline=60, $depth=0) {
+    Sq::Dump::dumpw($hash, $inline, $depth);
+    return;
+}
+
 1;

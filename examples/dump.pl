@@ -22,4 +22,4 @@ my $test = sq {
     opt6 => Some("text"),
 };
 
-printf "\$test: %s\n", $test->dump;
+$test->dumpw;
