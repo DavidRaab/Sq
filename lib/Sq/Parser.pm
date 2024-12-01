@@ -18,6 +18,8 @@ sub p_run($parser, $str) {
     $parser->(sq({ pos => 0 }), $str);
 }
 
+
+# matches a regex against a string. Just returns an Option if successfull or not.
 sub p_is($regex) {
     return sub($context,$str) {
         pos($str) = $context->{pos};
