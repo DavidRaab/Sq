@@ -90,4 +90,12 @@ sub result(@xs) { Some([@xs]) }
     is(p_run($p_array, '1,2,3,420'), result([1,2,3,420]), 'parses to array');
 }
 
+# p_match with many captures
+{
+    my $time = p_match(qr/(\d\d?):(\d\d?)/);
+    is(p_run($time, '12:34'), result(12,34), 'extracts 2 vars 1');
+    is(p_run($time, '1:3'),     result(1,3), 'extracts 2 vars 2');
+    is(p_run($time, '123:12'),         None, 'no time');
+}
+
 done_testing;

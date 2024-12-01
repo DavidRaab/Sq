@@ -17,7 +17,7 @@ use Sub::Exporter -setup => {
 # Expects a Parser and a string and runs the parser against the string
 # returning if it succedded or not.
 #
-# Parser<'a> -> string -> Option<[$1,$context]>
+# Parser<'a> -> string -> Option<[@matches]>
 sub p_run($parser, $str) {
     $parser->(sq({ pos => 0 }), $str)->map(sub($args) { Array::skip($args,1) });
 }
@@ -42,15 +42,14 @@ sub p_is($regex) {
     };
 }
 
-# Matches a Regex against the current position of the string. Expects that
-# $regex has one capture $1 to extract
+# Matches a Regex against the current position of the string.
 #
-# Regex -> Parser<[$1,$context]>
+# Regex -> Parser<[$context,@matches]>
 sub p_match($regex) {
     return sub($context,$str) {
         pos($str) = $context->{pos};
         if ( $str =~ m/\G$regex/gc ) {
-            return Some([Hash::with($context, pos => pos($str)), $1]);
+            return Some([Hash::with($context, pos => pos($str)), @{^CAPTURE}]);
         }
         else {
             return None;
