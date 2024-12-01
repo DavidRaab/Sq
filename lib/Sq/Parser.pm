@@ -48,30 +48,27 @@ sub p_match($regex) {
     };
 }
 
-# maps function $f against the $1 value of the parser and returns a new parser
+# maps function $f against the values of the parser and returns a new parser
 #
 # Parser<'a> -> ('a -> 'b) -> Parser<'b>
 sub p_map($parser, $f) {
     return sub($context,$str) {
-        my ($is_some, $ctx, $x) = Option->extract_array($parser->($context,$str));
-        if ( $is_some ) { return Some([$ctx, $f->($x)]) }
-        else            { return None                   }
+        my ($is_some, $ctx, @xs) = Option->extract_array($parser->($context,$str));
+        if ( $is_some ) { return Some([$ctx, $f->(@xs)]) }
+        else            { return None                    }
     }
 }
 
 # Parser<'a> -> ('a -> Parser<'b>) -> Parser<'b>
 sub p_bind($parser, $f) {
     return sub($context,$str) {
-        my ($is_some, $ctxA, $a) = Option->extract_array($parser->($context,$str));
+        my ($is_some, $ctxA, @as) = Option->extract_array($parser->($context,$str));
         if ( $is_some ) {
-            my $p = $f->($a);
-            my ($is_some, $b, $ctxB) = Option->extract_array($p->({pos => 0}, $str));
-            if ( $is_some ) {
-                return Some([$ctxB, $b]);
-            }
-            else {
-                return None;
-            }
+            my $p = $f->(@as);
+            my ($is_some, $ctxB, @bs) = Option->extract_array($p->($ctxA, $str));
+            return $is_some
+                 ? Some([$ctxB, @bs])
+                 : None;
         }
         else {
             return None;
