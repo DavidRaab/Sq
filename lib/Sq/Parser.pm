@@ -3,10 +3,10 @@ use 5.036;
 use Sq;
 use Sub::Exporter -setup => {
     exports => [
-        qw(p_run p_is p_match p_map p_bind p_and p_return p_or p_opt p_join),
+        qw(p_run p_is p_match p_map p_bind p_and p_return p_or p_maybe p_join),
     ],
     groups => {
-        default => [qw(p_run p_is p_match p_map p_bind p_and p_return p_or p_opt p_join)],
+        default => [qw(p_run p_is p_match p_map p_bind p_and p_return p_or p_maybe p_join)],
     },
 };
 
@@ -115,7 +115,7 @@ sub p_or(@parsers) {
 # tries to apply $parser, but $parser is optional. The parser that is returned
 # is always succesfull either "eating" something from the string or not.
 # Regex:?
-sub p_opt($parser) {
+sub p_maybe($parser) {
     return sub($ctx,$str) {
         my $opt = $parser->($ctx,$str);
         return $opt if @$opt;
