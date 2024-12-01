@@ -86,12 +86,8 @@ sub p_and(@parsers) {
         my (@results, $is_some, @xs);
         for my $p ( @parsers ) {
             ($is_some, $last_ctx, @xs) = Option->extract_array($p->($last_ctx, $str));
-            if ( $is_some ) {
-                push @results, @xs;
-            }
-            else {
-                return None;
-            }
+            return None if !$is_some;
+            push @results, @xs;
         }
         return Some([$last_ctx, @results]);
     };
