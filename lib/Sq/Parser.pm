@@ -3,10 +3,14 @@ use 5.036;
 use Sq;
 use Sub::Exporter -setup => {
     exports => [
-        qw(p_run p_is p_match p_map p_bind p_and p_return p_or p_maybe p_join p_str),
+        qw(p_run p_is p_match p_map p_bind p_and p_return p_or p_maybe),
+        qw(p_join p_str p_strc p_many p_many0),
     ],
     groups => {
-        default => [qw(p_run p_is p_match p_map p_bind p_and p_return p_or p_maybe p_join p_str)],
+        default => [
+            qw(p_run p_is p_match p_map p_bind p_and p_return p_or p_maybe),
+            qw(p_join p_str p_strc p_many p_many0)
+        ],
     },
 };
 
@@ -15,7 +19,7 @@ use Sub::Exporter -setup => {
 #
 # Parser<'a> -> string -> Option<[$1,$context]>
 sub p_run($parser, $str) {
-    $parser->(sq({ pos => 0 }), $str);
+    $parser->(sq({ pos => 0 }), $str)->map(sub($args) { Array::skip($args,1) });
 }
 
 # monadic return. just wraps any values into an parser. Useful in bind functions.
@@ -133,10 +137,23 @@ sub p_join($parser, $sep) {
     }
 }
 
-# parses string
+# TODO: Check if a version with substr() is faster
+#
+# just parses a string - no capture
 sub p_str($string) {
     return sub($ctx,$str) {
-        pos($string) = $ctx->{pos};
+        pos($str) = $ctx->{pos};
+        if ( $str =~ m/\G\Q$string\E/gc ) {
+            return Some([{pos => pos($str)}]);
+        }
+        return None;
+    }
+}
+
+# parses string - and captures string
+sub p_strc($string) {
+    return sub($ctx,$str) {
+        pos($str) = $ctx->{pos};
         if ( $str =~ m/\G\Q$string\E/gc ) {
             return Some([{pos => pos($str)}, $string]);
         }
@@ -144,8 +161,41 @@ sub p_str($string) {
     }
 }
 
-# * or +
-sub p_many($parser) {}
+# +: at least one, as much as possible
+sub p_many($parser) {
+    return sub($ctx,$str) {
+        my ($is_some, $last_ctx, @matches, @xs);
+        ($is_some, $ctx, @xs) = Option->extract_array($parser->($ctx,$str));
+        if ( $is_some ) {
+            push @matches, @xs;
+            REPEAT:
+            ($is_some, $ctx, @xs) = Option->extract_array($parser->($ctx,$str));
+            if ( $is_some ) {
+                $last_ctx = $ctx;
+                push @matches, @xs;
+                goto REPEAT;
+            }
+            return Some([$last_ctx, @matches]);
+        }
+        return None;
+    }
+}
+
+# zero or many times
+sub p_many0($parser) {
+    return sub($ctx,$str) {
+        my ($is_some, $last_ctx, @matches, @xs);
+        $last_ctx = $ctx;
+        REPEAT:
+        ($is_some, $ctx, @xs) = Option->extract_array($parser->($ctx,$str));
+        if ( $is_some ) {
+            $last_ctx = $ctx;
+            push @matches, @xs;
+            goto REPEAT;
+        }
+        return Some([$last_ctx, @matches]);
+    }
+}
 
 # quantity
 sub p_qty($parser, $min, $max) {}
