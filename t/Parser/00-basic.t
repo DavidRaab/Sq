@@ -68,9 +68,14 @@ sub result($pos,@xs) {
     my $sign       = p_or($sign_plus, $sign_minus);
     my $int        = p_and(p_opt($sign), p_match(qr/(\d+)/));
 
-    is(p_run($int, '1234foo'),  result(4, 1234),        '$int parses just int');
+    is(p_run($int, '1234foo'),  result(4, '1234'),      '$int parses just int');
     is(p_run($int, '+1234foo'), result(5, '+', '1234'), '$int with + sign');
     is(p_run($int, '-1234foo'), result(5, '-', '1234'), '$int with - sign');
+
+    my $jint = p_join($int, '');
+    is(p_run($jint, '1234foo'),  result(4,  '1234'), '$jint parses just int');
+    is(p_run($jint, '+1234foo'), result(5, '+1234'), '$jint with + sign');
+    is(p_run($jint, '-1234foo'), result(5, '-1234'), '$jint with - sign');
 }
 
 done_testing;

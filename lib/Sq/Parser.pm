@@ -3,10 +3,10 @@ use 5.036;
 use Sq;
 use Sub::Exporter -setup => {
     exports => [
-        qw(p_run p_is p_match p_map p_bind p_and p_return p_or p_opt),
+        qw(p_run p_is p_match p_map p_bind p_and p_return p_or p_opt p_join),
     ],
     groups => {
-        default => [qw(p_run p_is p_match p_map p_bind p_and p_return p_or p_opt)],
+        default => [qw(p_run p_is p_match p_map p_bind p_and p_return p_or p_opt p_join)],
     },
 };
 
@@ -120,6 +120,16 @@ sub p_opt($parser) {
         my $opt = $parser->($ctx,$str);
         return $opt if @$opt;
         return Some([$ctx]);
+    }
+}
+
+# Concatenates all the results of the parser with string join
+sub p_join($parser, $sep) {
+    return sub($ctx,$str) {
+        my ($is_some, $c, @strs) = Option->extract_array($parser->($ctx,$str));
+        return $is_some
+             ? Some([$c, join($sep,@strs)])
+             : None;
     }
 }
 
