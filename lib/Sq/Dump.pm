@@ -99,7 +99,7 @@ sub compact($max, $str) {
     $no_ws =~ s/\s+/ /g;
 
     # when $no_ws is smaller than $max we keep that string but we
-    # need to add $ident again
+    # need to add $indent again
     if ( CORE::length $no_ws <= $max ) {
         $str = (" " x $indent) . $no_ws;
     }
