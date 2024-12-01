@@ -3,10 +3,10 @@ use 5.036;
 use Sq;
 use Sub::Exporter -setup => {
     exports => [
-        qw(p_run p_is p_match p_map p_bind p_and p_return p_or p_maybe p_join),
+        qw(p_run p_is p_match p_map p_bind p_and p_return p_or p_maybe p_join p_str),
     ],
     groups => {
-        default => [qw(p_run p_is p_match p_map p_bind p_and p_return p_or p_maybe p_join)],
+        default => [qw(p_run p_is p_match p_map p_bind p_and p_return p_or p_maybe p_join p_str)],
     },
 };
 
@@ -132,5 +132,28 @@ sub p_join($parser, $sep) {
              : None;
     }
 }
+
+# parses string
+sub p_str($string) {
+    return sub($ctx,$str) {
+        pos($string) = $ctx->{pos};
+        if ( $str =~ m/\G\Q$string\E/gc ) {
+            return Some([{pos => pos($str)}, $string]);
+        }
+        return None;
+    }
+}
+
+# * or +
+sub p_many($parser) {}
+
+# quantity
+sub p_qty($parser, $min, $max) {}
+
+# repeats $parser exactly $amount times
+sub p_repeat($parser, $amount) {}
+
+# removes matches
+sub p_ignore($parser) {}
 
 1;
