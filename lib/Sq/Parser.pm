@@ -3,10 +3,10 @@ use 5.036;
 use Sq;
 use Sub::Exporter -setup => {
     exports => [
-        qw(p_run p_is p_match p_map p_bind p_and p_return),
+        qw(p_run p_is p_match p_map p_bind p_and p_return p_or),
     ],
     groups => {
-        default => [qw(p_run p_is p_match p_map p_bind p_and p_return)],
+        default => [qw(p_run p_is p_match p_map p_bind p_and p_return p_or)],
     },
 };
 
@@ -96,6 +96,18 @@ sub p_and(@parsers) {
         }
         return Some([$last_ctx, @results]);
     };
+}
+
+# checks multiple parsers and returns the result of the first one that is
+# successful. Or returns None if no one is succesfull.
+sub p_or(@parsers) {
+    return sub($ctx,$str) {
+        for my $p ( @parsers ) {
+            my $opt = $p->($ctx, $str);
+            return $opt if @$opt;
+        }
+        return None;
+    }
 }
 
 1;

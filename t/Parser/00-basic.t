@@ -10,6 +10,11 @@ my $ws   = p_is(qr/\s+/);
 my $int  = p_match(qr/(\d+)/);
 my $hex  = p_map(p_match(qr/0x([0-9a-zA-Z]+)/), sub($hex) { hex $hex });
 
+# helper function to built the return values of the parser
+sub result($pos,@xs) {
+    return Some([{pos => $pos}, @xs]);
+}
+
 # basics
 {
     my $p_hello = p_match(qr/(Hello)/);
@@ -17,12 +22,12 @@ my $hex  = p_map(p_match(qr/0x([0-9a-zA-Z]+)/), sub($hex) { hex $hex });
     my $length  = p_map($p_hello, sub($str) { length $str });
 
     my $greeting = "Hello, World!";
-    is(p_run($p_hello, $greeting), Some([{pos => 5}, 'Hello']), 'starts with hello');
-    is(p_run($length,  $greeting),       Some([{pos => 5}, 5]), 'length of hello');
-    is(p_run($p_world, $greeting),                        None, 'does not start with world');
-    is(p_run($int,    "12345foo"), Some([{pos => 5}, "12345"]), 'extracted int');
-    is(p_run($int,      "foo123"),                        None, 'no int at start');
-    is(p_run($hex,    "0xff 123"),     Some([{pos => 4}, 255]), 'extract hex');
+    is(p_run($p_hello, $greeting), result(5, 'Hello'), 'starts with hello');
+    is(p_run($length,  $greeting),       result(5, 5), 'length of hello');
+    is(p_run($p_world, $greeting),               None, 'does not start with world');
+    is(p_run($int,    "12345foo"), result(5, "12345"), 'extracted int');
+    is(p_run($int,      "foo123"),               None, 'no int at start');
+    is(p_run($hex,    "0xff 123"),     result(4, 255), 'extract hex');
 }
 
 # bind correct?
@@ -47,5 +52,13 @@ my $hex  = p_map(p_match(qr/0x([0-9a-zA-Z]+)/), sub($hex) { hex $hex });
     is(p_run($greeting, "helloworld!"),                                      None, 'no greeting');
 }
 
+# p_or
+{
+    my $num = p_or($hex, $int);
+
+    is(p_run($num, '12345'), result(5, '12345'), '$num parses int');
+    is(p_run($num, '0xff'),      result(4, 255), '$num parses hex');
+    is(p_run($num, 'abc'),                 None, '$num on non-number');
+}
 
 done_testing;
