@@ -3,10 +3,10 @@ use 5.036;
 use Sq;
 use Sub::Exporter -setup => {
     exports => [
-        qw(p_run p_is p_match p_map p_bind p_and p_return p_or),
+        qw(p_run p_is p_match p_map p_bind p_and p_return p_or p_opt),
     ],
     groups => {
-        default => [qw(p_run p_is p_match p_map p_bind p_and p_return p_or)],
+        default => [qw(p_run p_is p_match p_map p_bind p_and p_return p_or p_opt)],
     },
 };
 
@@ -85,6 +85,7 @@ sub p_bind($parser, $f) {
 # executes multiple parsers one after another and expects every paser to be successful
 # when all are successful then it return Some() result containing the matches
 # of all parsers. When one parser fails it returns None.
+# Regex: abc
 sub p_and(@parsers) {
     return sub($ctx,$str) {
         my $last_ctx = $ctx;
@@ -100,6 +101,7 @@ sub p_and(@parsers) {
 
 # checks multiple parsers and returns the result of the first one that is
 # successful. Or returns None if no one is succesfull.
+# Regex: ( | | | )
 sub p_or(@parsers) {
     return sub($ctx,$str) {
         for my $p ( @parsers ) {
@@ -107,6 +109,17 @@ sub p_or(@parsers) {
             return $opt if @$opt;
         }
         return None;
+    }
+}
+
+# tries to apply $parser, but $parser is optional. The parser that is returned
+# is always succesfull either "eating" something from the string or not.
+# Regex:?
+sub p_opt($parser) {
+    return sub($ctx,$str) {
+        my $opt = $parser->($ctx,$str);
+        return $opt if @$opt;
+        return Some([$ctx]);
     }
 }
 

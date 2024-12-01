@@ -61,4 +61,16 @@ sub result($pos,@xs) {
     is(p_run($num, 'abc'),                 None, '$num on non-number');
 }
 
+# p_opt
+{
+    my $sign_plus  = p_match(qr/(\+)/);
+    my $sign_minus = p_match(qr/(\-)/);
+    my $sign       = p_or($sign_plus, $sign_minus);
+    my $int        = p_and(p_opt($sign), p_match(qr/(\d+)/));
+
+    is(p_run($int, '1234foo'),  result(4, 1234),        '$int parses just int');
+    is(p_run($int, '+1234foo'), result(5, '+', '1234'), '$int with + sign');
+    is(p_run($int, '-1234foo'), result(5, '-', '1234'), '$int with - sign');
+}
+
 done_testing;
