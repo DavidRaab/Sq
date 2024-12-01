@@ -35,4 +35,15 @@ use Test2::V0 ':DEFAULT';
     is(p_run($greeting, "helloworld!"),                                      None, 'no greeting');
 }
 
+# bind correct?
+{
+    my sub pmap($p, $f) {
+        p_bind($p, sub(@xs) { p_return $f->(@xs) });
+    }
+
+    my $int  = p_match(qr/(\d+)/);
+    my $incr = pmap($int, sub($x) { $x + 1 });
+    is(p_run($incr, "12"), Some([{pos => 2}, 13]), 'map through bind');
+}
+
 done_testing;
