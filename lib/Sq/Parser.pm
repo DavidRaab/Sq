@@ -3,10 +3,10 @@ use 5.036;
 use Sq;
 use Sub::Exporter -setup => {
     exports => [
-        qw(p_run p_is p_match p_map p_bind p_and),
+        qw(p_run p_is p_match p_map p_bind p_and p_return),
     ],
     groups => {
-        default => [qw(p_run p_is p_match p_map p_bind p_and)],
+        default => [qw(p_run p_is p_match p_map p_bind p_and p_return)],
     },
 };
 
@@ -18,6 +18,12 @@ sub p_run($parser, $str) {
     $parser->(sq({ pos => 0 }), $str);
 }
 
+# monadic return. just wraps any values into an parser. Useful in bind functions.
+sub p_return(@values) {
+    return sub($ctx,$str) {
+        return Some([$ctx,@values]);
+    };
+}
 
 # matches a regex against a string. Just returns an Option if successfull or not.
 sub p_is($regex) {
