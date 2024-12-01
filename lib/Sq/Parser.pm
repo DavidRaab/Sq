@@ -165,19 +165,17 @@ sub p_strc($string) {
 sub p_many($parser) {
     return sub($ctx,$str) {
         my ($is_some, $last_ctx, @matches, @xs);
+        $last_ctx = $ctx;
+        REPEAT:
         ($is_some, $ctx, @xs) = Option->extract_array($parser->($ctx,$str));
         if ( $is_some ) {
+            $last_ctx = $ctx;
             push @matches, @xs;
-            REPEAT:
-            ($is_some, $ctx, @xs) = Option->extract_array($parser->($ctx,$str));
-            if ( $is_some ) {
-                $last_ctx = $ctx;
-                push @matches, @xs;
-                goto REPEAT;
-            }
-            return Some([$last_ctx, @matches]);
+            goto REPEAT;
         }
-        return None;
+        return @matches > 0
+             ? Some([$last_ctx, @matches])
+             : None;
     }
 }
 
