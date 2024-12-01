@@ -38,7 +38,7 @@ sub result($pos,@xs) {
 
     my $int  = p_match(qr/(\d+)/);
     my $incr = pmap($int, sub($x) { $x + 1 });
-    is(p_run($incr, "12"), Some([{pos => 2}, 13]), 'map through bind');
+    is(p_run($incr, "12"), result(2, 13), 'map through bind');
 }
 
 # p_and
@@ -46,10 +46,10 @@ sub result($pos,@xs) {
     my $p_comma  = p_is(qr/,/);
     my $greeting = p_and($word, $p_comma, $ws, $word);
 
-    is(p_run($greeting, "HELLO, WORLD!"),   Some([{pos => 12}, "HELLO", "WORLD"]), 'parse greeting 1');
-    is(p_run($greeting, "hello, world!"),   Some([{pos => 12}, "hello", "world"]), 'parse greeting 2');
-    is(p_run($greeting, "hElLo,   wOrLd!"), Some([{pos => 14}, "hElLo", "wOrLd"]), 'parse greeting 3');
-    is(p_run($greeting, "helloworld!"),                                      None, 'no greeting');
+    is(p_run($greeting, "HELLO, WORLD!"),   result(12, "HELLO", "WORLD"), 'parse greeting 1');
+    is(p_run($greeting, "hello, world!"),   result(12, "hello", "world"), 'parse greeting 2');
+    is(p_run($greeting, "hElLo,   wOrLd!"), result(14, "hElLo", "wOrLd"), 'parse greeting 3');
+    is(p_run($greeting, "helloworld!"),                             None, 'no greeting');
 }
 
 # p_or
