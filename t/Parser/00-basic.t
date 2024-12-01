@@ -74,7 +74,7 @@ sub result(@xs) { Some([@xs]) }
     is(p_run($jint, '-1234foo'), result('-1234'), '$jint with - sign');
 }
 
-# p_many
+# p_many, p_many0
 {
     # Regex: (\d+) (?: (\d+) , )*
     my $int1 = p_and($int, p_many (p_and(p_str(','), $int)));
@@ -85,8 +85,8 @@ sub result(@xs) { Some([@xs]) }
     is(p_run($int0, '123,12,300,420'), result(123, 12, 300, 420), '$int0 list 2');
     is(p_run($int1, '123,12,300,420'), result(123, 12, 300, 420), '$int1 list 2');
 
-    my $p_array = p_map($int0, sub(@xs) { sq [@xs] });
-    is(p_run($p_array, '1,2,3,420'), result([1,2,3,420]), 'parses array');
+    my $p_array = p_map($int0, sub(@xs) { [@xs] });
+    is(p_run($p_array, '1,2,3,420'), result([1,2,3,420]), 'parses to array');
 }
 
 done_testing;
