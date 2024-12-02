@@ -605,4 +605,10 @@ is(Option::is_none({}),          0, 'is_none 8');
         'Option with Array::choose');
 }
 
+# returning option in Option::map
+{
+    my $x = Some(10)->map(sub($x) { Some($x+1) });
+    is($x, [Some(11)] , 'Returning option in Option::map');
+}
+
 done_testing;
