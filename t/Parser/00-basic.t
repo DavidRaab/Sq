@@ -30,6 +30,7 @@ sub result(@xs) { Some([@xs]) }
 
 # bind correct?
 {
+    # for testing i implement map through bind, and then check if map works correctly
     my sub pmap($p, $f) {
         p_bind($p, sub(@xs) { p_return $f->(@xs) });
     }
@@ -37,6 +38,10 @@ sub result(@xs) { Some([@xs]) }
     my $int  = p_match(qr/(\d+)/);
     my $incr = pmap($int, sub($x) { $x + 1 });
     is(p_run($incr, "12"), result(13), 'map through bind');
+    is(
+        p_run(p_and($incr, $ws, $incr, $ws, $incr), '12 13 14'),
+        result(13, 14, 15),
+        'extract and increment');
 }
 
 # p_and

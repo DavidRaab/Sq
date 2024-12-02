@@ -190,7 +190,7 @@ sub p_many($parser) {
     }
 }
 
-# zero or many times
+# *: zero or many times
 sub p_many0($parser) {
     return sub($ctx,$str) {
         my ($is_some, $last_ctx, @matches, @xs);
