@@ -688,12 +688,34 @@ call C<to_array>.
     my $doubled = $evens->map(sub($x) { $x * 2  });
     my $squared = $evens->map(sub($x) { $x * $x });
 
-=head2 regex_match($seq_of_strings, $regex, $array_picks) : $seq
+=head2 regex_match($seq_of_strings, $regex) : $seq_of_array
 
-Matches a C<$regex> against every element of a sequence. C<$array_picks>
-contains the $1, $2, $3, ... numbers that should be extracted from the regex.
+Matches a C<$regex> against every element of a sequence that is supposed to
+be a string. When a regex matches against the string it extracts all captures
+into an array.
 
-TODO EXAMPLE
+    my $lines = Seq->new(
+        '2023-11-25T15:10:00',
+        '2023-11-20T10:05:29',
+        'xxxx-xx-xxT00:00:00',
+        '1900-01-01T00:00:01',
+        '12345678901234567890',
+    );
+
+    my $matches = $lines->regex_match(qr/
+        \A
+            (\d\d\d\d) - (\d\d) - (\d\d)  # Date
+        T                                 # T
+            (\d\d) : (\d\d) : (\d\d)      # Time
+        \z/xms
+    )->to_array;
+
+    # $matches
+    # [
+    #     [qw/2023 11 25 15 10 00/],
+    #     [qw/2023 11 20 10 05 29/],
+    #     [qw/1900 01 01 00 00 01/],
+    # ],
 
 =head2 windowed($seq, $window_size) : $seq_of_array
 
