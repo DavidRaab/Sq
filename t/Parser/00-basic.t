@@ -108,6 +108,17 @@ sub result(@xs) { Some([@xs]) }
 
     is(p_run($hex1, "0xffff 123"), result(65535), '$hex1 ffff');
     is(p_run($hex2, "0xffff 123"), result(65535), '$hex2 ffff');
+
+    # parses percentage only between 0% - 100%
+    my $percent = p_matchf(qr/(\d{1,3}) \s* %/x, sub($num) {
+        $num >= 0 && $num <= 100 ? Some($num) : None;
+    });
+
+    is(p_run($percent,   '0%'),   result(0),   '0%');
+    is(p_run($percent,  '10%'),  result(10),  '10%');
+    is(p_run($percent, '100%'), result(100), '100%');
+    is(p_run($percent, '110%'),        None, '110%');
+    is(p_run($percent, '10 %'),  result(10), '10 %');
 }
 
 done_testing;
