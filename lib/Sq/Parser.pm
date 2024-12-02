@@ -3,12 +3,12 @@ use 5.036;
 use Sq;
 use Sub::Exporter -setup => {
     exports => [
-        qw(p_run p_is p_match p_map p_bind p_and p_return p_or p_maybe),
+        qw(p_run p_is p_match p_matchf p_map p_bind p_and p_return p_or p_maybe),
         qw(p_join p_str p_strc p_many p_many0),
     ],
     groups => {
         default => [
-            qw(p_run p_is p_match p_map p_bind p_and p_return p_or p_maybe),
+            qw(p_run p_is p_match p_matchf p_map p_bind p_and p_return p_or p_maybe),
             qw(p_join p_str p_strc p_many p_many0)
         ],
     },
@@ -36,9 +36,7 @@ sub p_is($regex) {
         if ( $str =~ m/\G$regex/gc ) {
             return Some([Hash::with($context, pos => pos($str))]);
         }
-        else {
-            return None;
-        }
+        return None;
     };
 }
 
@@ -51,9 +49,25 @@ sub p_match($regex) {
         if ( $str =~ m/\G$regex/gc ) {
             return Some([Hash::with($context, pos => pos($str)), @{^CAPTURE}]);
         }
-        else {
-            return None;
+        return None;
+    };
+}
+
+# Like p_match but when the regex could be matched than `$f_opt` is executed
+# and expected to return an optional value. The option is used to decide if
+# parsing failed or not. This way we also can additionally change the value
+# in a single step without calling p_map. When it returns B<None> than parsing
+# is considered as a failure
+sub p_matchf($regex, $f_opt) {
+    return sub($ctx,$str) {
+        pos($str) = $ctx->{pos};
+        if ( $str =~ m/\G$regex/gc ) {
+            my ($is_some, $x) = Option->extract($f_opt->(@{^CAPTURE}));
+            if ( $is_some ) {
+                return Some([Hash::with($ctx, pos => pos($str)), $x]);
+            }
         }
+        return None;
     };
 }
 
@@ -63,8 +77,8 @@ sub p_match($regex) {
 sub p_map($parser, $f) {
     return sub($context,$str) {
         my ($is_some, $ctx, @xs) = Option->extract_array($parser->($context,$str));
-        if ( $is_some ) { return Some([$ctx, $f->(@xs)]) }
-        else            { return None                    }
+        return Some([$ctx, $f->(@xs)]) if $is_some;
+        return None;
     }
 }
 
@@ -79,9 +93,7 @@ sub p_bind($parser, $f) {
                  ? Some([$ctxB, @bs])
                  : None;
         }
-        else {
-            return None;
-        }
+        return None;
     }
 }
 

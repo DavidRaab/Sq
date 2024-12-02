@@ -98,4 +98,16 @@ sub result(@xs) { Some([@xs]) }
     is(p_run($time, '123:12'),         None, 'no time');
 }
 
+# p_matchf
+{
+    my $hex1 = p_map(p_match(qr/0x([0-9a-zA-Z]+)/), sub($hex) { hex $hex });
+    my $hex2 = p_matchf(     qr/0x([0-9a-zA-Z]+)/ , sub($hex) { hex $hex });
+
+    is(p_run($hex1, "0xff 123"), result(255), '$hex1 ff');
+    is(p_run($hex2, "0xff 123"), result(255), '$hex2 ff');
+
+    is(p_run($hex1, "0xffff 123"), result(65535), '$hex1 ffff');
+    is(p_run($hex2, "0xffff 123"), result(65535), '$hex2 ffff');
+}
+
 done_testing;
