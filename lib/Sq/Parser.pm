@@ -1,7 +1,6 @@
 package Sq::Parser;
 use 5.036;
 use Sq;
-use Carp ();
 use Sub::Exporter -setup => {
     exports => [
         qw(p_run p_is p_match p_matchf p_map p_bind p_and p_return p_or p_maybe),
@@ -55,7 +54,6 @@ sub p_match($regex) {
     return sub($context,$str) {
         pos($str) = $context->{pos};
         if ( $str =~ m/\G$regex/gc ) {
-            Carp::croak "p_match: no captures in regex $regex" if @{^CAPTURE} == 0;
             return Some([Hash::with($context, pos => pos($str)), @{^CAPTURE}]);
         }
         return None;
@@ -71,7 +69,6 @@ sub p_matchf($regex, $f_opt_array) {
     return sub($ctx,$str) {
         pos($str) = $ctx->{pos};
         if ( $str =~ m/\G$regex/gc ) {
-            Carp::croak "p_matchf: no captures in regex $regex" if @{^CAPTURE} == 0;
             my ($is_some, @xs) = Option->extract_array($f_opt_array->(@{^CAPTURE}));
             if ( $is_some ) {
                 return Some([Hash::with($ctx, pos => pos($str)), @xs]);
