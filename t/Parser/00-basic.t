@@ -101,6 +101,41 @@ sub result(@xs) { Some([@xs]) }
     is(p_run($time, '12:34'), result(12,34), 'extracts 2 vars 1');
     is(p_run($time, '1:3'),     result(1,3), 'extracts 2 vars 2');
     is(p_run($time, '123:12'),         None, 'no time');
+
+    # valid_time with bind
+    my $valid_time_b = p_bind($time, sub($hour,$min) {
+        $hour < 24 && $min < 60
+            ? p_return $hour,$min
+            : p_fail;
+    });
+
+    is(p_run($valid_time_b, '23:59'), result(23,59), 'valid time bind 1');
+    is(p_run($valid_time_b,   '0:0'),   result(0,0), 'valid time bind 2');
+    is(p_run($valid_time_b, '23:60'),          None, 'valid time bind 3');
+    is(p_run($valid_time_b,  '0:60'),          None, 'valid time bind 4');
+    is(p_run($valid_time_b,  '24:0'),          None, 'valid time bind 5');
+
+    # valid_time with choose
+    my $valid_time_c = p_choose($time, sub($hour,$min) {
+        $hour < 24 && $min < 60 ? ($hour,$min) : undef;
+    });
+
+    is(p_run($valid_time_c, '23:59'), result(23,59), 'valid time choose 1');
+    is(p_run($valid_time_c,   '0:0'),   result(0,0), 'valid time choose 2');
+    is(p_run($valid_time_c, '23:60'),          None, 'valid time choose 3');
+    is(p_run($valid_time_c,  '0:60'),          None, 'valid time choose 4');
+    is(p_run($valid_time_c,  '24:0'),          None, 'valid time choose 5');
+
+    # valid_time with matchf
+    my $valid_time_m = p_matchf(qr/(\d\d?):(\d\d?)/, sub($hour,$min) {
+        $hour < 24 && $min < 60 ? ($hour,$min) : undef;
+    });
+
+    is(p_run($valid_time_m, '23:59'), result(23,59), 'valid time matchf 1');
+    is(p_run($valid_time_m,   '0:0'),   result(0,0), 'valid time matchf 2');
+    is(p_run($valid_time_m, '23:60'),          None, 'valid time matchf 3');
+    is(p_run($valid_time_m,  '0:60'),          None, 'valid time matchf 4');
+    is(p_run($valid_time_m,  '24:0'),          None, 'valid time matchf 5');
 }
 
 # p_matchf
@@ -128,11 +163,30 @@ sub result(@xs) { Some([@xs]) }
 
 # p_ignore
 {
+    # Regex: [+-](\d+)
     my $sign = p_or(p_strc('+'), p_strc('-'));
     my $pint = p_and( p_ignore($sign), $int );
 
     is(p_run($pint, '+1234'), result(1234), 'ignore 1');
     is(p_run($pint, '-1234'), result(1234), 'ignore 2');
+}
+
+# p_qty
+{
+    # Regex: ( \d{1,3} ){1,3}
+    my $three = p_qty(p_match(qr/(\d{1,3})/), 1, 3);
+
+    is(p_run($three,          '1'),             result(1), 'p_qty 1');
+    is(p_run($three,        '123'),           result(123), 'p_qty 2');
+    is(p_run($three,    '1234567'),   result(123, 456, 7), 'p_qty 3');
+    is(p_run($three, '1234567890'), result(123, 456, 789), 'p_qty 4');
+
+    # Regex: \d{3}
+    my $d3 = p_repeat(p_match(qr/(\d)/), 3);
+    is(p_run($d3,    '1'),          None, 'p_repeat 1');
+    is(p_run($d3,   '12'),          None, 'p_repeat 2');
+    is(p_run($d3,  '123'), result(1,2,3), 'p_repeat 3');
+    is(p_run($d3, '1234'), result(1,2,3), 'p_repeat 4');
 }
 
 done_testing;

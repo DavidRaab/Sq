@@ -1,15 +1,18 @@
 package Sq::Parser;
 use 5.036;
 use Sq;
+use Carp ();
 use Sub::Exporter -setup => {
     exports => [
         qw(p_run p_is p_match p_matchf p_map p_bind p_and p_return p_or p_maybe),
-        qw(p_join p_str p_strc p_many p_many0 p_ignore),
+        qw(p_join p_str p_strc p_many p_many0 p_ignore p_fail p_qty p_choose),
+        qw(p_repeat),
     ],
     groups => {
         default => [
             qw(p_run p_is p_match p_matchf p_map p_bind p_and p_return p_or p_maybe),
-            qw(p_join p_str p_strc p_many p_many0 p_ignore)
+            qw(p_join p_str p_strc p_many p_many0 p_ignore p_fail p_qty p_choose),
+            qw(p_repeat),
         ],
     },
 };
@@ -27,6 +30,11 @@ sub p_return(@values) {
     return sub($ctx,$str) {
         return Some([$ctx,@values]);
     };
+}
+
+# returns a parser that always fails. Useful in bind functions.
+sub p_fail() {
+    return sub($ctx,$str) { return None }
 }
 
 # matches a regex against a string. Just returns an Option if successfull or not.
@@ -47,6 +55,7 @@ sub p_match($regex) {
     return sub($context,$str) {
         pos($str) = $context->{pos};
         if ( $str =~ m/\G$regex/gc ) {
+            Carp::croak "p_match: no captures in regex $regex" if @{^CAPTURE} == 0;
             return Some([Hash::with($context, pos => pos($str)), @{^CAPTURE}]);
         }
         return None;
@@ -58,13 +67,14 @@ sub p_match($regex) {
 # parsing failed or not. This way we also can additionally change the value
 # in a single step without calling p_map. When it returns B<None> than parsing
 # is considered as a failure
-sub p_matchf($regex, $f_opt) {
+sub p_matchf($regex, $f_opt_array) {
     return sub($ctx,$str) {
         pos($str) = $ctx->{pos};
         if ( $str =~ m/\G$regex/gc ) {
-            my ($is_some, $x) = Option->extract($f_opt->(@{^CAPTURE}));
+            Carp::croak "p_matchf: no captures in regex $regex" if @{^CAPTURE} == 0;
+            my ($is_some, @xs) = Option->extract_array($f_opt_array->(@{^CAPTURE}));
             if ( $is_some ) {
-                return Some([Hash::with($ctx, pos => pos($str)), $x]);
+                return Some([Hash::with($ctx, pos => pos($str)), @xs]);
             }
         }
         return None;
@@ -78,6 +88,21 @@ sub p_map($parser, $f) {
     return sub($context,$str) {
         my ($is_some, $ctx, @xs) = Option->extract_array($parser->($context,$str));
         return Some([$ctx, $f->(@xs)]) if $is_some;
+        return None;
+    }
+}
+
+# Like p_map but functions $f_opt returns an optional that can decide if parsing
+# was a failure or not.
+sub p_choose($parser, $f_opt_array) {
+    return sub($context,$str) {
+        my ($is_some, $ctx, @xs) = Option->extract_array($parser->($context,$str));
+        if ( $is_some ) {
+            ($is_some, @xs) = Option->extract_array($f_opt_array->(@xs));
+            if ( $is_some ) {
+                return Some([$ctx, @xs]);
+            }
+        }
         return None;
     }
 }
@@ -207,10 +232,33 @@ sub p_many0($parser) {
 }
 
 # quantity
-sub p_qty($parser, $min, $max) {}
+sub p_qty($parser, $min, $max) {
+    return sub($ctx,$str) {
+        my ($is_some, $last_ctx, $count, @matches, @xs);
+        $last_ctx = $ctx;
+        $count    = 0;
+        REPEAT:
+        ($is_some, $ctx, @xs) = Option->extract_array($parser->($ctx,$str));
+        if ( $is_some ) {
+            $count++;
+            $last_ctx = $ctx;
+            push @matches, @xs;
+            return Some([$last_ctx, @matches]) if $count >= $max;
+            goto REPEAT;
+        }
+        if ( $count >= $min && $count <= $max ) {
+            return Some([$last_ctx, @matches]);
+        }
+        else {
+            return None;
+        }
+    }
+}
 
 # repeats $parser exactly $amount times
-sub p_repeat($parser, $amount) {}
+sub p_repeat($parser, $amount) {
+    return p_qty($parser, $amount, $amount);
+}
 
 # removes matches
 sub p_ignore($parser) {
