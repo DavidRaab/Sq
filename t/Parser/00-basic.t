@@ -52,7 +52,7 @@ sub result(@xs) { Some([@xs]) }
     is(p_run($greeting, "HELLO, WORLD!"),   result("HELLO", "WORLD"), 'parse greeting 1');
     is(p_run($greeting, "hello, world!"),   result("hello", "world"), 'parse greeting 2');
     is(p_run($greeting, "hElLo,   wOrLd!"), result("hElLo", "wOrLd"), 'parse greeting 3');
-    is(p_run($greeting, "helloworld!"),                             None, 'no greeting');
+    is(p_run($greeting, "helloworld!"),                         None, 'no greeting');
 }
 
 # p_or
@@ -124,6 +124,15 @@ sub result(@xs) { Some([@xs]) }
     is(p_run($percent, '100%'), result(100), '100%');
     is(p_run($percent, '110%'),        None, '110%');
     is(p_run($percent, '10 %'),  result(10), '10 %');
+}
+
+# p_ignore
+{
+    my $sign = p_or(p_strc('+'), p_strc('-'));
+    my $pint = p_and( p_ignore($sign), $int );
+
+    is(p_run($pint, '+1234'), result(1234), 'ignore 1');
+    is(p_run($pint, '-1234'), result(1234), 'ignore 2');
 }
 
 done_testing;

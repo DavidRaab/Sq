@@ -4,12 +4,12 @@ use Sq;
 use Sub::Exporter -setup => {
     exports => [
         qw(p_run p_is p_match p_matchf p_map p_bind p_and p_return p_or p_maybe),
-        qw(p_join p_str p_strc p_many p_many0),
+        qw(p_join p_str p_strc p_many p_many0 p_ignore),
     ],
     groups => {
         default => [
             qw(p_run p_is p_match p_matchf p_map p_bind p_and p_return p_or p_maybe),
-            qw(p_join p_str p_strc p_many p_many0)
+            qw(p_join p_str p_strc p_many p_many0 p_ignore)
         ],
     },
 };
@@ -213,6 +213,12 @@ sub p_qty($parser, $min, $max) {}
 sub p_repeat($parser, $amount) {}
 
 # removes matches
-sub p_ignore($parser) {}
+sub p_ignore($parser) {
+    return sub($ctx,$str) {
+        $parser->($ctx,$str)->map(sub($array) {
+            return [$array->[0]];
+        });
+    }
+}
 
 1;
