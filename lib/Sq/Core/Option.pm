@@ -272,13 +272,30 @@ sub extract_array($, @args) {
         my $any = $args[0];
         if ( defined $any ) {
             if ( ref $any eq 'Option' ) {
-                return 1, @{$any->[0]} if @$any;
+                # when is_some
+                if ( @$any ) {
+                    my $value = $any->[0];
+                    my $type  = ref $value;
+                    # if value in option is array
+                    if ( $type eq 'Array' || $type eq 'ARRAY' ) {
+                        return 1, @$value;
+                        # TODO: return 0 when empty array was passed???
+                    }
+                    # if value in option not an array
+                    return 1, $value if defined $value;
+                    return 0;
+                }
+                # when option is none
                 return 0;
             }
-            return 1, $any;
+            # not an option, but a single value
+            return 1, $any if defined $any;
+            return 0;
         }
+        # single undef value
         return 0;
     }
+    # multiple values always valid
     else {
         return 1, @args;
     }
