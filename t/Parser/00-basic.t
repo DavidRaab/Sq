@@ -189,4 +189,18 @@ sub result(@xs) { Some([@xs]) }
     is(p_run($d3, '1234'), result(1,2,3), 'p_repeat 4');
 }
 
+# p_filter
+{
+    # silly way to only extract 0,1 from a number
+    my $binary =
+        p_join('',
+            p_filter(
+                p_many(p_match(qr/([0-9])/)),
+                sub($x) { $x==0 || $x==1 ? 1 : 0 }));
+
+    is(p_run($binary, '0123041'), result('0101'), 'p_filter 1');
+    is(p_run($binary,    '1234'),    result('1'), 'p_filter 2');
+    is(p_run($binary,     '234'),     result(''), 'p_filter 3');
+}
+
 done_testing;

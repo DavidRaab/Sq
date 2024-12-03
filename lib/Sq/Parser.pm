@@ -6,13 +6,13 @@ use Sub::Exporter -setup => {
     exports => [
         qw(p_run p_is p_match p_matchf p_map p_bind p_and p_return p_or p_maybe),
         qw(p_join p_str p_strc p_many p_many0 p_ignore p_fail p_qty p_choose),
-        qw(p_repeat),
+        qw(p_repeat p_filter),
     ],
     groups => {
         default => [
             qw(p_run p_is p_match p_matchf p_map p_bind p_and p_return p_or p_maybe),
             qw(p_join p_str p_strc p_many p_many0 p_ignore p_fail p_qty p_choose),
-            qw(p_repeat),
+            qw(p_repeat p_filter),
         ],
     },
 };
@@ -102,6 +102,17 @@ sub p_choose($parser, $f_opt_array) {
             if ( $is_some ) {
                 return Some([$ctx, @xs]);
             }
+        }
+        return None;
+    }
+}
+
+# executes
+sub p_filter($parser, $predicate) {
+    return sub($context,$str) {
+        my ($is_some, $ctx, @xs) = Option->extract_array($parser->($context,$str));
+        if ( $is_some ) {
+            return Some([$ctx, grep { $predicate->($_) } @xs]);
         }
         return None;
     }
