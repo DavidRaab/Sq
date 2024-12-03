@@ -20,12 +20,12 @@ sub replicate($class, $count, $initial) {
 
 # creates new array, stops at first undef
 sub new($class, @array) {
-    my @copy;
+    my @new;
     for my $x ( @array ) {
         last if not defined $x;
-        push @copy, $x;
+        push @new, $x;
     }
-    return CORE::bless(\@copy, 'Array');
+    return CORE::bless(\@new, 'Array');
 }
 
 # wraps all function arguments into Array. Stops at first undef
