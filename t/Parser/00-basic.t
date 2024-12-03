@@ -73,7 +73,7 @@ sub result(@xs) { Some([@xs]) }
     is(p_run($int, '+1234foo'), result('+', '1234'), '$int with + sign');
     is(p_run($int, '-1234foo'), result('-', '1234'), '$int with - sign');
 
-    my $jint = p_join($int, '');
+    my $jint = p_join('', $int);
     is(p_run($jint, '1234foo'),  result( '1234'), '$jint parses just int');
     is(p_run($jint, '+1234foo'), result('+1234'), '$jint with + sign');
     is(p_run($jint, '-1234foo'), result('-1234'), '$jint with - sign');

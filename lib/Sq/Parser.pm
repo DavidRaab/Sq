@@ -164,7 +164,7 @@ sub p_maybe($parser) {
 }
 
 # Concatenates all the results of the parser with string join
-sub p_join($parser, $sep) {
+sub p_join($sep, $parser) {
     return sub($ctx,$str) {
         my ($is_some, $c, @strs) = Option->extract_array($parser->($ctx,$str));
         return $is_some
