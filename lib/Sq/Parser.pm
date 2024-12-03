@@ -5,13 +5,13 @@ use Sub::Exporter -setup => {
     exports => [
         qw(p_run p_is p_match p_matchf p_map p_bind p_and p_return p_or p_maybe),
         qw(p_join p_str p_strc p_many p_many0 p_ignore p_fail p_qty p_choose),
-        qw(p_repeat p_filter),
+        qw(p_repeat p_filter p_delay),
     ],
     groups => {
         default => [
             qw(p_run p_is p_match p_matchf p_map p_bind p_and p_return p_or p_maybe),
             qw(p_join p_str p_strc p_many p_many0 p_ignore p_fail p_qty p_choose),
-            qw(p_repeat p_filter),
+            qw(p_repeat p_filter p_delay),
         ],
     },
 };
@@ -274,6 +274,13 @@ sub p_ignore($parser) {
         $parser->($ctx,$str)->map(sub($array) {
             return [$array->[0]];
         });
+    }
+}
+
+# This helps in defining recursive parsers. See: t/Parsers/02-nested-arrays.t
+sub p_delay($f_parser) {
+    return sub($ctx,$str) {
+        return $f_parser->()($ctx,$str);
     }
 }
 
