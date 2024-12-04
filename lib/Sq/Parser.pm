@@ -33,7 +33,8 @@ sub p_return(@values) {
 
 # returns a parser that always fails. Useful in bind functions.
 sub p_fail() {
-    return sub($ctx,$str) { return None }
+    state $fail = sub($ctx,$str) { return None };
+    return $fail;
 }
 
 # matches a regex against a string. Just returns an Option if successfull or not.
