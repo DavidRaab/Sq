@@ -71,10 +71,10 @@ sub p_matchf($regex, $f_opt_array) {
 # maps function $f against the values of the parser and returns a new parser
 #
 # Parser<'a> -> ('a -> 'b) -> Parser<'b>
-sub p_map($parser, $f) {
+sub p_map($parser, $f_map) {
     return sub($context,$str) {
         my ($is_some, $ctx, @xs) = Option->extract_array($parser->($context,$str));
-        return Some([$ctx, $f->(@xs)]) if $is_some;
+        return Some([$ctx, $f_map->(@xs)]) if $is_some;
         return None;
     }
 }
@@ -171,14 +171,12 @@ sub p_join($sep, $parser) {
     }
 }
 
-# TODO: Check if a version with substr() is faster
-#
 # just parses a string - no capture
 sub p_str($string) {
     return sub($ctx,$str) {
-        pos($str) = $ctx->{pos};
-        if ( $str =~ m/\G\Q$string\E/gc ) {
-            return Some([{pos => pos($str)}]);
+        my $length = length $string;
+        if ( $string eq substr($str, $ctx->{pos}, $length) ) {
+            return Some([{pos => $ctx->{pos} + $length}]);
         }
         return None;
     }
@@ -187,9 +185,9 @@ sub p_str($string) {
 # parses string - and captures string
 sub p_strc($string) {
     return sub($ctx,$str) {
-        pos($str) = $ctx->{pos};
-        if ( $str =~ m/\G\Q$string\E/gc ) {
-            return Some([{pos => pos($str)}, $string]);
+        my $length = length $string;
+        if ( $string eq substr($str, $ctx->{pos}, $length) ) {
+            return Some([{pos => $ctx->{pos} + $length}, $string]);
         }
         return None;
     }
