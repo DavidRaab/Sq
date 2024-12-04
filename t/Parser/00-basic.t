@@ -6,7 +6,7 @@ use Test2::V0 ':DEFAULT';
 
 # Some parsers
 my $word = p_match(qr/([a-zA-Z]+)/);
-my $ws   = p_is(qr/\s++/);
+my $ws   = p_match(qr/\s++/);
 my $int  = p_match(qr/(\d++)/);
 my $hex  = p_map(p_match(qr/0x([0-9a-zA-Z]+)/), sub($hex) { hex $hex });
 
@@ -46,7 +46,7 @@ sub result(@xs) { Some([@xs]) }
 
 # p_and
 {
-    my $p_comma  = p_is(qr/,/);
+    my $p_comma  = p_match(qr/,/);
     my $greeting = p_and($word, $p_comma, $ws, $word);
 
     is(p_run($greeting, "HELLO, WORLD!"),   result("HELLO", "WORLD"), 'parse greeting 1');

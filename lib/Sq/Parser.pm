@@ -3,13 +3,13 @@ use 5.036;
 use Sq;
 use Sub::Exporter -setup => {
     exports => [
-        qw(p_run p_is p_match p_matchf p_map p_bind p_and p_return p_or p_maybe),
+        qw(p_run p_match p_matchf p_map p_bind p_and p_return p_or p_maybe),
         qw(p_join p_str p_strc p_many p_many0 p_ignore p_fail p_qty p_choose),
         qw(p_repeat p_filter p_delay),
     ],
     groups => {
         default => [
-            qw(p_run p_is p_match p_matchf p_map p_bind p_and p_return p_or p_maybe),
+            qw(p_run p_match p_matchf p_map p_bind p_and p_return p_or p_maybe),
             qw(p_join p_str p_strc p_many p_many0 p_ignore p_fail p_qty p_choose),
             qw(p_repeat p_filter p_delay),
         ],
@@ -35,17 +35,6 @@ sub p_return(@values) {
 sub p_fail() {
     state $fail = sub($ctx,$str) { return None };
     return $fail;
-}
-
-# matches a regex against a string. Just returns an Option if successfull or not.
-sub p_is($regex) {
-    return sub($context,$str) {
-        pos($str) = $context->{pos};
-        if ( $str =~ m/\G$regex/gc ) {
-            return Some([Hash::with($context, pos => pos($str))]);
-        }
-        return None;
-    };
 }
 
 # Matches a Regex against the current position of the string.
