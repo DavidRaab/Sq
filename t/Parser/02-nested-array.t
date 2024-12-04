@@ -15,9 +15,8 @@ my $int       = p_match(qr/\s* (\d+) \s*/x);
 
 # int array
 my $array;
-my $a     = p_delay(sub{ $array });
-my $value = p_or($int, $a);
-$array    = p_map(
+my $value = p_or($int, p_delay(sub{ $array }));
+$array = p_map(
     p_and(
         $open,
         p_or(
