@@ -204,23 +204,15 @@ typing.
 
 So that C<Stuff> class will be represensetd like this in C<Sq>.
 
-    my $stuff = Hash->new(
-        options => Array->new,
-    );
-
-and voila, that's all. This code is very much just like writing.
-
-    my $stuff = {
+    my $stuff = sq {
         options => [],
     };
 
-So what does C<Hash> and C<Array> does? First of, they are just normal
-Perl Hashes and Arrays, you just can use them as a normal Perl Hash
-and Array, the typical idea that you shouldn't acces the internals
-of an object are not valid here.
+and voila, that's all. The `sq` function recursively traverse the reference
+you pass it to and adds the `Array` and `Hash` blessing to that data.
 
-You are supposed to work with them like any Hash or Perl. So why is
-there are blessing added?
+You are supposed to work with $stuff any Hash or Array you are used in Perl.
+But the added blessing allows you to call some additional methods on it.
 
 The idea is simple. Let's go back to the C<min> example. Sq provides
 a function named C<Array::min>, and you can call this function in this
@@ -233,12 +225,15 @@ way. C<min> is implemented once, no need to re-write it a thousand times.
 
 But Perls object orientation is unique that by adding a blessing to a package
 we basically can call it as a method. Now consider the following. While it looks
-object-oriented but it isn't. To it's core C<Sq> just uses Perl OO feature
-so you also can write.
+object-oriented, it is not. To it's core C<Sq> just uses Perl OO feature
+as a convenient way to write all functions in a chaining syntax.
 
-    my $opt_min = Array->new(1, 10, -3)->min; # Some(-3)
+    my $opt_min = Array->new(1, 10, -3)->min;        # Some(-3)
+    my $opt_min = Array::min(Array->new(1, 10, -3)); # Some(-3)
 
-It's just about having a better syntax that allows chaining operation.
+It's just about having a better syntax that allows chaining operation. But
+you still can use both ways. The second way has the benefit that it also
+works with unblessed Arrays as any Method in the C<Array> package should do.
 
 So let's go back to our C<Stuff> example. Here look at the comparison again.
 This is Moose.
@@ -252,9 +247,9 @@ This is Moose.
 
 This is Sq.
 
-    my $stuff = Hash->new(
-        options => Array->new,
-    );
+    my $stuff = {
+        options => [],
+    };
 
     $stuff->{options}->push('whatever', 'foo');
     my $foo    = $stuff->{options}[1];
@@ -266,14 +261,15 @@ So what basically changes is
     $stuff->add_option('whatever', 'foo');      # Moose
     $stuff->{options}->push('whatever', 'foo'); # Sq
 
-So all it does is change from C<add_option> to a C<option_add> instead.
+So all it does is basically a naming convention from C<add_option> to
+a C<option_add> naming convention instead.
 
 But, there is one big difference. You don't need to install those delegates.
 Not only that, we don't even need to create a class. I mean to
 work with C<Stuff> and just the C<option> field we had to create a package
 and write nearly 20 lines of code just for the C<option> field.
 
-In C<Sq> all of it is done in 3 lines and no package/class is needed. And not
+In C<Sq> all of it is done in 3 lines of code and no package/class is needed. And not
 only do you have the same advantages, it provides a lot more functions too!
 
 Here are just some functions/methods that are currently written for the
@@ -343,21 +339,21 @@ language.
 Let's look at another example on why I think this programming model is superior.
 Here is some data. Can you guess what it is just from seeing the data?
 
-    my $album = Hash->new(
+    my $album = sq {
         artist => 'Michael Jackson',
         title  => 'Thriller',
-        tracks => Array->new(
-            Hash->new(title => "Wanna Be Startin’ Somethin", duration => 363),
-            Hash->new(title => "Baby Be Mine",               duration => 260),
-            Hash->new(title => "The Girl Is Mine",           duration => 242),
-            Hash->new(title => "Thriller",                   duration => 357),
-            Hash->new(title => "Beat It",                    duration => 258),
-            Hash->new(title => "Billie Jean",                duration => 294),
-            Hash->new(title => "Human Nature",               duration => 246),
-            Hash->new(title => "P.Y.T.",                     duration => 239),
-            Hash->new(title => "The Lady in My Life",        duration => 300),
-        ),
-    );
+        tracks => [
+            {title => "Wanna Be Startin’ Somethin", duration => 363},
+            {title => "Baby Be Mine",               duration => 260},
+            {title => "The Girl Is Mine",           duration => 242},
+            {title => "Thriller",                   duration => 357},
+            {title => "Beat It",                    duration => 258},
+            {title => "Billie Jean",                duration => 294},
+            {title => "Human Nature",               duration => 246},
+            {title => "P.Y.T.",                     duration => 239},
+            {title => "The Lady in My Life",        duration => 300},
+        ],
+    };
 
 Now let's assume i want to get the track with the maximum running time. I
 would write something like that.
@@ -696,7 +692,7 @@ access a field that doesn't exists.
 It's like not using C<use strict> and suddenly every variable you not
 explicitly define is not even an error anymore. Horrible. But Python
 developers that have that mantra about explicit is better than implicit
-will tell you that this is not a problem.
+will tell you that this is implicit creation of variables is not a problem.
 
 But do you know that Perl added something like B<restricted hashes> since
 Perl 5.8? You actually can restrict a Hash to certain kinds of keys. So
@@ -726,21 +722,21 @@ Somewhere we have written code and we call
 
 and the result we get is our data-structure we had above.
 
-    my $album = Hash->new(
+    my $album = sq {
         artist => 'Michael Jackson',
         title  => 'Thriller',
-        tracks => Array->new(
-            Hash->new(title => "Wanna Be Startin’ Somethin", duration => 363),
-            Hash->new(title => "Baby Be Mine",               duration => 260),
-            Hash->new(title => "The Girl Is Mine",           duration => 242),
-            Hash->new(title => "Thriller",                   duration => 357),
-            Hash->new(title => "Beat It",                    duration => 258),
-            Hash->new(title => "Billie Jean",                duration => 294),
-            Hash->new(title => "Human Nature",               duration => 246),
-            Hash->new(title => "P.Y.T.",                     duration => 239),
-            Hash->new(title => "The Lady in My Life",        duration => 300),
-        ),
-    );
+        tracks => [
+            {title => "Wanna Be Startin’ Somethin", duration => 363},
+            {title => "Baby Be Mine",               duration => 260},
+            {title => "The Girl Is Mine",           duration => 242},
+            {title => "Thriller",                   duration => 357},
+            {title => "Beat It",                    duration => 258},
+            {title => "Billie Jean",                duration => 294},
+            {title => "Human Nature",               duration => 246},
+            {title => "P.Y.T.",                     duration => 239},
+            {title => "The Lady in My Life",        duration => 300},
+        ],
+    };
 
 But you know, just working with the duration as seconds is not the best way.
 Maybe you wanna have a better representation of that?
@@ -754,10 +750,10 @@ Maybe you wanna have a better representation of that?
     $album->on(tracks => sub($tracks) {
         for my $track ( @$tracks ) {
             my $dur = $track->{duration};
-            $track->{duration} = Hash->new(
+            $track->{duration} = sq {
                 seconds   => $dur,
                 as_string => seconds_to_str($dur),
-            );
+            };
         }
     });
 
@@ -775,8 +771,10 @@ that value when you have a function like C<seconds_to_str> to just compute
 the value?
 
 But there are cases where this is helpfull, like when we iterate a
-certain kind of data-structure multiple times, then we only need to compute
-the value once.
+certain kind of data-structure multiple times and while we do that we compute
+the time string multiple times. Instead of always recomputing the value
+we just can change our data-structure and compute the value once. So
+any other logic accessing the time field now has become a lot faster.
 
 What you see here is also the abilities C<Sq> offers when working with Hashes.
 In this case we mutated the Hash, but we also can easily get a whole
