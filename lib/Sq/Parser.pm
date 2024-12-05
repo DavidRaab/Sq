@@ -187,7 +187,7 @@ sub p_str($string) {
         my $length = length $string;
         if ( $string eq substr($str, $ctx->{pos}, $length) ) {
             return Some([
-                Hash::withf($ctx, pos => sub($pos){ $pos + $length})
+                { %$ctx, pos => $ctx->{pos} + $length },
             ]);
         }
         return None;
@@ -200,7 +200,7 @@ sub p_strc($string) {
         my $length = length $string;
         if ( $string eq substr($str, $ctx->{pos}, $length) ) {
             return Some([
-                Hash::withf($ctx, pos => sub($pos){ $pos + $length}),
+                { %$ctx, pos => $ctx->{pos} + $length },
                 $string
             ]);
         }
