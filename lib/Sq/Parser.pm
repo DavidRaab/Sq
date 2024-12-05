@@ -5,13 +5,13 @@ use Sub::Exporter -setup => {
     exports => [
         qw(p_run p_match p_matchf p_map p_bind p_and p_return p_or p_maybe),
         qw(p_join p_str p_strc p_many p_many0 p_ignore p_fail p_qty p_choose),
-        qw(p_repeat p_filter p_split p_delay),
+        qw(p_repeat p_filter p_split p_delay p_not),
     ],
     groups => {
         default => [
             qw(p_run p_match p_matchf p_map p_bind p_and p_return p_or p_maybe),
             qw(p_join p_str p_strc p_many p_many0 p_ignore p_fail p_qty p_choose),
-            qw(p_repeat p_filter p_split p_delay),
+            qw(p_repeat p_filter p_split p_delay p_not),
         ],
     },
 };
@@ -281,6 +281,16 @@ sub p_ignore($parser) {
 sub p_delay($f_parser) {
     return sub($ctx,$str) {
         return $f_parser->()($ctx,$str);
+    }
+}
+
+# succeeds if the parser does not match
+sub p_not($parser) {
+    state $incr = sub($x) { $x + 1 };
+    return sub($ctx,$str) {
+        my ($is_some, $c) = Option->extract_array($parser->($ctx,$str));
+        return None if $is_some;
+        return Some([Hash::withf($ctx, pos => $incr)]);
     }
 }
 

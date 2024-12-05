@@ -219,4 +219,18 @@ sub result(@xs) { Some([@xs]) }
     }
 }
 
+# p_not
+{
+    my $digit = p_match(qr/(\d)/);
+    my $wd    =
+        p_join('',
+            p_and(
+                p_many0(p_not($digit)),
+                p_many($digit)));
+
+    is(p_run($wd, "123"), result("123"), 'p_not 1');
+    is(p_run($wd, "ab3"),   result("3"), 'p_not 2');
+    is(p_run($wd, "some3"), result("3"), 'p_not 3');
+}
+
 done_testing;
