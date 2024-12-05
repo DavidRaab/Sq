@@ -265,10 +265,7 @@ sub extract($, $any=undef) {
 }
 
 sub extract_array($, @args) {
-    if ( @args == 0 ) {
-        return 0;
-    }
-    elsif ( @args == 1 ) {
+    if ( @args == 1 ) {
         my $any = $args[0];
         if ( defined $any ) {
             if ( ref $any eq 'Option' ) {
@@ -281,9 +278,8 @@ sub extract_array($, @args) {
                         return 1, @$value;
                         # TODO: return 0 when empty array was passed???
                     }
-                    # if value in option not an array
-                    return 1, $value if defined $value;
-                    return 0;
+                    # if value in option is not an array
+                    return defined $value ? (1, $value) : 0;
                 }
                 # when option is none
                 return 0;
@@ -293,6 +289,9 @@ sub extract_array($, @args) {
             return 0;
         }
         # single undef value
+        return 0;
+    }
+    elsif ( @args == 0 ) {
         return 0;
     }
     # multiple values always valid
