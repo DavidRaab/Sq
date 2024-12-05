@@ -201,6 +201,22 @@ sub result(@xs) { Some([@xs]) }
     is(p_run($binary, '0123041'), result('0101'), 'p_filter 1');
     is(p_run($binary,    '1234'),    result('1'), 'p_filter 2');
     is(p_run($binary,     '234'),     result(''), 'p_filter 3');
+
+    # integers that are allowed to contain -_
+    my $int1 =
+        p_join('',
+            p_filter(
+                p_split('',
+                    p_match(qr/([0-9-_]+)/)),
+                sub($x) { $x =~ m/[0-9]/ }));
+    my $int2 = p_matchf(qr/([0-9-_]+)/, sub($str) { $str =~ s/[-_]+//gr });
+    for my $int ( $int1, $int2 ) {
+        is(p_run($int, '1000'),         result("1000"), 'int 1');
+        is(p_run($int, '1_000'),        result("1000"), 'int 2');
+        is(p_run($int, '-1-0-0-0-'),    result("1000"), 'int 3');
+        is(p_run($int, '1-00-00'),     result("10000"), 'int 4');
+        is(p_run($int, '1_000_000'), result("1000000"), 'int 5');
+    }
 }
 
 done_testing;

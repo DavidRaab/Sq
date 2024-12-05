@@ -5,13 +5,13 @@ use Sub::Exporter -setup => {
     exports => [
         qw(p_run p_match p_matchf p_map p_bind p_and p_return p_or p_maybe),
         qw(p_join p_str p_strc p_many p_many0 p_ignore p_fail p_qty p_choose),
-        qw(p_repeat p_filter p_delay),
+        qw(p_repeat p_filter p_split p_delay),
     ],
     groups => {
         default => [
             qw(p_run p_match p_matchf p_map p_bind p_and p_return p_or p_maybe),
             qw(p_join p_str p_strc p_many p_many0 p_ignore p_fail p_qty p_choose),
-            qw(p_repeat p_filter p_delay),
+            qw(p_repeat p_filter p_split p_delay),
         ],
     },
 };
@@ -167,6 +167,16 @@ sub p_join($sep, $parser) {
         my ($is_some, $c, @strs) = Option->extract_array($parser->($ctx,$str));
         return $is_some
              ? Some([$c, join($sep,@strs)])
+             : None;
+    }
+}
+
+# Splits every string-value with split
+sub p_split($regex, $parser) {
+    return sub($ctx,$str) {
+        my ($is_some, $c, @strs) = Option->extract_array($parser->($ctx,$str));
+        return $is_some
+             ? Some([$c, map { split $regex, $_ } @strs])
              : None;
     }
 }
