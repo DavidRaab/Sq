@@ -41,10 +41,13 @@ sub p_fail() {
 #
 # Regex -> Parser<[$context,@matches]>
 sub p_match($regex) {
-    return sub($context,$str) {
-        pos($str) = $context->{pos};
+    return sub($ctx,$str) {
+        pos($str) = $ctx->{pos};
         if ( $str =~ m/\G$regex/gc ) {
-            return Some([Hash::with($context, pos => pos($str)), @{^CAPTURE}]);
+            return Some([
+                { %$ctx, pos => pos($str) },
+                @{^CAPTURE}
+            ]);
         }
         return None;
     };
@@ -61,7 +64,10 @@ sub p_matchf($regex, $f_opt_array) {
         if ( $str =~ m/\G$regex/gc ) {
             my ($is_some, @xs) = Option->extract_array($f_opt_array->(@{^CAPTURE}));
             if ( $is_some ) {
-                return Some([Hash::with($ctx, pos => pos($str)), @xs]);
+                return Some([
+                    { %$ctx, pos => pos($str) },
+                    @xs
+                ]);
             }
         }
         return None;
