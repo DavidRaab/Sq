@@ -260,9 +260,7 @@ sub p_qty($parser, $min, $max) {
         if ( $count >= $min && $count <= $max ) {
             return Some([$last_ctx, @matches]);
         }
-        else {
-            return None;
-        }
+        return None;
     }
 }
 
