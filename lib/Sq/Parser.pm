@@ -268,10 +268,9 @@ sub p_repeat($parser, $amount) {
 
 # removes matches
 sub p_ignore($parser) {
+    state $ctx_only = sub($array) { [$array->[0]] };
     return sub($ctx,$str) {
-        $parser->($ctx,$str)->map(sub($array) {
-            return [$array->[0]];
-        });
+        $parser->($ctx,$str)->map($ctx_only);
     }
 }
 
