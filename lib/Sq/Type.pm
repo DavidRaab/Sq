@@ -53,15 +53,33 @@ sub t_check($obj, $check) {
 
 # check references
 sub t_hash(@checks) {
-    on_hash(sub($hash) {
-        t_checks($hash, \@checks);
-    });
+    return sub($any) {
+        my $type = ref $any;
+        if ( $type eq 'Hash' || $type eq 'HASH' ) {
+            for my $check ( @checks ) {
+                my $result = $check->($any);
+                return $result if $result->is_err;
+            }
+            return Ok 1;
+        }
+        return Err("Not a Hash");
+    }
 }
 
 sub t_array(@checks) {
-    on_array(sub($array) {
-        t_checks($array, \@checks);
-    });
+    return sub($any) {
+        my $type = ref $any;
+        if ( $type eq 'Array' || $type eq 'ARRAY' ) {
+            for my $check ( @checks ) {
+                my $result = $check->($any);
+                return $result if $result->is_err;
+            }
+            return Ok 1;
+        }
+        return Err("Not an Array");
+    }
+}
+
 }
 
 # check hash keys
