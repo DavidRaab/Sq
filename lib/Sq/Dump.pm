@@ -61,9 +61,9 @@ sub result($result, $inline=60, $depth=0) {
 
 # Dumping Logic
 my $dispatch = {
-    'UNDEF'      => sub { return 'undef'                        },
-    'NUM'        => sub { return sprintf "%s", $_[0]            },
-    'STRING'     => sub { return sprintf "\"%s\"", quote($_[0]) },
+    'UNDEF'      => sub { 'undef'                        },
+    'NUM'        => sub { sprintf "%s", $_[0]            },
+    'STRING'     => sub { sprintf "\"%s\"", quote($_[0]) },
     'ARRAY'      => \&array,
     'HASH'       => \&hash,
     'OPTION'     => \&option,
