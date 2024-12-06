@@ -49,6 +49,6 @@ my $is_album2 = t_hash(
     ),
 );
 
-ok($is_album2, $album1, '$album1 ok');
+ok(t_valid($is_album2, $album1), '$album1 ok');
 
 done_testing;

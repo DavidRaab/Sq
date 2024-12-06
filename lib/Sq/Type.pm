@@ -136,13 +136,15 @@ sub t_key($name, @checks) {
     });
 }
 
-sub t_keys(%tv) {
-    for my $type ( keys %tv ) {
-        my $value  = $tv{$type};
-        my $result = t_run(t_key($type,$value));
-        return $result if $result->is_err;
+sub t_keys(%kt) {
+    return sub($any) {
+        for my $key ( keys %kt ) {
+            my $type   = $kt{$key};
+            my $result = t_run(t_key($key, $type), $any);
+            return $result if $result->is_err;
+        }
+        return Ok 1;
     }
-    return Ok 1;
 }
 
 sub t_str_eq($expected) {
