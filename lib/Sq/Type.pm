@@ -5,7 +5,7 @@ use Scalar::Util ();
 use Sq;
 use Sub::Exporter -setup => {
     exports => [
-        qw(t_run t_valid t_assert t_is t_num t_str t_str_eq), # Basic
+        qw(t_run t_valid t_assert t_is t_num t_str t_match t_str_eq), # Basic
         qw(t_opt),
         qw(t_hash t_has_keys t_key t_keys),  # Hash
         qw(t_array t_idx),                   # Array
@@ -13,7 +13,7 @@ use Sub::Exporter -setup => {
     ],
     groups => {
         default => [
-            qw(t_run t_valid t_assert t_is t_num t_str t_str_eq), # Basic
+            qw(t_run t_valid t_assert t_is t_num t_str t_match t_str_eq), # Basic
             qw(t_opt),
             qw(t_hash t_has_keys t_key t_keys), # Hash
             qw(t_array t_idx),                  # Array
@@ -257,5 +257,11 @@ sub t_length($min, $max=undef) {
     }
 }
 
+sub t_match($regex) {
+    return sub($any) {
+        return Ok 1 if $any =~ $regex;
+        return Err("$regex no match: $any");
+    }
+}
 
 1;
