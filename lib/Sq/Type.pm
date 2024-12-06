@@ -20,12 +20,8 @@ use Sub::Exporter -setup => {
     },
 };
 
-sub t_ref($type, $f) {
-    return sub($any) {
-        return $f->($any) if ref $any eq $type;
-        return Err("Not a reference of type $type");
-    }
-}
+
+### Runners
 
 sub t_run($any, @checks) {
     for my $check ( @checks ) {
@@ -33,6 +29,15 @@ sub t_run($any, @checks) {
         return $result if $result->is_err;
     }
     return Ok 1;
+}
+
+### type checkers
+
+sub t_ref($type, $f) {
+    return sub($any) {
+        return $f->($any) if ref $any eq $type;
+        return Err("Not a reference of type $type");
+    }
 }
 
 # check references
@@ -186,5 +191,14 @@ sub t_length($min, $max=undef) {
         }
     }
 }
+
+# TODO
+# Add: t_and, t_or, t_not
+# t_run: change parameter order
+# t_run: only one check
+# Add: t_keys (Like t_key but you can pass multiple key,values)
+# Add: t_num, t_num_eq, t_int, t_num_range
+# Add: t_none, t_any
+# Add: t_match, t_parser
 
 1;
