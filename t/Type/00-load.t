@@ -1,7 +1,7 @@
 #!perl
 use 5.036;
 use Sq;
-use Sq::Language;
+use Sq::Type;
 use Test2::V0 qw(diag is done_testing);
 
 my $album = {
