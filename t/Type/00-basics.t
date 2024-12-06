@@ -2,7 +2,7 @@
 use 5.036;
 use Sq;
 use Sq::Type;
-use Test2::V0 qw(diag is done_testing);
+use Test2::V0;
 
 my $album = {
     artist => 'Michael Jackson',
@@ -137,6 +137,19 @@ is(t_run($is_album2, $album_wrong2), Err('Not an Array'),
     is(t_run(t_all(t_array), {a=>[]}           ), Ok(1), 't_all 5');
     is(t_run(t_all(t_array), {a=>[],b=>[]}     ), Ok(1), 't_all 6');
     is(t_run(t_all(t_array), {a=>[],b=>[],c=>1}),   $eh, 't_all 7');
+}
+
+# t_valid & t_assert
+{
+    ok( t_valid(t_hash, {}),     'is hash');
+    ok( t_valid(t_hash, {}, {}), 'is hash');
+    ok(!t_valid(t_hash, {}, []), 'not all hash');
+
+    like(
+        dies { t_assert(t_hash, []) },
+        qr/\AType check failed/,
+        't_assert throws exception'
+    );
 }
 
 done_testing;

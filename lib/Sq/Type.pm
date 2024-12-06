@@ -1,9 +1,10 @@
 package Sq::Type;
 use 5.036;
+use Carp ();
 use Sq;
 use Sub::Exporter -setup => {
     exports => [
-        qw(t_run t_is t_str t_str_eq), # Basic
+        qw(t_run t_valid t_assert t_is t_str t_str_eq), # Basic
         qw(t_opt),
         qw(t_hash t_has_keys t_key),  # Hash
         qw(t_array t_idx),             # Array
@@ -11,7 +12,7 @@ use Sub::Exporter -setup => {
     ],
     groups => {
         default => [
-            qw(t_run t_is t_str t_str_eq), # Basic
+            qw(t_run t_valid t_assert t_is t_str t_str_eq), # Basic
             qw(t_opt),
             qw(t_hash t_has_keys t_key),  # Hash
             qw(t_array t_idx),             # Array
@@ -23,12 +24,31 @@ use Sub::Exporter -setup => {
 
 ### Runners
 
+# t_run: $type -> @values -> Result
 sub t_run($check, @values) {
     for my $value ( @values ) {
         my $result = $check->($value);
         return $result if $result->is_err;
     }
     return Ok 1;
+}
+
+# t_valid: $type -> @values -> bool
+sub t_valid($check, @values) {
+    for my $value ( @values ) {
+        my $result = $check->($value);
+        return 0 if $result->is_err;
+    }
+    return 1;
+}
+
+# t_assert: $type -> @values -> void | EXCEPTION
+sub t_assert($check, @values) {
+    for my $value ( @values ) {
+        my $result = $check->($value);
+        Carp::croak 'Type check failed' if $result->is_err;
+    }
+    return;
 }
 
 ### type checkers
