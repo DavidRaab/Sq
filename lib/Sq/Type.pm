@@ -1,10 +1,11 @@
 package Sq::Type;
 use 5.036;
 use Carp ();
+use Scalar::Util ();
 use Sq;
 use Sub::Exporter -setup => {
     exports => [
-        qw(t_run t_valid t_assert t_is t_str t_str_eq), # Basic
+        qw(t_run t_valid t_assert t_is t_num t_str t_str_eq), # Basic
         qw(t_opt),
         qw(t_hash t_has_keys t_key t_keys),  # Hash
         qw(t_array t_idx),                   # Array
@@ -12,7 +13,7 @@ use Sub::Exporter -setup => {
     ],
     groups => {
         default => [
-            qw(t_run t_valid t_assert t_is t_str t_str_eq), # Basic
+            qw(t_run t_valid t_assert t_is t_num t_str t_str_eq), # Basic
             qw(t_opt),
             qw(t_hash t_has_keys t_key t_keys), # Hash
             qw(t_array t_idx),                  # Array
@@ -23,7 +24,7 @@ use Sub::Exporter -setup => {
 
 # TODO
 # Add: t_and, t_or, t_not
-# Add: t_num, t_num_eq, t_int, t_num_range
+# Add: t_num_eq, t_int, t_num_range
 # Add: t_none, t_any
 # Add: t_match, t_parser
 
@@ -156,9 +157,28 @@ sub t_str_eq($expected) {
     }
 }
 
-sub t_str() {
+sub t_num(@checks) {
     return sub($any) {
-        return Ok 1 if ref $any eq '';
+        if ( Scalar::Util::looks_like_number($any) ) {
+            for my $check ( @checks ) {
+                my $result = t_run($check, $any);
+                return $result if $result->is_err;
+            }
+            return Ok 1;
+        }
+        return Err("Not a number");
+    }
+}
+
+sub t_str(@checks) {
+    return sub($any) {
+        if ( ref $any eq '' ) {
+            for my $check ( @checks ) {
+                my $result = t_run($check, $any);
+                return $result if $result->is_err;
+            }
+            return Ok 1;
+        }
         return Err("not a string");
     }
 }

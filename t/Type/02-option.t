@@ -50,5 +50,21 @@ my $is_album2 = t_hash(
 );
 
 ok(t_valid($is_album2, $album1), '$album1 ok');
+ok(
+    t_valid(t_hash(t_key(rating => t_opt(t_num))), $album1),
+    'rating is number');
+ok(
+    t_valid(
+        t_hash(t_key(
+            rating => t_opt(t_num(t_is(sub($num){ $num == 10 })))
+        )),
+        $album1),
+    'rating is number and 10');
+ok(
+    t_valid(
+        t_hash(t_key(
+            artist => t_str(t_length(3)))),
+        $album1),
+    'artist at least 3 characters');
 
 done_testing;
