@@ -69,7 +69,7 @@ my $dispatch = {
     'OPTION'     => \&option,
     'SEQ'        => \&seq,
     'RESULT'     => \&result,
-    'PATH::TINY' => sub { '"' . $_[0]->stringify .'"' },
+    'PATH::TINY' => sub { '"' . quote($_[0]->stringify) .'"' },
 };
 
 sub to_string($any, $inline=60, $depth=0) {
