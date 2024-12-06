@@ -39,9 +39,9 @@ sub on_array($f) {
     }
 }
 
-sub t_checks($obj, $checks) {
+sub t_checks($any, $checks) {
     for my $check ( @$checks ) {
-        my $result = $check->($obj);
+        my $result = $check->($any);
         return $result if $result->is_err;
     }
     return Ok 1;
