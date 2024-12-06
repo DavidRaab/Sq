@@ -152,7 +152,7 @@ is(t_run($is_album2, $album_wrong2), Err('Not an Array'),
     );
 }
 
-# t_min / t_max
+# t_min / t_max / t_range
 {
     ok(!t_valid(t_min(10),  0), 't_min 1');
     ok( t_valid(t_min(10), 10), 't_min 2');
@@ -160,6 +160,18 @@ is(t_run($is_album2, $album_wrong2), Err('Not an Array'),
     ok( t_valid(t_max(10),  0), 't_max 1');
     ok( t_valid(t_max(10), 10), 't_max 2');
     ok(!t_valid(t_max(10), 20), 't_max 3');
+
+    ok(!t_valid(t_num(t_min(0), t_max(10)), -1), 't_min & t_max 1');
+    ok( t_valid(t_num(t_min(0), t_max(10)),  0), 't_min & t_max 2');
+    ok( t_valid(t_num(t_min(0), t_max(10)),  5), 't_min & t_max 3');
+    ok( t_valid(t_num(t_min(0), t_max(10)), 10), 't_min & t_max 4');
+    ok(!t_valid(t_num(t_min(0), t_max(10)), 11), 't_min & t_max 5');
+
+    ok(!t_valid(t_range(0, 10), -1), 't_range 1');
+    ok( t_valid(t_range(0, 10),  0), 't_range 2');
+    ok( t_valid(t_range(0, 10),  5), 't_range 3');
+    ok( t_valid(t_range(0, 10), 10), 't_range 4');
+    ok(!t_valid(t_range(0, 10), 11), 't_range 5');
 }
 
 done_testing;

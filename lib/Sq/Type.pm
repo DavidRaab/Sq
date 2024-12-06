@@ -7,7 +7,7 @@ use Sub::Exporter -setup => {
     exports => [
         qw(t_run t_valid t_assert t_is),     # Basic
         qw(t_str t_str_eq t_match),          # String
-        qw(t_num t_min t_max),               # Numbers
+        qw(t_num t_min t_max t_range),       # Numbers
         qw(t_opt),
         qw(t_hash t_has_keys t_key t_keys),  # Hash
         qw(t_array t_idx),                   # Array
@@ -17,7 +17,7 @@ use Sub::Exporter -setup => {
         default => [
             qw(t_run t_valid t_assert t_is),     # Basic
             qw(t_str t_str_eq t_match),          # String
-            qw(t_num t_min t_max),               # Numbers
+            qw(t_num t_min t_max t_range),       # Numbers
             qw(t_opt),
             qw(t_hash t_has_keys t_key t_keys),  # Hash
             qw(t_array t_idx),                   # Array
@@ -279,6 +279,13 @@ sub t_max($max) {
     return sub($num) {
         return Ok 1 if $num <= $max;
         return Err("$num must be smaller $max");
+    }
+}
+
+sub t_range($min, $max) {
+    return sub($num) {
+        return Ok 1 if $num >= $min && $num <= $max;
+        return Err("$num must be between $min - $max");
     }
 }
 
