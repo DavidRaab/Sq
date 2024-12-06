@@ -7,7 +7,7 @@ use Sub::Exporter -setup => {
     exports => [
         qw(t_run t_valid t_assert t_or t_is), # Basic
         qw(t_str t_str_eq t_match),           # String
-        qw(t_num t_min t_max t_range),        # Numbers
+        qw(t_num t_int t_min t_max t_range),  # Numbers
         qw(t_opt),
         qw(t_hash t_has_keys t_key t_keys),   # Hash
         qw(t_array t_idx),                    # Array
@@ -17,7 +17,7 @@ use Sub::Exporter -setup => {
         default => [
             qw(t_run t_valid t_assert t_or t_is), # Basic
             qw(t_str t_str_eq t_match),           # String
-            qw(t_num t_min t_max t_range),        # Numbers
+            qw(t_num t_int t_min t_max t_range),  # Numbers
             qw(t_opt),
             qw(t_hash t_has_keys t_key t_keys),   # Hash
             qw(t_array t_idx),                    # Array
@@ -171,6 +171,19 @@ sub t_num(@checks) {
             return Ok 1;
         }
         return Err("Not a number");
+    }
+}
+
+sub t_int(@checks) {
+    return sub($any) {
+        if ( $any =~ m/\A[-+]?\d+\z/ ) {
+            for my $check ( @checks ) {
+                my $result = $check->($any);
+                return $result if $result->is_err;
+            }
+            return Ok 1;
+        }
+        return Err("Not an integer");
     }
 }
 

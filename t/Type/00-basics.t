@@ -186,4 +186,16 @@ is(t_run($is_album2, $album_wrong2), Err('Not an Array'),
     ok(!t_valid($date, "12-24-1970"), 't_or 3');
 }
 
+# t_int
+{
+    ok(!t_valid(t_int(t_range(0,10)), "-1"), 't_int 1');
+    ok( t_valid(t_int(t_range(0,10)),  "0"), 't_int 2');
+    ok( t_valid(t_int(t_range(0,10)),  "5"), 't_int 3');
+    ok( t_valid(t_int(t_range(0,10)), "+5"), 't_int 4');
+    ok(!t_valid(t_int(t_range(0,10)),"5.5"), 't_int 5');
+    ok( t_valid(t_num(t_range(0,10)),"5.5"), 't_num vs t_int');
+    ok( t_valid(t_int(t_range(0,10)), "10"), 't_int 6');
+    ok(!t_valid(t_int(t_range(0,10)), "11"), 't_int 7');
+}
+
 done_testing;
