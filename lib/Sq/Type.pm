@@ -3,11 +3,19 @@ use 5.036;
 use Sq;
 use Sub::Exporter -setup => {
     exports => [
-        qw(t_check t_hash t_with_keys t_key t_array t_idx t_str t_str_eq),
+        qw(t_run t_is t_str t_str_eq), # Basic
+        qw(t_opt),
+        qw(t_hash t_with_keys t_key),    # Hash
+        qw(t_array t_idx),               # Array
+        qw(t_all),
     ],
     groups => {
         default => [
-            qw(t_check t_hash t_with_keys t_key t_array t_idx t_str t_str_eq),
+            qw(t_run t_is t_str t_str_eq), # Basic
+            qw(t_opt),
+            qw(t_hash t_with_keys t_key),    # Hash
+            qw(t_array t_idx),               # Array
+            qw(t_all),
         ],
     },
 };
@@ -19,36 +27,12 @@ sub t_ref($type, $f) {
     }
 }
 
-sub on_hash($f) {
-    return sub($any) {
-        my $type = ref $any;
-        if ( $type eq 'Hash' || $type eq 'HASH' ) {
-            return $f->($any);
-        }
-        return Err("Not a Hash");
-    }
-}
-
-sub on_array($f) {
-    return sub($any) {
-        my $type = ref $any;
-        if ( $type eq 'Array' || $type eq 'ARRAY' ) {
-            return $f->($any);
-        }
-        return Err("Not an Array");
-    }
-}
-
-sub t_checks($any, $checks) {
-    for my $check ( @$checks ) {
+sub t_run($any, @checks) {
+    for my $check ( @checks ) {
         my $result = $check->($any);
         return $result if $result->is_err;
     }
     return Ok 1;
-}
-
-sub t_check($obj, $check) {
-    t_checks($obj, [$check]);
 }
 
 # check references
@@ -80,6 +64,22 @@ sub t_array(@checks) {
     }
 }
 
+sub t_opt(@checks) {
+    return sub($any) {
+        my $type = ref $any;
+        if ( $type eq 'Option' ) {
+            # when $any is some value all @checks must be Ok
+            if ( @$any ) {
+                for my $check ( @checks ) {
+                    my $result = $check->($any->[0]);
+                    return $result if $result->is_err;
+                }
+            }
+            # when None or no checks
+            return Ok 1;
+        }
+        return Err("Not an Option");
+    }
 }
 
 # check hash keys
@@ -93,9 +93,9 @@ sub t_with_keys (@keys) {
 }
 
 sub t_key($name, @checks) {
-    on_hash(sub($hash) {
+    t_hash(sub($hash) {
         if ( exists $hash->{$name} ) {
-            return t_checks($hash->{$name}, \@checks);
+            return t_run($hash->{$name}, @checks);
         }
         return Err("$name does not exists on hash");
     });
@@ -111,18 +111,51 @@ sub t_str_eq($expected) {
 }
 
 sub t_str() {
-    return sub($obj) {
-        if ( ref $obj eq "" ) {
-            return Ok 1;
-        }
+    return sub($any) {
+        return Ok 1 if ref $any eq '';
         return Err("not a string");
     }
 }
 
 sub t_idx($index, @checks) {
-    on_array(sub($array) {
-        t_checks($array->[$index], \@checks);
+    t_array(sub($array) {
+        t_run($array->[$index], @checks);
     });
+}
+
+sub t_is($predicate) {
+    return sub($any) {
+        if ( $predicate->($any) ) {
+            return Ok 1;
+        }
+        return Err("predicate does not match");
+    }
+}
+
+sub t_all($predicate) {
+    return sub($any) {
+        my $type = ref $any;
+        if ( $type eq 'Array' || $type eq 'ARRAY' ) {
+            for my $x ( @$any ) {
+                if ( not $predicate->($x) ) {
+                    return Err("Element of Array does not match predicate");
+                }
+            }
+            return Ok 1;
+        }
+        elsif ( $type eq 'Hash' || $type eq 'HASH' ) {
+            my ($k,$v);
+            for my $key ( keys %$any ) {
+                if ( not $predicate->($any->{$key}) ) {
+                    return Err("A value of a Hash does not match predicate");
+                }
+            }
+            return Ok 1;
+        }
+        else {
+            return Err("$type not supported by t_all");
+        }
+    }
 }
 
 1;

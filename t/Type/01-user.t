@@ -42,11 +42,11 @@ my @users = (
     },
 );
 
-is(t_check($users[0]{addr}, $addr), Ok(1),
+is(t_run($users[0]{addr}, $addr), Ok(1),
     '$users[0] is addr');
-is(t_check($users[0], $user), Ok(1),
+is(t_run($users[0], $user), Ok(1),
     '$users[0] is a user');
-is(t_check($users[1], $user), Err("first does not exists on hash"),
+is(t_run($users[1], $user), Err("first does not exists on hash"),
     '$users[1] has a typo');
 
 done_testing;
