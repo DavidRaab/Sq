@@ -108,6 +108,17 @@ is(t_run($album_wrong2, $is_album2), Err('Not an Array'),
     is(t_run({a=>1,b=>2},           t_length(1,3)), Ok(1), 't_length 14');
     is(t_run({a=>1,b=>2,c=>3},      t_length(1,3)), Ok(1), 't_length 15');
     is(t_run({a=>1,b=>2,c=>3,d=>4}, t_length(1,3)),   $tm, 't_length 16');
+
+    # string
+    is(t_run("",   t_length(1)), Err("string to short"), 't_length 17');
+    is(t_run("a",  t_length(1)),                  Ok(1), 't_length 18');
+    is(t_run("ab", t_length(1)),                  Ok(1), 't_length 19');
+
+    is(t_run("",     t_length(1,3)), Err("string to short"), 't_length 17');
+    is(t_run("a",    t_length(1,3)),                  Ok(1), 't_length 18');
+    is(t_run("ab",   t_length(1,3)),                  Ok(1), 't_length 19');
+    is(t_run("abc",  t_length(1,3)),                  Ok(1), 't_length 20');
+    is(t_run("abcd", t_length(1,3)),  Err('string to long'), 't_length 21');
 }
 
 # t_all

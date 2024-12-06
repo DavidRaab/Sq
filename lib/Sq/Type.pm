@@ -163,20 +163,28 @@ sub t_all($is_type) {
 sub t_length($min, $max=undef) {
     return sub($any) {
         my $type = ref $any;
+
         if ( $type eq 'Array' || $type eq 'ARRAY' ) {
-            my $count = @$any;
-            return Err("Not enough elements") if $count < $min;
-            return Err("Too many elements")   if defined $max && $count > $max;
+            my $length = @$any;
+            return Err("Not enough elements") if $length < $min;
+            return Err("Too many elements")   if defined $max && $length > $max;
             return Ok 1;
         }
         elsif ( $type eq 'Hash' || $type eq 'HASH' ) {
-            my $count = keys %$any;
-            return Err("Not enough elements") if $count < $min;
-            return Err("Too many elements")   if defined $max && $count > $max;
+            my $length = keys %$any;
+            return Err("Not enough elements") if $length < $min;
+            return Err("Too many elements")   if defined $max && $length > $max;
+            return Ok 1;
+        }
+        # String
+        elsif ( $type eq '' ) {
+            my $length = length $any;
+            return Err("string to short") if $length < $min;
+            return Err("string to long")  if defined $max && $length > $max;
             return Ok 1;
         }
         else {
-            return Err("Not array-ref nor hash-ref");
+            return Err("Not array-ref, hash-ref or string");
         }
     }
 }
