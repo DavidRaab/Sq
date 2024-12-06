@@ -56,8 +56,8 @@ my $is_album2 =
         )),
     );
 
-is(t_run({}, t_hash),  Ok(1),               '{} is hash');
-is(t_run([], t_hash),  Err('Not a Hash'),   '[] not a hash');
+is(t_run({},  t_hash), Ok(1),               '{} is hash');
+is(t_run([],  t_hash), Err('Not a Hash'),   '[] not a hash');
 is(t_run([], t_array), Ok(1),               '[] is array');
 is(t_run({}, t_array), Err('Not an Array'), '{} not an array');
 
@@ -81,5 +81,48 @@ is(t_run($album, $is_album2), Ok(1),
 
 is(t_run($album_wrong2, $is_album2), Err('Not an Array'),
     'album.tracks not an array');
+
+# t_length
+{
+    my $ne = Err("Not enough elements");
+    my $tm = Err("Too many elements");
+
+    # only min
+    is(t_run([],          t_length(1)), $ne,   't_length 1');
+    is(t_run([1],         t_length(1)), Ok(1), 't_length 2');
+    is(t_run([1,2],       t_length(1)), Ok(1), 't_length 3');
+
+    is(t_run({},          t_length(1)), $ne,   't_length 4');
+    is(t_run({f=>1},      t_length(1)), Ok(1), 't_length 5');
+    is(t_run({f=>1,g=>1}, t_length(1)), Ok(1), 't_length 6');
+
+    # min and max
+    is(t_run([],        t_length(1,3)),   $ne, 't_length 7');
+    is(t_run([1],       t_length(1,3)), Ok(1), 't_length 8');
+    is(t_run([1,2],     t_length(1,3)), Ok(1), 't_length 9');
+    is(t_run([1,2,3],   t_length(1,3)), Ok(1), 't_length 10');
+    is(t_run([1,2,3,4], t_length(1,3)),   $tm, 't_length 11');
+
+    is(t_run({},                    t_length(1,3)),   $ne, 't_length 12');
+    is(t_run({a=>1},                t_length(1,3)), Ok(1), 't_length 13');
+    is(t_run({a=>1,b=>2},           t_length(1,3)), Ok(1), 't_length 14');
+    is(t_run({a=>1,b=>2,c=>3},      t_length(1,3)), Ok(1), 't_length 15');
+    is(t_run({a=>1,b=>2,c=>3,d=>4}, t_length(1,3)),   $tm, 't_length 16');
+}
+
+# t_all
+{
+    my $ea = Err("Element of Array does not match predicate");
+    my $eh = Err("A value of a Hash does not match predicate");
+
+    is(t_run([],          t_all(t_hash)), Ok(1), 't_all 1');
+    is(t_run([{}, {}],    t_all(t_hash)), Ok(1), 't_all 2');
+    is(t_run([{}, {}, 1], t_all(t_hash)),   $ea, 't_all 3');
+
+    is(t_run({},                 t_all(t_array)), Ok(1), 't_all 4');
+    is(t_run({a=>[]},            t_all(t_array)), Ok(1), 't_all 5');
+    is(t_run({a=>[],b=>[]},      t_all(t_array)), Ok(1), 't_all 6');
+    is(t_run({a=>[],b=>[],c=>1}, t_all(t_array)),   $eh, 't_all 7');
+}
 
 done_testing;

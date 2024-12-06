@@ -7,7 +7,7 @@ use Sub::Exporter -setup => {
         qw(t_opt),
         qw(t_hash t_with_keys t_key),    # Hash
         qw(t_array t_idx),               # Array
-        qw(t_all),
+        qw(t_all t_length),
     ],
     groups => {
         default => [
@@ -15,7 +15,7 @@ use Sub::Exporter -setup => {
             qw(t_opt),
             qw(t_hash t_with_keys t_key),    # Hash
             qw(t_array t_idx),               # Array
-            qw(t_all),
+            qw(t_all t_length),
         ],
     },
 };
@@ -155,6 +155,28 @@ sub t_all($is_type) {
         }
         else {
             return Err("$type not supported by t_all");
+        }
+    }
+}
+
+# checks if Array/Hash has minimum upto maximum amount of elements
+sub t_length($min, $max=undef) {
+    return sub($any) {
+        my $type = ref $any;
+        if ( $type eq 'Array' || $type eq 'ARRAY' ) {
+            my $count = @$any;
+            return Err("Not enough elements") if $count < $min;
+            return Err("Too many elements")   if defined $max && $count > $max;
+            return Ok 1;
+        }
+        elsif ( $type eq 'Hash' || $type eq 'HASH' ) {
+            my $count = keys %$any;
+            return Err("Not enough elements") if $count < $min;
+            return Err("Too many elements")   if defined $max && $count > $max;
+            return Ok 1;
+        }
+        else {
+            return Err("Not array-ref nor hash-ref");
         }
     }
 }
