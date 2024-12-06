@@ -12,20 +12,32 @@ use Sub::Exporter -setup => {
     },
 };
 
-# Language
-sub on_ref($type, $f) {
-    return sub($obj) {
-        if ( ref $obj eq $type ) {
-            return $f->($obj);
-        }
-        else {
-            return Err("Not a $type");
-        }
+sub t_ref($type, $f) {
+    return sub($any) {
+        return $f->($any) if ref $any eq $type;
+        return Err("Not a reference of type $type");
     }
 }
 
-sub on_hash($f)  { on_ref('HASH',  $f) }
-sub on_array($f) { on_ref('ARRAY', $f) }
+sub on_hash($f) {
+    return sub($any) {
+        my $type = ref $any;
+        if ( $type eq 'Hash' || $type eq 'HASH' ) {
+            return $f->($any);
+        }
+        return Err("Not a Hash");
+    }
+}
+
+sub on_array($f) {
+    return sub($any) {
+        my $type = ref $any;
+        if ( $type eq 'Array' || $type eq 'ARRAY' ) {
+            return $f->($any);
+        }
+        return Err("Not an Array");
+    }
+}
 
 sub t_checks($obj, $checks) {
     for my $check ( @$checks ) {

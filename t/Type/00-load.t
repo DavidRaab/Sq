@@ -59,10 +59,10 @@ my $is_album2 =
         )),
     );
 
-is(t_check({}, t_hash),  Ok(1),              '{} is hash');
-is(t_check([], t_hash),  Err('Not a HASH'),  '[] not a hash');
-is(t_check([], t_array), Ok(1),              '[] is array');
-is(t_check({}, t_array), Err('Not a ARRAY'), '{} not an array');
+is(t_check({}, t_hash),  Ok(1),               '{} is hash');
+is(t_check([], t_hash),  Err('Not a Hash'),   '[] not a hash');
+is(t_check([], t_array), Ok(1),               '[] is array');
+is(t_check({}, t_array), Err('Not an Array'), '{} not an array');
 
 is(t_check($album,        $is_album), Ok(1),
     'check if $album is album');
@@ -82,7 +82,7 @@ is(t_check($album, t_key artist => t_str_eq('Michael Jackson')), Ok(1),
 is(t_check($album, $is_album2), Ok(1),
     'full album check');
 
-is(t_check($album_wrong2, $is_album2), Err('Not a ARRAY'),
+is(t_check($album_wrong2, $is_album2), Err('Not an Array'),
     'album.tracks not an array');
 
 done_testing;
