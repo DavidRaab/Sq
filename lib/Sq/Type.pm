@@ -28,7 +28,6 @@ use Sub::Exporter -setup => {
 
 # TODO
 # Add: t_and, t_not
-# Add: t_int
 # Add: t_none, t_any
 # Add: t_parser
 
