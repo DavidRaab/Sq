@@ -34,15 +34,12 @@ my $album_wrong2 = {
 # my $is_album =
 my $is_album =
     t_hash(
-        t_with_key('artist'),
-        t_with_key('title'),
-        t_with_key('tracks'),
+        t_with_keys(qw/artist title tracks/),
     );
 
 my $is_album2 =
     t_hash(
-        t_with_key('artist'),
-        t_with_key('title'),
+        t_with_keys('artist', 'title'),
         t_key('tracks', t_array(
             t_idx(0,
                 t_hash(

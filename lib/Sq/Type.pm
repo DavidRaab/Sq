@@ -3,11 +3,11 @@ use 5.036;
 use Sq;
 use Sub::Exporter -setup => {
     exports => [
-        qw(t_check t_hash t_with_key t_key t_array t_idx t_str t_str_eq),
+        qw(t_check t_hash t_with_keys t_key t_array t_idx t_str t_str_eq),
     ],
     groups => {
         default => [
-            qw(t_check t_hash t_with_key t_key t_array t_idx t_str t_str_eq),
+            qw(t_check t_hash t_with_keys t_key t_array t_idx t_str t_str_eq),
         ],
     },
 };
@@ -83,10 +83,12 @@ sub t_array(@checks) {
 }
 
 # check hash keys
-sub t_with_key :prototype($) ($name) {
+sub t_with_keys (@keys) {
     return sub($hash) {
-        return Ok(1) if defined $hash->{$name};
-        return Err("key $name not defined");
+        for my $key ( @keys ) {
+            return Err("key $key not defined") if !defined $hash->{$key};
+        }
+        return Ok 1;
     }
 }
 
