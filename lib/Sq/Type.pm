@@ -148,11 +148,11 @@ sub t_keys(%kt) {
 }
 
 sub t_str_eq($expected) {
-    return sub($got) {
-        if ( ref $got eq "" ) {
-            return Ok(1) if $got eq $expected;
+    return sub($any) {
+        if ( ref $any eq "" ) {
+            return Ok(1) if $any eq $expected;
         }
-        return Err("Expected: '$expected' got '$got'");
+        return Err("Expected: '$expected' got '$any'");
     }
 }
 
