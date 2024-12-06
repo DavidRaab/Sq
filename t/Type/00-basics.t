@@ -61,6 +61,9 @@ is(t_run(t_hash,  []), Err('Not a Hash'),   '[] not a hash');
 is(t_run(t_array, []), Ok(1),               '[] is array');
 is(t_run(t_array, {}), Err('Not an Array'), '{} not an array');
 
+is(t_run(t_hash, {}, {}, {}),             Ok(1), 'multiple hashes');
+is(t_run(t_hash, {}, {}, []), Err("Not a Hash"), 'one not hash');
+
 is(t_run($is_album, $album), Ok(1),
     'check if $album is album');
 is(t_run($is_album, $album_wrong1), Err("key artist not defined"),
