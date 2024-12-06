@@ -1,9 +1,8 @@
 #!perl
 use 5.036;
+use Sq;
+use Sq::Language qw/:default :error/;
 use Test2::V0 qw(diag is done_testing);
-use Data::Language qw/:default :error/;
-
-diag( "Testing Data::Language $Data::Language::VERSION, Perl $], $^X" );
 
 my $album = {
     artist => 'Michael Jackson',

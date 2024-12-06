@@ -1,7 +1,8 @@
 #!perl
 use 5.036;
+use Sq;
+use Sq::Language qw(:default :error);
 use Test2::V0 qw(is done_testing);
-use Data::Language qw(:default :error);
 
 my $street = key street => is_str;
 my $city   = key city   => is_str;

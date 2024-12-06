@@ -1,6 +1,5 @@
-package Data::Language;
+package Sq::Language;
 use 5.036;
-our $VERSION = '0.001';
 use Sub::Exporter -setup => {
     exports => [
         qw(check a_hash with_key key a_array idx str is_str),
@@ -15,9 +14,6 @@ use Sub::Exporter -setup => {
         ]
     },
 };
-
-use Data::Dumper qw(Dumper);
-
 
 # Error Type
 sub ok ($value)  { return [Ok  => $value] }
