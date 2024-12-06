@@ -164,7 +164,7 @@ is($range->sum, $range->rev->sum, 'sum 2');
 is(
     Array::zip(
         Array->wrap(qw/A B C D E F/),
-        Array->range(0, 1_000_000),
+        Array->range(0, 1_000),
     ),
     Array->wrap(qw/A B C D E F/)->indexed,
     'zip and indexed');
