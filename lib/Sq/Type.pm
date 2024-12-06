@@ -5,7 +5,9 @@ use Scalar::Util ();
 use Sq;
 use Sub::Exporter -setup => {
     exports => [
-        qw(t_run t_valid t_assert t_is t_num t_str t_match t_str_eq), # Basic
+        qw(t_run t_valid t_assert t_is),     # Basic
+        qw(t_str t_str_eq t_match),          # String
+        qw(t_num t_min t_max),               # Numbers
         qw(t_opt),
         qw(t_hash t_has_keys t_key t_keys),  # Hash
         qw(t_array t_idx),                   # Array
@@ -13,10 +15,12 @@ use Sub::Exporter -setup => {
     ],
     groups => {
         default => [
-            qw(t_run t_valid t_assert t_is t_num t_str t_match t_str_eq), # Basic
+            qw(t_run t_valid t_assert t_is),     # Basic
+            qw(t_str t_str_eq t_match),          # String
+            qw(t_num t_min t_max),               # Numbers
             qw(t_opt),
-            qw(t_hash t_has_keys t_key t_keys), # Hash
-            qw(t_array t_idx),                  # Array
+            qw(t_hash t_has_keys t_key t_keys),  # Hash
+            qw(t_array t_idx),                   # Array
             qw(t_all t_length),
         ],
     },
@@ -26,7 +30,7 @@ use Sub::Exporter -setup => {
 # Add: t_and, t_or, t_not
 # Add: t_num_eq, t_int, t_num_range
 # Add: t_none, t_any
-# Add: t_match, t_parser
+# Add: t_parser
 
 ### Runners
 
@@ -261,6 +265,20 @@ sub t_match($regex) {
     return sub($any) {
         return Ok 1 if $any =~ $regex;
         return Err("$regex no match: $any");
+    }
+}
+
+sub t_min($min) {
+    return sub($num) {
+        return Ok 1 if $num >= $min;
+        return Err("$num must be greater $min");
+    }
+}
+
+sub t_max($max) {
+    return sub($num) {
+        return Ok 1 if $num <= $max;
+        return Err("$num must be smaller $max");
     }
 }
 

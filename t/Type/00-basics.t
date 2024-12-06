@@ -152,4 +152,14 @@ is(t_run($is_album2, $album_wrong2), Err('Not an Array'),
     );
 }
 
+# t_min / t_max
+{
+    ok(!t_valid(t_min(10),  0), 't_min 1');
+    ok( t_valid(t_min(10), 10), 't_min 2');
+    ok( t_valid(t_min(10), 20), 't_min 3');
+    ok( t_valid(t_max(10),  0), 't_max 1');
+    ok( t_valid(t_max(10), 10), 't_max 2');
+    ok(!t_valid(t_max(10), 20), 't_max 3');
+}
+
 done_testing;
