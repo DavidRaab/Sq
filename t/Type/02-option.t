@@ -6,11 +6,11 @@ use Test2::V0 qw(diag is done_testing);
 
 # checks for an album
 my $is_album = t_hash(
-    t_with_keys(qw/artist title tracks rating desc tags/),
+    t_has_keys(qw/artist title tracks rating desc tags/),
     t_key(artist => t_str),
     t_key(title  => t_str),
     t_key(tracks => t_array(
-        t_all(t_hash(t_with_keys(qw/name duration/))),
+        t_all(t_hash(t_has_keys(qw/name duration/))),
     )),
     t_key(rating => t_opt(
         t_is(sub($x) { is_num $x }),

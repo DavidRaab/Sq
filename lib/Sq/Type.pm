@@ -5,7 +5,7 @@ use Sub::Exporter -setup => {
     exports => [
         qw(t_run t_is t_str t_str_eq), # Basic
         qw(t_opt),
-        qw(t_hash t_with_keys t_key),  # Hash
+        qw(t_hash t_has_keys t_key),  # Hash
         qw(t_array t_idx),             # Array
         qw(t_all t_length),
     ],
@@ -13,7 +13,7 @@ use Sub::Exporter -setup => {
         default => [
             qw(t_run t_is t_str t_str_eq), # Basic
             qw(t_opt),
-            qw(t_hash t_with_keys t_key),  # Hash
+            qw(t_hash t_has_keys t_key),  # Hash
             qw(t_array t_idx),             # Array
             qw(t_all t_length),
         ],
@@ -88,7 +88,7 @@ sub t_opt(@checks) {
 }
 
 # check hash keys
-sub t_with_keys (@keys) {
+sub t_has_keys (@keys) {
     return sub($hash) {
         for my $key ( @keys ) {
             return Err("key $key not defined") if !defined $hash->{$key};
