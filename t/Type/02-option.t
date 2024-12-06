@@ -33,7 +33,7 @@ my $is_album1 = t_hash(
 );
 is(t_run($is_album1, $album1), Ok 1, '$album1 ok');
 
-# same as $album1 but used t_keys
+# same as $album1 but uses t_keys
 my $is_album2 = t_hash(
     t_has_keys(qw/artist title tracks rating desc tags/),
     t_keys(
