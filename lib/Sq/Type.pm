@@ -23,9 +23,9 @@ use Sub::Exporter -setup => {
 
 ### Runners
 
-sub t_run($any, @checks) {
-    for my $check ( @checks ) {
-        my $result = $check->($any);
+sub t_run($check, @values) {
+    for my $value ( @values ) {
+        my $result = $check->($value);
         return $result if $result->is_err;
     }
     return Ok 1;
@@ -99,8 +99,13 @@ sub t_with_keys (@keys) {
 
 sub t_key($name, @checks) {
     t_hash(sub($hash) {
-        if ( exists $hash->{$name} ) {
-            return t_run($hash->{$name}, @checks);
+        my $value = $hash->{$name};
+        if ( defined $value ) {
+            for my $check ( @checks ) {
+                my $result = $check->($value);
+                return $result if $result->is_err;
+            }
+            return Ok 1;
         }
         return Err("$name does not exists on hash");
     });
@@ -124,7 +129,11 @@ sub t_str() {
 
 sub t_idx($index, @checks) {
     t_array(sub($array) {
-        t_run($array->[$index], @checks);
+        for my $check ( @checks ) {
+            my $result = $check->($array->[$index]);
+            return $result if $result->is_err;
+        }
+        return Ok 1;
     });
 }
 
@@ -194,8 +203,6 @@ sub t_length($min, $max=undef) {
 
 # TODO
 # Add: t_and, t_or, t_not
-# t_run: change parameter order
-# t_run: only one check
 # Add: t_keys (Like t_key but you can pass multiple key,values)
 # Add: t_num, t_num_eq, t_int, t_num_range
 # Add: t_none, t_any

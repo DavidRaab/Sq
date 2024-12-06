@@ -31,6 +31,6 @@ my $album1 = sq {
     desc   => "Good Album",
 };
 
-is(t_run($album1, $is_album), Ok 1, '$album1 ok');
+is(t_run($is_album, $album1), Ok 1, '$album1 ok');
 
 done_testing;
