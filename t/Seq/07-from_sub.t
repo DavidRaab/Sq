@@ -5,7 +5,6 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end 
 use FindBin qw($Bin);
 use Path::Tiny;
 use IO::File;
-# use DDP;
 
 # Some values, functions, ... for testing
 my $range     = Seq->range(1, 10);
