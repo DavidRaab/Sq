@@ -5,7 +5,7 @@ use Sq::Type;
 use Test2::V0;
 
 # data used for checking
-my $album1 = sq {
+my $album = sq {
     artist => 'Michael Jackson',
     title  => 'Thriller',
     tracks => [
@@ -31,9 +31,9 @@ my $is_album1 = t_hash(
     t_key(tags => t_opt(t_array(t_str))),
     t_key(desc => t_str),
 );
-is(t_run($is_album1, $album1), Ok 1, '$album1 ok');
+is(t_run($is_album1, $album), Ok 1, '$album1 ok');
 
-# same as $album1 but uses t_keys
+# same as $album but uses t_keys
 my $is_album2 = t_hash(
     t_has_keys(qw/artist title tracks rating desc tags/),
     t_keys(
@@ -50,22 +50,22 @@ my $is_album2 = t_hash(
     ),
 );
 
-ok(t_valid($is_album2, $album1), '$album1 ok');
+ok(t_valid($is_album2, $album), '$album1 ok');
 ok(
-    t_valid(t_hash(t_key(rating => t_opt(t_num))), $album1),
+    t_valid(t_hash(t_key(rating => t_opt(t_num))), $album),
     'rating is number');
 ok(
     t_valid(
         t_hash(t_key(
             rating => t_opt(t_num(t_is(sub($num){ $num == 10 })))
         )),
-        $album1),
+        $album),
     'rating is number and 10');
 ok(
     t_valid(
         t_hash(t_key(
             artist => t_str(t_length(3)))),
-        $album1),
+        $album),
     'artist at least 3 characters');
 ok(
     t_valid(
@@ -75,7 +75,7 @@ ok(
                 duration => t_match(qr/\A(\d\d):(\d\d)\z/)
             ))))
         )),
-        $album1
+        $album
     ),
     'tracks duration matches regex');
 
