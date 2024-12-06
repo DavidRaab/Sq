@@ -174,4 +174,16 @@ is(t_run($is_album2, $album_wrong2), Err('Not an Array'),
     ok(!t_valid(t_range(0, 10), 11), 't_range 5');
 }
 
+# t_or
+{
+    my $date = t_or(
+        t_match(qr{\A \d\d \. \d\d \. \d\d\d\d\z}x),
+        t_match(qr{\A \d\d / \d\d  /  \d\d\d\d\z}x),
+    );
+
+    ok( t_valid($date, "01.01.1970"), 't_or 1');
+    ok( t_valid($date, "12/24/1970"), 't_or 2');
+    ok(!t_valid($date, "12-24-1970"), 't_or 3');
+}
+
 done_testing;

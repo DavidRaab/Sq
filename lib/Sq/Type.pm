@@ -5,30 +5,30 @@ use Scalar::Util ();
 use Sq;
 use Sub::Exporter -setup => {
     exports => [
-        qw(t_run t_valid t_assert t_is),     # Basic
-        qw(t_str t_str_eq t_match),          # String
-        qw(t_num t_min t_max t_range),       # Numbers
+        qw(t_run t_valid t_assert t_or t_is), # Basic
+        qw(t_str t_str_eq t_match),           # String
+        qw(t_num t_min t_max t_range),        # Numbers
         qw(t_opt),
-        qw(t_hash t_has_keys t_key t_keys),  # Hash
-        qw(t_array t_idx),                   # Array
+        qw(t_hash t_has_keys t_key t_keys),   # Hash
+        qw(t_array t_idx),                    # Array
         qw(t_all t_length),
     ],
     groups => {
         default => [
-            qw(t_run t_valid t_assert t_is),     # Basic
-            qw(t_str t_str_eq t_match),          # String
-            qw(t_num t_min t_max t_range),       # Numbers
+            qw(t_run t_valid t_assert t_or t_is), # Basic
+            qw(t_str t_str_eq t_match),           # String
+            qw(t_num t_min t_max t_range),        # Numbers
             qw(t_opt),
-            qw(t_hash t_has_keys t_key t_keys),  # Hash
-            qw(t_array t_idx),                   # Array
+            qw(t_hash t_has_keys t_key t_keys),   # Hash
+            qw(t_array t_idx),                    # Array
             qw(t_all t_length),
         ],
     },
 };
 
 # TODO
-# Add: t_and, t_or, t_not
-# Add: t_num_eq, t_int, t_num_range
+# Add: t_and, t_not
+# Add: t_int
 # Add: t_none, t_any
 # Add: t_parser
 
@@ -286,6 +286,16 @@ sub t_range($min, $max) {
     return sub($num) {
         return Ok 1 if $num >= $min && $num <= $max;
         return Err("$num must be between $min - $max");
+    }
+}
+
+sub t_or(@checks) {
+    return sub($any) {
+        for my $check ( @checks ) {
+            my $result = $check->($any);
+            return $result if $result->is_ok;
+        }
+        return Err("No check was successfull");
     }
 }
 
