@@ -59,10 +59,10 @@ sub t_assert($check, @values) {
 
 ### type checkers
 
-sub t_ref($type, $f) {
+sub t_ref($ref, $f) {
     return sub($any) {
-        return $f->($any) if ref $any eq $type;
-        return Err("Not a reference of type $type");
+        return $f->($any) if ref $any eq $ref;
+        return Err("Not a reference of type $ref");
     }
 }
 
