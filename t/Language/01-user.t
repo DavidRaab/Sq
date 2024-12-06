@@ -1,7 +1,7 @@
 #!perl
 use 5.036;
 use Sq;
-use Sq::Language qw(:default :error);
+use Sq::Language;
 use Test2::V0 qw(is done_testing);
 
 my $street = key street => is_str;
@@ -42,11 +42,11 @@ my @users = (
     },
 );
 
-is(check($users[0]{addr}, $addr), ok(1),
+is(check($users[0]{addr}, $addr), Ok(1),
     '$users[0] is addr');
-is(check($users[0], $user), ok(1),
+is(check($users[0], $user), Ok(1),
     '$users[0] is a user');
-is(check($users[1], $user), err("first does not exists on hash"),
+is(check($users[1], $user), Err("first does not exists on hash"),
     '$users[1] has a typo');
 
 done_testing;

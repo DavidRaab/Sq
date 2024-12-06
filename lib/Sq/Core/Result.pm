@@ -111,8 +111,12 @@ sub to_option($result) {
 
 sub to_array($result) {
     return $result->[0] == $ok
-         ? Array->new($result->[1])
-         : Array->new();
+         ? Array->bless([$result->[1]])
+         : Array->empty;
+}
+
+sub value($result) {
+    return $result->[1];
 }
 
 ### MODULE FUNCTIONS

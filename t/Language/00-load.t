@@ -1,7 +1,7 @@
 #!perl
 use 5.036;
 use Sq;
-use Sq::Language qw/:default :error/;
+use Sq::Language;
 use Test2::V0 qw(diag is done_testing);
 
 my $album = {
@@ -59,30 +59,30 @@ my $is_album2 =
         )),
     );
 
-is(check({}, a_hash),  ok(1),              '{} is hash');
-is(check([], a_hash),  err('Not a HASH'),  '[] not a hash');
-is(check([], a_array), ok(1),              '[] is array');
-is(check({}, a_array), err('Not a ARRAY'), '{} not an array');
+is(check({}, a_hash),  Ok(1),              '{} is hash');
+is(check([], a_hash),  Err('Not a HASH'),  '[] not a hash');
+is(check([], a_array), Ok(1),              '[] is array');
+is(check({}, a_array), Err('Not a ARRAY'), '{} not an array');
 
-is(check($album,        $is_album), ok(1),
+is(check($album,        $is_album), Ok(1),
     'check if $album is album');
-is(check($album_wrong1, $is_album), err("key artist not defined"),
+is(check($album_wrong1, $is_album), Err("key artist not defined"),
     'check if $album_wrong1 fails');
 
-is(check($album_wrong2, $is_album),  ok(1),
+is(check($album_wrong2, $is_album),  Ok(1),
     '$album_wrong2 is a valid $album because tracks only need to be defined');
 
-is(check($album, key artist => is_str), ok(1),
+is(check($album, key artist => is_str), Ok(1),
     'check if album.artist is_str');
-is(check($album, key foo    => is_str), err("foo does not exists on hash"),
+is(check($album, key foo    => is_str), Err("foo does not exists on hash"),
     'album.foo must fail');
 
-is(check($album, key artist => str('Michael Jackson')), ok(1),
+is(check($album, key artist => str('Michael Jackson')), Ok(1),
     'album is from Michael Jackson');
-is(check($album, $is_album2), ok(1),
+is(check($album, $is_album2), Ok(1),
     'full album check');
 
-is(check($album_wrong2, $is_album2), err('Not a ARRAY'),
+is(check($album_wrong2, $is_album2), Err('Not a ARRAY'),
     'album.tracks not an array');
 
 done_testing;
