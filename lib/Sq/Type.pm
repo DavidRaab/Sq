@@ -132,21 +132,22 @@ sub t_is($predicate) {
     }
 }
 
-sub t_all($predicate) {
+sub t_all($is_type) {
     return sub($any) {
         my $type = ref $any;
         if ( $type eq 'Array' || $type eq 'ARRAY' ) {
             for my $x ( @$any ) {
-                if ( not $predicate->($x) ) {
+                my $result = $is_type->($x);
+                if ( $result->is_err ) {
                     return Err("Element of Array does not match predicate");
                 }
             }
             return Ok 1;
         }
         elsif ( $type eq 'Hash' || $type eq 'HASH' ) {
-            my ($k,$v);
             for my $key ( keys %$any ) {
-                if ( not $predicate->($any->{$key}) ) {
+                my $result = $is_type->($any->{$key});
+                if ( $result->is_err ) {
                     return Err("A value of a Hash does not match predicate");
                 }
             }
