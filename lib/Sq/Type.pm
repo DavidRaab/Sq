@@ -6,21 +6,26 @@ use Sub::Exporter -setup => {
     exports => [
         qw(t_run t_valid t_assert t_is t_str t_str_eq), # Basic
         qw(t_opt),
-        qw(t_hash t_has_keys t_key),  # Hash
-        qw(t_array t_idx),             # Array
+        qw(t_hash t_has_keys t_key t_keys),  # Hash
+        qw(t_array t_idx),                   # Array
         qw(t_all t_length),
     ],
     groups => {
         default => [
             qw(t_run t_valid t_assert t_is t_str t_str_eq), # Basic
             qw(t_opt),
-            qw(t_hash t_has_keys t_key),  # Hash
-            qw(t_array t_idx),             # Array
+            qw(t_hash t_has_keys t_key t_keys), # Hash
+            qw(t_array t_idx),                  # Array
             qw(t_all t_length),
         ],
     },
 };
 
+# TODO
+# Add: t_and, t_or, t_not
+# Add: t_num, t_num_eq, t_int, t_num_range
+# Add: t_none, t_any
+# Add: t_match, t_parser
 
 ### Runners
 
@@ -131,6 +136,15 @@ sub t_key($name, @checks) {
     });
 }
 
+sub t_keys(%tv) {
+    for my $type ( keys %tv ) {
+        my $value  = $tv{$type};
+        my $result = t_run(t_key($type,$value));
+        return $result if $result->is_err;
+    }
+    return Ok 1;
+}
+
 sub t_str_eq($expected) {
     return sub($got) {
         if ( ref $got eq "" ) {
@@ -221,11 +235,5 @@ sub t_length($min, $max=undef) {
     }
 }
 
-# TODO
-# Add: t_and, t_or, t_not
-# Add: t_keys (Like t_key but you can pass multiple key,values)
-# Add: t_num, t_num_eq, t_int, t_num_range
-# Add: t_none, t_any
-# Add: t_match, t_parser
 
 1;
