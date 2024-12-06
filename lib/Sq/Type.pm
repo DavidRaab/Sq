@@ -123,7 +123,7 @@ sub t_has_keys (@keys) {
 }
 
 sub t_key($name, @checks) {
-    t_hash(sub($hash) {
+    return sub($hash) {
         my $value = $hash->{$name};
         if ( defined $value ) {
             for my $check ( @checks ) {
@@ -133,7 +133,7 @@ sub t_key($name, @checks) {
             return Ok 1;
         }
         return Err("$name does not exists on hash");
-    });
+    };
 }
 
 sub t_keys(%kt) {
@@ -164,13 +164,13 @@ sub t_str() {
 }
 
 sub t_idx($index, @checks) {
-    t_array(sub($array) {
+    return sub($array) {
         for my $check ( @checks ) {
             my $result = $check->($array->[$index]);
             return $result if $result->is_err;
         }
         return Ok 1;
-    });
+    };
 }
 
 sub t_is($predicate) {
