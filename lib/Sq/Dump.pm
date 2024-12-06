@@ -10,7 +10,7 @@ sub array($array, $inline=60, $depth=0) {
     }
     $str =~ s/,\n\z/\n/;
     $str .= (" " x $depth) . "]";
-    return compact($inline, $str);
+    return $str;
 }
 
 sub hash($hash, $inline=60, $depth=0) {
@@ -22,14 +22,14 @@ sub hash($hash, $inline=60, $depth=0) {
     }
     $str =~ s/,\n\z/\n/;
     $str .= (" " x $depth) . "}";
-    return compact($inline, $str);
+    return $str;
 }
 
 sub option($opt, $inline=60, $depth=0) {
     my $str = @$opt
         ? 'Some(' . to_string($opt->[0], $inline, $depth+2) . ')'
         : 'None';
-    return compact($inline, $str);
+    return $str;
 }
 
 sub seq($seq, $inline=60, $depth=0) {
@@ -49,7 +49,14 @@ sub seq($seq, $inline=60, $depth=0) {
         $str =~ s/,\n\z/\n/;
         $str .= (" " x $depth) . '}';
     }
-    return compact($inline, $str);
+    return $str;
+}
+
+sub result($result, $inline=60, $depth=0) {
+    my $str = $result->[0] == 1
+        ? 'Ok('  . to_string($result->[1], $inline, $depth+2) . ')'
+        : 'Err(' . to_string($result->[1], $inline, $depth+2) . ')';
+    return $str;
 }
 
 # Dumping Logic
@@ -61,6 +68,7 @@ my $dispatch = {
     'HASH'   => \&hash,
     'OPTION' => \&option,
     'SEQ'    => \&seq,
+    'RESULT' => \&result,
 };
 
 sub to_string($any, $inline=60, $depth=0) {
@@ -72,7 +80,7 @@ sub to_string($any, $inline=60, $depth=0) {
 
     my $func = $dispatch->{$type};
     return defined $func
-         ? $func->($any, $inline, $depth)
+         ? compact($inline, $func->($any, $inline, $depth))
          : 'NOT_IMPLEMENTED';
 }
 
