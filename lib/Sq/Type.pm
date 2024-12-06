@@ -5,16 +5,16 @@ use Sub::Exporter -setup => {
     exports => [
         qw(t_run t_is t_str t_str_eq), # Basic
         qw(t_opt),
-        qw(t_hash t_with_keys t_key),    # Hash
-        qw(t_array t_idx),               # Array
+        qw(t_hash t_with_keys t_key),  # Hash
+        qw(t_array t_idx),             # Array
         qw(t_all t_length),
     ],
     groups => {
         default => [
             qw(t_run t_is t_str t_str_eq), # Basic
             qw(t_opt),
-            qw(t_hash t_with_keys t_key),    # Hash
-            qw(t_array t_idx),               # Array
+            qw(t_hash t_with_keys t_key),  # Hash
+            qw(t_array t_idx),             # Array
             qw(t_all t_length),
         ],
     },
@@ -125,9 +125,7 @@ sub t_idx($index, @checks) {
 
 sub t_is($predicate) {
     return sub($any) {
-        if ( $predicate->($any) ) {
-            return Ok 1;
-        }
+        return Ok 1 if $predicate->($any);
         return Err("predicate does not match");
     }
 }
