@@ -72,7 +72,7 @@ ok(
         t_hash(t_key(
             tracks => t_array(t_all(t_hash(t_keys(
                 name     => t_str,
-                duration => t_match(qr/\A(\d\d):(\d\d)/)
+                duration => t_match(qr/\A(\d\d):(\d\d)\z/)
             ))))
         )),
         $album1
