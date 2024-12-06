@@ -61,14 +61,15 @@ sub result($result, $inline=60, $depth=0) {
 
 # Dumping Logic
 my $dispatch = {
-    'UNDEF'  => sub { return 'undef'                        },
-    'NUM'    => sub { return sprintf "%s", $_[0]            },
-    'STRING' => sub { return sprintf "\"%s\"", quote($_[0]) },
-    'ARRAY'  => \&array,
-    'HASH'   => \&hash,
-    'OPTION' => \&option,
-    'SEQ'    => \&seq,
-    'RESULT' => \&result,
+    'UNDEF'      => sub { return 'undef'                        },
+    'NUM'        => sub { return sprintf "%s", $_[0]            },
+    'STRING'     => sub { return sprintf "\"%s\"", quote($_[0]) },
+    'ARRAY'      => \&array,
+    'HASH'       => \&hash,
+    'OPTION'     => \&option,
+    'SEQ'        => \&seq,
+    'RESULT'     => \&result,
+    'PATH::TINY' => sub { $_[0]->stringify },
 };
 
 sub to_string($any, $inline=60, $depth=0) {
