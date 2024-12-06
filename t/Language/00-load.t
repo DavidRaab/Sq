@@ -33,56 +33,56 @@ my $album_wrong2 = {
 
 # my $is_album =
 my $is_album =
-    a_hash(
-        with_key('artist'),
-        with_key('title'),
-        with_key('tracks'),
+    t_hash(
+        t_with_key('artist'),
+        t_with_key('title'),
+        t_with_key('tracks'),
     );
 
 my $is_album2 =
-    a_hash(
-        with_key('artist'),
-        with_key('title'),
-        key('tracks', a_array(
-            idx(0,
-                a_hash(
-                    key(name     => is_str),
-                    key(duration => str('03:16')),
+    t_hash(
+        t_with_key('artist'),
+        t_with_key('title'),
+        t_key('tracks', t_array(
+            t_idx(0,
+                t_hash(
+                    t_key(name     => t_str),
+                    t_key(duration => t_str_eq('03:16')),
                 ),
             ),
-            idx(1,
-                a_hash(
-                    key(name     => str('bar')),
-                    key(duration => str('03:45')),
+            t_idx(1,
+                t_hash(
+                    t_key(name     => t_str_eq('bar')),
+                    t_key(duration => t_str_eq('03:45')),
                 ),
             ),
         )),
     );
 
-is(check({}, a_hash),  Ok(1),              '{} is hash');
-is(check([], a_hash),  Err('Not a HASH'),  '[] not a hash');
-is(check([], a_array), Ok(1),              '[] is array');
-is(check({}, a_array), Err('Not a ARRAY'), '{} not an array');
+is(t_check({}, t_hash),  Ok(1),              '{} is hash');
+is(t_check([], t_hash),  Err('Not a HASH'),  '[] not a hash');
+is(t_check([], t_array), Ok(1),              '[] is array');
+is(t_check({}, t_array), Err('Not a ARRAY'), '{} not an array');
 
-is(check($album,        $is_album), Ok(1),
+is(t_check($album,        $is_album), Ok(1),
     'check if $album is album');
-is(check($album_wrong1, $is_album), Err("key artist not defined"),
+is(t_check($album_wrong1, $is_album), Err("key artist not defined"),
     'check if $album_wrong1 fails');
 
-is(check($album_wrong2, $is_album),  Ok(1),
+is(t_check($album_wrong2, $is_album),  Ok(1),
     '$album_wrong2 is a valid $album because tracks only need to be defined');
 
-is(check($album, key artist => is_str), Ok(1),
+is(t_check($album, t_key artist => t_str), Ok(1),
     'check if album.artist is_str');
-is(check($album, key foo    => is_str), Err("foo does not exists on hash"),
+is(t_check($album, t_key foo    => t_str), Err("foo does not exists on hash"),
     'album.foo must fail');
 
-is(check($album, key artist => str('Michael Jackson')), Ok(1),
+is(t_check($album, t_key artist => t_str_eq('Michael Jackson')), Ok(1),
     'album is from Michael Jackson');
-is(check($album, $is_album2), Ok(1),
+is(t_check($album, $is_album2), Ok(1),
     'full album check');
 
-is(check($album_wrong2, $is_album2), Err('Not a ARRAY'),
+is(t_check($album_wrong2, $is_album2), Err('Not a ARRAY'),
     'album.tracks not an array');
 
 done_testing;

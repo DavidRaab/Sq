@@ -3,11 +3,11 @@ use 5.036;
 use Sq;
 use Sub::Exporter -setup => {
     exports => [
-        qw(check a_hash with_key key a_array idx str is_str),
+        qw(t_check t_hash t_with_key t_key t_array t_idx t_str t_str_eq),
     ],
     groups => {
         default => [
-            qw(check a_hash with_key key a_array idx str is_str),
+            qw(t_check t_hash t_with_key t_key t_array t_idx t_str t_str_eq),
         ],
     },
 };
@@ -27,7 +27,7 @@ sub on_ref($type, $f) {
 sub on_hash($f)  { on_ref('HASH',  $f) }
 sub on_array($f) { on_ref('ARRAY', $f) }
 
-sub checks($obj, $checks) {
+sub t_checks($obj, $checks) {
     for my $check ( @$checks ) {
         my $result = $check->($obj);
         return $result if $result->is_err;
@@ -35,43 +35,41 @@ sub checks($obj, $checks) {
     return Ok 1;
 }
 
-sub check($obj, $check) {
-    checks($obj, [$check]);
+sub t_check($obj, $check) {
+    t_checks($obj, [$check]);
 }
 
-
 # check references
-sub a_hash(@checks) {
+sub t_hash(@checks) {
     on_hash(sub($hash) {
-        checks($hash, \@checks);
+        t_checks($hash, \@checks);
     });
 }
 
-sub a_array(@checks) {
+sub t_array(@checks) {
     on_array(sub($array) {
-        checks($array, \@checks);
+        t_checks($array, \@checks);
     });
 }
 
 # check hash keys
-sub with_key :prototype($) ($name) {
+sub t_with_key :prototype($) ($name) {
     return sub($hash) {
         return Ok(1) if defined $hash->{$name};
         return Err("key $name not defined");
     }
 }
 
-sub key($name, @checks) {
+sub t_key($name, @checks) {
     on_hash(sub($hash) {
         if ( exists $hash->{$name} ) {
-            return checks($hash->{$name}, \@checks);
+            return t_checks($hash->{$name}, \@checks);
         }
         return Err("$name does not exists on hash");
     });
 }
 
-
-sub str($expected) {
+sub t_str_eq($expected) {
     return sub($got) {
         if ( ref $got eq "" ) {
             return Ok(1) if $got eq $expected;
@@ -80,7 +78,7 @@ sub str($expected) {
     }
 }
 
-sub is_str() {
+sub t_str() {
     return sub($obj) {
         if ( ref $obj eq "" ) {
             return Ok 1;
@@ -89,9 +87,9 @@ sub is_str() {
     }
 }
 
-sub idx($index, @checks) {
+sub t_idx($index, @checks) {
     on_array(sub($array) {
-        checks($array->[$index], \@checks);
+        t_checks($array->[$index], \@checks);
     });
 }
 
