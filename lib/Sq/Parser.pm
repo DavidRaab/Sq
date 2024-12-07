@@ -237,7 +237,7 @@ sub p_strc($string) {
                 matches => [$string],
             };
         }
-        return {valid=>0, pos => $ctx->{pos}};
+        return {valid => 0, pos => $ctx->{pos}};
     }
 }
 

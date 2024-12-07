@@ -37,9 +37,9 @@ for my $func ( @funcs ) {
 done_testing;
 
 # Benchmark
-my $afc = p_and(map { p_strc($_) } "a" .. "f");
 my $af1 = p_and(map { pstr_1($_) } "a" .. "f");
 my $af2 = p_and(map { pstr_2($_) } "a" .. "f");
+my $afc = p_and(map { p_strc($_) } "a" .. "f");
 
 my $str = 'abcdef';
 cmpthese(-1, {
