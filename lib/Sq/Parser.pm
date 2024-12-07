@@ -118,13 +118,13 @@ sub p_map($parser, $f_map) {
 
 # Like p_map but functions $f_opt returns an optional that can decide if parsing
 # was a failure or not.
-sub p_choose($parser, $f_opt_array) {
+sub p_choose($parser, $f_opt) {
     return sub($ctx,$str) {
         my $p = $parser->($ctx,$str);
         if ( $p->{valid} ) {
-            my $opt = $f_opt_array->($p->{matches}->@*);
+            my $opt = $f_opt->($p->{matches}->@*);
             if ( @$opt ) {
-                return { valid => 1, pos => $p->{pos}, matches => $opt->[0] };
+                return { valid => 1, pos => $p->{pos}, matches => [@$opt] };
             }
         }
         return { valid => 0, pos => $ctx->{pos} };
