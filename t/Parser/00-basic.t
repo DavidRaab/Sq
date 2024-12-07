@@ -117,7 +117,7 @@ sub result(@xs) { Some([@xs]) }
 
     # valid_time with choose
     my $valid_time_c = p_choose($time, sub($hour,$min) {
-        $hour < 24 && $min < 60 ? Some [$hour,$min] : None;
+        $hour < 24 && $min < 60 ? Some($hour,$min) : None;
     });
 
     is(p_run($valid_time_c, '23:59'), result(23,59), 'valid time choose 1');
