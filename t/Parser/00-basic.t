@@ -128,7 +128,7 @@ sub result(@xs) { Some([@xs]) }
 
     # valid_time with matchf
     my $valid_time_m = p_matchf(qr/(\d\d?):(\d\d?)/, sub($hour,$min) {
-        $hour < 24 && $min < 60 ? Some($hour,$min) : None;
+        $hour < 24 && $min < 60 ? ($hour,$min) : ();
     });
 
     is(p_run($valid_time_m, '23:59'), result(23,59), 'valid time matchf 1');
@@ -140,8 +140,8 @@ sub result(@xs) { Some([@xs]) }
 
 # p_matchf
 {
-    my $hex1 = p_map(p_match(qr/0x([0-9a-zA-Z]+)/), sub($hex) { hex $hex       });
-    my $hex2 = p_matchf(     qr/0x([0-9a-zA-Z]+)/ , sub($hex) { Some(hex $hex) });
+    my $hex1 = p_map(p_match(qr/0x([0-9a-zA-Z]+)/), sub($hex) { hex $hex });
+    my $hex2 = p_matchf(     qr/0x([0-9a-zA-Z]+)/ , sub($hex) { hex $hex });
 
     is(p_run($hex1, "0xff 123"), result(255), '$hex1 ff');
     is(p_run($hex2, "0xff 123"), result(255), '$hex2 ff');
@@ -150,7 +150,7 @@ sub result(@xs) { Some([@xs]) }
     is(p_run($hex2, "0xffff 123"), result(65535), '$hex2 ffff');
 
     # parses percentage only between 0% - 100%
-    my $percent = p_matchf(qr/(\d{1,3}) \s* %/x, sub($num) {
+    my $percent = p_matchf_opt(qr/(\d{1,3}) \s* %/x, sub($num) {
         $num >= 0 && $num <= 100 ? Some $num : None;
     });
 

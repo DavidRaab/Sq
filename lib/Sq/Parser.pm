@@ -3,13 +3,13 @@ use 5.036;
 use Sq;
 use Sub::Exporter -setup => {
     exports => [
-        qw(p_run p_match p_matchf p_map p_bind p_and p_return p_or p_maybe),
+        qw(p_run p_match p_matchf p_matchf_opt p_map p_bind p_and p_return p_or p_maybe),
         qw(p_join p_str p_strc p_many p_many0 p_ignore p_fail p_qty p_choose),
         qw(p_repeat p_filter p_split p_delay p_not),
     ],
     groups => {
         default => [
-            qw(p_run p_match p_matchf p_map p_bind p_and p_return p_or p_maybe),
+            qw(p_run p_match p_matchf p_matchf_opt p_map p_bind p_and p_return p_or p_maybe),
             qw(p_join p_str p_strc p_many p_many0 p_ignore p_fail p_qty p_choose),
             qw(p_repeat p_filter p_split p_delay p_not),
         ],
@@ -61,33 +61,40 @@ sub p_match($regex) {
     };
 }
 
+# Matches a Regex against the current position of the string.
+#
+# Regex -> Parser<[$context,@matches]>
+sub p_matchf($regex, $f_xs) {
+    my $match = qr/\G$regex/;
+    return sub($ctx,$str) {
+        pos($str) = $ctx->{pos};
+        if ( $str =~ m/$match/gc ) {
+            my @xs = $f_xs->(@{^CAPTURE});
+            return { valid => 1, pos => pos($str), matches => \@xs } if @xs;
+        }
+        return { valid => 0, pos => $ctx->{pos} };
+    };
+}
+
 # Like p_match but when the regex could be matched than `$f_opt` is executed
 # and expected to return an optional value. The option is used to decide if
 # parsing failed or not. This way we also can additionally change the value
 # in a single step without calling p_map. When it returns B<None> than parsing
 # is considered as a failure
-sub p_matchf($regex, $f_opt_array) {
+sub p_matchf_opt($regex, $f_opt_xs) {
     my $match = qr/\G$regex/;
     return sub($ctx,$str) {
         pos($str) = $ctx->{pos};
         if ( $str =~ m/$match/gc ) {
-            # Inlined: my $opt = Some( $f_opt_array->(...) )
-            my @matches;
-            for my $value ( $f_opt_array->(@{^CAPTURE}) ) {
-                goto INVALID if !defined $value;
-                if ( ref $value eq 'Option' ) {
-                    goto INVALID if !@$value;
-                    push @matches, @$value;
-                }
-                else {
-                    push @matches, $value;
-                }
+            my $opt = $f_opt_xs->(@{^CAPTURE});
+            if ( @$opt ) {
+                return {
+                    valid   => 1,
+                    pos     => pos($str),
+                    matches => [@$opt],
+                };
             }
-            return @matches
-                 ? { valid => 1, pos => pos($str), matches => \@matches }
-                 : { valid => 0, pos => $ctx->{pos} };
         }
-        INVALID:
         return { valid => 0, pos => $ctx->{pos} };
     };
 }
