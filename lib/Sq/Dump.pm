@@ -69,6 +69,7 @@ my $dispatch = {
     'OPTION'     => \&option,
     'SEQ'        => \&seq,
     'RESULT'     => \&result,
+    'CODE'       => sub { 'sub { DUMMY }' },
     'PATH::TINY' => sub { '"' . quote($_[0]->stringify) .'"' },
 };
 
@@ -82,7 +83,7 @@ sub to_string($any, $inline=60, $depth=0) {
     my $func = $dispatch->{$type};
     return defined $func
          ? compact($inline, $func->($any, $inline, $depth))
-         : 'NOT_IMPLEMENTED';
+         : "NOT_IMPLEMENTED REF: $type";
 }
 
 sub quote($str) {
