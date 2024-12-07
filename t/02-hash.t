@@ -242,9 +242,9 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 # get, set, extract
 {
     my $h = Hash->new(foo => 1, bar => 2, baz => 3);
-    is($h->get("foo"), Some 1, 'get 1');
-    is($h->get("bar"), Some 2, 'get 2');
-    is($h->get("baz"), Some 3, 'get 3');
+    is($h->get("foo"), Some(1), 'get 1');
+    is($h->get("bar"), Some(2), 'get 2');
+    is($h->get("baz"), Some(3), 'get 3');
     is($h->get("maz"),   None, 'get 4');
 
     # set
@@ -254,7 +254,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     # extract
     is(
         $h->extract(qw/foo latz bar/),
-        [Some 1, None, Some 4],
+        [Some(1), None, Some(4)],
         'extract');
 
     is(
@@ -763,13 +763,13 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
         'testing optional none case');
 
     is(
-        $data->pick(sub($k,$v){ return $k >= 10 ? Some [$k,$v] : None}),
-        Some [10 => 'baz'],
+        $data->pick(sub($k,$v){ return $k >= 10 ? Some([$k,$v]) : None}),
+        Some([10 => 'baz']),
         'pick baz');
 
     is(
         $data->pick(sub($k,$v){ return $k < 2 ? Some [$k,$v] : None}),
-        Some [ 1 => 'foo' ],
+        Some([ 1 => 'foo' ]),
         'pick foo');
 
     is(
@@ -778,8 +778,8 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
         'pick did not found anything');
 
     is(
-        $data->pick(sub($k,$v){ $k > 9 ? Some $k * 2 : None}),
-        Some 20,
+        $data->pick(sub($k,$v){ $k > 9 ? Some($k * 2) : None}),
+        Some(20),
         'pick returning string');
 }
 

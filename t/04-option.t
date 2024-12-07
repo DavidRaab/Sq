@@ -460,14 +460,14 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end 
     };
 
     my @tests = (
-        [Some 1,   Some 2, Some  3],
-        [Some 1,   Some 1, Some  2],
-        [Some 10, Some 10, Some 20],
-        [Some 1,     None,    None],
-        [None,     Some 1,    None],
-        [None,       None,    None],
-        [Some 0,   Some 1,    None],
-        [Some 1,   Some 0,    None],
+        [Some( 1), Some( 2), Some( 3)],
+        [Some( 1), Some( 1), Some( 2)],
+        [Some(10), Some(10), Some(20)],
+        [Some( 1),     None,    None],
+        [None,      Some(1),    None],
+        [None,         None,    None],
+        [Some(0),   Some(1),    None],
+        [Some(1),   Some(0),    None],
     );
 
     my $idx = 0;
@@ -495,7 +495,7 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end 
         'bind3');
 
     is(
-        Option::bind4(Some 1, Some 2, Some 3, Some 4, sub($x,$y,$z,$w) { Some $x+$y+$z+$w }),
+        Option::bind4(Some(1), Some(2), Some(3), Some(4), sub($x,$y,$z,$w) { Some $x+$y+$z+$w }),
         Some(10),
         'bind4');
 }
@@ -503,7 +503,7 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end 
 # map_v
 {
     is(
-        Option::map_v(Some 1, Some 2, Some 3, Some 4, Some 5, Some 6, Some 7, sub {
+        Option::map_v(Some(1), Some(2), Some(3), Some(4), Some(5), Some(6), Some(7), sub {
             my $sum = 0;
             for my $x ( @_ ) {
                 $sum += $x;
@@ -514,7 +514,7 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end 
         'map_v');
 
     is(
-        Some(1)->map_v(Some 2, Some 3, Some 4, Some 5, Some 6, Some 7, sub {
+        Some(1)->map_v(Some(2), Some(3), Some(4), Some(5), Some(6), Some(7), sub {
             my $sum = 0;
             for my $x ( @_ ) {
                 $sum += $x;
@@ -525,7 +525,7 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end 
         'map_v as method');
 
     is(
-        Option::map_v(Some 1, Some 2, sub($x,$y) { $x + $y }),
+        Option::map_v(Some(1), Some(2), sub($x,$y) { $x + $y }),
         Some(3),
         'map_v with two arguments');
 }
@@ -543,17 +543,17 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end 
     };
 
     is(
-        Option::bind_v(Some 1, Some 2, Some 3, Some 4, Some 5, Some 6, Some 7, $sum_under_100),
+        Option::bind_v(Some(1), Some(2), Some(3), Some(4), Some(5), Some(6), Some(7), $sum_under_100),
         Some(28),
         'bind_v 1');
 
     is(
-        Option::map_v(Some 1, Some 2, Some 3, Some 4, Some 5, Some 6, Some 7, $sum_under_100),
+        Option::map_v(Some(1), Some(2), Some(3), Some(4), Some(5), Some(6), Some(7), $sum_under_100),
         Some(Some(28)),
         'map_v compared to bind_v');
 
     is(
-        Option::bind_v(Some 10, Some 50, Some 50, $sum_under_100),
+        Option::bind_v(Some(10), Some(50), Some(50), $sum_under_100),
         None,
         'bind_v 2');
 }
@@ -608,7 +608,7 @@ is(Option::is_none({}),          0, 'is_none 8');
 # returning option in Option::map
 {
     my $x = Some(10)->map(sub($x) { Some($x+1) });
-    is($x, [Some(11)] , 'Returning option in Option::map');
+    is($x, Some(11) , 'Returning option in Option::map');
 }
 
 done_testing;

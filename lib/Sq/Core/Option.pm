@@ -12,12 +12,22 @@ use Sub::Exporter -setup => {
 my $None = bless([], 'Option');
 
 # Constructor functions that are importet by Sq
-sub Some :prototype($) ($value=undef) {
-    if ( defined $value ) {
-        return $value if ref $value eq 'Option';
-        return bless([$value], 'Option');
+sub Some(@values) {
+    return $None if @values == 0;
+
+    my @new;
+    for my $value ( @values ) {
+        return $None if !defined $value;
+        if ( ref $value eq 'Option' ) {
+            return $None if @$value == 0;
+            push @new, @$value;
+        }
+        else {
+            push @new, $value;
+        }
     }
-    return $None;
+
+    return bless(\@new, 'Option');
 }
 
 sub None :prototype() () {
@@ -42,7 +52,7 @@ sub match($opt, %args) {
     my $fSome = $args{Some} or Carp::croak "Some not defined";
     my $fNone = $args{None} or Carp::croak "None not defined";
     if ( @$opt ) {
-        return $fSome->($opt->[0]);
+        return $fSome->(@$opt);
     }
     else {
         return $fNone->();
@@ -50,13 +60,23 @@ sub match($opt, %args) {
 }
 
 # or: Option<'a> -> 'a -> 'a
-sub or($opt, $default) {
-    return @$opt ? $opt->[0] : $default;
+sub or($opt, @defaults) {
+    if ( wantarray ) {
+        return @$opt ? @$opt : @defaults;
+    }
+    else {
+        return @$opt ? $opt->[0] : $defaults[0];
+    }
 }
 
 # or_with: Option<'a> -> (unit -> Option<'a>) -> 'a
 sub or_with($opt, $f_x) {
-    return @$opt ? $opt->[0] : $f_x->();
+    if ( wantarray ) {
+        return @$opt ? @$opt : $f_x->();
+    }
+    else {
+        return @$opt ? $opt->[0] : $f_x->();
+    }
 }
 
 # or_else: Option<'a> -> Option<'a> -> Option<'a>
@@ -71,26 +91,26 @@ sub or_else_with($opt, $fopt) {
 
 # bind : Option<'a> -> ('a -> Option<'b>) -> Option<'b>
 sub bind($opt, $f) {
-    return @$opt ? $f->($opt->[0]) : $None;
+    return @$opt ? $f->(@$opt) : $None;
 }
 
 sub bind2($optA, $optB, $f) {
     if ( @$optA && @$optB ) {
-        return $f->($optA->[0], $optB->[0]);
+        return $f->(@$optA, @$optB);
     }
     return $None;
 }
 
 sub bind3($optA, $optB, $optC, $f) {
     if ( @$optA && @$optB && @$optC ) {
-        return $f->($optA->[0], $optB->[0], $optC->[0]);
+        return $f->(@$optA, @$optB, @$optC);
     }
     return $None;
 }
 
 sub bind4($optA, $optB, $optC, $optD, $f) {
     if ( @$optA && @$optB && @$optC && @$optD ) {
-        return $f->($optA->[0], $optB->[0], $optC->[0], $optD->[0]);
+        return $f->(@$optA, @$optB, @$optC, @$optD);
     }
     return $None;
 }
@@ -101,45 +121,35 @@ sub bind_v {
 
     my @unpack;
     for my $opt ( @opts ) {
-        if ( @$opt ) {
-            push @unpack, $opt->[0];
-        }
-        else {
-            return $None;
-        }
+        if ( @$opt ) { push @unpack, @$opt }
+        else         { return $None        }
     }
 
     return $f->(@unpack);
 }
 
 sub map($opt, $f) {
-    if ( @$opt ) {
-        my $v = $f->($opt->[0]);
-        return defined $v ? bless([$v],'Option') : $None;
-    }
+    return Some($f->(@$opt)) if @$opt;
     return $None;
 }
 
 sub map2($optA, $optB, $f) {
     if ( @$optA && @$optB ) {
-        my $v = $f->($optA->[0], $optB->[0]);
-        return defined $v ? bless([$v],'Option') : $None;
+        return Some($f->(@$optA, @$optB));
     }
     return $None;
 }
 
 sub map3($a, $b, $c, $f) {
     if ( @$a && @$b && @$c ) {
-        my $v = $f->($a->[0], $b->[0], $c->[0]);
-        return defined $v ? bless([$v],'Option') : $None;
+        return Some( $f->(@$a, @$b, @$c) );
     }
     return $None;
 }
 
 sub map4($a, $b, $c, $d, $f) {
     if ( @$a && @$b && @$c && @$d ) {
-        my $v = $f->($a->[0], $b->[0], $c->[0], $d->[0]);
-        return defined $v ? bless([$v],'Option') : $None;
+        return Some($f->(@$a, @$b, @$c, @$d));
     }
     return $None;
 }
@@ -150,19 +160,15 @@ sub map_v {
 
     my @unpack;
     for my $opt ( @opts ) {
-        if ( @$opt ) {
-            push @unpack, $opt->[0];
-        }
-        else {
-            return $None;
-        }
+        if ( @$opt ) { push @unpack, @$opt }
+        else         { return $None        }
     }
 
     return Some($f->(@unpack));
 }
 
 sub validate($opt, $predicate) {
-    if ( @$opt && $predicate->($opt->[0]) ) {
+    if ( @$opt && $predicate->(@$opt) ) {
         return $opt;
     }
     return $None;
@@ -170,11 +176,12 @@ sub validate($opt, $predicate) {
 
 sub check($opt, $predicate) {
     if ( @$opt ) {
-        return $predicate->($opt->[0]) ? 1 : 0;
+        return $predicate->(@$opt) ? 1 : 0;
     }
     return 0;
 }
 
+# TODO: REMOVE
 sub flatten($opt) {
     my $ret = $opt;
     while ( @$ret && ref $ret->[0] eq 'Option' ) {
@@ -184,22 +191,27 @@ sub flatten($opt) {
 }
 
 sub fold($opt, $state, $f) {
-    return @$opt ? $f->($opt->[0], $state) : $state;
+    return @$opt ? $f->(@$opt, $state) : $state;
 }
 
 sub iter($opt, $f) {
-    $f->($opt->[0]) if @$opt;
+    $f->(@$opt) if @$opt;
     return;
 }
 
 sub to_array($opt) {
     return @$opt
-         ? bless([$opt->[0]], 'Array')
-         : bless([],          'Array');
+         ? bless([@$opt], 'Array')
+         : bless([],      'Array');
 }
 
 sub get($opt) {
-    return $opt->[0] if @$opt;
+    if ( wantarray ) {
+        return @$opt if @$opt;
+    }
+    else {
+        return $opt->[0] if @$opt;
+    }
     die "Cannot extract value of None\n";
 }
 
@@ -208,12 +220,8 @@ sub get($opt) {
 sub all_valid($, $array_of_opt) {
     my $new = Array->new;
     for my $opt ( @$array_of_opt ) {
-        if ( @$opt ) {
-            push @$new, $opt->[0];
-        }
-        else {
-            return $None;
-        }
+        if ( @$opt ) { push @$new, @$opt }
+        else         { return $None      }
     }
     return bless([$new], 'Option');
 }
@@ -222,12 +230,8 @@ sub all_valid_by($, $array, $f) {
     my $new = Array->new;
     for my $x ( @$array ) {
         my $opt = $f->($x);
-        if ( @$opt ) {
-            push @$new, $opt->[0];
-        }
-        else {
-            return $None;
-        }
+        if ( @$opt ) { push @$new, @$opt }
+        else         { return $None      }
     }
     return bless([$new], 'Option');
 }
@@ -235,9 +239,7 @@ sub all_valid_by($, $array, $f) {
 sub filter_valid($, $array_of_opt) {
     my $new = Array->new;
     for my $opt ( @$array_of_opt ) {
-        if ( @$opt ) {
-            push @$new, $opt->[0];
-        }
+        push @$new, @$opt if @$opt;
     }
     return $new;
 }
@@ -246,58 +248,24 @@ sub filter_valid_by($, $array, $f) {
     my $new = Array->new;
     for my $x ( @$array ) {
         my $opt = $f->($x);
-        if ( @$opt ) {
-            push @$new, $opt->[0];
-        }
+        push @$new, @$opt if @$opt;
     }
     return $new;
 }
 
-sub extract($, $any=undef) {
-    if ( defined $any ) {
+sub extract($, @anys) {
+    my @ret;
+    for my $any ( @anys ) {
+        return 0 if !defined $any;
         if ( ref $any eq 'Option' ) {
-            return 1, $any->[0] if @$any;
-            return 0, undef;
+            return 0 if @$any == 0;
+            push @ret, @$any;
         }
-        return 1, $any;
-    }
-    return 0, undef;
-}
-
-sub extract_array($, @args) {
-    if ( @args == 1 ) {
-        my $any = $args[0];
-        if ( defined $any ) {
-            if ( ref $any eq 'Option' ) {
-                # when is_some
-                if ( @$any ) {
-                    my $value = $any->[0];
-                    my $type  = ref $value;
-                    # if value in option is array
-                    if ( $type eq 'Array' || $type eq 'ARRAY' ) {
-                        return 1, @$value;
-                        # TODO: return 0 when empty array was passed???
-                    }
-                    # if value in option is not an array
-                    return defined $value ? (1, $value) : 0;
-                }
-                # when option is none
-                return 0;
-            }
-            # not an option, but a single value
-            return 1, $any if defined $any;
-            return 0;
+        else {
+            push @ret, $any;
         }
-        # single undef value
-        return 0;
     }
-    elsif ( @args == 0 ) {
-        return 0;
-    }
-    # multiple values always valid
-    else {
-        return 1, @args;
-    }
+    return @ret > 0 ? (1,@ret) : 0;
 }
 
 sub dump($opt, $inline=60, $depth=0) {

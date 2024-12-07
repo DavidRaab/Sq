@@ -20,7 +20,7 @@ use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end 
 
     my $nums_opt = Array->unfold(0, sub($x) {
         if ( $x < 20 ) {
-            return Some([$x, $x+1]);
+            return Some($x, $x+1);
         }
         return None;
     });

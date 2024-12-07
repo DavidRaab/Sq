@@ -70,7 +70,7 @@ sub unfold($, $state, $f_opt) {
 
     my ($is_some, $x);
     while (1) {
-        ($is_some, $x, $state) = Option->extract_array($f_opt->($state));
+        ($is_some, $x, $state) = Option->extract($f_opt->($state));
         last if !$is_some;
         push @array, $x;
     }

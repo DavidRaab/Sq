@@ -71,10 +71,23 @@ sub p_matchf($regex, $f_opt_array) {
     return sub($ctx,$str) {
         pos($str) = $ctx->{pos};
         if ( $str =~ m/$match/gc ) {
-            my $opt = $f_opt_array->(@{^CAPTURE});
-            return { valid => 1, pos => pos($str), matches => $opt->[0] } if @$opt;
-            return { valid => 0, pos => $ctx->{pos} };
+            # Inlined: my $opt = Some( $f_opt_array->(...) )
+            my @matches;
+            for my $value ( $f_opt_array->(@{^CAPTURE}) ) {
+                goto INVALID if !defined $value;
+                if ( ref $value eq 'Option' ) {
+                    goto INVALID if !@$value;
+                    push @matches, @$value;
+                }
+                else {
+                    push @matches, $value;
+                }
+            }
+            return @matches
+                 ? { valid => 1, pos => pos($str), matches => \@matches }
+                 : { valid => 0, pos => $ctx->{pos} };
         }
+        INVALID:
         return { valid => 0, pos => $ctx->{pos} };
     };
 }

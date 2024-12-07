@@ -18,10 +18,11 @@ my $int1 =
                 p_match(qr/([0-9-_]+)/)),
             sub($x) { $x =~ m/[0-9]/ }));
 
-my $int2 = p_matchf(qr/([0-9-_]+)/, sub($str) { Some([ $str =~ s/[-_]+//gr ]) });
+my $int2 = p_matchf(qr/([0-9-_]+)/, sub($str) {      $str =~ s/[-_]+//gr  });
+my $int3 = p_matchf(qr/([0-9-_]+)/, sub($str) { Some($str =~ s/[-_]+//gr) });
 
 # Testing if the same.
-for my $int ( $int1, $int2 ) {
+for my $int ( $int1, $int2, $int3 ) {
     is(p_run($int, '1000'),         result("1000"), 'int 1');
     is(p_run($int, '1_000'),        result("1000"), 'int 2');
     is(p_run($int, '-1-0-0-0-'),    result("1000"), 'int 3');
@@ -31,6 +32,7 @@ for my $int ( $int1, $int2 ) {
 done_testing;
 
 cmpthese(-3, {
-    int1 => sub { for ( 1 .. 1_000 ) { my $x = p_run($int1, '1-00-00') } },
-    int2 => sub { for ( 1 .. 1_000 ) { my $x = p_run($int2, '1-00-00') } },
+    int1_complex    => sub { for ( 1 .. 1_000 ) { my $x = p_run($int1, '1-00-00') } },
+    int2_matchf     => sub { for ( 1 .. 1_000 ) { my $x = p_run($int2, '1-00-00') } },
+    int3_matchf_opt => sub { for ( 1 .. 1_000 ) { my $x = p_run($int3, '1-00-00') } },
 });

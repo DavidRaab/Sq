@@ -84,7 +84,7 @@ sub unfold($, $state, $f_opt) {
         my ($is_some, $x);
         return sub {
             return undef if $abort;
-            ($is_some, $x, $state) = Option->extract_array($f_opt->($state));
+            ($is_some, $x, $state) = Option->extract($f_opt->($state));
             return $x if $is_some;
             $abort = 1;
             undef $state;
