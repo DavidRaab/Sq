@@ -81,10 +81,10 @@ sub result(@xs) { Some([@xs]) }
 
 # p_many, p_many0
 {
-    # Regex: (\d+) (?: (\d+) , )+
-    my $int1 = p_and($int, p_many (p_and(p_str(','), $int)));
     # Regex: (\d+) (?: (\d+) , )*
     my $int0 = p_and($int, p_many0(p_and(p_str(','), $int)));
+    # Regex: (\d+) (?: (\d+) , )+
+    my $int1 = p_and($int, p_many (p_and(p_str(','), $int)));
 
     is(p_run($int0, '123'),                          result(123), '$int0 list');
     is(p_run($int1, '123'),                                 None, '$int1 list');
@@ -117,7 +117,7 @@ sub result(@xs) { Some([@xs]) }
 
     # valid_time with choose
     my $valid_time_c = p_choose($time, sub($hour,$min) {
-        $hour < 24 && $min < 60 ? ($hour,$min) : undef;
+        $hour < 24 && $min < 60 ? Some [$hour,$min] : None;
     });
 
     is(p_run($valid_time_c, '23:59'), result(23,59), 'valid time choose 1');
@@ -128,7 +128,7 @@ sub result(@xs) { Some([@xs]) }
 
     # valid_time with matchf
     my $valid_time_m = p_matchf(qr/(\d\d?):(\d\d?)/, sub($hour,$min) {
-        $hour < 24 && $min < 60 ? ($hour,$min) : undef;
+        $hour < 24 && $min < 60 ? Some [$hour,$min] : None;
     });
 
     is(p_run($valid_time_m, '23:59'), result(23,59), 'valid time matchf 1');
@@ -140,8 +140,8 @@ sub result(@xs) { Some([@xs]) }
 
 # p_matchf
 {
-    my $hex1 = p_map(p_match(qr/0x([0-9a-zA-Z]+)/), sub($hex) { hex $hex });
-    my $hex2 = p_matchf(     qr/0x([0-9a-zA-Z]+)/ , sub($hex) { hex $hex });
+    my $hex1 = p_map(p_match(qr/0x([0-9a-zA-Z]+)/), sub($hex) { hex $hex        });
+    my $hex2 = p_matchf(     qr/0x([0-9a-zA-Z]+)/ , sub($hex) { Some [hex $hex] });
 
     is(p_run($hex1, "0xff 123"), result(255), '$hex1 ff');
     is(p_run($hex2, "0xff 123"), result(255), '$hex2 ff');
@@ -151,7 +151,7 @@ sub result(@xs) { Some([@xs]) }
 
     # parses percentage only between 0% - 100%
     my $percent = p_matchf(qr/(\d{1,3}) \s* %/x, sub($num) {
-        $num >= 0 && $num <= 100 ? Some($num) : None;
+        $num >= 0 && $num <= 100 ? Some [$num] : None;
     });
 
     is(p_run($percent,   '0%'),   result(0),   '0%');
@@ -209,7 +209,7 @@ sub result(@xs) { Some([@xs]) }
                 p_split('',
                     p_match(qr/([0-9-_]+)/)),
                 sub($x) { $x =~ m/[0-9]/ }));
-    my $int2 = p_matchf(qr/([0-9-_]+)/, sub($str) { $str =~ s/[-_]+//gr });
+    my $int2 = p_matchf(qr/([0-9-_]+)/, sub($str) { Some [ $str =~ s/[-_]+//gr ] });
     for my $int ( $int1, $int2 ) {
         is(p_run($int, '1000'),         result("1000"), 'int 1');
         is(p_run($int, '1_000'),        result("1000"), 'int 2');

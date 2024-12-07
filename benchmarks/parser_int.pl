@@ -18,7 +18,7 @@ my $int1 =
                 p_match(qr/([0-9-_]+)/)),
             sub($x) { $x =~ m/[0-9]/ }));
 
-my $int2 = p_matchf(qr/([0-9-_]+)/, sub($str) { $str =~ s/[-_]+//gr });
+my $int2 = p_matchf(qr/([0-9-_]+)/, sub($str) { Some([ $str =~ s/[-_]+//gr ]) });
 
 # Testing if the same.
 for my $int ( $int1, $int2 ) {

@@ -16,24 +16,33 @@ use Sub::Exporter -setup => {
     },
 };
 
+sub pass($pos, $matches) {
+    return { valid => 1, pos => $pos, matches => $matches }
+}
+sub fail($pos) {
+    return { valid => 0, pos => $pos }
+}
+
 # Expects a Parser and a string and runs the parser against the string
 # returning if it succedded or not.
 #
 # Parser<'a> -> string -> Option<[@matches]>
 sub p_run($parser, $str) {
-    $parser->(sq({ pos => 0 }), $str)->map(sub($args) { Array::skip($args,1) });
+    my $p = $parser->({ valid => 1, pos => 0 }, $str);
+    return Some($p->{matches}) if $p->{valid};
+    return None;
 }
 
 # monadic return. just wraps any values into an parser. Useful in bind functions.
 sub p_return(@values) {
     return sub($ctx,$str) {
-        return Some([$ctx,@values]);
+        return pass($ctx->{pos}, \@values);
     };
 }
 
 # returns a parser that always fails. Useful in bind functions.
 sub p_fail() {
-    state $fail = sub($ctx,$str) { return None };
+    state $fail = sub($ctx,$str) { return {valid => 0, pos => $ctx->{pos}} };
     return $fail;
 }
 
@@ -45,12 +54,9 @@ sub p_match($regex) {
     return sub($ctx,$str) {
         pos($str) = $ctx->{pos};
         if ( $str =~ m/$match/gc ) {
-            return Some([
-                { %$ctx, pos => pos($str) },
-                @{^CAPTURE}
-            ]);
+            return { valid => 1, pos => pos($str), matches => [@{^CAPTURE}] };
         }
-        return None;
+        return { valid => 0, pos => $ctx->{pos} };
     };
 }
 
@@ -64,15 +70,11 @@ sub p_matchf($regex, $f_opt_array) {
     return sub($ctx,$str) {
         pos($str) = $ctx->{pos};
         if ( $str =~ m/$match/gc ) {
-            my ($is_some, @xs) = Option->extract_array($f_opt_array->(@{^CAPTURE}));
-            if ( $is_some ) {
-                return Some([
-                    { %$ctx, pos => pos($str) },
-                    @xs
-                ]);
-            }
+            my $opt = $f_opt_array->(@{^CAPTURE});
+            return { valid => 1, pos => pos($str), matches => $opt->[0] } if @$opt;
+            return { valid => 0, pos => $ctx->{pos} };
         }
-        return None;
+        return { valid => 0, pos => $ctx->{pos} };
     };
 }
 
@@ -80,51 +82,54 @@ sub p_matchf($regex, $f_opt_array) {
 #
 # Parser<'a> -> ('a -> 'b) -> Parser<'b>
 sub p_map($parser, $f_map) {
-    return sub($context,$str) {
-        my ($is_some, $ctx, @xs) = Option->extract_array($parser->($context,$str));
-        return Some([$ctx, $f_map->(@xs)]) if $is_some;
-        return None;
+    return sub($ctx,$str) {
+        my $p = $parser->($ctx,$str);
+        if ( $p->{valid} ) {
+            return pass($p->{pos}, [$f_map->($p->{matches}->@*)]);
+        }
+        return fail($p->{pos});
     }
 }
 
 # Like p_map but functions $f_opt returns an optional that can decide if parsing
 # was a failure or not.
 sub p_choose($parser, $f_opt_array) {
-    return sub($context,$str) {
-        my ($is_some, $ctx, @xs) = Option->extract_array($parser->($context,$str));
-        if ( $is_some ) {
-            ($is_some, @xs) = Option->extract_array($f_opt_array->(@xs));
-            if ( $is_some ) {
-                return Some([$ctx, @xs]);
+    return sub($ctx,$str) {
+        my $p = $parser->($ctx,$str);
+        if ( $p->{valid} ) {
+            my $opt = $f_opt_array->($p->{matches}->@*);
+            if ( @$opt ) {
+                return { valid => 1, pos => $p->{pos}, matches => $opt->[0] };
             }
         }
-        return None;
+        return fail($ctx->{pos});
     }
 }
 
 # executes
 sub p_filter($parser, $predicate) {
-    return sub($context,$str) {
-        my ($is_some, $ctx, @xs) = Option->extract_array($parser->($context,$str));
-        if ( $is_some ) {
-            return Some([$ctx, grep { $predicate->($_) } @xs]);
+    return sub($ctx,$str) {
+        my $p = $parser->($ctx,$str);
+        if ( $p->{valid} ) {
+            return pass($p->{pos}, [grep { $predicate->($_) } $p->{matches}->@*]);
         }
-        return None;
+        return fail($ctx->{pos});
     }
 }
 
 # Parser<'a> -> ('a -> Parser<'b>) -> Parser<'b>
 sub p_bind($parser, $f) {
-    return sub($context,$str) {
-        my ($is_some, $ctxA, @as) = Option->extract_array($parser->($context,$str));
-        if ( $is_some ) {
-            my $p = $f->(@as);
-            my ($is_some, $ctxB, @bs) = Option->extract_array($p->($ctxA, $str));
-            return $is_some
-                 ? Some([$ctxB, @bs])
-                 : None;
+    return sub($ctx,$str) {
+        my $p1 = $parser->($ctx,$str);
+        if ( $p1->{valid} ) {
+            my $parser = $f->($p1->{matches}->@*);
+            my $p2     = $parser->($p1, $str);
+            if ( $p2->{valid} ) {
+                return pass($p2->{pos}, $p2->{matches});
+            }
+            return fail($ctx->{pos});
         }
-        return None;
+        return fail($ctx->{pos});
     }
 }
 
@@ -134,14 +139,15 @@ sub p_bind($parser, $f) {
 # Regex: abc
 sub p_and(@parsers) {
     return sub($ctx,$str) {
-        my $last_ctx = $ctx;
-        my (@results, $is_some, @xs);
-        for my $p ( @parsers ) {
-            ($is_some, $last_ctx, @xs) = Option->extract_array($p->($last_ctx, $str));
-            return None if !$is_some;
-            push @results, @xs;
+        my $last_p = $ctx;
+        my ($p, @matches);
+        for my $parser ( @parsers ) {
+            $p = $parser->($last_p, $str);
+            return fail($ctx->{pos}) if !$p->{valid};
+            $last_p = $p;
+            push @matches, $p->{matches}->@*;
         }
-        return Some([$last_ctx, @results]);
+        return pass($last_p->{pos}, \@matches);
     };
 }
 
@@ -150,11 +156,12 @@ sub p_and(@parsers) {
 # Regex: ( | | | )
 sub p_or(@parsers) {
     return sub($ctx,$str) {
-        for my $p ( @parsers ) {
-            my $opt = $p->($ctx, $str);
-            return $opt if @$opt;
+        my $p;
+        for my $parser ( @parsers ) {
+            $p = $parser->($ctx, $str);
+            return $p if $p->{valid};
         }
-        return None;
+        return fail($ctx->{pos});
     }
 }
 
@@ -163,29 +170,31 @@ sub p_or(@parsers) {
 # Regex:?
 sub p_maybe($parser) {
     return sub($ctx,$str) {
-        my $opt = $parser->($ctx,$str);
-        return $opt if @$opt;
-        return Some([$ctx]);
+        my $p = $parser->($ctx,$str);
+        return $p if $p->{valid};
+        return pass($ctx->{pos}, []);
     }
 }
 
 # Concatenates all the results of the parser with string join
 sub p_join($sep, $parser) {
     return sub($ctx,$str) {
-        my ($is_some, $c, @strs) = Option->extract_array($parser->($ctx,$str));
-        return $is_some
-             ? Some([$c, join($sep,@strs)])
-             : None;
+        my $p = $parser->($ctx,$str);
+        if ( $p->{valid} ) {
+            return pass($p->{pos}, [join $sep, $p->{matches}->@*]);
+        }
+        return fail($ctx->{pos});
     }
 }
 
 # Splits every string-value with split
 sub p_split($regex, $parser) {
     return sub($ctx,$str) {
-        my ($is_some, $c, @strs) = Option->extract_array($parser->($ctx,$str));
-        return $is_some
-             ? Some([$c, map { split $regex, $_ } @strs])
-             : None;
+        my $p = $parser->($ctx,$str);
+        if ( $p->{valid} ) {
+            return pass($p->{pos}, [map { split $regex, $_ } $p->{matches}->@*]);
+        }
+        return fail($ctx->{pos});
     }
 }
 
@@ -194,11 +203,9 @@ sub p_str($string) {
     return sub($ctx,$str) {
         my $length = length $string;
         if ( $string eq substr($str, $ctx->{pos}, $length) ) {
-            return Some([
-                { %$ctx, pos => $ctx->{pos} + $length },
-            ]);
+            return pass($ctx->{pos}+$length, []);
         }
-        return None;
+        return fail($ctx->{pos});
     }
 }
 
@@ -207,68 +214,70 @@ sub p_strc($string) {
     return sub($ctx,$str) {
         my $length = length $string;
         if ( $string eq substr($str, $ctx->{pos}, $length) ) {
-            return Some([
-                { %$ctx, pos => $ctx->{pos} + $length },
-                $string
-            ]);
+            return pass($ctx->{pos}+$length, [$string]);
         }
-        return None;
+        return fail($ctx->{pos});
     }
 }
 
 # +: at least one, as much as possible
 sub p_many($parser) {
     return sub($ctx,$str) {
-        my ($is_some, $last_ctx, @matches, @xs);
-        $last_ctx = $ctx;
+        my (@matches, $p, $last_p);
+        ($p, $last_p) = ($ctx, $ctx);
+
         REPEAT:
-        ($is_some, $ctx, @xs) = Option->extract_array($parser->($ctx,$str));
-        if ( $is_some ) {
-            $last_ctx = $ctx;
-            push @matches, @xs;
+        $p = $parser->($p,$str);
+        if ( $p->{valid} ) {
+            $last_p = $p;
+            push @matches, $p->{matches}->@*;
             goto REPEAT;
         }
+
         return @matches > 0
-             ? Some([$last_ctx, @matches])
-             : None;
+             ? pass($last_p->{pos}, \@matches)
+             : fail($ctx->{pos});
     }
 }
 
 # *: zero or many times
 sub p_many0($parser) {
     return sub($ctx,$str) {
-        my ($is_some, $last_ctx, @matches, @xs);
-        $last_ctx = $ctx;
+        my (@matches, $p, $last_p);
+        ($p, $last_p) = ($ctx, $ctx);
+
         REPEAT:
-        ($is_some, $ctx, @xs) = Option->extract_array($parser->($ctx,$str));
-        if ( $is_some ) {
-            $last_ctx = $ctx;
-            push @matches, @xs;
+        $p = $parser->($p, $str);
+        if ( $p->{valid} ) {
+            $last_p = $p;
+            push @matches, $p->{matches}->@*;
             goto REPEAT;
         }
-        return Some([$last_ctx, @matches]);
+
+        return pass($last_p->{pos}, \@matches);
     }
 }
 
 # quantity
 sub p_qty($parser, $min, $max) {
     return sub($ctx,$str) {
-        my ($is_some, $last_ctx, $count, @matches, @xs);
-        $last_ctx = $ctx;
-        $count    = 0;
+        my ($p, $last_p, @matches);
+        ($p, $last_p) = ($ctx, $ctx);
+        my $count = 0;
+
         REPEAT:
-        ($is_some, $ctx, @xs) = Option->extract_array($parser->($ctx,$str));
-        if ( $is_some ) {
+        $p = $parser->($p,$str);
+        if ( $p->{valid} ) {
             $count++;
-            $last_ctx = $ctx;
-            push @matches, @xs;
-            return Some([$last_ctx, @matches]) if $count >= $max;
+            $last_p = $p;
+            push @matches, $p->{matches}->@*;
+            return pass($last_p->{pos}, \@matches) if $count >= $max;
             goto REPEAT;
         }
         if ( $count >= $min && $count <= $max ) {
-            return Some([$last_ctx, @matches]);
+            return pass($last_p->{pos}, \@matches);
         }
-        return None;
+        return fail($ctx->{pos});
     }
 }
 
@@ -281,7 +290,11 @@ sub p_repeat($parser, $amount) {
 sub p_ignore($parser) {
     state $ctx_only = sub($array) { [$array->[0]] };
     return sub($ctx,$str) {
-        $parser->($ctx,$str)->map($ctx_only);
+        my $p = $parser->($ctx,$str);
+        if ( $p->{valid} ) {
+            return pass($p->{pos}, []);
+        }
+        return $p;
     }
 }
 
@@ -296,9 +309,11 @@ sub p_delay($f_parser) {
 sub p_not($parser) {
     state $incr = sub($x) { $x + 1 };
     return sub($ctx,$str) {
-        my ($is_some, $c) = Option->extract_array($parser->($ctx,$str));
-        return None if $is_some;
-        return Some([Hash::withf($ctx, pos => $incr)]);
+        my $p = $parser->($ctx,$str);
+        if ( $p->{valid} ) {
+            return fail($ctx->{pos});
+        }
+        return pass($ctx->{pos}+1, []);
     }
 }
 
