@@ -41,9 +41,10 @@ sub p_fail() {
 #
 # Regex -> Parser<[$context,@matches]>
 sub p_match($regex) {
+    my $match = qr/\G$regex/;
     return sub($ctx,$str) {
         pos($str) = $ctx->{pos};
-        if ( $str =~ m/\G$regex/gc ) {
+        if ( $str =~ m/$match/gc ) {
             return Some([
                 { %$ctx, pos => pos($str) },
                 @{^CAPTURE}
@@ -59,9 +60,10 @@ sub p_match($regex) {
 # in a single step without calling p_map. When it returns B<None> than parsing
 # is considered as a failure
 sub p_matchf($regex, $f_opt_array) {
+    my $match = qr/\G$regex/;
     return sub($ctx,$str) {
         pos($str) = $ctx->{pos};
-        if ( $str =~ m/\G$regex/gc ) {
+        if ( $str =~ m/$match/gc ) {
             my ($is_some, @xs) = Option->extract_array($f_opt_array->(@{^CAPTURE}));
             if ( $is_some ) {
                 return Some([
