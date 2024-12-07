@@ -16,6 +16,7 @@ use Sub::Exporter -setup => {
     },
 };
 
+### DS to represents pass/fail
 sub pass($pos, $matches) {
     return { valid => 1, pos => $pos, matches => $matches }
 }
@@ -36,7 +37,7 @@ sub p_run($parser, $str) {
 # monadic return. just wraps any values into an parser. Useful in bind functions.
 sub p_return(@values) {
     return sub($ctx,$str) {
-        return pass($ctx->{pos}, \@values);
+        return {valid => 1, pos => $ctx->{pos}, matches => \@values};
     };
 }
 
@@ -85,9 +86,13 @@ sub p_map($parser, $f_map) {
     return sub($ctx,$str) {
         my $p = $parser->($ctx,$str);
         if ( $p->{valid} ) {
-            return pass($p->{pos}, [$f_map->($p->{matches}->@*)]);
+            return {
+                valid   => 1,
+                pos     => $p->{pos},
+                matches => [$f_map->($p->{matches}->@*)],
+            };
         }
-        return fail($p->{pos});
+        return { valid => 0, pos => $p->{pos} };
     }
 }
 
@@ -102,7 +107,7 @@ sub p_choose($parser, $f_opt_array) {
                 return { valid => 1, pos => $p->{pos}, matches => $opt->[0] };
             }
         }
-        return fail($ctx->{pos});
+        return { valid => 0, pos => $ctx->{pos} };
     }
 }
 
@@ -125,11 +130,15 @@ sub p_bind($parser, $f) {
             my $parser = $f->($p1->{matches}->@*);
             my $p2     = $parser->($p1, $str);
             if ( $p2->{valid} ) {
-                return pass($p2->{pos}, $p2->{matches});
+                return {
+                    valid   => 1,
+                    pos     => $p2->{pos},
+                    matches => $p2->{matches},
+                }
             }
-            return fail($ctx->{pos});
+            return {valid => 0, pos => $ctx->{pos}};
         }
-        return fail($ctx->{pos});
+        return {valid => 0, pos => $ctx->{pos}};
     }
 }
 
@@ -143,11 +152,15 @@ sub p_and(@parsers) {
         my ($p, @matches);
         for my $parser ( @parsers ) {
             $p = $parser->($last_p, $str);
-            return fail($ctx->{pos}) if !$p->{valid};
+            return {valid=>0, pos=>$ctx->{pos}} if !$p->{valid};
             $last_p = $p;
             push @matches, $p->{matches}->@*;
         }
-        return pass($last_p->{pos}, \@matches);
+        return {
+            valid   => 1,
+            pos     => $last_p->{pos},
+            matches => \@matches,
+        };
     };
 }
 
@@ -203,9 +216,13 @@ sub p_str($string) {
     return sub($ctx,$str) {
         my $length = length $string;
         if ( $string eq substr($str, $ctx->{pos}, $length) ) {
-            return pass($ctx->{pos}+$length, []);
+            return {
+                valid   => 1,
+                pos     => $ctx->{pos}+$length,
+                matches => [],
+            };
         }
-        return fail($ctx->{pos});
+        return {valid => 0, pos => $ctx->{pos}};
     }
 }
 
@@ -214,9 +231,13 @@ sub p_strc($string) {
     return sub($ctx,$str) {
         my $length = length $string;
         if ( $string eq substr($str, $ctx->{pos}, $length) ) {
-            return pass($ctx->{pos}+$length, [$string]);
+            return {
+                valid   => 1,
+                pos     => $ctx->{pos}+$length,
+                matches => [$string],
+            };
         }
-        return fail($ctx->{pos});
+        return {valid=>0, pos => $ctx->{pos}};
     }
 }
 
@@ -307,7 +328,6 @@ sub p_delay($f_parser) {
 
 # succeeds if the parser does not match
 sub p_not($parser) {
-    state $incr = sub($x) { $x + 1 };
     return sub($ctx,$str) {
         my $p = $parser->($ctx,$str);
         if ( $p->{valid} ) {
