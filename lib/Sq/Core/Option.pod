@@ -162,10 +162,12 @@ C<or> instead.
 Returns the value when it is C<Some> value or the C<$default> value passed to it
 when it is C<None>.
 
-    my $a = $opt    ->or(10);
-    my $b = Some(10)->or(0);      # 10
-    my $c = None    ->or(0);      #  0
-    my $d = Option::or($opt, 10);
+    my $a  = $opt    ->or(10);
+    my $b  = Some(10)->or(0);      # 10
+    my $c  = None    ->or(0);      #  0
+    my $d  = Option::or($opt, 10);
+    my $e  = Some(1,2)->or(3);     # 1
+    my @xs = None     ->or(1,2,3)  # (1,2,3)
 
 =head2 or_else($opt, $default_opt) : $opt
 
@@ -452,6 +454,17 @@ function hardly makes any sense.
 
     my $x = Option::fold(Some(10), 3, sub($x,$y) { $x - $y }); # 10 - 3 = 7
 
+=head2 fold_back($opt, $state, $f_state) : $state
+
+Same as C<fold> but C<$state> is passed as the first argument to C<$f_state>
+instead of last. This behaviour can be more useful when C<Some> contains
+multiple values.
+
+    my $sum = Some(1,2,3)->fold_back(10, sub($state,@rest) {
+        # 10   + (1+2+3)
+        $state + Array::sum(\@rest)
+    });
+
 =head2 iter($opt, $f) : void
 
 Runs function C<$f> when there is C<Some> value otherwise does nothing when
@@ -471,6 +484,26 @@ Arrays are blessed into the Sq Array.
     my $array = Some(1)->to_array; # [1]
     my $array = None   ->to_array; # []
 
+=head2 single($opt) : $opt_array
+
+An optional can contain multiple values, but all of those values are usually
+also passed as multiple values to the lambda function or are returned. It
+is sometimes better to work with an array instead.
+
+This function transforms the inner values into an Sq Array. This transformation
+also happens for a single value. When the option only has a single value
+that already is an array, than nothing happens. So it safe to call multiple
+times C<single>.
+
+C<single> does not return a new Array or a copy when it is what it should be.
+It just returns C<$opt> as-is. Also adds C<Array> blessing when a normal
+array was passed.
+
+    my $array = Some(1,2,3)->single->get;                        # [1,2,3]
+    my $array = Some(1,2,3)->single->or(sq []);                  # [1,2,3]
+    my $sum   = Some(1,2,3)->single->map(call 'sum');            # Some(6)
+    my $sum   = Some(1,2,3)->map(sub(@xs) { Array::sum(\@xs) }); # 6
+
 =head2 get($opt) : $x | EXCEPTION
 
 Returns the value inside of an optional, but only when the value is Some value,
@@ -479,8 +512,14 @@ possible if you want a working program. At least you should use C<is_some>
 before extracting, or even better either use C<match>, C<or> or C<or_with>
 to extract the value.
 
+When C<Some> contains multiple values than only the first argument is returned
+in scalar context.
+
     my $x = Some(10)->get; # 10
     my $x = None    ->get; # throws exception
+
+    my $x  = Some(1,2,3)->get; # 1
+    my @xs = Some(1,2,3)->get; # (1,2,3)
 
 =head2 dump($opt, $inline=60, $depth=0) : $str
 

@@ -216,10 +216,9 @@ sub single($opt) {
             return $opt;
         }
         return Some(bless [$v], 'Array');
-
     }
     elsif ( $l > 1 ) {
-        return Some(bless [@$opt], 'Array')
+        return Some(bless [@$opt], 'Array');
     }
     return $None;
 }

@@ -121,4 +121,8 @@ is(
     [1,2,3],
     'returns all elements in list context');
 
+is(Some(1,2,3)->single->single->get,     [1,2,3], 'multiple single calls 1');
+is(Some(1,2,3)->single->single->or([]),  [1,2,3], 'multiple single calls 2');
+is(Some(1,2,3)->single->map(call 'sum'), Some(6), 'single with call');
+
 done_testing;
