@@ -217,17 +217,6 @@ use Test2::V0 qw/is ok done_testing dies like check_isa/;
     is(None         ->check(\&is_num), 0, 'check None');
 }
 
-# flatten
-{
-    is(Some(Some(Some(10)))->flatten, Some(10), 'flatten 10');
-    is(Some(Some(None))    ->flatten, None,     'flatten None');
-    is(Some(None)          ->flatten, None,     'flatten None 2');
-    is(Some(Some(undef))   ->flatten, None,     'flatten None 2');
-    is(Some(Some(Some([])))->flatten, Some([]), 'Some array');
-    is(Some(1)             ->flatten, Some(1),  'Some 1');
-    is(None                ->flatten, None,     'None')
-}
-
 # flatten is now built-into Some()
 {
     is(Some(Some(Some(10))), Some(10), 'flatten 10');
