@@ -3,8 +3,7 @@ use 5.036;
 use List::Util qw(reduce);
 use Scalar::Util qw(refaddr);
 use Sq;
-use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end bag float U/;
-# use DDP;
+use Test2::V0 qw/is ok done_testing dies like check_isa/;
 
 # Some values, functions, ... for testing
 my $range     = Array->range(1, 10);
@@ -34,7 +33,7 @@ my $is_even = sub($x)     { $x % 2 == 0 };
 }
 
 # Basic checks of range and rangeDesc
-is($range, D(),                   'range returns something');
+ok(defined $range,                'range returns something');
 is($range, check_isa('Array'),    'returns an Array');
 is($range, [1 .. 10],             'is an array');
 is(Array->range(1,1), [1],        'range is inclusive');
@@ -42,9 +41,9 @@ is($rangeDesc, [reverse 1 .. 10], 'rangeDesc');
 is($range, $rangeDesc->rev,       'reverse of rangeDesc same as range');
 is($range->map($double),     [2,4,6,8,10,12,14,16,18,20], 'map');
 is($range->filter($is_even), [2,4,6,8,10],                'filter');
-is($range->take(5),   [1..5], 'take 1');
-is($range->take(0),       [], 'take 2');
-is($range->take(-1),      [], 'take 3');
+is($range->take(5),    [1..5], 'take 1');
+is($range->take(0),        [], 'take 2');
+is($range->take(-1),       [], 'take 3');
 is($range->length,         10, 'length');
 is($range->take(5)->length, 5, 'take & length');
 
@@ -318,23 +317,21 @@ is(
 
 is(
     Array->wrap(qw/Hello World you are awesome/)->to_hash(sub($x) { length $x => $x }),
-    hash {
-        field 5 => "World";
-        field 3 => "are";
-        field 7 => "awesome";
-        end;
+    {
+        3 => "are",
+        5 => "World",
+        7 => "awesome",
     },
     'to_hash 1');
 
 is(
     Array->wrap(qw/Hello World you are awesome/)->to_hash(sub($x) { $x => length $x }),
-    hash {
-        field "Hello"   => 5;
-        field "World"   => 5;
-        field "you"     => 3;
-        field "are"     => 3;
-        field "awesome" => 7;
-        end;
+    {
+        "Hello"   => 5,
+        "World"   => 5,
+        "you"     => 3,
+        "are"     => 3,
+        "awesome" => 7,
     },
     'to_hash 2');
 
@@ -425,11 +422,7 @@ is(Array->init(-10, sub($idx) { $idx }), [], 'init with length -10');
 is(Array->range_step(1,1,1), [1], 'range_step with 1,1,1');
 is(
     Array->range_step(0,0.1,1),
-    array {
-        for (my $f=0.0; $f <= 1.0; $f+=0.1) {
-            item float $f;
-        }
-    },
+    [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
     'range_step with 0,0.1,1');
 
 like(

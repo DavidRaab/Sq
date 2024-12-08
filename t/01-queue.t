@@ -1,8 +1,7 @@
 #!perl
 use 5.036;
 use Sq;
-use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end bag float U/;
-use DDP;
+use Test2::V0 qw/is ok done_testing/;
 
 # Some values, functions, ... for testing
 my $add     = sub($x,$y) { $x + $y     };

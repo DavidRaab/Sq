@@ -1,7 +1,7 @@
 #!perl
 use 5.036;
 use Sq;
-use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end bag float U/;
+use Test2::V0 qw/is ok done_testing dies like check_isa/;
 
 # Some values, functions, ... for testing
 my $range     = Seq->range(1, 10);
@@ -100,37 +100,32 @@ my $query =
 # check if query contains correct data
 is(
     $query->to_array,
-    array {
-        item hash {
-            field object_id   => 1;
-            field object_name => "David";
-            field tag_id      => 1;
-            field tag_name    => "WoW";
-            end;
-        };
-        item hash {
-            field object_id   => 1;
-            field object_name => "David";
-            field tag_id      => 2;
-            field tag_name    => "Super";
-            end;
-        };
-        item hash {
-            field object_id   => 2;
-            field object_name => "Bob";
-            field tag_id      => 3;
-            field tag_name    => "Awesome";
-            end;
-        };
-        item hash {
-            field object_id   => 3;
-            field object_name => 'Alex';
-            field tag_id      => 2;
-            field tag_name    => 'Super';
-            end;
-        };
-        end;
-    },
+    [
+        {
+            object_id   => 1,
+            object_name => "David",
+            tag_id      => 1,
+            tag_name    => "WoW",
+        },
+        {
+            object_id   => 1,
+            object_name => "David",
+            tag_id      => 2,
+            tag_name    => "Super",
+        },
+        {
+            object_id   => 2,
+            object_name => "Bob",
+            tag_id      => 3,
+            tag_name    => "Awesome",
+        },
+        {
+            object_id   => 3,
+            object_name => 'Alex',
+            tag_id      => 2,
+            tag_name    => 'Super',
+        },
+    ],
     'join and select');
 
 # reuse query again and get tags of specific perons

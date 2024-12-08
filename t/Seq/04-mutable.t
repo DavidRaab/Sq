@@ -1,8 +1,7 @@
 #!perl
 use 5.036;
 use Sq;
-use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end bag float U/;
-# use DDP;
+use Test2::V0 qw/is ok done_testing dies like check_isa/;
 
 # Some values, functions, ... for testing
 my $range     = Seq->range(1, 10);
@@ -47,13 +46,8 @@ my $snd     = sub($array) { $array->[1] };
 
     is($data->length, 3, 'length from hashref is 3');
     is(
-        $data->to_array,
-        bag {
-            item "1Foo";
-            item "2Bar";
-            item "3Baz";
-            end;
-        },
+        $data->to_array->sort_str,
+        ["1Foo", "2Bar", "3Baz"],
         'hash to sequence');
 
     # add entry to data
@@ -61,14 +55,8 @@ my $snd     = sub($array) { $array->[1] };
 
     is($data->length, 4, 'length from hashref is 4');
     is(
-        $data->to_array,
-        bag {
-            item "1Foo";
-            item "2Bar";
-            item "3Baz";
-            item "4Maz";
-            end;
-        },
+        $data->to_array->sort_str,
+        ["1Foo", "2Bar", "3Baz", "4Maz"],
         'hash to sequence after added key');
 }
 

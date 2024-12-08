@@ -2,7 +2,7 @@
 use 5.036;
 use Sq;
 use Sq::Type;
-use Test2::V0 qw(is done_testing);
+use Test2::V0 qw/is ok done_testing dies like check_isa/;
 
 my $address = t_hash(t_keys(
     street => t_str,

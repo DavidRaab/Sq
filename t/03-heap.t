@@ -2,7 +2,7 @@
 use 5.036;
 use DDP;
 use Sq;
-use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end bag float U/;
+use Test2::V0 qw/is ok done_testing dies like check_isa/;
 
 #----------
 

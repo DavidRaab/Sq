@@ -2,8 +2,7 @@
 use 5.036;
 use List::Util qw(reduce);
 use Sq;
-use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end bag float U/;
-# use DDP;
+use Test2::V0 qw/is ok done_testing dies like check_isa/;
 
 # Some values, functions, ... for testing
 my $range     = List->range(1, 10);
@@ -27,7 +26,7 @@ is(List->range(1,3)->tail, [2, [3,[]]], 'tail');
 is(List->range(1,3)->tail, List::tail(List->range(1,3)), 'List::tail');
 
 # Basic checks of range and rangeDesc
-is($range, D(),                 'range returns something');
+ok(defined $range,              'range returns something');
 is($range, check_isa('List'),   'returns a List');
 is($range->to_array, [1 .. 10], 'to_array');
 is($range->to_array, [1 .. 10], 'calling to_array twice still returns the same');
@@ -244,33 +243,30 @@ is(
 
 is(
     List->wrap(qw/Hello World you are awesome/)->to_hash(sub($x) { length $x => $x }),
-    hash {
-        field 5 => "World";
-        field 3 => "are";
-        field 7 => "awesome";
-        end;
+    {
+        5 => "World",
+        3 => "are",
+        7 => "awesome",
     },
     'to_hash 1');
 
 is(
     List->wrap(qw/Hello World you are awesome/)->to_hash(sub($x) { $x => length $x }),
-    hash {
-        field "Hello"   => 5;
-        field "World"   => 5;
-        field "you"     => 3;
-        field "are"     => 3;
-        field "awesome" => 7;
-        end;
+    {
+        "Hello"   => 5,
+        "World"   => 5,
+        "you"     => 3,
+        "are"     => 3,
+        "awesome" => 7,
     },
     'to_hash 2');
 
 is(
     List->wrap(qw/Hello World you are awesome/)->to_hash_of_array(sub($x) { length $x => $x }),
-    hash {
-        field 5 => array { item "Hello";   item "World" };
-        field 3 => array { item "you";     item "are"   };
-        field 7 => array { item "awesome";              };
-        end;
+    {
+        5 => [ "Hello",   "World" ],
+        3 => [ "you",     "are"   ],
+        7 => [ "awesome",         ],
     },
     'to_hash_of_array');
 
@@ -320,11 +316,7 @@ is(List->init(-10, sub($idx) { $idx })->to_array, [], 'init with length -10');
 is(List->range_step(1,1,1)->to_array, [1], 'range_step with 1,1,1');
 is(
     List->range_step(0,0.1,1)->to_array,
-    array {
-        for (my $f=0.0; $f <= 1.0; $f+=0.1) {
-            item float $f;
-        }
-    },
+    [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
     'range_step with 0,0.1,1');
 like(
     dies { List->range_step(0,0,1)->to_array },
@@ -369,17 +361,17 @@ is(List->wrap([1,1], [1,2])->to_array, [[1,1],[1,2]], 'wrap with arrays');
 is(List->wrap([1,1])       ->to_array, [[1,1]],       'wrap with array');
 is(List->from_array([1,1]) ->to_array, [1,1],         'from_array vs. wrap');
 
-is($range->reduce(undef, $add),       55, 'reduce');
-is(List->empty->reduce(undef, $add), U(), 'reduce on empty 1');
-is(List->empty->reduce(0, $add),       0, 'reduce on empty 2');
-is(List->wrap(1)->reduce(0, $add),     1, 'reduce on single element');
+is($range->reduce(undef, $add),         55, 'reduce');
+is(List->empty->reduce(undef, $add), undef, 'reduce on empty 1');
+is(List->empty->reduce(0, $add),         0, 'reduce on empty 2');
+is(List->wrap(1)->reduce(0, $add),       1, 'reduce on single element');
 
-is(List->empty->first(undef), U(), 'first on empty is undef');
+is(List->empty->first(undef), undef, 'first on empty is undef');
 is(List->empty->first(0),       0, 'first with default value');
 is($range->first(-1),           1, 'first on non empty without default');
 is($range->first(0),            1, 'first on non empty with default');
 
-is(List->empty->last(undef),  U(), 'last on empty is undef');
+is(List->empty->last(undef),  undef, 'last on empty is undef');
 is(List->empty->last(0),        0, 'last with default value');
 is($range->last(undef),        10, 'last on non empty without default');
 is($range->last(0),            10, 'last on non empty with default');

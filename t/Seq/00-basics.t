@@ -3,7 +3,7 @@ use 5.036;
 use Scalar::Util qw(refaddr);
 use List::Util qw(reduce);
 use Sq;
-use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end bag float U/;
+use Test2::V0 qw/is ok done_testing dies like check_isa/;
 
 # Some values, functions, ... for testing
 my $range     = Seq->range(1, 10);
@@ -16,7 +16,7 @@ my $square  = sub($x)     { $x * $x     };
 my $is_even = sub($x)     { $x % 2 == 0 };
 
 # Basic checks of range and rangeDesc
-is($range, D(),                 'range returns something');
+ok(defined $range,              'range returns something');
 is($range, check_isa('Seq'),    'returns a Seq');
 is($range->to_array, [1 .. 10], 'to_array');
 is($range->to_array, [1 .. 10], 'calling to_array twice still returns the same');
@@ -250,33 +250,30 @@ is(
 
 is(
     Seq->wrap(qw/Hello World you are awesome/)->to_hash(sub($x) { length $x => $x }),
-    hash {
-        field 5 => "World";
-        field 3 => "are";
-        field 7 => "awesome";
-        end;
+    {
+        5 => "World",
+        3 => "are",
+        7 => "awesome",
     },
     'to_hash 1');
 
 is(
     Seq->wrap(qw/Hello World you are awesome/)->to_hash(sub($x) { $x => length $x }),
-    hash {
-        field "Hello"   => 5;
-        field "World"   => 5;
-        field "you"     => 3;
-        field "are"     => 3;
-        field "awesome" => 7;
-        end;
+    {
+        "Hello"   => 5,
+        "World"   => 5,
+        "you"     => 3,
+        "are"     => 3,
+        "awesome" => 7,
     },
     'to_hash 2');
 
 is(
     Seq->wrap(qw/Hello World you are awesome/)->to_hash_of_array(sub($x) { length $x => $x }),
-    hash {
-        field 5 => array { item "Hello";   item "World" };
-        field 3 => array { item "you";     item "are"   };
-        field 7 => array { item "awesome";              };
-        end;
+    {
+        5 => [ "Hello",   "World" ],
+        3 => [ "you",     "are"   ],
+        7 => [ "awesome",         ],
     },
     'to_hash_of_array');
 
@@ -317,11 +314,7 @@ is(Seq->init(-10, sub($idx) { $idx })->to_array, [], 'init with length -10');
 is(Seq->range_step(1,1,1)->to_array, [1], 'range_step with 1,1,1');
 is(
     Seq->range_step(0,0.1,1)->to_array,
-    array {
-        for (my $f=0.0; $f <= 1.0; $f+=0.1) {
-            item float $f;
-        }
-    },
+    [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
     'range_step with 0,0.1,1');
 like(
     dies { Seq->range_step(0,0,1)->to_array },

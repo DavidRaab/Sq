@@ -2,7 +2,7 @@
 use 5.036;
 use Sq;
 use Sq::Parser;
-use Test2::V0 ':DEFAULT';
+use Test2::V0 qw/is ok done_testing dies like check_isa/;
 
 # Some parsers
 my $word = p_match(qr/([a-zA-Z]+)/);

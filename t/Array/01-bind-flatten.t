@@ -1,7 +1,7 @@
 #!perl
 use 5.036;
 use Sq;
-use Test2::V0 ':DEFAULT', qw/number_ge check_isa dies hash field array item end bag float/;
+use Test2::V0 qw/is ok done_testing dies like check_isa/;
 
 my $data1 =
     Array->new(

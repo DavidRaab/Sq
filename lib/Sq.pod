@@ -133,29 +133,33 @@ returns a truish value if C<$str> is a number.
 
 returns a truish value if C<$str> is a string.
 
-=head2 id($x) : $x
-
-return its input as-is
-
-    sub id($x) { return $x }
-
-=head2 fst($array) : $x0
-
-return the first element of an array
-
-    sub fst($array) { return $array->[0] }
-
-=head2 snd($array) : $x1
-
-return the second element of an array
-
-    sub snd($array) { return $array->[1] }
-
 =head2 key($name) : $f_key_of_hash
 
 returns a function that selects the specified key from a hash.
 
     sub key($name) { sub($hash) { return $hash->{$name} } }
+
+=head2 call($method, @args) : $f
+
+returns a function that calls C<$method> on an object with C<@args> arguments.
+
+    my $data = sq [
+        [1,2,3],
+        [4,5,6],
+        [7,8,9],
+    ];
+
+    my $array = $data->map(call 'sum');                  # [6,15,24]
+    my $array = $data->map(sub($array) { $array->sum }); # [6,15,24]
+
+    my $add1 = sub($x) { $x + 1 };
+    my $aoa  = $data->map(call 'map', $add1);
+    my $aoa  = $data->map(sub ($array) { $array->map($add1) });
+    # [
+    #     [2,3,4],
+    #     [5,6,7],
+    #     [8,9,10],
+    # ]
 
 =head2 assign
 
@@ -177,6 +181,24 @@ Same as
         my $y  = ...  # code to compute $y
         $value = $x + $y;
     }
+
+=head2 id($x) : $x
+
+return its input as-is
+
+    sub id($x) { return $x }
+
+=head2 fst($array) : $x0
+
+return the first element of an array
+
+    sub fst($array) { return $array->[0] }
+
+=head2 snd($array) : $x1
+
+return the second element of an array
+
+    sub snd($array) { return $array->[1] }
 
 =head1 AUTOMATICALLY LOADED MODULES
 

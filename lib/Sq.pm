@@ -4,14 +4,14 @@ our $VERSION = '0.006';
 use Scalar::Util ();
 use Sub::Exporter -setup => {
     exports => [
-        qw(id fst snd key assign is_str is_num sq),
+        qw(id fst snd key assign is_str is_num sq call),
         Some => sub { \&Option::Some },
         None => sub { \&Option::None },
         Ok   => sub { \&Result::Ok   },
         Err  => sub { \&Result::Err  },
     ],
     groups => {
-        default => [qw(id fst snd key assign is_str is_num Some None sq Ok Err)],
+        default => [qw(id fst snd key assign is_str is_num Some None sq Ok Err call)],
     },
 };
 
@@ -51,6 +51,11 @@ sub key :prototype($) {
     $func = sub($hash) { return $hash->{$name} };
     $cache{$name} = $func;
     return $func;
+}
+
+# returns a function that calls $method with its arguments on an object
+sub call($method, @args) {
+    return sub($obj) { $obj->$method(@args) };
 }
 
 # allows writing a code block to create a value
