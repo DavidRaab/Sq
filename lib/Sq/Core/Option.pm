@@ -181,15 +181,6 @@ sub check($opt, $predicate) {
     return 0;
 }
 
-# TODO: REMOVE / UPDATE
-sub flatten($opt) {
-    my $ret = $opt;
-    while ( @$ret && ref $ret->[0] eq 'Option' ) {
-        $ret = $ret->[0];
-    }
-    return $ret;
-}
-
 sub fold($opt, $state, $f) {
     return @$opt ? $f->(@$opt, $state) : $state;
 }

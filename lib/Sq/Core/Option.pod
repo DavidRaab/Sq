@@ -316,8 +316,6 @@ value, but returns an optional value again.
     my $opt = Some("ab")->map($parse_int);  # Some(None)
     my $opt = None      ->map($parse_int);  # None
 
-    # calling ->map($f)->flatten() will return the same result as using bind()
-
 =head2 bind2($optA, $optB, $f_opt) : $opt
 
 When you have two optional values to unpack and want them to pass it to
@@ -416,24 +414,6 @@ value. A C<None> value always return a falsish value.
     my $bool = Some(undef)  ->check(\&is_num) # 0
     my $bool = Some("")     ->check(\&is_num) # 0
     my $bool = None         ->check(\&is_num) # 0
-
-=head2 flatten($opt) : $opt
-
-Since the latest changes to C<Option> this method has become B<DEPRECATED>.
-It still exists, but usually is not needed anymore, as you cannot create
-nested options anymore. You will get the result shown here without calling
-C<flatten>. Currently I am in an evaluation stage and see if that change
-creates any problem. If not, then this function will be removed in the future.
-
-Whenever you have multiple nested optionals you just call C<flatten> and it
-flattens its down to just a single optional value. One reason why you could
-end up with multiple nested optionals is when you use C<map> instead of C<bind>.
-
-    my $opt = None                      ->flatten # None
-    my $opt = Some(10)                  ->flatten # Some(10)
-    my $opt = Some(Some(10))            ->flatten # Some(10)
-    my $opt = Some(Some(Some(Some(10))))->flatten # Some(10)
-    my $opt = Some(Some(Some(None)))    ->flatten # None
 
 =head2 fold($opt, $state, $f_state) : $state
 
