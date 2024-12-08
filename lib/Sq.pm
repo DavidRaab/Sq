@@ -40,8 +40,17 @@ sub snd :prototype($) { return $_[0][1] }
 
 # a helper to create a function for selecting a hash-key
 sub key :prototype($) {
+    state %cache;
     my $name = $_[0];
-    return sub($hash) { return $hash->{$name} };
+
+    # return cached sub
+    my $func = $cache{$name};
+    return $func if defined $func;
+
+    # otherwise create/store new sub
+    $func = sub($hash) { return $hash->{$name} };
+    $cache{$name} = $func;
+    return $func;
 }
 
 # allows writing a code block to create a value
