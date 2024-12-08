@@ -4,7 +4,7 @@ use open ':std', ':encoding(UTF-8)';
 use DDP;
 use Sq;
 use Benchmark qw(cmpthese);
-use Test2::V0;
+use Test2::V0 qw(is done_testing);
 
 sub append_1($hashA, $hashB) {
     my %new = %$hashA;

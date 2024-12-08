@@ -4,7 +4,6 @@ use open ':std', ':encoding(UTF-8)';
 use Sq;
 use Benchmark qw(cmpthese);
 
-
 sub choose_extract($array, $f_opt) {
     my $new = Array->new;
     my ($is_some, $v);

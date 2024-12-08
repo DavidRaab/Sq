@@ -4,7 +4,7 @@ use open ':std', ':encoding(UTF-8)';
 use Data::Printer;
 use Getopt::Long::Descriptive;
 use Sq;
-use Test2::V0;
+use Test2::V0 qw(is done_testing);
 use Benchmark qw(cmpthese);
 
 my ($opt, $usage) = describe_options(

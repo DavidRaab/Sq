@@ -4,7 +4,7 @@ use open ':std', ':encoding(UTF-8)';
 use Data::Printer;
 use Sq;
 use Benchmark qw(cmpthese);
-use Test2::V0;
+use Test2::V0 qw(is done_testing);
 
 # this is the fastest way to write in Perl, without arguments and no undef checking
 sub map_pureperl($array) {

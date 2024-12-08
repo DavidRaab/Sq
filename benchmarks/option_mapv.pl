@@ -3,7 +3,7 @@ use v5.36;
 use open ':std', ':encoding(UTF-8)';
 use Sq;
 use Benchmark qw(cmpthese);
-use Test2::V0;
+use Test2::V0 qw(is done_testing);
 
 ### map, map2 and map_v
 

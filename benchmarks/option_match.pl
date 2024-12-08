@@ -2,7 +2,7 @@
 use v5.36;
 use open ':std', ':encoding(UTF-8)';
 use Sq;
-use Test2::V0;
+use Test2::V0 qw(is done_testing);
 use Benchmark qw(cmpthese);
 
 # Using goto on a subroutine reference means that no call-stack is created.
