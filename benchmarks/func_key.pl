@@ -28,7 +28,9 @@ sub key2 :prototype($) {
 sub bench($data) {
     cmpthese(-1, {
         inline => sub {
-            for ( 1 .. 1_000 ) { my $max = $data->max_by(sub($hash) { $hash->{num} }) }
+            for ( 1 .. 1_000 ) {
+                my $max = $data->max_by(sub($hash) { $hash->{num} })
+            }
         },
         inline_cache => sub {
             my $num = sub($hash) { $hash->{num} };
@@ -37,10 +39,14 @@ sub bench($data) {
             }
         },
         key1 => sub {
-            for ( 1 .. 1_000 ) { my $max = $data->max_by(key1 'num') }
+            for ( 1 .. 1_000 ) {
+                my $max = $data->max_by(key1 'num')
+            }
         },
         key2 => sub {
-            for ( 1 .. 1_000 ) { my $max = $data->max_by(key2 'num') }
+            for ( 1 .. 1_000 ) {
+                my $max = $data->max_by(key2 'num')
+            }
         },
         key2_cache => sub {
             my $num = key2 'num';
@@ -49,7 +55,9 @@ sub bench($data) {
             }
         },
         current => sub {
-            for ( 1 .. 1_000 ) { my $max = $data->max_by(key 'num') }
+            for ( 1 .. 1_000 ) {
+                my $max = $data->max_by(key 'num')
+            }
         }
     });
 }
