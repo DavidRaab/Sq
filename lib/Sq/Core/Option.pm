@@ -60,12 +60,12 @@ sub match($opt, %args) {
 }
 
 # or: Option<'a> -> 'a -> 'a
-sub or($opt, @defaults) {
+sub or($opt, $default, @defaults) {
     if ( wantarray ) {
-        return @$opt ? @$opt : @defaults;
+        return @$opt ? @$opt : ($default, @defaults);
     }
     else {
-        return @$opt ? $opt->[0] : $defaults[0];
+        return @$opt ? $opt->[0] : $default;
     }
 }
 

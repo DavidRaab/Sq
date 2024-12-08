@@ -44,7 +44,7 @@ to create optional values.
 
 These function creates optional values.
 
-=head2 Some($x,$x,$x) : $opt_xs
+=head2 Some(@xs) : $opt_xs
 
 The C<Some> function is automatically imported by loading C<Sq>. C<Some> can
 take multiple arguments and is valid as long every value is C<defined> and not
@@ -157,9 +157,9 @@ C<or> instead.
             None => sub     { 0      },
         );
 
-=head2 or($opt, $default) : $x
+=head2 or($opt, @defaults) : $x
 
-Returns the value when it is C<Some> value or the C<$default> value passed to it
+Returns the value when it is C<Some> value or the C<@defaults> value passed to it
 when it is C<None>.
 
     my $a  = $opt    ->or(10);
