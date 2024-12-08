@@ -20,6 +20,7 @@ my $test = sq {
         }
     ]),
     opt6 => Some("text"),
+    opt7 => Some(1,2,3),
     seq1 => Seq->init(10_000, sub($idx) { $idx+1 }),
     seq2 => Seq->new(1,2,3),
     seq3 => Seq->new(1,2,3,4),

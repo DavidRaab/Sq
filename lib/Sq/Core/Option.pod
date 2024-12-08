@@ -44,20 +44,26 @@ to create optional values.
 
 These function creates optional values.
 
-=head2 Some($x) : $opt_x
+=head2 Some($x,$x,$x) : $opt_xs
 
-The C<Some> function is automatically imported by loading C<Sq>. Every value
-except C<undef> turns into a valid value. C<Some> has a detection that prohibits
-creating nested optional values. When you pass an optional to C<Some> then this
-optional is returned as-is.
+The C<Some> function is automatically imported by loading C<Sq>. C<Some> can
+take multiple arguments and is valid as long every value is C<defined> and not
+a C<None>. All optionals are flattened on creation and thus it is like working
+with Arrays in list context. Every value in C<Some> must be valid, otherwise the
+whole turns to C<None>.
 
-    my $opt = Some(10);
-    my $opt = Some([]);
-    my $opt = Some({ a => 1, b => 2});
-    my $opt = Some(undef);         # None
-    my $opt = Some(Some(10))       # Some(10)
-    my $opt = Some(None)           # None
-    my $opt = Some(Some(Some([]))) # Some([])
+    my $opt = Some();                         # None
+    my $opt = Some(undef);                    # None
+    my $opt = Some(10);                       # Some(10)
+    my $opt = Some([]);                       # Some([])
+    my $opt = Some({ a => 1, b => 2});        # Some({ a => 1, b => 2})
+    my $opt = Some(Some(10));                 # Some(10)
+    my $opt = Some(None);                     # None
+    my $opt = Some(Some(Some([])));           # Some([])
+    my $opt = Some(Some(1,2), Some(3,4));     # Some(1,2,3,4)
+    my $opt = Some(Some(1,2), undef);         # None
+    my $opt = Some(Some(1,2), Some(Some(3))); # Some(1,2,3)
+    my $opt = Some(1,2,None);                 # None
 
 =head2 None() : $opt
 

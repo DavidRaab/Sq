@@ -611,4 +611,6 @@ is(Option::is_none({}),          0, 'is_none 8');
     is($x, Some(11) , 'Returning option in Option::map');
 }
 
+is(Some(1,2,3)->to_seq->sum, 6, 'to_seq');
+
 done_testing;

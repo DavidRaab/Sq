@@ -41,7 +41,7 @@ sub is_opt($, $any) {
 }
 
 sub is_some($any) {
-    return ref $any eq 'Option' && @$any == 1 ? 1 : 0;
+    return ref $any eq 'Option' && @$any ? 1 : 0;
 }
 
 sub is_none($any) {
@@ -181,7 +181,7 @@ sub check($opt, $predicate) {
     return 0;
 }
 
-# TODO: REMOVE
+# TODO: REMOVE / UPDATE
 sub flatten($opt) {
     my $ret = $opt;
     while ( @$ret && ref $ret->[0] eq 'Option' ) {
@@ -194,15 +194,44 @@ sub fold($opt, $state, $f) {
     return @$opt ? $f->(@$opt, $state) : $state;
 }
 
+sub fold_back($opt, $state, $f) {
+    return @$opt ? $f->($state, @$opt) : $state;
+}
+
 sub iter($opt, $f) {
     $f->(@$opt) if @$opt;
     return;
+}
+
+sub single($opt) {
+    my $l = @$opt;
+    if ( $l == 1 ) {
+        my $v    = $opt->[0];
+        my $type = ref $v;
+        if ( $type eq 'Array' ) {
+            return $opt;
+        }
+        elsif ( $type eq 'ARRAY' ) {
+            bless($v, 'Array');
+            return $opt;
+        }
+        return Some(bless [$v], 'Array');
+
+    }
+    elsif ( $l > 1 ) {
+        return Some(bless [@$opt], 'Array')
+    }
+    return $None;
 }
 
 sub to_array($opt) {
     return @$opt
          ? bless([@$opt], 'Array')
          : bless([],      'Array');
+}
+
+sub to_seq($opt) {
+    return Seq->from_array($opt);
 }
 
 sub get($opt) {

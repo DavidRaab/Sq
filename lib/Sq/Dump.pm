@@ -26,10 +26,11 @@ sub hash($hash, $inline=60, $depth=0) {
 }
 
 sub option($opt, $inline=60, $depth=0) {
-    my $str = @$opt
-        ? 'Some(' . to_string($opt->[0], $inline, $depth+2) . ')'
-        : 'None';
-    return $str;
+    if ( @$opt ) {
+        my $inner = join(',', map { to_string($_, $inline, $depth+2) } @$opt);
+        return 'Some(' . $inner . ')';
+    }
+    return 'None';
 }
 
 sub seq($seq, $inline=60, $depth=0) {
@@ -61,24 +62,26 @@ sub result($result, $inline=60, $depth=0) {
 
 # Dumping Logic
 my $dispatch = {
-    'UNDEF'      => sub { 'undef'                        },
-    'NUM'        => sub { sprintf "%s", $_[0]            },
-    'STRING'     => sub { sprintf "\"%s\"", quote($_[0]) },
+    '_UNDEF'      => sub { 'undef'                        },
+    '_NUM'        => sub { sprintf "%s", $_[0]            },
+    '_STRING'     => sub { sprintf "\"%s\"", quote($_[0]) },
     'ARRAY'      => \&array,
+    'Array'      => \&array,
     'HASH'       => \&hash,
-    'OPTION'     => \&option,
-    'SEQ'        => \&seq,
-    'RESULT'     => \&result,
+    'Hash'       => \&hash,
+    'Option'     => \&option,
+    'Seq'        => \&seq,
+    'Result'     => \&result,
     'CODE'       => sub { 'sub { DUMMY }' },
-    'PATH::TINY' => sub { '"' . quote($_[0]->stringify) .'"' },
+    'Path::Tiny' => sub { '"' . quote($_[0]->stringify) .'"' },
 };
 
 sub to_string($any, $inline=60, $depth=0) {
     my $type =
-        !defined $any    ? 'UNDEF'  :
-        Sq::is_num($any) ? 'NUM'    :
-        Sq::is_str($any) ? 'STRING' :
-        uc ref $any;
+        !defined $any    ? '_UNDEF'  :
+        Sq::is_num($any) ? '_NUM'    :
+        Sq::is_str($any) ? '_STRING' :
+        ref $any;
 
     my $func = $dispatch->{$type};
     return defined $func
