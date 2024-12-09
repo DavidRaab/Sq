@@ -25,11 +25,11 @@ is($rangeDesc->to_array, [reverse 1 .. 10], 'rangeDesc');
 is($range->to_array,     $rangeDesc->rev->to_array, 'reverse of rangeDesc same as range');
 
 # to_array with a limit
-is($range->to_array(0),     [],      'to_array(0)');
-is($range->to_array(-1),    [],      'to_array(-1)');
-is($range->to_array(1),     [1],     'to_array(1)');
-is($range->to_array(5),     [1..5],  'to_array(5)');
-is($range->to_array(100),   [1..10], 'to_array(100)');
+is($range->to_array(0),   [],      'to_array(0)');
+is($range->to_array(-1),  [],      'to_array(-1)');
+is($range->to_array(1),   [1],     'to_array(1)');
+is($range->to_array(5),   [1..5],  'to_array(5)');
+is($range->to_array(100), [1..10], 'to_array(100)');
 
 is(
     $range->map($double)->to_array,
