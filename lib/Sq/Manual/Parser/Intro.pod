@@ -1,0 +1,372 @@
+=encoding UTF-8
+
+=head1 Sq::Manual::Parser::Intro
+
+In this Intro we use C<Sq::Parser> to parse an integer. First i create an
+exhausted example so you can see how to use the Parser, this doesn't mean the
+example we build here is the I<best> version. A better approach is shown at the end.
+
+When you load C<Sq::Parser> it imports a series of functions all prefixed with
+C<p_>. There is only a function based interface.
+
+=head1 Parsing an int
+
+The first most primitive function we have for parsing is C<p_strc>. It creates
+a parser that checks for a string. You can write.
+
+    my $zero = p_strc('0');
+
+C<$zero> now represent a Parser that only can parse the character C<0> and that's
+it. You can execute a parser by running it with C<p_run>.
+
+    my $opt = p_run($zero, "0");
+
+In this case C<$opt> will be C<Some( [0] )>. When the Parsing is successful
+it returns C<Some($array)> otherwise when parsing fails you get a C<None>.
+
+    is(p_run($zero,   "0"), Some([0]), 'parses 0');
+    is(p_run($zero,   "1"),      None, 'do not parse 1');
+    is(p_run($zero, "012"), Some([0]), 'parses 0');
+
+Consider the last example. Also here it is succesfull. Because the string C<"012">
+starts with C<0>. At this point all of it is much the same as the following
+regex approach.
+
+    if ( $str =~ m/\A0/ ) {
+        ...
+    }
+
+=head2 Or: Alternatives
+
+Parsing just a predefined string will not help for parsing an integer. First we
+need a way to say that different digits are allowed. There is a function C<p_or>
+that expects multiple parsers and is successfull as long one of the parser
+is valid.
+
+    my $digit = p_or(
+        p_strc('0'),
+        p_strc('1'),
+        p_strc('2'),
+        p_strc('3'),
+        p_strc('4'),
+        p_strc('5'),
+        p_strc('6'),
+        p_strc('7'),
+        p_strc('8'),
+        p_strc('9'),
+    );
+
+    is(p_run($digit, "012"), Some([0]), 'parses 0');
+    is(p_run($digit, "123"), Some([1]), 'parses 1');
+    is(p_run($digit, "666"), Some([6]), 'parses 6');
+    is(p_run($digit, "a12"),      None, 'no digit');
+
+Sure, we also can write typical Perl code.
+
+    my $digit = p_or(map { p_strc($_) } 0 .. 9);
+
+    is(p_run($digit, "012"), Some([0]), 'parses 0');
+    is(p_run($digit, "123"), Some([1]), 'parses 1');
+    is(p_run($digit, "666"), Some([6]), 'parses 6');
+    is(p_run($digit, "a12"),      None, 'no digit');
+
+=head2 And: Chaining
+
+The next very important function will be C<p_and>. It expects multiple parsers
+and all of them are run one after another and all of them must succeed. For
+example we can parse three digits this way.
+
+    my $digit  = p_or(map { p_strc($_) } 0 .. 9);
+    my $digit3 = p_and($digit, $digit, $digit);
+
+    is(p_run($digit3, "012"), Some([0,1,2]), 'parses 012');
+    is(p_run($digit3, "123"), Some([1,2,3]), 'parses 123');
+    is(p_run($digit3, "666"), Some([6,6,6]), 'parses 666');
+    is(p_run($digit3, "a12"),          None, 'no digit');
+
+The important idea is that we are not just parsing/checking, but also extracting
+what we succesfully parse. We get a result representing the single matched
+characters.
+
+=head2 map
+
+At certain places we want to work with the extracted data so far. For example
+instead of three single digits we want to C<join> the results back into
+a single string again. In general we can use C<p_map> to transform the values
+into any other value.
+
+    my $digit3 = assign {
+        my $digit = p_or(map { p_strc($_) } 0 .. 9);
+        my $three = p_and($digit, $digit, $digit);
+        return p_map($three, sub(@xs) { join '', @xs });
+    };
+
+    is(p_run($digit3, "012"), Some(["012"]), 'parses 012');
+    is(p_run($digit3, "123"), Some(["123"]), 'parses 123');
+    is(p_run($digit3, "666"), Some(["666"]), 'parses 666');
+    is(p_run($digit3, "a12"),          None, 'no digit');
+
+=head2 Joining
+
+But joining a string is such a common operation, so there is also a C<p_join>
+function.
+
+    my $digit3 = assign {
+        my $digit = p_or(map { p_strc($_) } 0 .. 9);
+        return p_join('', p_and($digit, $digit, $digit));
+    };
+
+    is(p_run($digit3, "012"), Some(["012"]), 'parses 012');
+    is(p_run($digit3, "123"), Some(["123"]), 'parses 123');
+    is(p_run($digit3, "666"), Some(["666"]), 'parses 666');
+    is(p_run($digit3, "a12"),          None, 'no digit');
+
+=head2 Quantity
+
+Up so far we parse for exactly three digits. We also need to pass C<$digit>
+three times to C<p_and>. How about defining a minimum and maximum range instead?
+We can do that using C<p_qty>.
+
+    my $digit10 = assign {
+        my $digit = p_or(map { p_strc($_) } 0 .. 9);
+        return p_join('', p_qty($digit, 1, 10));
+    };
+
+    is(p_run($digit10,       "0"),      Some(["0"]), 'parses 0');
+    is(p_run($digit10,      "12"),     Some(["12"]), 'parses 12');
+    is(p_run($digit10,  "666666"), Some(["666666"]), 'parses 666666');
+    is(p_run($digit10, "666f666"),    Some(["666"]), 'parses 666');
+    is(p_run($digit10,     "a12"),             None, 'no digit');
+
+This is the same as C<\d{1,10}> in a regex. It expects 1 upto 10 digits.
+
+=head2 +: One or Many
+
+In regex we often use C<+> for meaning at least one, and up so many that is
+possible. The function C<p_many> does the same.
+
+    my $digits = assign {
+        my $digit = p_or(map { p_strc($_) } 0 .. 9);
+        return p_join('', p_many($digit));
+    };
+
+    is(p_run($digits,       "0"),      Some(["0"]), 'parses 0');
+    is(p_run($digits,      "12"),     Some(["12"]), 'parses 12');
+    is(p_run($digits,  "666666"), Some(["666666"]), 'parses 666666');
+    is(p_run($digits, "666f666"),    Some(["666"]), 'parses 666');
+    is(p_run($digits,     "a12"),             None, 'no digit');
+
+=head2 ?: maybe
+
+How about negative integers? We want the ability that an integer can be
+prefixed wih either '+' or '-'. And additionally this sign must not be present.
+
+    my $digits = assign {
+        my $digit       = p_or(map { p_strc($_) } 0 .. 9);
+        my $sign        = p_maybe(p_or(p_strc('+'), p_strc('-')));
+        my $sign_digits = p_and($sign, p_many($digit));
+        return p_join('', $sign_digits);
+    };
+
+    is(p_run($digits,       "0"),      Some(["0"]), 'parses 0');
+    is(p_run($digits,      "12"),     Some(["12"]), 'parses 12');
+    is(p_run($digits,     "+13"),    Some(["+13"]), 'parses +13');
+    is(p_run($digits,  "666666"), Some(["666666"]), 'parses 666666');
+    is(p_run($digits, "666f666"),    Some(["666"]), 'parses 666');
+    is(p_run($digits, "-666f666"),  Some(["-666"]), 'parses -666');
+    is(p_run($digits,     "a12"),             None, 'no digit');
+
+=head2 No variables
+
+Assigning variables is not necessary, we also can inline most stuff,
+I would prefer to write it this way.
+
+    my $digits =
+        p_join('',
+            p_and(
+                p_maybe(p_or(p_strc('+'), p_strc('-'))),  # sign
+                p_many (p_or(map { p_strc($_) } 0 .. 9)), # many digits
+            )
+        );
+
+    is(p_run($digits,        "0"),      Some(["0"]), 'parses 0');
+    is(p_run($digits,       "12"),     Some(["12"]), 'parses 12');
+    is(p_run($digits,      "+13"),    Some(["+13"]), 'parses +13');
+    is(p_run($digits,   "666666"), Some(["666666"]), 'parses 666666');
+    is(p_run($digits,  "666f666"),    Some(["666"]), 'parses 666');
+    is(p_run($digits, "-666f666"),  Some(["-666"]),  'parses -666');
+    is(p_run($digits,      "a12"),             None, 'no digit');
+
+=head2 *: Zero or more
+
+Between the sign and the starting of the digit we want to allow zero
+or more spaces. The function C<p_many0> does that.
+
+    my $int =
+        p_join('',
+            p_and(
+                p_maybe(p_or(p_strc('+'), p_strc('-'))),  # sign
+                p_many0(p_strc(' ')),                     # zero or more ws
+                p_many (p_or(map { p_strc($_) } 0 .. 9)), # many digits
+            )
+        );
+
+    is(p_run($int,       "0"),      Some(["0"]), 'parses 0');
+    is(p_run($int,      "12"),     Some(["12"]), 'parses 12');
+    is(p_run($int,     "+13"),    Some(["+13"]), 'parses +13');
+    is(p_run($int,  "- 666"), Some(["- 666"]),   'parses - 666');
+    is(p_run($int,  "+ 666"), Some(["+ 666"]),   'parses + 666');
+    is(p_run($int, "666f666"),    Some(["666"]), 'parses 666');
+    is(p_run($int, "-666f666"),  Some(["-666"]), 'parses -666');
+    is(p_run($int,     "a12"),             None, 'no digit');
+
+=head2 No capture
+
+By default C<p_strc> captures everything it matches. But in the above example
+we don't want the whitespace to appear in the output. When we are not interested
+in the capture we use C<p_str> instead.
+
+    my $int =
+        p_join('',
+            p_and(
+                p_maybe(p_or(p_strc('+'), p_strc('-'))),  # sign
+                p_many0(p_str(' ')),                      # zero or more ws
+                p_many (p_or(map { p_strc($_) } 0 .. 9)), # many digits
+            )
+        );
+
+    is(p_run($int,        "0"),    Some(["0"]), 'parses 0');
+    is(p_run($int,       "12"),   Some(["12"]), 'parses 12');
+    is(p_run($int,      "+13"),  Some(["+13"]), 'parses +13');
+    is(p_run($int,    "- 666"), Some(["-666"]), 'parses -666');
+    is(p_run($int,    "+ 666"), Some(["+666"]), 'parses +666');
+    is(p_run($int,  "666f666"),  Some(["666"]), 'parses 666');
+    is(p_run($int, "-666f666"), Some(["-666"]), 'parses -666');
+    is(p_run($int,      "a12"),           None, 'no digit');
+
+=head2 Using regex
+
+As you can see we have a regex like function based parser. But up so far
+we only used C<p_strc> and C<p_str> for parsing that only relies on matching
+characters. The goal is not to replace Perls regex. Perl's regex are powerful
+and fast. This parser also fully supports creating single parser out of regexes
+by C<p_match>. This is maybe the function you should use most of the time.
+
+So all we have written can be replaced like this.
+
+    my $int = p_match(qr/([+-]? \s* \d+)/x);
+
+    is(p_run($int,        "0"),    Some(["0"]), 'parses 0');
+    is(p_run($int,       "12"),   Some(["12"]), 'parses 12');
+    is(p_run($int,      "+13"),  Some(["+13"]), 'parses +13');
+    is(p_run($int,    "- 666"), Some(["- 666"]), 'parses -666');
+    is(p_run($int,    "+ 666"), Some(["+ 666"]), 'parses +666');
+    is(p_run($int,  "666f666"),  Some(["666"]), 'parses 666');
+    is(p_run($int, "-666f666"), Some(["-666"]), 'parses -666');
+    is(p_run($int,      "a12"),           None, 'no digit');
+
+C<p_match> automatically extracts all captures. As we only have a single
+parenthesis we also only get a single match. We also could create
+two matches.
+
+    my $int = p_match(qr/([+-])? \s* (\d+)/x);
+
+    is(p_run($int,        "0"),    Some([undef, "0"]), 'parses 0');
+    is(p_run($int,       "12"),   Some([undef, "12"]), 'parses 12');
+    is(p_run($int,      "+13"),     Some(["+", "13"]), 'parses +13');
+    is(p_run($int,    "- 666"),    Some(["-", "666"]), 'parses -666');
+    is(p_run($int,    "+ 666"),    Some(["+", "666"]), 'parses +666');
+    is(p_run($int,  "666f666"),  Some([undef, "666"]), 'parses 666');
+    is(p_run($int, "-666f666"),    Some(["-", "666"]), 'parses -666');
+    is(p_run($int,      "a12"),                  None, 'no digit');
+
+=head2 match and transform
+
+We also could C<p_map> the result of C<p_match> again and transform the two
+values into an integer. But C<p_matchf> does it in a single call. The function
+we pass to C<p_matchf> only executes when the match was succesfull. The result
+of that function is then used as the parsing result.
+
+    my $int = p_matchf(qr/([+-])? \s* (\d+)/x, sub($sign,$num) {
+        if ( defined $sign ) {
+            return $sign eq '-' ? $num * -1 : $num;
+        }
+        return $num;
+    });
+
+    is(p_run($int,        "0"),    Some([0]), 'parses 0');
+    is(p_run($int,       "12"),   Some([12]), 'parses 12');
+    is(p_run($int,      "+13"),   Some([13]), 'parses 13');
+    is(p_run($int,    "- 666"), Some([-666]), 'parses -666');
+    is(p_run($int,    "+ 666"),  Some([666]), 'parses 666');
+    is(p_run($int,  "666f666"),  Some([666]), 'parses 666');
+    is(p_run($int, "-666f666"), Some([-666]), 'parses -666');
+    is(p_run($int,      "a12"),         None, 'no digit');
+
+All the captures of the regex are passed as function arguments to C<p_matchf>.
+
+=head2 match and filter
+
+An important feature is that we not only can return different things, basically
+any data-structure, object and so on you can think of. But we also can filter
+or return multiple arguments. But when nothing is returned, then parsing is
+considered as a failure.
+
+Let's say we not only want to parse any integer, but than we want to restrict
+the number to be between C<0> and C<100> we could do.
+
+    my $hundred = p_matchf(qr/([+-])? \s* (\d+)/x, sub($sign,$num) {
+        my $result = $num;
+        if ( defined $sign && $sign eq '-' ) {
+            $result = $result * -1;
+        }
+        if ( $result >= 0 && $result <= 100 ) {
+            return $result;
+        }
+        return;
+    });
+
+    is(p_run($hundred,        "0"),    Some([0]), 'parses 0');
+    is(p_run($hundred,       "12"),   Some([12]), 'parses 12');
+    is(p_run($hundred,      "+13"),   Some([13]), 'parses 13');
+    is(p_run($hundred,    "- 666"),         None, 'not valid');
+    is(p_run($hundred,    "+ 666"),         None, 'not valid');
+    is(p_run($hundred,  "666f666"),         None, 'not valid');
+    is(p_run($hundred, "-666f666"),         None, 'not valid');
+    is(p_run($hundred,      "a12"),         None, 'not valid');
+
+=head2 integer list
+
+Consider that C<p_matchf> also just returns a parser. And this parser can
+be used with all the functions you have seen so far. For example consider
+a string that either is just a single integer or contains multiple integers
+separated by a colon.
+
+    my $int = p_matchf(qr/([+-])? \s* (\d+)/x, sub($sign,$num) {
+        my $result = $num;
+        $result *= -1 if defined $sign && $sign eq '-';
+        return $result;
+    });
+
+    my $int_list =
+        p_and(
+            $int,
+            p_many0(p_and(p_match(qr/\s* , \s*/x), $int)),
+        );
+
+    is(p_run($int_list,       "1"),           Some([1]), '1 int');
+    is(p_run($int_list,     "1,2"),         Some([1,2]), '2 int');
+    is(p_run($int_list,  "12,-23"),      Some([12,-23]), '2 int');
+    is(p_run($int_list, "12,- 23, 0"), Some([12,-23,0]), '3 int');
+
+Consider the C<p_match(qr/\s* , \s*/x)> call. Here no capture is defined in
+the regex. This means that the regex still must match to be succesfull but
+it doesn't capture anything.
+
+=head2 Conclusion
+
+I hope you get an understanding of the working and how you can use regular
+expressions as single pieces to put a whole parser with transformation together.
+
+There are still some more functions to cover but those shown here are the basics
+you can already use to built some complicated stuff.

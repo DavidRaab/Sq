@@ -1,0 +1,20 @@
+=encoding UTF-8
+
+=head1 Sq::Parser
+
+A Combinator based approach to parsing. The parser is not yet complet. It
+works and it can parse stuff, but currently lacks any kind of useful error
+messages when parsing is not succesfull.
+
+This will improve in the future, also some more functions will be added.
+Still the API in itself will not change much.
+
+When you are used with Regexes and I guess you are when you are a Perl programmer
+you will see the similarity with a Regex based approach. But the Combinator here
+is designed to just use Perl Regexes with Parsing.
+
+See L<Sq::Manual::Parser::Intro> at the moment for an Intro.
+
+=head2 FUNCTIONS
+
+TODO
