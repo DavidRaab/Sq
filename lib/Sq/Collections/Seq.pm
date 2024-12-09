@@ -1003,19 +1003,16 @@ sub last($seq) {
 
 # to_array : Seq<'a> -> Array<'a>
 sub to_array($seq, $count=undef) {
-    $count  = Sq::is_num($count) ? int($count) : undef;
     my $new = Array->new;
     my $it  = $seq->();
     my $x;
     if ( defined $count ) {
         my $current = 0;
-
-        NEXT:
-        return $new if $current++ >= $count;
-        if ( defined($x = $it->()) ) {
-            push @$new, $x;
+        while ( $current++ < $count ) {
+            if ( defined($x = $it->()) ) {
+                push @$new, $x;
+            }
         }
-        goto NEXT;
     }
     else {
         while ( defined($x = $it->()) ) {

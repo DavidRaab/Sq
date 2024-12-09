@@ -30,7 +30,6 @@ is($range->to_array(-1),    [],      'to_array(-1)');
 is($range->to_array(1),     [1],     'to_array(1)');
 is($range->to_array(5),     [1..5],  'to_array(5)');
 is($range->to_array(100),   [1..10], 'to_array(100)');
-is($range->to_array("foo"), $range->to_array, 'to_array(not number)');
 
 is(
     $range->map($double)->to_array,
