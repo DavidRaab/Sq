@@ -233,4 +233,33 @@ sub result(@xs) { Some([@xs]) }
     is(p_run($wd, "some3"), result("3"), 'p_not 3');
 }
 
+# p_str and p_strc can have multiple values
+{
+    my $int  =
+        p_map(
+            p_join('', p_and(
+                p_maybe(p_strc(qw/+ -/)),
+                p_many(p_strc(0 .. 9)),
+            )),
+            sub($x) { $x+0 }
+        );
+
+    is(p_run($int,  '1234'), Some([ 1234]), 'p_strc many 1');
+    is(p_run($int, '+1234'), Some([ 1234]), 'p_strc many 2');
+    is(p_run($int, '-1234'), Some([-1234]), 'p_strc many 3');
+}
+{
+    my $int  =
+        p_and(
+            p_maybe(p_str('+', '-')),
+            p_many(p_str(0 .. 9)),
+        ),
+    my $word    = p_match(qr/([a-zA-Z]+)/);
+    my $intword = p_and($int, $word);
+
+    is(p_run($intword,  '1234abc'), Some(["abc"]), 'p_str many 1');
+    is(p_run($intword, '+1234foo'), Some(["foo"]), 'p_str many 2');
+    is(p_run($intword, '-1234bar'), Some(["bar"]), 'p_str many 3');
+}
+
 done_testing;

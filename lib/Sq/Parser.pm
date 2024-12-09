@@ -231,33 +231,39 @@ sub p_split($regex, $parser) {
     }
 }
 
-# just parses a string - no capture
-sub p_str($string) {
+# parses a string - no capture
+sub p_str($strings, @strings) {
     return sub($ctx,$str) {
-        my $length = length $string;
-        if ( $string eq substr($str, $ctx->{pos}, $length) ) {
-            return {
-                valid   => 1,
-                pos     => $ctx->{pos}+$length,
-                matches => [],
-            };
+        my $pos = $ctx->{pos};
+        for my $string ( $strings, @strings ) {
+            my $length = length $string;
+            if ( $string eq substr($str, $pos, $length) ) {
+                return {
+                    valid   => 1,
+                    pos     => $pos+$length,
+                    matches => [],
+                };
+            }
         }
-        return {valid => 0, pos => $ctx->{pos}};
+        return {valid => 0, pos => $pos};
     }
 }
 
 # parses string - and captures string
-sub p_strc($string) {
+sub p_strc($strings, @strings) {
     return sub($ctx,$str) {
-        my $length = length $string;
-        if ( $string eq substr($str, $ctx->{pos}, $length) ) {
-            return {
-                valid   => 1,
-                pos     => $ctx->{pos}+$length,
-                matches => [$string],
-            };
+        my $pos = $ctx->{pos};
+        for my $string ( $strings, @strings ) {
+            my $length = length $string;
+            if ( $string eq substr($str, $pos, $length) ) {
+                return {
+                    valid   => 1,
+                    pos     => $pos+$length,
+                    matches => [$string],
+                };
+            }
         }
-        return {valid => 0, pos => $ctx->{pos}};
+        return {valid => 0, pos => $pos};
     }
 }
 
@@ -265,17 +271,19 @@ sub p_strc($string) {
 sub p_many($parser) {
     return sub($ctx,$str) {
         my (@matches, $p, $last_p);
+        my $at_least_one = 0;
         ($p, $last_p) = ($ctx, $ctx);
 
         REPEAT:
         $p = $parser->($p,$str);
         if ( $p->{valid} ) {
+            $at_least_one = 1;
             $last_p = $p;
             push @matches, $p->{matches}->@*;
             goto REPEAT;
         }
 
-        return @matches > 0
+        return $at_least_one
              ? pass($last_p->{pos}, \@matches)
              : fail($ctx->{pos});
     }
