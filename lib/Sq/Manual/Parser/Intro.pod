@@ -211,14 +211,14 @@ or more spaces. The function C<p_many0> does that.
             )
         );
 
-    is(p_run($int,       "0"),      Some(["0"]), 'parses 0');
-    is(p_run($int,      "12"),     Some(["12"]), 'parses 12');
-    is(p_run($int,     "+13"),    Some(["+13"]), 'parses +13');
-    is(p_run($int,  "- 666"), Some(["- 666"]),   'parses - 666');
-    is(p_run($int,  "+ 666"), Some(["+ 666"]),   'parses + 666');
-    is(p_run($int, "666f666"),    Some(["666"]), 'parses 666');
+    is(p_run($int,        "0"),     Some(["0"]), 'parses 0');
+    is(p_run($int,       "12"),    Some(["12"]), 'parses 12');
+    is(p_run($int,      "+13"),   Some(["+13"]), 'parses +13');
+    is(p_run($int,    "- 666"), Some(["- 666"]), 'parses - 666');
+    is(p_run($int,    "+ 666"), Some(["+ 666"]), 'parses + 666');
+    is(p_run($int,  "666f666"),   Some(["666"]), 'parses 666');
     is(p_run($int, "-666f666"),  Some(["-666"]), 'parses -666');
-    is(p_run($int,     "a12"),             None, 'no digit');
+    is(p_run($int,      "a12"),            None, 'no digit');
 
 =head2 No capture
 
@@ -256,14 +256,14 @@ So all we have written can be replaced like this.
 
     my $int = p_match(qr/([+-]? \s* \d+)/x);
 
-    is(p_run($int,        "0"),    Some(["0"]), 'parses 0');
-    is(p_run($int,       "12"),   Some(["12"]), 'parses 12');
-    is(p_run($int,      "+13"),  Some(["+13"]), 'parses +13');
+    is(p_run($int,        "0"),     Some(["0"]), 'parses 0');
+    is(p_run($int,       "12"),    Some(["12"]), 'parses 12');
+    is(p_run($int,      "+13"),   Some(["+13"]), 'parses +13');
     is(p_run($int,    "- 666"), Some(["- 666"]), 'parses -666');
     is(p_run($int,    "+ 666"), Some(["+ 666"]), 'parses +666');
-    is(p_run($int,  "666f666"),  Some(["666"]), 'parses 666');
-    is(p_run($int, "-666f666"), Some(["-666"]), 'parses -666');
-    is(p_run($int,      "a12"),           None, 'no digit');
+    is(p_run($int,  "666f666"),   Some(["666"]), 'parses 666');
+    is(p_run($int, "-666f666"),  Some(["-666"]), 'parses -666');
+    is(p_run($int,      "a12"),            None, 'no digit');
 
 C<p_match> automatically extracts all captures. As we only have a single
 parenthesis we also only get a single match. We also could create
@@ -326,14 +326,14 @@ the number to be between C<0> and C<100> we could do.
         return;
     });
 
-    is(p_run($hundred,        "0"),    Some([0]), 'parses 0');
-    is(p_run($hundred,       "12"),   Some([12]), 'parses 12');
-    is(p_run($hundred,      "+13"),   Some([13]), 'parses 13');
-    is(p_run($hundred,    "- 666"),         None, 'not valid');
-    is(p_run($hundred,    "+ 666"),         None, 'not valid');
-    is(p_run($hundred,  "666f666"),         None, 'not valid');
-    is(p_run($hundred, "-666f666"),         None, 'not valid');
-    is(p_run($hundred,      "a12"),         None, 'not valid');
+    is(p_run($hundred,        "0"),  Some([0]), 'parses 0');
+    is(p_run($hundred,       "12"), Some([12]), 'parses 12');
+    is(p_run($hundred,      "+13"), Some([13]), 'parses 13');
+    is(p_run($hundred,    "- 666"),       None, 'not valid');
+    is(p_run($hundred,    "+ 666"),       None, 'not valid');
+    is(p_run($hundred,  "666f666"),       None, 'not valid');
+    is(p_run($hundred, "-666f666"),       None, 'not valid');
+    is(p_run($hundred,      "a12"),       None, 'not valid');
 
 =head2 integer list
 
