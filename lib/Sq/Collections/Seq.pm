@@ -1198,10 +1198,12 @@ sub as_hash($seq) {
 # to_hash : Seq<'a> -> ('a -> string,'b) -> Hash<'b>
 sub to_hash($seq, $f_map) {
     my $hash = Hash->new;
-    iter($seq, sub($x) {
+    my $it = $seq->();
+    my $x;
+    while ( defined($x = $it->()) ) {
         my ($key, $value) = $f_map->($x);
         $hash->{$key} = $value;
-    });
+    }
     return $hash;
 }
 
