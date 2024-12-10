@@ -20,10 +20,7 @@ $array = p_map(
     p_and(
         $open,
         p_or(
-            p_and(
-                $value,
-                p_many0(p_and($delimeter, $value)),
-            ),
+            p_and($value, p_many0(p_and($delimeter, $value))),
             $value,
             p_match(qr/\s*/),
         ),
@@ -57,5 +54,43 @@ is(
     p_run($array, '[[ 1, 2,3], [ 4,5, [6 ,7,8]]]'),
     result([[1,2,3], [4,5,[6,7,8]]]),
     'nested arrays 4');
+
+
+# p_delay & p_empty
+{
+    my $array;
+    my $value = p_or($int, p_delay(sub{ $array }));
+    $array    = p_delay(sub {
+        p_map(
+            p_and(
+                p_str('['),
+                p_or(
+                    p_and($value, p_many0(p_and(p_match(qr/\s* , \s*/x), $value))),
+                    p_empty(),
+                ),
+                p_str(']')
+            ),
+            sub (@xs) { [@xs] }
+        )
+    });
+
+    is(
+        p_run($array, '[[[1]]]'),
+        result([[[1]]]),
+        'delay nested arrays 1');
+    is(
+        p_run($array, '[[1,2,3], [4,5,6]]'),
+        result([[1,2,3], [4,5,6]]),
+        'delay nested arrays 2');
+    is(
+        p_run($array, '[[1,2,3], [4,5,[6,7,8]]]'),
+        result([[1,2,3], [4,5,[6,7,8]]]),
+        'delay nested arrays 3');
+    is(
+        p_run($array, '[[ 1, 2,3], [ 4,5, [6 ,7,8]]]'),
+        result([[1,2,3], [4,5,[6,7,8]]]),
+        'delay nested arrays 4');
+}
+
 
 done_testing;
