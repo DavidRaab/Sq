@@ -63,12 +63,12 @@ is(
     $array    = p_delay(sub {
         p_map(
             p_and(
-                p_str('['),
+                p_match(qr/\s* \[ \s*/x),
                 p_or(
-                    p_and($value, p_many0(p_and(p_match(qr/\s* , \s*/x), $value))),
+                    p_and($value, p_many0(p_match(qr/\s* , \s*/x), $value)),
                     p_empty(),
                 ),
-                p_str(']')
+                p_match(qr/\s* \] \s*/x),
             ),
             sub (@xs) { [@xs] }
         )

@@ -268,7 +268,9 @@ sub p_strc($strings, @strings) {
 }
 
 # +: at least one, as much as possible
-sub p_many($parser) {
+sub p_many(@parsers) {
+    Carp::croak "p_many needs at least one parser" if @parsers == 0;
+    my $parser = @parsers == 1 ? $parsers[0] : p_and(@parsers);
     return sub($ctx,$str) {
         my (@matches, $p, $last_p);
         my $at_least_one = 0;
@@ -290,7 +292,9 @@ sub p_many($parser) {
 }
 
 # *: zero or many times
-sub p_many0($parser) {
+sub p_many0(@parsers) {
+    Carp::croak "p_many0 needs at least one parser" if @parsers == 0;
+    my $parser = @parsers == 1 ? $parsers[0] : p_and(@parsers);
     return sub($ctx,$str) {
         my (@matches, $p, $last_p);
         ($p, $last_p) = ($ctx, $ctx);
