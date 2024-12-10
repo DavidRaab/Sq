@@ -18,10 +18,7 @@ use Test2::V0 qw(is ok done_testing);
 
 # +: one or many
 {
-    my $digits = assign {
-        my $digit = p_or(map { p_strc($_) } 0 .. 9);
-        return p_join('', p_many($digit));
-    };
+    my $digits = p_join('', p_many(p_strc(0 .. 9)));
 
     is(p_run($digits,       "0"),      Some(["0"]), 'parses 0');
     is(p_run($digits,      "12"),     Some(["12"]), 'parses 12');
@@ -93,9 +90,9 @@ use Test2::V0 qw(is ok done_testing);
     my $int =
         p_join('',
             p_and(
-                p_maybe(p_strc('+', '-')),     # sign
-                p_many0(p_str(' ')),           # zero or more ws
-                p_many (p_or(p_strc(0 .. 9))), # many digits
+                p_maybe(p_strc('+', '-')), # sign
+                p_many0(p_str(' ')),       # zero or more ws
+                p_many (p_strc(0 .. 9)),   # many digits
             )
         );
 
@@ -120,7 +117,7 @@ use Test2::V0 qw(is ok done_testing);
     my $int_list =
         p_and(
             $int,
-            p_many0(p_match(qr/\s* , \s*/x), $int),
+            p_many0(p_match(qr/\s* , \s*/x), $int)
         );
 
     is(p_run($int_list,       "1"),           Some([1]), '1 int');
