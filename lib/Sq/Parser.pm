@@ -194,7 +194,7 @@ sub p_or(@parsers) {
             $p = $parser->($ctx, $str);
             return $p if $p->{valid};
         }
-        return fail($ctx->{pos});
+        return { valid => 0, pos => $ctx->{pos} };
     }
 }
 
