@@ -1,0 +1,95 @@
+=encoding UTF-8
+
+=head1 Sq::Manual::Parser::Shortcuts
+
+Some functions also take multiple parsers by default instead of just one
+parser. They often make writing Parser more convenient or even can increase
+the speed of the parser. Here are some shortcuts you can use from the
+previous Intro.
+
+=head1 p_str and p_strc
+
+You also can pass multuple strings to C<p_str> and C<p_strc> and not just one
+string. All strings are considered as an alternative. So instead of
+writing.
+
+    my $digit = p_or( map{ p_strc($_) } 0 .. 9 );
+    my $sign  = p_or( p_strc('+'), p_strc('-') );
+
+you can just write.
+
+    my $digit = p_strc(0 .. 9);
+    my $sign  = p_strc('+', '-');
+
+=head2 p_many & p_many0
+
+Those two functions also accept multiple arguments. But they are B<anded>
+together by default instead of B<ored>. So writing.
+
+    my $parser = p_many($parser1, $parser2, $parser3);
+
+is the same as
+
+    my $parser = p_many(p_and($parser1, $parser2, $parser3));
+
+=head2 No variables
+
+The previous version of parsing digits.
+
+    my $digits =
+        p_join('',
+            p_and(
+                p_maybe(p_or(p_strc('+'), p_strc('-'))),  # sign
+                p_many (p_or(map { p_strc($_) } 0 .. 9)), # many digits
+            )
+        );
+
+can be reduced to.
+
+    my $digits =
+        p_join('',
+            p_and(
+                p_maybe(p_strc('+', '-')), # sign
+                p_many (p_strc(0 .. 9)),   # many digits
+            )
+        );
+
+=head2 Parsing int
+
+The full example for parsing an int
+
+    my $int =
+        p_join('',
+            p_and(
+                p_maybe(p_or(p_strc('+'), p_strc('-'))),  # sign
+                p_many0(p_strc(' ')),                     # zero or more spaces
+                p_many (p_or(map { p_strc($_) } 0 .. 9)), # many digits
+            )
+        );
+
+also can be shortened.
+
+    my $int =
+        p_join('',
+            p_and(
+                p_maybe(p_strc('+', '-')), # sign
+                p_many0(p_str (' ')),      # zero or more spaces
+                p_many (p_strc(0 .. 9)),   # many digits
+            )
+        );
+
+=head2 *: zero or many
+
+We can omit the C<p_and> in the C<p_many0> call.
+
+    my $int = p_matchf(qr/([+-])? \s* (\d+)/x, sub($sign,$num) {
+        my $result = $num;
+        $result *= -1 if defined $sign && $sign eq '-';
+        return $result;
+    });
+
+    my $int_list =
+        p_and(
+            $int,
+            p_many0(p_match(qr/\s* , \s*/x), $int) # colon then $int, zero or more
+        );
