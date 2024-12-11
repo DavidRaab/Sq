@@ -202,11 +202,20 @@ sub p_or(@parsers) {
 # tries to apply $parser, but $parser is optional. The parser that is returned
 # is always succesfull either "eating" something from the string or not.
 # Regex:?
-sub p_maybe($parser) {
+sub p_maybe(@parsers) {
+    Carp::croak "p_maybe needs at least one parser" if @parsers == 0;
     return sub($ctx,$str) {
-        my $p = $parser->($ctx,$str);
-        return $p if $p->{valid};
-        return pass($ctx->{pos}, []);
+        my ($p, @matches) = ($ctx);
+        for my $parser ( @parsers ) {
+            $p = $parser->($p,$str);
+            return {valid=>1, pos=>$ctx->{pos}, matches=>[]} if !$p->{valid};
+            push @matches, $p->{matches}->@*;
+        }
+        return {
+            valid   => 1,
+            pos     => $p->{pos},
+            matches => $p->{valid} ? \@matches : [],
+        };
     }
 }
 

@@ -126,4 +126,21 @@ use Test2::V0 qw(is ok done_testing);
     is(p_run($int_list, "12,- 23, 0"), Some([12,-23,0]), '3 int');
 }
 
+# p_maybe
+{
+    my $maybe_num_word =
+        p_and(
+            p_join('',
+                p_maybe(
+                    p_strc('+', '-'),
+                    p_many(p_strc(0 .. 9)),
+                ),
+            ),
+            p_match(qr/([a-zA-Z]+)/),
+        );
+
+    is(p_run($maybe_num_word, '+123foo'), Some(["+123", "foo"]), '+123foo');
+    is(p_run($maybe_num_word,     'foo'),         Some(["foo"]), 'foo');
+}
+
 done_testing;
