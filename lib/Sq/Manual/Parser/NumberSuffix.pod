@@ -15,12 +15,10 @@ Here is a full example for parsing numbers with suffixes.
         p_many(
             p_maybe(p_match(qr/\s* , \s*/x)), # optional ,
             p_map(
-                p_and(
-                    p_many (p_strc(0 .. 9)), # digits
-                    p_match(qr/\s*/),        # whitespace
-                    p_strc (qw/b kb mb gb/), # suffix
-                ),
-                $to_num
+                $to_num,
+                p_many (p_strc(0 .. 9)), # digits
+                p_match(qr/\s*/),        # whitespace
+                p_strc (qw/b kb mb gb/), # suffix
             )
         );
     };
@@ -37,6 +35,17 @@ C<$to_num> is scoped and isn't accessible by other functions.
 We could inline the function directly in the C<p_map> call, but extracting it
 makes it sometimes better readable. But we don't want C<$to_num> exposed
 to other code, because it is directly tied to the parsing construct.
+
+Additionally you also can see that C<p_map> also can be passed multiple parsers.
+Multiple parsers are again assembled together with C<p_and>
+
+So writing.
+
+    p_map($func, $parser1, $parser2, $parser3);
+
+is the same as
+
+    p_map($func, p_and($parser1, $parser2, $parser3));
 
 C<p_many> here is passed two parsers. The first one expects a colon and consumes
 any whitespace before and after it. But it's optional. Then after that colon
