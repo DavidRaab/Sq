@@ -40,7 +40,7 @@ use Test2::V0 qw(is ok done_testing);
         };
 
         p_many(
-            p_matchf(qr/\s* (?: , )? \s* (\d+) \s* (b|kb|mb|gb)/xi, $to_num),
+            p_matchf(qr/\s* ,? \s* (\d+) \s* (b|kb|mb|gb)/xi, $to_num),
         );
     };
 
