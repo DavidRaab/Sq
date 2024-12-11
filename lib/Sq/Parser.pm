@@ -287,12 +287,8 @@ sub p_strc($strings, @strings) {
 sub p_many(@parsers) {
     Carp::croak "p_many needs at least one parser" if @parsers == 0;
     return sub($ctx,$str) {
-        my (@matches, $p, $last_p);
-        my $at_least_one = 0;
-        ($p, $last_p) = ($ctx, $ctx);
-
+        my ($p, $last_p, $at_least_one, @matches, @and_matches) = ($ctx,$ctx,0);
         REPEAT:
-        my @and_matches;
         for my $parser ( @parsers ) {
             $p = $parser->($p,$str);
             last if !$p->{valid};
