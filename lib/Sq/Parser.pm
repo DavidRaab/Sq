@@ -159,7 +159,6 @@ sub p_bind($parser, $f) {
                     matches => $p2->{matches},
                 }
             }
-            return {valid => 0, pos => $ctx->{pos}};
         }
         return {valid => 0, pos => $ctx->{pos}};
     }
