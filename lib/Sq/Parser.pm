@@ -286,24 +286,30 @@ sub p_strc($strings, @strings) {
 # +: at least one, as much as possible
 sub p_many(@parsers) {
     Carp::croak "p_many needs at least one parser" if @parsers == 0;
-    my $parser = @parsers == 1 ? $parsers[0] : p_and(@parsers);
     return sub($ctx,$str) {
         my (@matches, $p, $last_p);
         my $at_least_one = 0;
         ($p, $last_p) = ($ctx, $ctx);
 
         REPEAT:
-        $p = $parser->($p,$str);
+        my @and_matches;
+        for my $parser ( @parsers ) {
+            $p = $parser->($p,$str);
+            last if !$p->{valid};
+            push @and_matches, $p->{matches}->@*;
+        }
+
         if ( $p->{valid} ) {
+            push @matches, @and_matches;
+            @and_matches  = ();
             $at_least_one = 1;
-            $last_p = $p;
-            push @matches, $p->{matches}->@*;
+            $last_p       = $p;
             goto REPEAT;
         }
 
         return $at_least_one
-             ? pass($last_p->{pos}, \@matches)
-             : fail($ctx->{pos});
+             ? {valid=>1, pos=> $last_p->{pos}, matches=>\@matches}
+             : {valid=>0, pos=> $ctx->{pos}};
     }
 }
 
