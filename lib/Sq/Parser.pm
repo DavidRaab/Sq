@@ -104,17 +104,18 @@ sub p_matchf_opt($regex, $f_opt_xs) {
 # ('a -> 'b) -> @{ Parser<'a> } -> Parser<'b>
 sub p_map($f_map, @parsers) {
     Carp::croak "p_map needs at least one parser." if @parsers == 0;
-    my $parser = @parsers == 1 ? $parsers[0] : p_and(@parsers);
     return sub($ctx,$str) {
-        my $p = $parser->($ctx,$str);
-        if ( $p->{valid} ) {
-            return {
-                valid   => 1,
-                pos     => $p->{pos},
-                matches => [$f_map->($p->{matches}->@*)],
-            };
+        my ($p, @matches) = ($ctx);
+        for my $parser ( @parsers ) {
+            $p = $parser->($p,$str);
+            return {valid=>0, pos=>$ctx->{pos}} if !$p->{valid};
+            push @matches, $p->{matches}->@*;
         }
-        return { valid => 0, pos => $p->{pos} };
+        return {
+            valid   => 1,
+            pos     => $p->{pos},
+            matches => [$f_map->(@matches)],
+        };
     }
 }
 
@@ -304,8 +305,8 @@ sub p_many(@parsers) {
         }
 
         return $at_least_one
-             ? {valid=>1, pos=> $last_p->{pos}, matches=>\@matches}
-             : {valid=>0, pos=> $ctx->{pos}};
+             ? {valid=>1, pos=>$last_p->{pos}, matches=>\@matches}
+             : {valid=>0, pos=>$ctx->{pos}};
     }
 }
 
