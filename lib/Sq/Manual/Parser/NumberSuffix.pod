@@ -57,3 +57,47 @@ converted to its full representation. For example B<1 mb> turns into B<1048576>.
 Also consider that this way also ",1b,1kb" is valid. We can change the parsing
 construct that the leading colon is not allowed. It's up to you to decide
 how forgiving you want to be for input to be valid or not.
+
+=head2 Use Regexes
+
+The above is just an example on how you can use the different functions
+to combine stuff. But Regexes in itself already can solve a lot without
+relying too much on the Parser API. For example a better approach for parsing
+the above would be.
+
+    my $num = assign {
+        my $to_num = sub($num,$suffix) {
+            return $num                      if $suffix eq 'b';
+            return $num * 1024               if $suffix eq 'kb';
+            return $num * 1024 * 1024        if $suffix eq 'mb';
+            return $num * 1024 * 1024 * 1024 if $suffix eq 'gb';
+        };
+
+        p_many(
+            p_matchf(qr/\s* (?: , )? \s* (\d+) \s* (b|kb|mb|gb)/xi, $to_num),
+        );
+    };
+
+    is(p_run($num, "1  b, 1kb"),         Some([1, 1024]), '1 b & 1kb');
+    is(p_run($num, "1 kb, 1gb"), Some([1024,1073741824]), '1 kb & 1gb');
+    is(p_run($num, "1 mb"),              Some([1048576]), '1 mb');
+    is(p_run($num, "1 gb"),           Some([1073741824]), '1 gb');
+
+Here you can see that the function C<$to_num> stays the same, but the
+whole parsing is basically replaces by a single regex. Only C<p_many>
+is used to repeat the regex one or multiple times.
+
+Theoretically this also is easy in a Regex. Just put C<(?: ... )+> around
+whatever you wanna repeat one or more times. But you wouldn't get the conversion
+and extractin of the number so easy. But even that would be possible in
+Perl Regexes.
+
+This regex version also has one advantage. The modifier C<i> at the end of the
+regex also allows for "MB", "KB" or "Kb" as it ignores upper and lower case.
+
+It also shows another important aspect you will encounter in C<Sq>.
+C<$to_num> is actually re-usable. You can pass it to C<p_map> or C<p_matchf>
+and it works. Actually you also can pass this function to a C<Option::map>
+call that has two values stored in it. For example this also would work.
+
+    my $num = Some('1', 'kb')->map($to_num);
