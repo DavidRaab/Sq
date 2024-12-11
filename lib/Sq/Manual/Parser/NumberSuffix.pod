@@ -1,0 +1,50 @@
+=encoding UTF-8
+
+=head1 Parsing Numbers with suffixes
+
+Here is a full example for parsing numbers with suffixes.
+
+    my $num = assign {
+        my $to_num = sub($num,$suffix) {
+            return $num                      if $suffix eq 'b';
+            return $num * 1024               if $suffix eq 'kb';
+            return $num * 1024 * 1024        if $suffix eq 'mb';
+            return $num * 1024 * 1024 * 1024 if $suffix eq 'gb';
+        };
+
+        p_many(
+            p_maybe(p_match(qr/\s* , \s*/x)), # optional ,
+            p_map(
+                p_and(
+                    p_many (p_strc(0 .. 9)), # digits
+                    p_match(qr/\s*/),        # whitespace
+                    p_strc (qw/b kb mb gb/), # suffix
+                ),
+                $to_num
+            )
+        );
+    };
+
+    is(p_run($num, "1  b, 1kb"),         Some([1, 1024]), '1 b & 1kb');
+    is(p_run($num, "1 kb, 1gb"), Some([1024,1073741824]), '1 kb');
+    is(p_run($num, "1 mb"),              Some([1048576]), '1 mb');
+    is(p_run($num, "1 gb"),           Some([1073741824]), '1 gb');
+
+C<assign> here is used to create a new scope. The last statement is returned
+and assigned to the variable. The reason for this is that this way the function
+C<$to_num> is scoped and isn't accessible by other functions.
+
+We could inline the function directly in the C<p_map> call, but extracting it
+makes it sometimes better readable. But we don't want C<$to_num> exposed
+to other code, because it is directly tied to the parsing construct.
+
+C<p_many> here is passed two parsers. The first one expects a colon and consumes
+any whitespace before and after it. But it's optional. Then after that colon
+a number with suffix must be passed.
+
+It's wrapped in a C<p_map> because every single number that is extracted is
+converted to its full representation. For example B<1 mb> turns into B<1048576>.
+
+Also consider that this way also ",1b,1kb" is valid. We can change the parsing
+construct that the leading colon is not allowed. It's up to you to decide
+how forgiving you want to be for input to be valid or not.
