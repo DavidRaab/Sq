@@ -312,20 +312,23 @@ sub p_many(@parsers) {
 # *: zero or many times
 sub p_many0(@parsers) {
     Carp::croak "p_many0 needs at least one parser" if @parsers == 0;
-    my $parser = @parsers == 1 ? $parsers[0] : p_and(@parsers);
     return sub($ctx,$str) {
-        my (@matches, $p, $last_p);
-        ($p, $last_p) = ($ctx, $ctx);
-
+        my ($p, $last_p, @matches, @and_matches) = ($ctx, $ctx);
         REPEAT:
-        $p = $parser->($p, $str);
+        for my $parser ( @parsers ) {
+            $p = $parser->($p,$str);
+            last if !$p->{valid};
+            push @and_matches, $p->{matches}->@*;
+        }
+
         if ( $p->{valid} ) {
-            $last_p = $p;
-            push @matches, $p->{matches}->@*;
+            push @matches, @and_matches;
+            @and_matches = ();
+            $last_p      = $p;
             goto REPEAT;
         }
 
-        return pass($last_p->{pos}, \@matches);
+        return {valid=>1, pos=>$last_p->{pos}, matches=>\@matches};
     }
 }
 
