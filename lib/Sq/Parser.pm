@@ -232,11 +232,7 @@ sub p_join($sep, $parser) {
                 matches => $matches,
             }
         }
-        return {
-            valid   => 0,
-            pos     => $ctx->{pos},
-            matches => [],
-        };
+        return {valid => 0, pos => $ctx->{pos}};
     }
 }
 
