@@ -215,9 +215,19 @@ sub p_join($sep, $parser) {
     return sub($ctx,$str) {
         my $p = $parser->($ctx,$str);
         if ( $p->{valid} ) {
-            return pass($p->{pos}, [join $sep, $p->{matches}->@*]);
+            my @matches = $p->{matches}->@*;
+            my $matches = @matches ? [join $sep, @matches] : [];
+            return {
+                valid   => 1,
+                pos     => $p->{pos},
+                matches => $matches,
+            }
         }
-        return fail($ctx->{pos});
+        return {
+            valid   => 0,
+            pos     => $ctx->{pos},
+            matches => [],
+        };
     }
 }
 

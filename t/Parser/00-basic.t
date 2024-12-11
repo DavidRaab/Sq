@@ -200,7 +200,7 @@ sub result(@xs) { Some([@xs]) }
 
     is(p_run($binary, '0123041'), result('0101'), 'p_filter 1');
     is(p_run($binary,    '1234'),    result('1'), 'p_filter 2');
-    is(p_run($binary,     '234'),     result(''), 'p_filter 3');
+    is(p_run($binary,     '234'),       result(), 'p_filter 3');
 
     # integers that are allowed to contain -_
     my $int1 =
