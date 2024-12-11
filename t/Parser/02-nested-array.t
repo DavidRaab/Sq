@@ -20,7 +20,7 @@ $array = p_map(
     sub(@xs) { sq [@xs] },
     $open,
     p_or(
-        p_and($value, p_many0(p_and($delimeter, $value))),
+        p_and($value, p_many0($delimeter, $value)),
         $value,
         p_match(qr/\s*/),
     ),
