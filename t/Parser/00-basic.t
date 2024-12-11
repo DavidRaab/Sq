@@ -8,7 +8,7 @@ use Test2::V0 qw/is ok done_testing dies like check_isa/;
 my $word = p_match(qr/([a-zA-Z]+)/);
 my $ws   = p_match(qr/\s++/);
 my $int  = p_match(qr/(\d++)/);
-my $hex  = p_map(p_match(qr/0x([0-9a-zA-Z]+)/), sub($hex) { hex $hex });
+my $hex  = p_map(sub($hex) { hex $hex }, p_match(qr/0x([0-9a-zA-Z]+)/));
 
 # Helper function to build result
 sub result(@xs) { Some([@xs]) }
@@ -17,7 +17,7 @@ sub result(@xs) { Some([@xs]) }
 {
     my $p_hello = p_match(qr/(Hello)/);
     my $p_world = p_match(qr/(World)/);
-    my $length  = p_map($p_hello, sub($str) { length $str });
+    my $length  = p_map(sub($str) { length $str }, $p_hello);
 
     my $greeting = "Hello, World!";
     is(p_run($p_hello, $greeting), result('Hello'), 'starts with hello');
@@ -91,7 +91,7 @@ sub result(@xs) { Some([@xs]) }
     is(p_run($int0, '123,12,300,420'), result(123, 12, 300, 420), '$int0 list 2');
     is(p_run($int1, '123,12,300,420'), result(123, 12, 300, 420), '$int1 list 2');
 
-    my $p_array = p_map($int0, sub(@xs) { [@xs] });
+    my $p_array = p_map(sub(@xs) { [@xs] }, $int0);
     is(p_run($p_array, '1,2,3,420'), result([1,2,3,420]), 'parses to array');
 }
 
@@ -140,8 +140,8 @@ sub result(@xs) { Some([@xs]) }
 
 # p_matchf
 {
-    my $hex1 = p_map(p_match(qr/0x([0-9a-zA-Z]+)/), sub($hex) { hex $hex });
-    my $hex2 = p_matchf(     qr/0x([0-9a-zA-Z]+)/ , sub($hex) { hex $hex });
+    my $hex1 = p_map(sub($hex) { hex $hex }, p_match(qr/0x([0-9a-zA-Z]+)/));
+    my $hex2 = p_matchf(qr/0x([0-9a-zA-Z]+)/, sub($hex) { hex $hex });
 
     is(p_run($hex1, "0xff 123"), result(255), '$hex1 ff');
     is(p_run($hex2, "0xff 123"), result(255), '$hex2 ff');
@@ -237,11 +237,11 @@ sub result(@xs) { Some([@xs]) }
 {
     my $int  =
         p_map(
+            sub($x) { $x+0 },
             p_join('', p_and(
                 p_maybe(p_strc(qw/+ -/)),
                 p_many(p_strc(0 .. 9)),
-            )),
-            sub($x) { $x+0 }
+            ))
         );
 
     is(p_run($int,  '1234'), Some([ 1234]), 'p_strc many 1');

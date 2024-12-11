@@ -101,8 +101,10 @@ sub p_matchf_opt($regex, $f_opt_xs) {
 
 # maps function $f against the values of the parser and returns a new parser
 #
-# Parser<'a> -> ('a -> 'b) -> Parser<'b>
-sub p_map($parser, $f_map) {
+# ('a -> 'b) -> @{ Parser<'a> } -> Parser<'b>
+sub p_map($f_map, @parsers) {
+    Carp::croak "p_map needs at least one parser." if @parsers == 0;
+    my $parser = @parsers == 1 ? $parsers[0] : p_and(@parsers);
     return sub($ctx,$str) {
         my $p = $parser->($ctx,$str);
         if ( $p->{valid} ) {

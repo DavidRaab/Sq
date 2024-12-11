@@ -62,7 +62,7 @@ use Test2::V0 qw(is ok done_testing);
     my $digit3 = assign {
         my $digit = p_or(map { p_strc($_) } 0 .. 9);
         my $three = p_and($digit, $digit, $digit);
-        return p_map($three, sub(@xs) { join '', @xs });
+        return p_map(sub(@xs) { join '', @xs }, $three);
     };
 
     is(p_run($digit3, "012"), Some(["012"]), 'parses 012');

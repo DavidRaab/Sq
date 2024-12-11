@@ -54,7 +54,7 @@ my $ia = p_and(
 );
 
 # parse array
-my $pa = p_map($ia, sub(@xs) { sq [@xs] });
+my $pa = p_map(sub(@xs) { sq [@xs] }, $ia);
 
 is(p_run($pa, '[]'),             result([]), 'parse array 1');
 is(p_run($pa, '[ ]'),            result([]), 'parse array 2');

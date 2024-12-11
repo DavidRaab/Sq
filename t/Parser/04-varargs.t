@@ -40,12 +40,12 @@ use Test2::V0 qw(is ok done_testing);
         p_many(
             p_maybe(p_match(qr/\s* , \s*/x)), # optional ,
             p_map(
+                $to_num,
                 p_and(
                     p_many (p_strc(0 .. 9)), # digits
                     p_match(qr/\s*/),        # whitespace
                     p_strc (qw/b kb mb gb/), # suffix
-                ),
-                $to_num
+                )
             )
         );
     };

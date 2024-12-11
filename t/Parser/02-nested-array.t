@@ -17,6 +17,7 @@ my $int       = p_match(qr/\s* (\d+) \s*/x);
 my $array;
 my $value = p_or($int, p_delay(sub{ $array }));
 $array = p_map(
+    sub(@xs) { sq [@xs] },
     p_and(
         $open,
         p_or(
@@ -26,7 +27,6 @@ $array = p_map(
         ),
         $close,
     ),
-    sub(@xs) { sq [@xs] }
 );
 
 # same as before
@@ -62,6 +62,7 @@ is(
     my $value = p_or($int, p_delay(sub{ $array }));
     $array    = p_delay(sub {
         p_map(
+            sub (@xs) { [@xs] },
             p_and(
                 p_match(qr/\s* \[ \s*/x),
                 p_or(
@@ -69,8 +70,7 @@ is(
                     p_empty(),
                 ),
                 p_match(qr/\s* \] \s*/x),
-            ),
-            sub (@xs) { [@xs] }
+            )
         )
     });
 
