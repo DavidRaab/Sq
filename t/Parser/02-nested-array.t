@@ -18,15 +18,13 @@ my $array;
 my $value = p_or($int, p_delay(sub{ $array }));
 $array = p_map(
     sub(@xs) { sq [@xs] },
-    p_and(
-        $open,
-        p_or(
-            p_and($value, p_many0(p_and($delimeter, $value))),
-            $value,
-            p_match(qr/\s*/),
-        ),
-        $close,
+    $open,
+    p_or(
+        p_and($value, p_many0(p_and($delimeter, $value))),
+        $value,
+        p_match(qr/\s*/),
     ),
+    $close,
 );
 
 # same as before
@@ -63,14 +61,12 @@ is(
     $array    = p_delay(sub {
         p_map(
             sub (@xs) { [@xs] },
-            p_and(
-                p_match(qr/\s* \[ \s*/x),
-                p_or(
-                    p_and($value, p_many0(p_match(qr/\s* , \s*/x), $value)),
-                    p_empty(),
-                ),
-                p_match(qr/\s* \] \s*/x),
-            )
+            p_match(qr/\s* \[ \s*/x),
+            p_or(
+                p_and($value, p_many0(p_match(qr/\s* , \s*/x), $value)),
+                p_empty(),
+            ),
+            p_match(qr/\s* \] \s*/x),
         )
     });
 
