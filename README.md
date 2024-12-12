@@ -303,7 +303,7 @@ is(t_run($user, $user2), Err("first does not exists on hash"), '$user2 has a typ
 
 # EXPORT
 
-It exports the following functions by default: id, fst, snd, key, assign, is_str, is_num, Some, None.
+It exports the following functions by default: sq, call, key, id, fst, snd, assign, is_str, is_num, Some, None, Ok, Err.
 
 # SUPPORT
 
