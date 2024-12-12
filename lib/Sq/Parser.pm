@@ -334,23 +334,44 @@ sub p_many(@parsers) {
 # *: zero or many times
 sub p_many0(@parsers) {
     Carp::croak "p_many0 needs at least one parser" if @parsers == 0;
-    return sub($ctx,$str) {
-        my ($p, $last_p, @matches, @and_matches) = ($ctx, $ctx);
-        REPEAT:
-        for my $parser ( @parsers ) {
+    # when only one parser was passed
+    if ( @parsers == 1 ) {
+        my $parser = $parsers[0];
+        return sub($ctx,$str) {
+            my ($p, $last_p, @matches) = ($ctx, $ctx);
+            REPEAT:
             $p = $parser->($p,$str);
-            last if !$p->{valid};
-            push @and_matches, $p->{matches}->@*;
-        }
 
-        if ( $p->{valid} ) {
-            push @matches, @and_matches;
-            @and_matches = ();
-            $last_p      = $p;
-            goto REPEAT;
-        }
+            if ( $p->{valid} ) {
+                push @matches, $p->{matches}->@*;
+                $last_p      = $p;
+                goto REPEAT;
+            }
 
-        return {valid=>1, pos=>$last_p->{pos}, matches=>\@matches};
+            return {valid=>1, pos=>$last_p->{pos}, matches=>\@matches};
+        }
+    }
+    # when multiple parsers are passed then a version with p_and inlined is
+    # returned.
+    else {
+        return sub($ctx,$str) {
+            my ($p, $last_p, @matches, @and_matches) = ($ctx, $ctx);
+            REPEAT:
+            for my $parser ( @parsers ) {
+                $p = $parser->($p,$str);
+                last if !$p->{valid};
+                push @and_matches, $p->{matches}->@*;
+            }
+
+            if ( $p->{valid} ) {
+                push @matches, @and_matches;
+                @and_matches = ();
+                $last_p      = $p;
+                goto REPEAT;
+            }
+
+            return {valid=>1, pos=>$last_p->{pos}, matches=>\@matches};
+        }
     }
 }
 
