@@ -1,0 +1,73 @@
+=encoding UTF-8
+
+=head1 Sq::Collections
+
+This is an overview of the Collections provided by C<Sq>.
+
+=head2 Sq::Collections::Seq
+
+Automatically loaded when loading C<Sq>. Available under the package C<Seq>.
+
+A sequence is a lazy List/Array implementation. It nearly offers the same
+API as an C<Array> but it is lazy, that means it only creates as much entries
+as you request from it. A sequence can be infinite. As it is an iterator
+it also offers immediat results compared to an C<Array> that needs to process
+all it's data at once. It usually always is less memory consuming compared to
+an C<Array>. When you don't need to iterate all elements it can be faster
+compared to an C<Array>, otherwise slower.
+
+=head2 Sq::Collections::Array
+
+Automatically loaded when loading C<Sq>. Available under the package C<Array>.
+
+This is not a re-implementation of an Array. It just uses the Perl built-in
+Array. It adds a blessing to the array-reference so you can call methods
+on it. You are supposed to work with it like a normal Array.
+
+=head2 Sq::Collections::Hash
+
+Automatically loaded when loading C<Sq>. Available under the package C<Hash>.
+
+This is not a re-implementation of an hash. It just uses the Perl built-in
+Hash. It adds a blessing to the hash-reference so you can call methods
+on it. You are supposed to work with it like a normal Hash.
+
+=head2 Sq::Collections::Heap
+
+Automatically loaded when loading C<Sq>. Available under the package C<Heap>.
+
+A C<Heap> is also sometimes called a B<Priority Queue>. A C<Heap> offers
+fast insertion and removal of the smallest element.
+
+=head2 Sq::Collections::Queue
+
+Automatically loaded when loading C<Sq>. Available under the package C<Queue>.
+
+A C<Queue> offers efficent adding at the end and removal at the beginning. It's
+a B<FIFO> structure. B<First in, First Out>.
+
+C<Queue> can be used, but it's internals will likely change because it doesn't
+offer the performance I expect.
+
+=head2 Sq::Collections::List
+
+Automatically loaded when loading C<Sq>. Available under the package C<List>.
+
+This C<List> is an immutable linked-list implementation.
+
+It's not directly B<immutable>. Theoretically it is B<mutable> but the way how
+this linked list works makes it unpractically to work with mutation. It's
+so unpractically that you likely use an C<Array> instead. Because of it's design
+it can enforce immutability at certain places.
+
+This data-structure has no priority at the moment and lacks behind of the features
+of C<Seq> and C<Array>. Once C<Seq> and C<Array> are finished this data-structure
+will be updated to reflect the latest changes.
+
+=head2 Sq::Collections::Set
+
+NOT YET IMPLEMENTED
+
+This will be a data-structure similar to an C<Array> that only allows values
+to appear once in it. Also has no priority at the moment. When you need this
+then you can use a C<Hash> instead.
