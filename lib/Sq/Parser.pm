@@ -109,12 +109,9 @@ sub p_map($f_map, @parsers) {
         my $parser = $parsers[0];
         return sub($ctx,$str) {
             my $p = $parser->($ctx,$str);
-            return {valid=>0, pos=>$ctx->{pos}} if !$p->{valid};
-            return {
-                valid   => 1,
-                pos     => $p->{pos},
-                matches => [$f_map->($p->{matches}->@*)],
-            };
+            return $p->{valid}
+                 ? { valid => 1, pos => $p->{pos}, matches => [$f_map->($p->{matches}->@*)] }
+                 : { valid => 0, pos => $ctx->{pos}};
         }
     }
     # multiple parsers with p_and inlined
