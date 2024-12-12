@@ -299,6 +299,29 @@ my $user2 = {
 # Tests
 is(t_run($user, $user1), Ok(1),                                '$user1 is a user');
 is(t_run($user, $user2), Err("first does not exists on hash"), '$user2 has a typo');
+
+# describes an album
+my $is_album = t_hash(
+    t_has_keys(qw/artist title tracks/),
+    t_keys(
+        artist => t_str,
+        title  => t_str,
+        tracks => t_array(
+            t_length(1),               # Array must have at least 1 entry
+            t_all(t_hash(              # All entries must be hashes
+                t_has_keys(qw/name duration/),
+                t_keys(
+                    name     => t_str,
+                    duration => t_parser(p_match(qr/\d\d:\d\d\z/)),
+                )
+            ))
+        )
+    )
+);
+
+my $result = t_run  ($is_album, $album); # Returns Result
+my $bool   = t_valid($is_album, $album); # Returns boolean
+t_assert($is_album, $album);             # Throws exception when not valid
 ```
 
 # EXPORT
