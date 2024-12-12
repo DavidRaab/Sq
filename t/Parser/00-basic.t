@@ -174,7 +174,7 @@ sub result(@xs) { Some([@xs]) }
 # p_qty
 {
     # Regex: ( \d{1,3} ){1,3}
-    my $three = p_qty(p_match(qr/(\d{1,3})/), 1, 3);
+    my $three = p_qty(1, 3, p_match(qr/(\d{1,3})/));
 
     is(p_run($three,          '1'),             result(1), 'p_qty 1');
     is(p_run($three,        '123'),           result(123), 'p_qty 2');
@@ -182,7 +182,7 @@ sub result(@xs) { Some([@xs]) }
     is(p_run($three, '1234567890'), result(123, 456, 789), 'p_qty 4');
 
     # Regex: \d{3}
-    my $d3 = p_repeat(p_match(qr/(\d)/), 3);
+    my $d3 = p_repeat(3, p_match(qr/(\d)/));
     is(p_run($d3,    '1'),          None, 'p_repeat 1');
     is(p_run($d3,   '12'),          None, 'p_repeat 2');
     is(p_run($d3,  '123'), result(1,2,3), 'p_repeat 3');

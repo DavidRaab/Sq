@@ -88,7 +88,7 @@ use Test2::V0 qw(is ok done_testing);
 {
     my $digit10 = assign {
         my $digit = p_or(map { p_strc($_) } 0 .. 9);
-        return p_join('', p_qty($digit, 1, 10));
+        return p_join('', p_qty(1, 10, $digit));
     };
 
     is(p_run($digit10,       "0"),      Some(["0"]), 'parses 0');

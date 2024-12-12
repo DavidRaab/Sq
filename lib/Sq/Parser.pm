@@ -396,7 +396,7 @@ sub p_many0(@parsers) {
 }
 
 # quantity
-sub p_qty($parser, $min, $max) {
+sub p_qty($min, $max, $parser) {
     return sub($ctx,$str) {
         my ($p, $last_p, $count, @matches) = ($ctx, $ctx, 0);
         REPEAT:
@@ -416,8 +416,8 @@ sub p_qty($parser, $min, $max) {
 }
 
 # repeats $parser exactly $amount times
-sub p_repeat($parser, $amount) {
-    return p_qty($parser, $amount, $amount);
+sub p_repeat($amount, $parser) {
+    return p_qty($amount, $amount, $parser);
 }
 
 # removes matches
