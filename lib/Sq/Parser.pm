@@ -169,7 +169,7 @@ sub p_bind($parser, $f) {
 # of all parsers. When one parser fails it returns None.
 # Regex: abc
 sub p_and(@parsers) {
-    Carp::croak "p_and needs at least one parser" if @parsers == 0;
+    Carp::croak "p_and needs at least two parsers" if @parsers < 2;
     return sub($ctx,$str) {
         my ($p, @matches) = ($ctx);
         for my $parser ( @parsers ) {
