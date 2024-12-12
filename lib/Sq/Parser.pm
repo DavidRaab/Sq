@@ -315,7 +315,6 @@ sub p_many(@parsers) {
                 $last_p       = $p;
                 goto REPEAT;
             }
-
             return $at_least_one
                 ? {valid=>1, pos=>$last_p->{pos}, matches=>\@matches}
                 : {valid=>0, pos=>$ctx->{pos}};
@@ -331,7 +330,6 @@ sub p_many(@parsers) {
                 last if !$p->{valid};
                 push @and_matches, $p->{matches}->@*;
             }
-
             if ( $p->{valid} ) {
                 push @matches, @and_matches;
                 @and_matches  = ();
@@ -339,7 +337,6 @@ sub p_many(@parsers) {
                 $last_p       = $p;
                 goto REPEAT;
             }
-
             return $at_least_one
                 ? {valid=>1, pos=>$last_p->{pos}, matches=>\@matches}
                 : {valid=>0, pos=>$ctx->{pos}};
@@ -357,13 +354,11 @@ sub p_many0(@parsers) {
             my ($p, $last_p, @matches) = ($ctx, $ctx);
             REPEAT:
             $p = $parser->($p,$str);
-
             if ( $p->{valid} ) {
                 push @matches, $p->{matches}->@*;
                 $last_p      = $p;
                 goto REPEAT;
             }
-
             return {valid=>1, pos=>$last_p->{pos}, matches=>\@matches};
         }
     }
@@ -378,14 +373,12 @@ sub p_many0(@parsers) {
                 last if !$p->{valid};
                 push @and_matches, $p->{matches}->@*;
             }
-
             if ( $p->{valid} ) {
                 push @matches, @and_matches;
                 @and_matches = ();
                 $last_p      = $p;
                 goto REPEAT;
             }
-
             return {valid=>1, pos=>$last_p->{pos}, matches=>\@matches};
         }
     }
@@ -394,10 +387,7 @@ sub p_many0(@parsers) {
 # quantity
 sub p_qty($parser, $min, $max) {
     return sub($ctx,$str) {
-        my ($p, $last_p, @matches);
-        ($p, $last_p) = ($ctx, $ctx);
-        my $count = 0;
-
+        my ($p, $last_p, $count, @matches) = ($ctx, $ctx, 0);
         REPEAT:
         $p = $parser->($p,$str);
         if ( $p->{valid} ) {
