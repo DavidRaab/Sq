@@ -48,11 +48,22 @@ $album->{tracks}->iteri(sub($hash,$idx) {
     is($hash, $is_hash, "album->tracks $idx is Hash");
 });
 is(
+    $album->get('tracks')->map(call 'sum_by', key 'duration')->or(0),
+    2559,
+    'album runtime 1');
+is(
     $album->get('tracks')->map(sub ($tracks) {
         $tracks->sum_by(key 'duration');
     })->or(0),
     2559,
-    'album runtime');
+    'album runtime 2');
+
+is(
+    $album->get('tracks')->map(sub ($tracks) {
+        $tracks->sum_by(sub($hash) { $hash->{duration} });
+    })->or(0),
+    2559,
+    'album runtime 3');
 
 {
     my $sum = 0;

@@ -126,17 +126,17 @@ $fib->take(5)->iter(sub($x) {
 my $cards =
     Seq::cartesian(
         Seq->wrap(qw/clubs spades hearts diamond/),
-        Seq->wrap(qw/7 8 9 10 B D K A/)
+        Seq->wrap(qw/7 8 9 10 J Q K A/)
     );
 
 use Path::Tiny qw(path);
 # get the maximum id from test-files so far
 my $maximum_id =
     Seq
-    ->wrap(   path('t')->children )
+    ->new(    path('t')->children )
     ->map(    sub($x) { $x->basename })
     ->choose( sub($x) { $x =~ m/\A(\d+) .* \.t\z/xms ? $1 : undef })
-    ->max(0); # or 0 if the sequence is empty
+    ->max->or(0); # or 0 if the sequence is empty
 ```
 
 # Parser
@@ -193,6 +193,54 @@ is(p_run($num, "1  b, 1kb"),         Some([1, 1024]), '1 b & 1kb');
 is(p_run($num, "1 kb, 1gb"), Some([1024,1073741824]), '1 kb & 1gb');
 is(p_run($num, "1 mb"),              Some([1048576]), '1 mb');
 is(p_run($num, "1 gb"),           Some([1073741824]), '1 gb');
+```
+
+# Data vs Classes
+
+```perl
+my $album = sq {
+    artist => 'Michael Jackson',
+    title  => 'Thriller',
+    tracks => [
+        {title => "Wanna Be Startin’ Somethin", duration => 363},
+        {title => "Baby Be Mine",               duration => 260},
+        {title => "The Girl Is Mine",           duration => 242},
+        {title => "Thriller",                   duration => 357},
+        {title => "Beat It",                    duration => 258},
+        {title => "Billie Jean",                duration => 294},
+        {title => "Human Nature",               duration => 246},
+        {title => "P.Y.T.",                     duration => 239},
+        {title => "The Lady in My Life",        duration => 300},
+    ],
+};
+
+# 3 - it has 3 keys
+my $length = $album->length;
+
+# 2559 - shortest version
+my $album_runtime = $album->get('tracks')->map(call 'sum_by', key 'duration')->or(0);
+
+# 2559 - expanded the "call" function
+my $album_runtime = $album->get('tracks')->map(sub ($tracks) {
+    $tracks->sum_by(key 'duration');
+})->or(0);
+
+# 2559 - expanded the "key" function
+my $album_runtime = $album->get('tracks')->map(sub ($tracks) {
+    $tracks->sum_by(sub($hash) { $hash->{duration} });
+})->or(0);
+
+# 2559 - Pure Perl version
+my $album_runtime = assign {
+    my $sum    = 0;
+    my $tracks = $album->{tracks};
+    if ( defined $tracks ) {
+        for my $track ( @$tracks ) {
+            $sum += $track->{duration};
+        }
+    }
+    return $sum;
+};
 ```
 
 # EXPORT
