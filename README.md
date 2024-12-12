@@ -16,9 +16,9 @@ Sq currently provides a lazy sequence `Seq`, extension for `Array`, `Hash`,
 a `Queue`, `List` and a `Heap` data-structure.
 
 It uses an `Option` and `Result` type for representing the absence of values
-or representing B<Ok/Err> values.
+or representing **Ok/Err** values.
 
-It is planned to implement B<Discriminated Unions>.
+It is planned to implement **Discriminated Unions**.
 
 Instead of classes, typing is done with an Structural Typing approach. It is
 available under `Sq::Type` but not completed and documented yet.
