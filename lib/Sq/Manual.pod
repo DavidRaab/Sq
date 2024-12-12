@@ -3,16 +3,13 @@
 
 This is an overview about the different Documentation
 
-
 =head2 INTRO
 
 Maybe
 
-
 =head2 EXAMPLES
 
 Coming SOON
-
 
 =head2 OTHER
 
@@ -28,7 +25,7 @@ Seq.
 
 =item L<Sq::Manual::Design::Wrap>
 
-Describes why ceratin operations like C<< Seq->wrap >> stops at C<undef>
+Describes why certain operations like C<< Seq->wrap >> stops at C<undef>
 
 =item L<Sq::Manual::Design::MinMax>
 
