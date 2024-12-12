@@ -1,0 +1,24 @@
+=encoding UTF-8
+
+=head1 Core Data-Structures
+
+Core data-structures are automatically loaded when you load C<Sq>.
+
+=head2 Sq::Core::Option
+
+This module is automatically available under the package C<Option>.
+
+An C<Option> is the idea to represent a value or not. It's an alternative to
+using C<undef>. An C<Option> is an object that has certain methods on it
+and makes typical code that crashes when using C<undef> impossible.
+
+=head2 Sq::Core::Result
+
+This module is automatically available under the package C<Result>.
+
+An C<Result> is the idea to represent an C<Ok> value or an C<Err>. Different
+to an C<Option> is that both cases can contain data. An C<Ok(1)> is different
+to an C<Err(1)> even when both contain a C<1>.
+
+A C<Result> is a another way to represent functions that either can be C<Ok>
+or returns an C<Err>or. Instead of just returning C<undef> or throwing Exceptions.
