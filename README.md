@@ -4,69 +4,42 @@ Sq - A Language hosted in Perl
 
 # SYNOPSIS
 
-What is a programming language anyway? Besides its syntax I think the default
-data-structures a programming language ships with has maybe the greatest
-impact on how someone programs.
+What is a programming language? The foundation of every programming language
+are the data-structures the language provides you by default. The default
+data-structures and their possibilites shape how you will build a solution.
 
-Lisp is a language that is basically built around the idea that everything is
-just a List. Haskell took the idea that this List must be lazy evaluated.
-F# ships by default with an Immutable List, immutable Record and so on,
-so you also use them. C basically has no data-structure at all, just pointers
-to memory, so you basically just use pointers to memory and use them
-as arrays.
+Sq is a module that provides certain data-structures. Those data-structures
+are meant as a replacement for the built-in Perl data-structures. But replacing
+those data-structures will change the way how you code.
 
-Perl ships with Array and Hash by default, and not surprisngly they are
-used everywhere to built stuff on top of it.
+Sq currently provides a lazy sequence `Seq`, extension for `Array`, `Hash`,
+a `Queue`, `List` and a `Heap` data-structure.
 
-`Sq` in that regards try to enhance the default `Array` and `Hash`
-implementation by giving them just more functions to work with, but it doesn't
-try to replace them.
+It uses an `Option` and `Result` type for representing the absence of values
+or representing B<Ok/Err> values.
 
-After getting used working in F# it actually becomes annoying to work in other
-languages that don't offer 100+ functions to just manipulate Lists. After
-working in Perl for 15+ years i know a lot how to implement a lot of common
-tasks efficently and with less code, and sometimes I am also annoyed that
-I have to implement those *patterns* again and again instead of giving
-them a name.
+It is planned to implement B<Discriminated Unions>.
 
-Then there are modules like List::Util that offers more functions, and somehow
-I was annoyed by the order you have to write them, how some functions are
-named, or that they are still some functions missing.
+Instead of classes, typing is done with an Structural Typing approach. It is
+available under `Sq::Type` but not completed and documented yet.
+This can be used as an argument validator or even as a testing tool.
 
-But the greatest problem was that there is basically no lazy Sequence
-implementation at all. And nearly zero immutable data-structures at all.
+Under `Sq::Parser` there is a Combinator based approach to parsing. It
+is already usuable and can be used for certain things but sill lacks some
+features like useful error-messages.
 
-`Sq` currently ships with Seq, Array, Hash, Heap and List.
+`Sq` don't invent new syntax, it just uses Perl as much as possible. It
+is also implemented in pure Perl so far.
 
-At the moment it is just a hobby project on my own that I work on occasionally.
+The idea of `Sq` is to combine procedural and functional programming and
+stick to a design that splits Data from Code. Because it leads to better
+software, is easier to develop and has more reusable code.
 
-Still everything is intended to be usuable with good performance. I don't
-try to enforce for example an *immutable all the way down* on top of Perl. I
-am also interested that it works seaminglessly with whatever else you use.
-
-For example you see this design in the Array module. You can write.
-
-    my $nums = Array->init(10, sub($idx) { $idx });
-
-and it creates an `Array` with 10 items that just contains its indexes as
-values. But `$nums` here is just a basic Perl Array, I am not trying to
-re-implement an Array. So you can use `$nums` like any array-reference
-you are used in Perl.
-
-    for my $x ( @$nums ) {
-        say $x;
-    }
-
-Sure, some other data-structures like `Seq` have to be their own
-implementation as their are no Perl implementations that provide the same
-functionality.
-
-Besides data-structures what makes a language unique is how you check for
-types, for example static and dynamic typed. Other *frameworks* like Moose for
-example try to give you more a *static-typing* approach with its classes and
-type-check against specific concrete classes or roles, here I will try a
-different approach build around the concept of dynamic-typing and having
-data, but this is still in work.
+The whole point is that it offers all basic operations you usually do in Perl
+like reading files, directories, parsing in general, parsing arguments, testing
+and a lot of other stuff in it's own System that uses the provided data-structures
+like `Seq`, `Array`, `Option` and `Result` so you can use it as a foundation
+to develop more abstract things without re-implementing the basics again and again.
 
 # HISTORY
 
@@ -78,9 +51,13 @@ So I decided to just name it `Sq` instead. At the same time I already had
 the idea to bring more stuff to Perl, like Records, Pattern Matching
 and Discriminated Unions, also some other approach to type-checking.
 
-So instead of realasing a dozens of seperate modules I thought about
-making one module that just combines all this ideas together. So `Sq` was
-born.
+So instead of releasing a dozens of seperate modules I thought about
+making one module that just combines all this ideas together that also can
+depend on each other. I wanted a short name, so i just removed the `e`
+from `Seq` and just named it `Sq`. You still can pronounce it `Seq`.
+
+There is no meaning/abreviation behind `Sq`. But when you can think of one
+that makes sense or you like then feel free to contribute.
 
 # Implemented so Far
 
@@ -102,6 +79,8 @@ working again.
 * [Sq::Collections::Queue](lib/Sq/Collections/Queue.pm)
 * [Sq::Collections::List](lib/Sq/Collections/List.pm)
 * [Sq::Collections::Heap](lib/Sq/Collections/Heap.pod)
+* [Sq::Type](lib/Sq/Type.pm)
+* [Sq::Parser](lib/Sq/Manual/Parser/00-intro.pod)
 
 # Seq Module
 
@@ -160,6 +139,62 @@ my $maximum_id =
     ->max(0); # or 0 if the sequence is empty
 ```
 
+# Parser
+
+Here is an example of the Parser to parse a number with suffix.
+
+```perl
+my $num = assign {
+    my $to_num = sub($num,$suffix) {
+        return $num                      if $suffix eq 'b';
+        return $num * 1024               if $suffix eq 'kb';
+        return $num * 1024 * 1024        if $suffix eq 'mb';
+        return $num * 1024 * 1024 * 1024 if $suffix eq 'gb';
+    };
+
+    p_many(
+        p_maybe(p_match(qr/\s* , \s*/x)), # optional ,
+        p_map(
+            $to_num,
+            p_many (p_strc(0 .. 9)), # digits
+            p_match(qr/\s*/),        # whitespace
+            p_strc (qw/b kb mb gb/), # suffix
+        )
+    );
+};
+
+# Tests
+is(p_run($num, "1  b, 1kb"),         Some([1, 1024]), '1 b & 1kb');
+is(p_run($num, "1 kb, 1gb"), Some([1024,1073741824]), '1 kb & 1gb');
+is(p_run($num, "1 mb"),              Some([1048576]), '1 mb');
+is(p_run($num, "1 gb"),           Some([1073741824]), '1 gb');
+```
+
+this is an exhausted example. `Sq::Parser` does not try to replace Regexes. Quite
+the opposite. It allows creating Parser with regexes in mind. So here is the above
+parser re-written using Perl Regexes.
+
+```perl
+my $num = assign {
+    my $to_num = sub($num,$suffix) {
+        return $num                      if $suffix eq 'b';
+        return $num * 1024               if $suffix eq 'kb';
+        return $num * 1024 * 1024        if $suffix eq 'mb';
+        return $num * 1024 * 1024 * 1024 if $suffix eq 'gb';
+    };
+
+    p_many(
+        p_matchf(qr/\s* ,? \s* (\d+) \s* (b|kb|mb|gb)/xi, $to_num),
+    );
+};
+
+# Tests
+is(p_run($num, "1  b, 1kb"),         Some([1, 1024]), '1 b & 1kb');
+is(p_run($num, "1 kb, 1gb"), Some([1024,1073741824]), '1 kb & 1gb');
+is(p_run($num, "1 mb"),              Some([1048576]), '1 mb');
+is(p_run($num, "1 gb"),           Some([1073741824]), '1 gb');
+```
+
 # EXPORT
 
 It exports the following functions by default: id, fst, snd, key, assign, is_str, is_num, Some, None.
@@ -176,7 +211,7 @@ You can also look for information at [my Blog on Perl Seq](https://davidraab.git
 
 # AUTHOR
 
-David Raab, C<< <davidraab83 at gmail.com> >>
+David Raab, **davidraab83 at gmail.com**
 
 # LICENSE AND COPYRIGHT
 
