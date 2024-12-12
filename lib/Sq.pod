@@ -21,24 +21,34 @@ Sq is a module that provides certain data-structures. Those data-structures
 are meant as a replacement for the built-in Perl data-structures. But replacing
 those data-structures will change the way how you code.
 
-Sq provides an immutable lazy sequence as its core data-structure (Seq),
-an immutable list (List), mutable Array (Array) and a mutable Queue (Queue).
+Sq currently provides a lazy sequence C<Seq>, extension for C<Array>, C<Hash>,
+a C<Queue>, C<List> and a C<Heap> data-structure.
 
-Those data-structures will share the same API as much as possible.
+It uses an C<Option> and C<Result> type for representing the absence of values
+or representing B<Ok/Err> values.
 
-Besides the above it will also provide a (Record) as an immutable Hash and
-Discriminated Unions.
+It is planned to implement B<Discriminated Unions>.
 
-Instead of classes, typing is done with an Structural Typing approach. This
-can be used as an argument validator or even as a testing tool.
+Instead of classes, typing is done with an Structural Typing approach. It is
+available under C<Sq::Type> but not completed and documented yet.
+This can be used as an argument validator or even as a testing tool.
 
-Sq don't invent new syntax, it just uses Perl as much as possible. It
+Under C<Sq::Parser> there is a Combinator based approach to parsing. It
+is already usuable and can be used for certain things but sill lacks some
+features like useful error-messages.
+
+C<Sq> don't invent new syntax, it just uses Perl as much as possible. It
 is also implemented in pure Perl so far.
 
-Besides just data-structures the idea of Sq is to have a certain high-level
-API for basic programming tasks. An easier API for doing all kinds of
-File System operations or reading and writing from files like CSV or JSON that
-uses the data-structures of this module.
+The idea of C<Sq> is to combine procedural and functional programming and
+stick to a design that splits Data from Code. Because it leads to better
+software, is easier to develop and has more reusable code.
+
+The whole point is that it offers all basic operations you usually do in Perl
+like reading files, directories, parsing in general, parsing arguments, testing
+and a lot of other stuff in it's own System that uses the provided data-structures
+like C<Seq>, C<Array>, C<Option> and C<Result> so you can use it as a foundation
+to develop more abstract things without re-implementing the basics again and again.
 
 =head1 IMPORTED FUNCTIONS
 
@@ -221,5 +231,15 @@ return the second element of an array
 =item L<Sq::Collections::List>
 
 =item L<Sq::Collections::Heap>
+
+=back
+
+=head1 Implemented
+
+=over 4
+
+=item L<Sq::Type>
+
+=item L<Sq::Parser>
 
 =back
