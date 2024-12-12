@@ -98,8 +98,7 @@ you can execute and iterate as often as you wish. In some sense I think
 that this design is more what someone expects using such a module.
 
 ```perl
-use v5.36;
-use Seq;
+use Sq;
 
 # Fibonacci Generator
 my $fib =
@@ -144,6 +143,9 @@ my $maximum_id =
 Here is an example of the Parser to parse a number with suffix.
 
 ```perl
+use Sq;
+use Sq::Parser;
+
 my $num = assign {
     my $to_num = sub($num,$suffix) {
         return $num                      if $suffix eq 'b';
@@ -175,6 +177,9 @@ the opposite. It allows creating Parser with regexes in mind. So here is the abo
 parser re-written using Perl Regexes.
 
 ```perl
+use Sq;
+use Sq::Parser;
+
 my $num = assign {
     my $to_num = sub($num,$suffix) {
         return $num                      if $suffix eq 'b';
@@ -198,6 +203,8 @@ is(p_run($num, "1 gb"),           Some([1073741824]), '1 gb');
 # Data vs Classes
 
 ```perl
+use Sq;
+
 my $album = sq {
     artist => 'Michael Jackson',
     title  => 'Thriller',
@@ -241,6 +248,57 @@ my $album_runtime = assign {
     }
     return $sum;
 };
+```
+
+# Typing
+
+```perl
+use Sq;
+use Sq::Type;
+
+# Describes a Address
+my $address = t_hash(t_keys(
+    street => t_str,
+    city   => t_str,
+    state  => t_str,
+    zip    => t_str,
+));
+
+# A user containing an address
+my $user  = t_hash(t_keys(
+    id      => t_str,
+    first   => t_str,
+    last    => t_str,
+    address => $address,
+));
+
+my $user1 = {
+    id      => 1,
+    first   => "David",
+    last    => "Raab",
+    address => {
+        street => 'Wonder Street',
+        city   => 'Wonder City',
+        state  => 'Wonder State',
+        zip    => '12345',
+    },
+};
+
+my $user2 = {
+    id      => 1,
+    frist   => "David",   # Typo
+    last    => "Raab",
+    address => {
+        street => 'Wonder Street',
+        city   => 'Wonder City',
+        state  => 'Wonder State',
+        zip    => '12345',
+    },
+};
+
+# Tests
+is(t_run($user, $user1), Ok(1),                                '$user1 is a user');
+is(t_run($user, $user2), Err("first does not exists on hash"), '$user2 has a typo');
 ```
 
 # EXPORT
