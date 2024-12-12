@@ -220,18 +220,29 @@ sub p_or(@parsers) {
 # Regex:?
 sub p_maybe(@parsers) {
     Carp::croak "p_maybe needs at least one parser" if @parsers == 0;
-    return sub($ctx,$str) {
-        my ($p, @matches) = ($ctx);
-        for my $parser ( @parsers ) {
-            $p = $parser->($p,$str);
-            return {valid=>1, pos=>$ctx->{pos}, matches=>[]} if !$p->{valid};
-            push @matches, $p->{matches}->@*;
+    if ( @parsers == 1 ) {
+        my $parser = $parsers[0];
+        return sub($ctx,$str) {
+            my $p = $parser->($ctx,$str);
+            return $p->{valid}
+                 ? {valid => 1, pos => $p->{pos},   matches => $p->{matches} }
+                 : {valid => 1, pos => $ctx->{pos}, matches => [] };
         }
-        return {
-            valid   => 1,
-            pos     => $p->{pos},
-            matches => $p->{valid} ? \@matches : [],
-        };
+    }
+    else {
+        return sub($ctx,$str) {
+            my ($p, @matches) = ($ctx);
+            for my $parser ( @parsers ) {
+                $p = $parser->($p,$str);
+                return {valid=>1, pos=>$ctx->{pos}, matches=>[]} if !$p->{valid};
+                push @matches, $p->{matches}->@*;
+            }
+            return {
+                valid   => 1,
+                pos     => $p->{pos},
+                matches => $p->{valid} ? \@matches : [],
+            };
+        }
     }
 }
 
