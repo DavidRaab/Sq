@@ -3,10 +3,11 @@ use 5.036;
 use Carp ();
 use Scalar::Util ();
 use Sq;
+use Sq::Parser qw(p_valid);
 use Sub::Exporter -setup => {
     exports => [
         qw(t_run t_valid t_assert t_or t_is), # Basic
-        qw(t_str t_str_eq t_match),           # String
+        qw(t_str t_str_eq t_match t_parser),  # String
         qw(t_num t_int t_min t_max t_range),  # Numbers
         qw(t_opt),
         qw(t_hash t_has_keys t_key t_keys),   # Hash
@@ -16,7 +17,7 @@ use Sub::Exporter -setup => {
     groups => {
         default => [
             qw(t_run t_valid t_assert t_or t_is), # Basic
-            qw(t_str t_str_eq t_match),           # String
+            qw(t_str t_str_eq t_match t_parser),  # String
             qw(t_num t_int t_min t_max t_range),  # Numbers
             qw(t_opt),
             qw(t_hash t_has_keys t_key t_keys),   # Hash
@@ -308,6 +309,14 @@ sub t_or(@checks) {
             return $result if $result->is_ok;
         }
         return Err("No check was successfull");
+    }
+}
+
+# Runs a Parser against a string
+sub t_parser($parser) {
+    return sub($str) {
+        return Ok 1 if p_valid($parser, $str);
+        return Err("string does not match Parser");
     }
 }
 
