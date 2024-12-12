@@ -286,26 +286,48 @@ sub p_strc($strings, @strings) {
 # +: at least one, as much as possible
 sub p_many(@parsers) {
     Carp::croak "p_many needs at least one parser" if @parsers == 0;
-    return sub($ctx,$str) {
-        my ($p, $last_p, $at_least_one, @matches, @and_matches) = ($ctx,$ctx,0);
-        REPEAT:
-        for my $parser ( @parsers ) {
+    # with only one parser a optimized version without p_and inlined is returned
+    if ( @parsers == 1 ) {
+        my $parser = $parsers[0];
+        return sub($ctx,$str) {
+            my ($p, $last_p, $at_least_one, @matches) = ($ctx,$ctx,0);
+            REPEAT:
             $p = $parser->($p,$str);
-            last if !$p->{valid};
-            push @and_matches, $p->{matches}->@*;
-        }
+            if ( $p->{valid} ) {
+                push @matches, $p->{matches}->@*;
+                $at_least_one = 1;
+                $last_p       = $p;
+                goto REPEAT;
+            }
 
-        if ( $p->{valid} ) {
-            push @matches, @and_matches;
-            @and_matches  = ();
-            $at_least_one = 1;
-            $last_p       = $p;
-            goto REPEAT;
+            return $at_least_one
+                ? {valid=>1, pos=>$last_p->{pos}, matches=>\@matches}
+                : {valid=>0, pos=>$ctx->{pos}};
         }
+    }
+    # when multiple parsers are passed, a version with p_and inlined is returned
+    else {
+        return sub($ctx,$str) {
+            my ($p, $last_p, $at_least_one, @matches, @and_matches) = ($ctx,$ctx,0);
+            REPEAT:
+            for my $parser ( @parsers ) {
+                $p = $parser->($p,$str);
+                last if !$p->{valid};
+                push @and_matches, $p->{matches}->@*;
+            }
 
-        return $at_least_one
-             ? {valid=>1, pos=>$last_p->{pos}, matches=>\@matches}
-             : {valid=>0, pos=>$ctx->{pos}};
+            if ( $p->{valid} ) {
+                push @matches, @and_matches;
+                @and_matches  = ();
+                $at_least_one = 1;
+                $last_p       = $p;
+                goto REPEAT;
+            }
+
+            return $at_least_one
+                ? {valid=>1, pos=>$last_p->{pos}, matches=>\@matches}
+                : {valid=>0, pos=>$ctx->{pos}};
+        }
     }
 }
 
