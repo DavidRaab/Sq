@@ -1,5 +1,5 @@
 
-=head1 Seq::Manual
+=head1 Sq::Manual
 
 This is an overview about the different Documentation
 
