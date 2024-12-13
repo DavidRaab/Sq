@@ -89,23 +89,19 @@ my $is_album_parser = assign {
         return $min,$sec;
     });
 
-    return t_hash(
-        t_has_keys(qw/artist title tracks/),
-        t_keys(
-            artist => t_str,
-            title  => t_str,
-            tracks => t_array(
-                t_length(1),               # Array must have at least 1 entry
-                t_all(t_hash(              # All entries must be hashes
-                    t_has_keys(qw/name duration/),
-                    t_keys(
-                        name     => t_str,
-                        duration => t_parser($duration),
-                    )
-                ))
-            )
-        )
-    );
+    return
+        t_hash(
+            t_has_keys(qw/artist title tracks/),
+            t_keys(
+                artist => t_str,
+                title  => t_str,
+                tracks => t_array(
+                    t_length(1),               # Array must have at least 1 entry
+                    t_all(t_hash(              # All entries must be hashes
+                        t_has_keys(qw/name duration/),
+                        t_keys(
+                            name     => t_str,
+                            duration => t_parser($duration)))))));
 };
 
 my $is_album_matchf = assign {
@@ -115,23 +111,19 @@ my $is_album_matchf = assign {
         return 1;
     });
 
-    return t_hash(
-        t_has_keys(qw/artist title tracks/),
-        t_keys(
-            artist => t_str,
-            title  => t_str,
-            tracks => t_array(
-                t_length(1),               # Array must have at least 1 entry
-                t_all(t_hash(              # All entries must be hashes
-                    t_has_keys(qw/name duration/),
-                    t_keys(
-                        name     => t_str,
-                        duration => $duration,
-                    )
-                ))
-            )
-        )
-    )
+    return
+        t_hash(
+            t_has_keys(qw/artist title tracks/),
+            t_keys(
+                artist => t_str,
+                title  => t_str,
+                tracks => t_array(
+                    t_length(1),               # Array must have at least 1 entry
+                    t_all(t_hash(              # All entries must be hashes
+                        t_has_keys(qw/name duration/),
+                        t_keys(
+                            name     => t_str,
+                            duration => $duration))))));
 };
 
 my $idx = 0;
