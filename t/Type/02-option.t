@@ -80,8 +80,16 @@ ok(
     ),
     'tracks duration matches regex');
 
-{
-    my $is_album = t_hash(
+my $is_album_parser = assign {
+    # Example for using the Parser, but its usually better to use
+    # t_match ot t_matchf instead.
+    my $duration = p_matchf(qr/(\d\d):(\d\d)\z/, sub($min,$sec) {
+        return if $min >= 60;
+        return if $sec >= 60;
+        return $min,$sec;
+    });
+
+    return t_hash(
         t_has_keys(qw/artist title tracks/),
         t_keys(
             artist => t_str,
@@ -92,13 +100,150 @@ ok(
                     t_has_keys(qw/name duration/),
                     t_keys(
                         name     => t_str,
-                        duration => t_parser(p_match(qr/\d\d:\d\d\z/)),
+                        duration => t_parser($duration),
                     )
                 ))
             )
         )
     );
+};
+
+my $is_album_matchf = assign {
+    my $duration = t_matchf(qr/\A(\d\d):(\d\d)\z/, sub($min,$sec) {
+        return if $min >= 60;
+        return if $sec >= 60;
+        return 1;
+    });
+
+    return t_hash(
+        t_has_keys(qw/artist title tracks/),
+        t_keys(
+            artist => t_str,
+            title  => t_str,
+            tracks => t_array(
+                t_length(1),               # Array must have at least 1 entry
+                t_all(t_hash(              # All entries must be hashes
+                    t_has_keys(qw/name duration/),
+                    t_keys(
+                        name     => t_str,
+                        duration => $duration,
+                    )
+                ))
+            )
+        )
+    )
+};
+
+for my $is_album ( $is_album_parser, $is_album_matchf ) {
     ok(t_valid($is_album, $album), '$album is an album');
+
+    ok(!t_valid($is_album, {
+        artist => "Yes",
+        title  => "Whatever",
+        tracks => [],
+    }), 'no track');
+
+    ok(!t_valid($is_album, {
+        artist => "Yes",
+        title  => "Whatever",
+        tracks => [{
+            name => "first",
+            dur  => 200,
+        }],
+    }), 'dur instead of duration in track');
+
+    ok(!t_valid($is_album, {
+        artist => "Yes",
+        title  => "Whatever",
+        tracks => [{
+            name     => "first",
+            duration => 200,
+        }],
+    }), 'duration not correct format 1');
+
+    ok(!t_valid($is_album, {
+        artist => "Yes",
+        title  => "Whatever",
+        tracks => [{
+            name     => "first",
+            duration => "000:00",
+        }],
+    }), 'duration not correct format 2');
+
+    ok(!t_valid($is_album, {
+        artist => "Yes",
+        title  => "Whatever",
+        tracks => [{
+            Name     => "first",
+            duration => "00:00",
+        }],
+    }), 'Name in tracks wrong');
+
+    ok(t_valid($is_album, {
+        artist => "Yes",
+        title  => "Whatever",
+        tracks => [{
+            name     => "first",
+            duration => "00:00",
+        }],
+    }), 'Everything ok');
+
+    ok(!t_valid($is_album, {
+        artist => "Yes",
+        title  => "Whatever",
+        tracks => [
+            {
+                name     => "first",
+                duration => "00:00",
+            },
+            {}
+        ],
+    }), 'second track missing everything');
+
+    ok(!t_valid($is_album, {
+        artist => "Yes",
+        title  => "Whatever",
+        tracks => [
+            {
+                name     => "first",
+                duration => "00:00",
+            },
+            {
+                name     => "second",
+                duration => "60:44",
+            }
+        ],
+    }), 'duration not correct');
+
+    ok(t_valid($is_album, {
+        artist => "Yes",
+        title  => "Whatever",
+        tracks => [
+            {
+                name     => "first",
+                duration => "00:00",
+            },
+            {
+                name     => "second",
+                duration => "59:59",
+            }
+        ],
+    }), 'everything ok 2');
+
+    ok(!t_valid($is_album, {
+        artist => "Yes",
+        title  => "Whatever",
+        tracks => [
+            {
+                name     => "first",
+                duration => "00:00",
+            },
+            {
+                name     => "second",
+                duration => "59:60",
+            }
+        ],
+    }), 'duration not correct');
 }
 
 done_testing;
