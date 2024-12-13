@@ -93,8 +93,8 @@ my $is_album_parser = assign {
         t_hash(
             t_has_keys(qw/artist title tracks/),
             t_keys(
-                artist => t_str,
-                title  => t_str,
+                artist => t_str(t_length 1),
+                title  => t_str(t_length 1),
                 tracks => t_array(
                     t_length(1),               # Array must have at least 1 entry
                     t_all(t_hash(              # All entries must be hashes
@@ -115,8 +115,8 @@ my $is_album_matchf = assign {
         t_hash(
             t_has_keys(qw/artist title tracks/),
             t_keys(
-                artist => t_str,
-                title  => t_str,
+                artist => t_str(t_length 1),
+                title  => t_str(t_length 1),
                 tracks => t_array(
                     t_length(1),               # Array must have at least 1 entry
                     t_all(t_hash(              # All entries must be hashes
@@ -180,6 +180,24 @@ for my $is_album ( $is_album_parser, $is_album_matchf ) {
             duration => "00:00",
         }],
     }), "$idx: Everything ok");
+
+    ok(!t_valid($is_album, {
+        artist => "",
+        title  => "Whatever",
+        tracks => [{
+            name     => "first",
+            duration => "00:00",
+        }],
+    }), "$idx: artist empty");
+
+    ok(!t_valid($is_album, {
+        artist => "Yes",
+        title  => "",
+        tracks => [{
+            name     => "first",
+            duration => "00:00",
+        }],
+    }), "$idx: title empty");
 
     ok(!t_valid($is_album, {
         artist => "Yes",

@@ -28,9 +28,8 @@ use Sub::Exporter -setup => {
 };
 
 # TODO
-# Add: t_and, t_not
+# Add: t_not
 # Add: t_none, t_any
-# Add: t_parser
 
 ### Runners
 
@@ -245,7 +244,7 @@ sub t_all($is_type) {
     }
 }
 
-# checks if Array/Hash has minimum upto maximum amount of elements
+# checks if Array/Hash/string has minimum upto maximum amount of elements
 sub t_length($min, $max=undef) {
     return sub($any) {
         my $type = ref $any;
