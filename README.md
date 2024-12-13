@@ -182,10 +182,10 @@ use Sq::Parser;
 
 my $num = assign {
     my $to_num = sub($num,$suffix) {
-        return $num                      if $suffix eq 'b';
-        return $num * 1024               if $suffix eq 'kb';
-        return $num * 1024 * 1024        if $suffix eq 'mb';
-        return $num * 1024 * 1024 * 1024 if $suffix eq 'gb';
+        return $num                      if fc $suffix eq fc 'b';
+        return $num * 1024               if fc $suffix eq fc 'kb';
+        return $num * 1024 * 1024        if fc $suffix eq fc 'mb';
+        return $num * 1024 * 1024 * 1024 if fc $suffix eq fc 'gb';
     };
 
     p_many(
@@ -193,10 +193,9 @@ my $num = assign {
     );
 };
 
-# Tests
 is(p_run($num, "1  b, 1kb"),         Some([1, 1024]), '1 b & 1kb');
 is(p_run($num, "1 kb, 1gb"), Some([1024,1073741824]), '1 kb & 1gb');
-is(p_run($num, "1 mb"),              Some([1048576]), '1 mb');
+is(p_run($num, "1 Mb"),              Some([1048576]), '1 mb');
 is(p_run($num, "1 gb"),           Some([1073741824]), '1 gb');
 ```
 
