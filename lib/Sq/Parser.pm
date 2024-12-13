@@ -16,13 +16,20 @@ use Sub::Exporter -setup => {
     },
 };
 
-### DS to represents pass/fail
+##########
+###
+### data-structure to represents pass/fail
+###
+### At a lot of places this is inlined for performance, but the function stay
+### here for "documentation" and sure still can be called.
 sub pass($pos, $matches) {
     return { valid => 1, pos => $pos, matches => $matches }
 }
 sub fail($pos) {
     return { valid => 0, pos => $pos }
 }
+###
+##########
 
 # Expects a Parser and a string and runs the parser against the string
 # returning if it succedded or not.
