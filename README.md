@@ -301,23 +301,28 @@ is(t_run($user, $user1), Ok(1),                                '$user1 is a user
 is(t_run($user, $user2), Err("first does not exists on hash"), '$user2 has a typo');
 
 # describes an album
-my $is_album = t_hash(
-    t_has_keys(qw/artist title tracks/),
-    t_keys(
-        artist => t_str,
-        title  => t_str,
-        tracks => t_array(
-            t_length(1),               # Array must have at least 1 entry
-            t_all(t_hash(              # All entries must be hashes
-                t_has_keys(qw/name duration/),
-                t_keys(
-                    name     => t_str,
-                    duration => t_parser(p_match(qr/\d\d:\d\d\z/)),
-                )
-            ))
-        )
-    )
-);
+my $is_album = assign {
+    # checks for format and if min:seconds are not >= 60
+    my $duration = t_matchf(qr/\A(\d\d):(\d\d)\z/, sub($min,$sec) {
+        return if $min >= 60;
+        return if $sec >= 60;
+        return 1;
+    });
+
+    return
+        t_hash(
+            t_has_keys(qw/artist title tracks/),
+            t_keys(
+                artist => t_str(t_length 1),   # string must have at least 1 char
+                title  => t_str(t_length 1),
+                tracks => t_array(
+                    t_length(1),               # Array must have at least 1 entry
+                    t_all(t_hash(              # All entries must be hashes
+                        t_has_keys(qw/name duration/),
+                        t_keys(
+                            name     => t_str,
+                            duration => $duration))))));
+};
 
 my $result = t_run  ($is_album, $album); # Returns Result
 my $bool   = t_valid($is_album, $album); # Returns boolean
