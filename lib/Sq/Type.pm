@@ -6,22 +6,22 @@ use Sq;
 use Sq::Parser qw(p_valid);
 use Sub::Exporter -setup => {
     exports => [
-        qw(t_run t_valid t_assert t_or t_is), # Basic
-        qw(t_str t_str_eq t_match t_parser),  # String
-        qw(t_num t_int t_min t_max t_range),  # Numbers
+        qw(t_run t_valid t_assert t_or t_is),         # Basic
+        qw(t_str t_str_eq t_match t_matchf t_parser), # String
+        qw(t_num t_int t_min t_max t_range),          # Numbers
         qw(t_opt),
-        qw(t_hash t_has_keys t_key t_keys),   # Hash
-        qw(t_array t_idx),                    # Array
+        qw(t_hash t_has_keys t_key t_keys),           # Hash
+        qw(t_array t_idx),                            # Array
         qw(t_all t_length),
     ],
     groups => {
         default => [
-            qw(t_run t_valid t_assert t_or t_is), # Basic
-            qw(t_str t_str_eq t_match t_parser),  # String
-            qw(t_num t_int t_min t_max t_range),  # Numbers
+            qw(t_run t_valid t_assert t_or t_is),         # Basic
+            qw(t_str t_str_eq t_match t_matchf t_parser), # String
+            qw(t_num t_int t_min t_max t_range),          # Numbers
             qw(t_opt),
-            qw(t_hash t_has_keys t_key t_keys),   # Hash
-            qw(t_array t_idx),                    # Array
+            qw(t_hash t_has_keys t_key t_keys),           # Hash
+            qw(t_array t_idx),                            # Array
             qw(t_all t_length),
         ],
     },
@@ -278,6 +278,14 @@ sub t_match($regex) {
     return sub($any) {
         return Ok 1 if $any =~ $regex;
         return Err("$regex no match: $any");
+
+sub t_matchf($regex, $predicate) {
+    return sub($str) {
+        if ( $str =~ $regex ) {
+            return Ok 1 if $predicate->(@{^CAPTURE});
+            return Err("\$predicate not succesful");
+        }
+        return Err("matchf: $regex does not match");
     }
 }
 
