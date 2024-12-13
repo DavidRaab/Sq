@@ -80,9 +80,9 @@ ok(
     ),
     'tracks duration matches regex');
 
+# Example for using the Parser, but its usually better to use
+# t_match ot t_matchf instead.
 my $is_album_parser = assign {
-    # Example for using the Parser, but its usually better to use
-    # t_match ot t_matchf instead.
     my $duration = p_matchf(qr/(\d\d):(\d\d)\z/, sub($min,$sec) {
         return if $min >= 60;
         return if $sec >= 60;
@@ -134,14 +134,15 @@ my $is_album_matchf = assign {
     )
 };
 
+my $idx = 0;
 for my $is_album ( $is_album_parser, $is_album_matchf ) {
-    ok(t_valid($is_album, $album), '$album is an album');
+    ok(t_valid($is_album, $album), "$idx: \$album is an album");
 
     ok(!t_valid($is_album, {
         artist => "Yes",
         title  => "Whatever",
         tracks => [],
-    }), 'no track');
+    }), "$idx: no track");
 
     ok(!t_valid($is_album, {
         artist => "Yes",
@@ -150,7 +151,7 @@ for my $is_album ( $is_album_parser, $is_album_matchf ) {
             name => "first",
             dur  => 200,
         }],
-    }), 'dur instead of duration in track');
+    }), "$idx: dur instead of duration in track");
 
     ok(!t_valid($is_album, {
         artist => "Yes",
@@ -159,7 +160,7 @@ for my $is_album ( $is_album_parser, $is_album_matchf ) {
             name     => "first",
             duration => 200,
         }],
-    }), 'duration not correct format 1');
+    }), "$idx: duration not correct format 1");
 
     ok(!t_valid($is_album, {
         artist => "Yes",
@@ -168,7 +169,7 @@ for my $is_album ( $is_album_parser, $is_album_matchf ) {
             name     => "first",
             duration => "000:00",
         }],
-    }), 'duration not correct format 2');
+    }), "$idx: duration not correct format 2");
 
     ok(!t_valid($is_album, {
         artist => "Yes",
@@ -177,7 +178,7 @@ for my $is_album ( $is_album_parser, $is_album_matchf ) {
             Name     => "first",
             duration => "00:00",
         }],
-    }), 'Name in tracks wrong');
+    }), "$idx: Name in tracks wrong");
 
     ok(t_valid($is_album, {
         artist => "Yes",
@@ -186,7 +187,7 @@ for my $is_album ( $is_album_parser, $is_album_matchf ) {
             name     => "first",
             duration => "00:00",
         }],
-    }), 'Everything ok');
+    }), "$idx: Everything ok");
 
     ok(!t_valid($is_album, {
         artist => "Yes",
@@ -198,7 +199,7 @@ for my $is_album ( $is_album_parser, $is_album_matchf ) {
             },
             {}
         ],
-    }), 'second track missing everything');
+    }), "$idx: second track missing everything");
 
     ok(!t_valid($is_album, {
         artist => "Yes",
@@ -213,7 +214,7 @@ for my $is_album ( $is_album_parser, $is_album_matchf ) {
                 duration => "60:44",
             }
         ],
-    }), 'duration not correct');
+    }), "$idx: duration not correct");
 
     ok(t_valid($is_album, {
         artist => "Yes",
@@ -228,7 +229,7 @@ for my $is_album ( $is_album_parser, $is_album_matchf ) {
                 duration => "59:59",
             }
         ],
-    }), 'everything ok 2');
+    }), "$idx: everything ok 2");
 
     ok(!t_valid($is_album, {
         artist => "Yes",
@@ -243,7 +244,9 @@ for my $is_album ( $is_album_parser, $is_album_matchf ) {
                 duration => "59:60",
             }
         ],
-    }), 'duration not correct');
+    }), "$idx: duration not correct");
+
+    $idx++;
 }
 
 done_testing;
