@@ -147,6 +147,7 @@ sub t_keys(%kt) {
             my $type   = $kt{$key};
             my $result = t_run(t_key($key, $type), $any);
             return $result if $result->is_err;
+            return Err("keys: $key failed type") if $result->is_err;
         }
         return Ok 1;
     }
@@ -157,7 +158,7 @@ sub t_str_eq($expected) {
         if ( ref $any eq "" ) {
             return Ok(1) if $any eq $expected;
         }
-        return Err("Expected: '$expected' got '$any'");
+        return Err("str_eq: Expected: '$expected' got '$any'");
     }
 }
 
@@ -170,7 +171,7 @@ sub t_num(@checks) {
             }
             return Ok 1;
         }
-        return Err("Not a number");
+        return Err("num: Not a number");
     }
 }
 
@@ -183,7 +184,7 @@ sub t_int(@checks) {
             }
             return Ok 1;
         }
-        return Err("Not an integer");
+        return Err("int: Not an integer");
     }
 }
 
@@ -196,7 +197,7 @@ sub t_str(@checks) {
             }
             return Ok 1;
         }
-        return Err("not a string");
+        return Err("str: Not a string");
     }
 }
 
@@ -213,7 +214,7 @@ sub t_idx($index, @checks) {
 sub t_is($predicate) {
     return sub($any) {
         return Ok 1 if $predicate->($any);
-        return Err("predicate does not match");
+        return Err("is: \$predicate not succesful");
     }
 }
 
@@ -224,7 +225,7 @@ sub t_all($is_type) {
             for my $x ( @$any ) {
                 my $result = $is_type->($x);
                 if ( $result->is_err ) {
-                    return Err("Element of Array does not match predicate");
+                    return Err("all: Element of Array does not match predicate");
                 }
             }
             return Ok 1;
@@ -233,13 +234,13 @@ sub t_all($is_type) {
             for my $key ( keys %$any ) {
                 my $result = $is_type->($any->{$key});
                 if ( $result->is_err ) {
-                    return Err("A value of a Hash does not match predicate");
+                    return Err("all: A value of a Hash does not match predicate");
                 }
             }
             return Ok 1;
         }
         else {
-            return Err("$type not supported by t_all");
+            return Err("all: $type not supported by t_all");
         }
     }
 }
@@ -251,25 +252,25 @@ sub t_length($min, $max=undef) {
 
         if ( $type eq 'Array' || $type eq 'ARRAY' ) {
             my $length = @$any;
-            return Err("Not enough elements") if $length < $min;
-            return Err("Too many elements")   if defined $max && $length > $max;
+            return Err("length: Not enough elements") if $length < $min;
+            return Err("length: Too many elements")   if defined $max && $length > $max;
             return Ok 1;
         }
         elsif ( $type eq 'Hash' || $type eq 'HASH' ) {
             my $length = keys %$any;
-            return Err("Not enough elements") if $length < $min;
-            return Err("Too many elements")   if defined $max && $length > $max;
+            return Err("length: Not enough elements") if $length < $min;
+            return Err("length: Too many elements")   if defined $max && $length > $max;
             return Ok 1;
         }
         # String
         elsif ( $type eq '' ) {
             my $length = length $any;
-            return Err("string to short") if $length < $min;
-            return Err("string to long")  if defined $max && $length > $max;
+            return Err("lenght: string to short") if $length < $min;
+            return Err("length: string to long")  if defined $max && $length > $max;
             return Ok 1;
         }
         else {
-            return Err("Not array-ref, hash-ref or string");
+            return Err("length: Not array-ref, hash-ref or string");
         }
     }
 }
@@ -277,7 +278,9 @@ sub t_length($min, $max=undef) {
 sub t_match($regex) {
     return sub($any) {
         return Ok 1 if $any =~ $regex;
-        return Err("$regex no match: $any");
+        return Err("match: $regex no match: $any");
+    }
+}
 
 sub t_matchf($regex, $predicate) {
     return sub($str) {
@@ -292,21 +295,21 @@ sub t_matchf($regex, $predicate) {
 sub t_min($min) {
     return sub($num) {
         return Ok 1 if $num >= $min;
-        return Err("$num must be greater $min");
+        return Err("min: $num >= $min");
     }
 }
 
 sub t_max($max) {
     return sub($num) {
         return Ok 1 if $num <= $max;
-        return Err("$num must be smaller $max");
+        return Err("max: $num <= $max");
     }
 }
 
 sub t_range($min, $max) {
     return sub($num) {
         return Ok 1 if $num >= $min && $num <= $max;
-        return Err("$num must be between $min - $max");
+        return Err("range: $num not between ($min,$max)");
     }
 }
 

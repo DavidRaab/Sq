@@ -64,79 +64,65 @@ is(t_run(t_array, {}), Err('Not an Array'), '{} not an array');
 is(t_run(t_hash, {}, {}, {}),             Ok(1), 'multiple hashes');
 is(t_run(t_hash, {}, {}, []), Err("Not a Hash"), 'one not hash');
 
-is(t_run($is_album, $album), Ok(1),
-    'check if $album is album');
-is(t_run($is_album, $album_wrong1), Err("key artist not defined"),
-    'check if $album_wrong1 fails');
-
-is(t_run($is_album, $album_wrong2), Ok(1),
+ok( t_valid($is_album, $album),        'check if $album is album');
+ok(!t_valid($is_album, $album_wrong1), 'check if $album_wrong1 fails');
+ok(
+    t_valid($is_album, $album_wrong2),
     '$album_wrong2 is a valid $album because tracks only need to be defined');
 
-is(t_run(t_key(artist => t_str), $album), Ok(1),
-    'check if album.artist is_str');
-is(t_run(t_key(foo    => t_str), $album), Err("foo does not exists on hash"),
-    'album.foo must fail');
-
-is(t_run(t_key(artist => t_str_eq('Michael Jackson')), $album, ), Ok(1),
+ok( t_valid(t_key(artist => t_str), $album), 'check if album.artist is_str');
+ok(!t_valid(t_key(foo    => t_str), $album), 'album.foo must fail');
+ok(
+    t_valid(t_key(artist => t_str_eq('Michael Jackson')), $album),
     'album is from Michael Jackson');
-is(t_run($is_album2, $album), Ok(1),
-    'full album check');
-
-is(t_run($is_album2, $album_wrong2), Err('Not an Array'),
-    'album.tracks not an array');
+ok( t_valid($is_album2, $album),        'full album check');
+ok(!t_valid($is_album2, $album_wrong2), 'album.tracks not an array');
 
 # t_length
 {
-    my $ne = Err("Not enough elements");
-    my $tm = Err("Too many elements");
-
     # only min
-    is(t_run(t_length(1), []   ), $ne,   't_length 1');
-    is(t_run(t_length(1), [1]  ), Ok(1), 't_length 2');
-    is(t_run(t_length(1), [1,2]), Ok(1), 't_length 3');
-
-    is(t_run(t_length(1), {}         ), $ne,   't_length 4');
-    is(t_run(t_length(1), {f=>1}     ), Ok(1), 't_length 5');
-    is(t_run(t_length(1), {f=>1,g=>1}), Ok(1), 't_length 6');
+    ok(!t_valid(t_length(1), []         ), 't_length 1');
+    ok( t_valid(t_length(1), [1]        ), 't_length 2');
+    ok( t_valid(t_length(1), [1,2]      ), 't_length 3');
+    ok(!t_valid(t_length(1), {}         ), 't_length 4');
+    ok( t_valid(t_length(1), {f=>1}     ), 't_length 5');
+    ok( t_valid(t_length(1), {f=>1,g=>1}), 't_length 6');
 
     # min and max
-    is(t_run(t_length(1,3), []       ),   $ne, 't_length 7');
-    is(t_run(t_length(1,3), [1]      ), Ok(1), 't_length 8');
-    is(t_run(t_length(1,3), [1,2]    ), Ok(1), 't_length 9');
-    is(t_run(t_length(1,3), [1,2,3]  ), Ok(1), 't_length 10');
-    is(t_run(t_length(1,3), [1,2,3,4]),   $tm, 't_length 11');
+    ok(!t_valid(t_length(1,3), []       ), 't_length 7');
+    ok( t_valid(t_length(1,3), [1,2]    ), 't_length 9');
+    ok( t_valid(t_length(1,3), [1]      ), 't_length 8');
+    ok( t_valid(t_length(1,3), [1,2,3]  ), 't_length 10');
+    ok(!t_valid(t_length(1,3), [1,2,3,4]), 't_length 11');
 
-    is(t_run(t_length(1,3), {}                   ),   $ne, 't_length 12');
-    is(t_run(t_length(1,3), {a=>1}               ), Ok(1), 't_length 13');
-    is(t_run(t_length(1,3), {a=>1,b=>2}          ), Ok(1), 't_length 14');
-    is(t_run(t_length(1,3), {a=>1,b=>2,c=>3}     ), Ok(1), 't_length 15');
-    is(t_run(t_length(1,3), {a=>1,b=>2,c=>3,d=>4}),   $tm, 't_length 16');
+    ok(!t_valid(t_length(1,3), {}                   ), 't_length 12');
+    ok( t_valid(t_length(1,3), {a=>1}               ), 't_length 13');
+    ok( t_valid(t_length(1,3), {a=>1,b=>2}          ), 't_length 14');
+    ok( t_valid(t_length(1,3), {a=>1,b=>2,c=>3}     ), 't_length 15');
+    ok(!t_valid(t_length(1,3), {a=>1,b=>2,c=>3,d=>4}), 't_length 16');
 
     # string
-    is(t_run(t_length(1),  "" ), Err("string to short"), 't_length 17');
-    is(t_run(t_length(1),  "a"),                  Ok(1), 't_length 18');
-    is(t_run(t_length(1), "ab"),                  Ok(1), 't_length 19');
+    ok(!t_valid(t_length(1),  "" ), 't_length 17');
+    ok( t_valid(t_length(1),  "a"), 't_length 18');
+    ok( t_valid(t_length(1), "ab"), 't_length 19');
 
-    is(t_run(t_length(1,3), ""    ), Err("string to short"), 't_length 17');
-    is(t_run(t_length(1,3), "a"   ),                  Ok(1), 't_length 18');
-    is(t_run(t_length(1,3), "ab"  ),                  Ok(1), 't_length 19');
-    is(t_run(t_length(1,3), "abc" ),                  Ok(1), 't_length 20');
-    is(t_run(t_length(1,3), "abcd"),  Err('string to long'), 't_length 21');
+    ok(!t_valid(t_length(1,3), ""    ), 't_length 17');
+    ok( t_valid(t_length(1,3), "a"   ), 't_length 18');
+    ok( t_valid(t_length(1,3), "ab"  ), 't_length 19');
+    ok( t_valid(t_length(1,3), "abc" ), 't_length 20');
+    ok(!t_valid(t_length(1,3), "abcd"), 't_length 21');
 }
 
 # t_all
 {
-    my $ea = Err("Element of Array does not match predicate");
-    my $eh = Err("A value of a Hash does not match predicate");
+    ok( t_valid(t_all(t_hash), []         ), 't_all 1');
+    ok( t_valid(t_all(t_hash), [{}, {}]   ), 't_all 2');
+    ok(!t_valid(t_all(t_hash), [{}, {}, 1]), 't_all 3');
 
-    is(t_run(t_all(t_hash), []         ), Ok(1), 't_all 1');
-    is(t_run(t_all(t_hash), [{}, {}]   ), Ok(1), 't_all 2');
-    is(t_run(t_all(t_hash), [{}, {}, 1]),   $ea, 't_all 3');
-
-    is(t_run(t_all(t_array), {}                ), Ok(1), 't_all 4');
-    is(t_run(t_all(t_array), {a=>[]}           ), Ok(1), 't_all 5');
-    is(t_run(t_all(t_array), {a=>[],b=>[]}     ), Ok(1), 't_all 6');
-    is(t_run(t_all(t_array), {a=>[],b=>[],c=>1}),   $eh, 't_all 7');
+    ok( t_valid(t_all(t_array), {}                ), 't_all 4');
+    ok( t_valid(t_all(t_array), {a=>[]}           ), 't_all 5');
+    ok( t_valid(t_all(t_array), {a=>[],b=>[]}     ), 't_all 6');
+    ok(!t_valid(t_all(t_array), {a=>[],b=>[],c=>1}), 't_all 7');
 }
 
 # t_valid & t_assert
