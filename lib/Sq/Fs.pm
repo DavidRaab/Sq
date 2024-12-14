@@ -1,8 +1,5 @@
+package Sq::Fs;
 
-=head1 Sq::FS
-
-File-System
-
-=cut
+# Don't know anymore what was planned.
 
 1;
