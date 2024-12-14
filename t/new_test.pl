@@ -31,7 +31,7 @@ my $maximum_id =
     Seq
     ->new( path($opt->folder)->children )
     ->map( sub($x) { $x->basename })
-    ->regex_match( qr/\A(\d+) .* \.t\z/xms, [1])
+    ->regex_match( qr/\A(\d+) .* \.t\z/xms)
     ->fsts
     ->max->or(-1);
 
