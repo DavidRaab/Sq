@@ -1,0 +1,8 @@
+=encoding UTF-8
+
+* static vs dynamic
+* functions vs type declaration
+* runtime vs. compile-time (AOP)
+
+=head1 What is a Type?
+
