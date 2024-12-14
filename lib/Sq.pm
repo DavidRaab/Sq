@@ -4,16 +4,22 @@ our $VERSION = '0.006';
 use Scalar::Util ();
 use Sub::Exporter -setup => {
     exports => [
-        qw(id fst snd key assign is_str is_num sq call),
-        Some => sub { \&Option::Some },
-        None => sub { \&Option::None },
-        Ok   => sub { \&Result::Ok   },
-        Err  => sub { \&Result::Err  },
+        qw(sq call key assign),
+        qw(is_num is_str),
+        qw(id fst snd),
+        Some => sub { \&Option::Some            },
+        None => sub { \&Option::None            },
+        Ok   => sub { \&Result::Ok              },
+        Err  => sub { \&Result::Err             },
+        lazy => sub { \&Sq::Control::Lazy::lazy },
     ],
     groups => {
-        default => [qw(id fst snd key assign is_str is_num Some None sq Ok Err call)],
+        default => [qw(id fst snd key assign is_str is_num Some None sq Ok Err call lazy)],
     },
 };
+
+# Load lazy keyword
+use Sq::Control::Lazy;
 
 # Load Basic Data Types
 use Sq::Core::Option;
