@@ -13,6 +13,7 @@ use Sub::Exporter -setup => {
         qw(t_hash t_has_keys t_key t_keys),           # Hash
         qw(t_array t_idx),                            # Array
         qw(t_all t_length),
+        qw(t_any t_sub),
     ],
     groups => {
         default => [
@@ -23,6 +24,7 @@ use Sub::Exporter -setup => {
             qw(t_hash t_has_keys t_key t_keys),           # Hash
             qw(t_array t_idx),                            # Array
             qw(t_all t_length),
+            qw(t_any t_sub),
         ],
     },
 };
@@ -328,6 +330,17 @@ sub t_parser($parser) {
         return Ok 1 if p_valid($parser, $str);
         return Err("string does not match Parser");
     }
+}
+
+sub t_any() {
+    return sub($any) { return Ok 1 };
+}
+
+sub t_sub() {
+    return sub($any) {
+        return Ok 1 if ref $any eq 'CODE';
+        return Err("Not a CODE reference.");
+    };
 }
 
 1;
