@@ -24,12 +24,6 @@ my $is_even = sub($x)     { $x % 2 == 0 };
     my $b = Array->bless([1,2,3]);
     is($b, check_isa('Array'), 'bless');
     is($b, [1,2,3],            'bless content');
-
-    like(
-        dies { Array->bless(1) },
-        qr/\AArray->bless\(\$aref\) must be called with arrayref/,
-        'bless without arrayref dies'
-    );
 }
 
 # Basic checks of range and rangeDesc

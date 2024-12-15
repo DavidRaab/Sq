@@ -34,12 +34,7 @@ sub wrap {
 }
 
 sub bless($class, $ref) {
-    if ( ref $ref eq 'ARRAY' ) {
-        return CORE::bless($ref, 'Array');
-    }
-    else {
-        Carp::croak('Array->bless($aref) must be called with arrayref.');
-    }
+    return CORE::bless($ref, 'Array');
 }
 
 # Array->from_array : Array<'a> -> Array<'a>
