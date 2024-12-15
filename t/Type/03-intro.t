@@ -98,4 +98,47 @@ sub test($idx, $is_album) {
 test(0, sub($data) { $is_album_manual->($data)      });
 test(1, sub($data) { t_valid($is_album_type, $data) });
 
+sub add_points($p1, $p2) {
+    state $is_point = t_hash(t_keys(
+        X => t_num,
+        Y => t_num,
+    ));
+    t_assert($is_point, $p1, $p2);
+
+    return {
+        X => $p1->{X} + $p2->{X},
+        Y => $p1->{Y} + $p2->{Y},
+    };
+}
+
+is(
+    add_points({X=>1,Y=>1}, {X=>1,Y=>1}),
+    {X => 2, Y => 2},
+    'adding points');
+
+like(
+    dies { add_points({X=>1}, {X=>1,Y=>1}) },
+    qr/\AType check failed/,
+    'throws error 1');
+
+like(
+    dies { add_points({X=>1,Y=>1}, {X=>1}) },
+    qr/\AType check failed/,
+    'throws error 2');
+
+like(
+    dies { add_points({}, {}) },
+    qr/\AType check failed/,
+    'throws error 3');
+
+like(
+    dies { add_points([], []) },
+    qr/\AType check failed/,
+    'throws error 4');
+
+like(
+    dies { add_points("", "") },
+    qr/\AType check failed/,
+    'throws error 5');
+
 done_testing;

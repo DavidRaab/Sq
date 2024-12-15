@@ -492,6 +492,49 @@ faster!
 Or to be more precise. We save computation time when we access/write/create/mutate
 data. Instead we have I<maybe> more computation time when we check for the type.
 
-But consider that usually data is more often accessed/written or read from and
-including type-checks at every place can be a real burdon that also makes building
-the data in itself very slow.
+=head1 Back to the Point
+
+Let's reconsider the example we started with. We now can write.
+
+    sub add_points($p1, $p2) {
+        state $is_point = t_hash(t_keys(
+            X => t_num,
+            Y => t_num,
+        ));
+        t_assert($is_point, $p1, $p2);
+
+        return {
+            X => $p1->{X} + $p2->{X},
+            Y => $p1->{Y} + $p2->{Y},
+        };
+    }
+
+and now we have a function that type-checks both arguments of being a
+hash with X/Y keys that must be numbers. Otherwise an exception is thrown.
+
+Here it is good to assign the type-check itself to a C<state> variable. This
+way the type-check is only created once on the first invocation when C<add_point>
+is called. All later invocations re-use that type-check.
+
+This is one way how you can use C<Sq::Type>. I would prefer to have just a
+definition of types at the beginning of a module so the same type can be re-used
+multiple times. I guess you maybe create multiple functions that expects a
+point and you don't want to re-write the type-check for every point in every
+function!
+
+    my $is_point = t_hash(t_keys(
+        X => t_num,
+        Y => t_num,
+    ));
+
+    sub add_points($p1, $p2) {
+        t_assert($is_point, $p1, $p2);
+
+        return {
+            X => $p1->{X} + $p2->{X},
+            Y => $p1->{Y} + $p2->{Y},
+        };
+    }
+
+While you still can do this. This is not the suggested way how you use C<Sq::Type>.
+In the next Section we will go into looking into C<Sq::Signature>.
