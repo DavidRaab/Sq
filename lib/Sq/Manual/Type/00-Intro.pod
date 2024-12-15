@@ -6,3 +6,492 @@
 
 =head1 What is a Type?
 
+Let's say i want to define a C<Vector2> type. Most statical typed language
+use a B<Nominal typing> approach. This means you define the name C<Vector2>
+and give it a structure. For example in F# you write.
+
+    type Vector2 = {
+        X: float
+        Y: float
+    }
+
+in C# this might look like this.
+
+    public class Vector2 {
+        public double X;
+        public double Y;
+
+        public Vector2(double x, double y) {
+            this.X = x;
+            this.Y = y;
+        }
+    }
+
+B<Nominal typing> means that something is of a specific type purely by its
+naming definition. Here by the name C<Vector2>.
+
+Now consider i would write the following C<Point> type in F#
+
+    type Point = {
+        X: float
+        Y: float
+    }
+
+Even though C<Vector2> and C<Point> are of the same structure they are still
+incompatible to each other. Let's say you wanna write a function that adds two
+Points or two Vector2 together, then you must write it twice!
+
+    module Vector2 =
+        let add (a:Vector2) b = {
+            Vector2.X = a.X + b.X
+            Y = a.Y + b.Y
+        }
+
+    module Point =
+        let add (a:Point) b = {
+            Point.X = a.X + b.X
+            Y = a.Y + b.Y
+        }
+
+This kind of typing is most used in a static typed language. In a dynamic typed
+language you also could do something similar. For example in Perl we can create
+a C<Vector2> class/package and with C<isa> check if it is a C<Vector2> or
+just implement C<add> as a method. When we create a C<Point> class we would
+again implement it twice. See L<Benefits of Dynamic Typing|https://davidraab.github.io/posts/benefits-of-dynamic-typing/>
+for a more in detail discussion about using classes and it's disadvantages.
+
+So while we could create classes in Perl and also stick to a B<Nominal typing>
+approach. We also can use dynamic data-structures to just represent our data.
+
+So here is how a C<Vector2> would look like:
+
+    my $vector2 = { X => 10; Y => 20 };
+
+and here is how a C<Point> would look like:
+
+    my $point = { X => 10; Y => 20 };
+
+what is the difference? Well, none at all. We just define a structure. When we
+want to write an C<add> function we could write.
+
+    sub add($p1, $p2) {
+        return {
+            X => $p1->{X} + $p2->{X},
+            Y => $p1->{Y} + $p2->{Y},
+        };
+    }
+
+This function would work with any two hashes you pass it, as long both contain
+an C<X> and a C<Y> field.
+
+This approach of typing is also named B<Structural typing> and works very good
+in a dynamic-typed language.
+
+=head1 When Types are not enough
+
+Let's consider we want to write a type that contains a Music album. A Music
+Album only should contain three things. An Artist Name, A Title and a list of
+Tracks. In F# I would create the following types.
+
+    type Track = {
+        Title:    string
+        Duration: int
+    }
+
+    type Album = {
+        Artist: string
+        Title:  string
+        Tracks: list<Track>
+    }
+
+with this kind of definition i can write the following in F#
+
+    let album = {
+        Artist = 'Michael Jackson'
+        Title  = 'Thriller'
+        Tracks = [
+            {Title = "Wanna Be Startin’ Somethin"; Duration = 363}
+            {Title = "Baby Be Mine";               Duration = 260}
+            {Title = "The Girl Is Mine";           Duration = 242}
+            {Title = "Thriller";                   Duration = 357}
+            {Title = "Beat It";                    Duration = 258}
+            {Title = "Billie Jean";                Duration = 294}
+            {Title = "Human Nature";               Duration = 246}
+            {Title = "P.Y.T.";                     Duration = 239}
+            {Title = "The Lady in My Life";        Duration = 300}
+        ]
+    }
+
+this definition would be "fully" typed. This means C<album> would be known
+as a type of C<Album>. Also it fields like C<Artist>, C<Title> and C<Tracks>
+must be defined, including that C<Tracks> must be a list.
+
+In Perl/Sq i just can write the following.
+
+    my $album = sq {
+        artist => 'Michael Jackson',
+        title  => 'Thriller',
+        tracks => [
+            {title => "Wanna Be Startin’ Somethin", duration => 363},
+            {title => "Baby Be Mine",               duration => 260},
+            {title => "The Girl Is Mine",           duration => 242},
+            {title => "Thriller",                   duration => 357},
+            {title => "Beat It",                    duration => 258},
+            {title => "Billie Jean",                duration => 294},
+            {title => "Human Nature",               duration => 246},
+            {title => "P.Y.T.",                     duration => 239},
+            {title => "The Lady in My Life",        duration => 300},
+        ],
+    };
+
+But here no type is involved. No type checking including that any field must
+be set. It's just a Hash that can contain any data.
+
+One reason for types is that it helps you to write correct code. For example
+I could create a function that sums up the duration and creates a total running
+time of an album. In F# I write.
+
+    let total album = album.Tracks |> List.sumBy (fun track -> track.Duration)
+
+F# has a B<type inference> system. So by writing C<album.Tracks> the compiler
+knows it must be a B<Record> that contains a C<Tracks> field and it would automatically
+restrict the variable C<album> to be of type C<Album>.
+
+In C<Sq> i write the following
+
+    sub total($album) { $album->{tracks}->sum_by(key 'duration') }
+
+The only difference is that there is no type checking involved. Still it doesn't
+mean C<$album> can be any structure. To work correctly you must pass a hash,
+containing a C<tracks> field that is an Array that again contains Hashes
+with a C<duration> field.
+
+This type information is implicitly assumed by the code, but nothing checks
+if what you pass to C<total> has this kind of structure. You just get some weird
+error messages back, when C<$album> has not at least the needed structure.
+
+But theoretically it is a lot more re-usable. As this code doesn't access for example
+the Album Title or Album Artist, we also don't need to pass a data-structure
+containing these fields and it would still work.
+
+But typing has it's reasons. The problem with programming in a dynamic
+typed language and working this way is when you accidently pass something
+incompatible to the function C<total>. For example an empty hash. A data-structure
+that has no Tracks defined and so on. Then instead of getting an error immediately
+when calling C<total> you get an error somewhere at a place that is not the
+real cause of the error.
+
+For example passing the empty hash to C<total> would give you an error telling
+you that `sum_by` cannot be called on an undefined value. And the error
+is in the C<total> function, even though the real error is that someone passed
+an empty hash to C<total>.
+
+Btw. in C<Sq> this is partialy fixed by using the C<Hash::get> function.
+
+    sub total($album) { $album->get('tracks')->map(call sum_by, key 'duration')->or(0) }
+
+Now a call like
+
+    my $sum = total(sq {});
+
+would just return C<0>.
+
+=head1 Checking for types
+
+Another way would be to write a function, and include type-checking where it
+needs. For example instead of just accessing C<tracks> we first check if it
+is defined, and an array. When not, we abort and so on. But in my opinion
+this makes code horrible to write. C<total> then suddenly will look like
+this.
+
+=head2 Inline checking
+
+    sub total($album) {
+        if ( ref $album eq 'HASH' ) {
+            my $tracks = $album->{tracks};
+            if ( ref $tracks eq 'ARRAY' ) {
+                my $sum = 0;
+                for my $track ( @$tracks ) {
+                    my $duration = $track->{duration};
+                    Carp::croak "duration not defined on a Track" if !defined $duration;
+                    $sum += $duration;
+                }
+                return $sum;
+            }
+            else {
+                Carp::croak 'variable doesn't contain a tracks field that is an array';
+            }
+        }
+        else {
+            Carp::croak 'not a hash';
+        }
+    }
+
+The problem of this code in my opinion is.
+
+=item * Too much code for what it does
+
+=item * More type-checking than the computation
+
+=item * Runtime type checking makes code slower
+
+=item * You must rewrite this checking for every function you write
+
+=head2 Function based checking
+
+So a better approach would be to put the type checking into it's own function.
+For example we could create the following function to check if something
+is an Album.
+
+    sub is_album($album) {
+        if ( ref $album eq 'Hash' ) {
+            return 0 if !defined $album->{artist};
+            return 0 if !defined $album->{title};
+            if ( ref $album->{tracks} eq 'Array' ) {
+                for my $track ( @{$album->{tracks}} ) {
+                    return 0 if !defined $track->{title};
+                    return 0 if !defined $track->{duration};
+                }
+                return 1;
+            }
+            return 0;
+        }
+        return 0;
+    }
+
+The idea is that we have so called B<predicate functions>. A predicate function
+is a function that just returns a boolean value that either returns true/false.
+By extracting the type check into it's own function we just can write.
+
+    sub total($album) {
+        Carp::croak "No album was passed" if !is_album($album);
+        return $album->{tracks}->sum_by(key 'duration');
+    }
+
+Consider that in a dynamic typed language. Type checking is basically equivalent
+to running code that checks for a structure! Even when you would just check
+the type of an object with C<isa> you actually must run some code to check
+for the type.
+
+Here the type-checking checks for the complete album. But for the C<total>
+function we also could create a type that only checks for the C<tracks> field
+and if it contains hashes with C<duration>. Because those are the only fields
+needed.
+
+Putting the type-checking code into it's own function makes it easily re-usable
+and also better understandble. The problem is that writing such "type-checking"
+code is tedious.
+
+=head2 Sq::Type
+
+This problem is solved by C<Sq::Type>. When loading C<Sq::Type> it loads a
+bunch of C<t_> namespaced functions that helps you creating those functions.
+Checking for an album now becomes.
+
+    my $is_album =
+        t_hash(
+            t_has_keys(qw/artist title tracks/),
+            t_keys(
+                artist => t_str,
+                title  => t_str,
+                tracks => t_array(
+                    t_all(t_hash(
+                        t_keys(
+                            title    => t_str,
+                            duration => t_int,
+                        )
+                    )),
+                ),
+            )
+        );
+
+Here C<$is_album> is a check that also can be combined again with other checks,
+but also can be runned with C<t_run>, C<t_valid> or C<t_assert>. So
+once you defined such a check, you can write.
+
+    sub total($album) {
+        t_assert($is_album, $album);
+        return $album->{tracks}->sum_by(key 'duration');
+    }
+
+First of, it already does a little bit more then the manual defined function.
+It also checks for C<artist> and C<title> being a string. And C<duration> in
+the tracks must be an B<integer>. I consider this kind of writing a lot more
+natural because it resembles exactly how you create your data. Consider an album
+could be defined like this.
+
+    my $album = sq {
+        artist => "Queen",
+        title  => "Greatest Hits",
+        tracks => [],
+    };
+
+and the type check also has the same structure.
+
+    my $is_album = t_hash(t_keys(
+        artist => t_str,
+        title  => t_str,
+        tracks => t_array,
+    ));
+
+but instead of values, you just write C<t_str>, C<t_array> and so on for what
+type this field should be.
+
+=head1 When static typing is not enough
+
+Here is one interesting thing. The static typing approach you see in F#
+has the benefits that it's type-checking is done at compilation time. Because
+it works at compilation time it doesn't need to type-check anything at runtime
+anymore. This is one reason why static typed languages are faster. The compiler
+ensures that you never call a function with the wrong type, so it doesn't
+need to check it at runtime.
+
+In a dynamic typed language this is never the case. Because that is basically
+what B<dynamic typed> means. It's type checks are always executed at runtime.
+But there is also a solution to this, that we will later look on.
+
+At the moment let's consider another problem. B<Static typing> is still limited
+at some points, not all checks can be done at compilation time!
+
+Let's consider that we want to further restrict what a valid album should look
+like. We also want
+
+=item * Album Artist/Title must be at least 1 character long.
+
+=item * Tracks must at least contain 1 Track
+
+The only way to solve this additional constraints is by writing a constructor
+that checks the values. The typical approach in F# would be to create an
+C<Album.create> function that does the additonal checking of the structure.
+
+    module Album =
+        let create artist title tracks =
+            if String.length artist = 0
+                failwithf "Artist must at least one character long"
+            if String.length title = 0
+                failwithf "Title must at least one character long"
+            if List.length tracks = 0
+                failwithf "One Track needed"
+            {
+                Artist = artist
+                Title  = title
+                Tracks = tracks
+            }
+
+This is no difference to any other language. Typical constraints in programming
+are usually deeper than just expecting a type. Sometimes we want numbers
+that cannot be negative, numbers in certain ranges. Array/List of a minimum/maximum
+size. When we have dates it maybe must be in the past. Sometimes it must be in
+the future. String must be of certain lengths, values cannot be null and so on.
+
+All of those type checks are still done with code at runtime even in a static typed
+language! Even though there are languages that supports stuff like this at compilation
+time. Look at L<F*|https://en.wikipedia.org/wiki/F*_(programming_language)>,
+L<Coq|https://en.wikipedia.org/wiki/Coq_(software)> or L<Idris|https://en.wikipedia.org/wiki/Idris_(programming_language)>.
+But those languages also come with its own complexities.
+
+Because C<Sq::Type> is actually just code, it also already includes checks like
+minimum or maximum values. Checking for length of strings, Arrays and so on.
+
+For example look at this Album type definition.
+
+    my $is_album = assign {
+        my $duration = t_matchf(qr/\A(\d\d):(\d\d)\z/, sub($min,$sec) {
+            return if $min >= 60;
+            return if $sec >= 60;
+            return 1;
+        });
+
+        return
+            t_hash(
+                t_has_keys(qw/artist title tracks/),
+                t_keys(
+                    artist => t_str(t_length 1),   # String must be one character long
+                    title  => t_str(t_length 1),
+                    tracks => t_array(
+                        t_length(1),               # Array must have at least 1 entry
+                        t_all(t_hash(              # All entries must be hashes
+                            t_has_keys(qw/name duration/),
+                            t_keys(
+                                name     => t_str,
+                                duration => $duration))))));
+    };
+
+First C<$duration> here is defined as a type-check with a Regular Expression.
+it matches on time values like C<"12:23">. But also consider that it correctly
+checks the numbers. So C<"60:00"> would be invalid.
+
+C<t_length> can check the length of a string, array or hash, depending on
+where you use it. here you also see that any type can be further extended.
+
+Writing just C<t_str> only checks for a value being a string. But when you
+write C<t_str(t_length 1)> it also checks it's minimum length!
+
+Writing C<t_str(t_length 1, 255)> would restrict the string to be between
+1 and 255 characters.
+
+You also could additionally pass a C<t_match> to C<t_str> when you want
+the string to match against a certain regex!
+
+Using C<t_length 1> inside a C<t_array()> call actually checks the length
+of the Array. You also could pass a maximum.
+
+=head2 Bypassing the checks
+
+One common problem in F# is that you basically can bypass any checks. Because
+data-type are open, you just can directly create an Album without being forced
+to use C<Album.create> that has your validation logic in it.
+
+There are certain ways around this, hiding the constructor and so on, but
+I usually don't care in F#. Still it's important to understand that static
+type checks you have even in a static typed language cannot truly check
+for all valid/invalid variations. To be practical you just must run some code
+to check your types.
+
+In C<Sq> we just completely omit the problem that we don't think of B<Nominal typing>
+and that something we built must be valid at every creation step. When you truly
+need to check for a certain type, you just call the function that checks it.
+
+For example, also this is valid for creating an album.
+
+    my $album = {};
+    $album->{artist} = get_artist_from_db();
+    $album->{title}  = get_title_from_db();
+    for my $track ( get_tracks_from_db() ) {
+        push @{$album->{tracks}}, $track;
+    }
+
+    if ( t_valid($is_album, $album) ) {
+        # valid album
+    }
+    else {
+        # not valid
+    }
+
+So we have a B<built phase> where we can built data in a procedural way. But
+C<$album> don't need to be valid at every step. Compare it to the F# solution
+where you already need to pass the whole B<Track list> when creating the Album.
+
+in C<Sq> we first can built the Album step-by-step and after all operations
+are finished only then we check for the type (once).
+
+Also consider that this is a lot more easier in a lot of cases. Consider for example
+that you provide a function that can delete Tracks from an Album. Then to be valid
+you Track deletion code always must ensure that there must be at least one Track.
+
+Otherwise just checking for the B<Nominal type> and checking just for C<Album>
+would cause probably bugs when you depent on Tracks having at least one Track.
+
+On the other-side with the approach picked in C<Sq> we don't have that problem.
+We can remove all Tracks, but then it wouldn't pass the type check anymore!
+No need for complicated logic in changing/mutation or creation of data!
+
+This not only makes code easier to read B<AND> write, it usually also makes it
+faster!
+
+Or to be more precise. We save computation time when we access/write/create/mutate
+data. Instead we have I<maybe> more computation time when we check for the type.
+
+But consider that usually data is more often accessed/written or read from and
+including type-checks at every place can be a real burdon that also makes building
+the data in itself very slow.
