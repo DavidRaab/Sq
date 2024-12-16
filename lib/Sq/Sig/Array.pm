@@ -6,7 +6,7 @@ use Sq::Signature;
 # Some predefined types
 my $aoa   = t_array(t_all t_array);
 my $aoh   = t_array(t_all t_hash);
-my $hoa   = t_hash(t_all t_array);
+my $hoa   = t_hash (t_all t_array);
 my $tuple = t_array(t_length 2);
 
 ### CONSTRUCTORS
@@ -29,7 +29,7 @@ sig('Array::range',      t_any, t_int, t_int, t_array);
 
 sig('Array::copy',          t_array, t_array);
 sig('Array::bind',          t_array, t_sub, t_array);
-sig('Array::flatten',       $aoa, t_array);
+sig('Array::flatten',       $aoa,    t_array);
 sig('Array::cartesian',     t_array, t_array, t_array);
 sig('Array::append',        t_array, t_array, t_array);
 sig('Array::rev',           t_array, t_array);
@@ -47,7 +47,7 @@ sig('Array::sort',          t_array, t_sub, t_array);
 sig('Array::sort_by',       t_array, t_sub, t_sub, t_array);
 sig('Array::sort_num',      t_array(t_all t_num), t_array);
 sig('Array::sort_str',      t_array(t_all t_str), t_array);
-sig('Array::sort_hash_str', $aoh, t_str, $aoh);
+sig('Array::sort_hash_str', $aoh,    t_str, $aoh);
 sig('Array::fsts',          t_array, t_array);
 sig('Array::snds',          t_array, t_array);
 #sig('Array::to_array',      t_array, t_int, t_array); # Needs solution
@@ -65,10 +65,10 @@ sig('Array::extract',       t_array, t_int, t_int, t_array);
 
 ### SIDE-EFFECTS
 
-#sig('Array::iter',          t_array, t_sub);
-#sig('Array::iteri',         t_array, t_sub);
-#sig('Array::foreachi',      t_array, t_sub);
-#sig('Array::foreachi',      t_array, t_sub);
+sig_void('Array::iter',     t_array, t_sub);
+sig_void('Array::iteri',    t_array, t_sub);
+sig_void('Array::foreachi', t_array, t_sub);
+sig_void('Array::foreachi', t_array, t_sub);
 
 ### CONVERTER
 
@@ -111,11 +111,10 @@ sig('Array::to_seq',     t_array, t_seq);
 ### MUTATION
 
 # sig('Array::push');
-# sig('Array::pop');
-# sig('Array::shift');
-# sig('Array::unshift');
-# sig('Array::blit');
-# sig('Array::shuffle');
-
+sig('Array::pop',          t_array, t_any);
+sig('Array::shift',        t_array, t_any);
+# sig_void('Array::unshift', t_array, t_any);
+sig_void('Array::blit',    t_array, t_int, t_array, t_int, t_int);
+sig_void('Array::shuffle', t_array);
 
 1;
