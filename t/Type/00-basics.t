@@ -56,13 +56,13 @@ my $is_album2 =
         )),
     );
 
-is(t_run(t_hash,  {}), Ok(1),               '{} is hash');
-is(t_run(t_hash,  []), Err('Not a Hash'),   '[] not a hash');
-is(t_run(t_array, []), Ok(1),               '[] is array');
-is(t_run(t_array, {}), Err('Not an Array'), '{} not an array');
+is(t_run(t_hash,  {}), Ok(1),                      '{} is hash');
+is(t_run(t_hash,  []), Err('hash: Not a Hash'),    '[] not a hash');
+is(t_run(t_array, []), Ok(1),                      '[] is array');
+is(t_run(t_array, {}), Err('array: Not an Array'), '{} not an array');
 
-is(t_run(t_hash, {}, {}, {}),             Ok(1), 'multiple hashes');
-is(t_run(t_hash, {}, {}, []), Err("Not a Hash"), 'one not hash');
+is(t_run(t_hash, {}, {}, {}),                   Ok(1), 'multiple hashes');
+is(t_run(t_hash, {}, {}, []), Err("hash: Not a Hash"), 'one not hash');
 
 ok( t_valid($is_album, $album),        'check if $album is album');
 ok(!t_valid($is_album, $album_wrong1), 'check if $album_wrong1 fails');

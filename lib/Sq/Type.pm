@@ -70,7 +70,7 @@ sub t_assert($check, @values) {
 sub t_ref($ref, $f) {
     return sub($any) {
         return $f->($any) if ref $any eq $ref;
-        return Err("Not a reference of type $ref");
+        return Err("ref: Not a reference of type \"$ref\"");
     }
 }
 
@@ -85,7 +85,7 @@ sub t_hash(@checks) {
             }
             return Ok 1;
         }
-        return Err("Not a Hash");
+        return Err("hash: Not a Hash");
     }
 }
 
@@ -99,7 +99,7 @@ sub t_array(@checks) {
             }
             return Ok 1;
         }
-        return Err("Not an Array");
+        return Err("array: Not an Array");
     }
 }
 
@@ -117,7 +117,7 @@ sub t_opt(@checks) {
             # when None or no checks
             return Ok 1;
         }
-        return Err("Not an Option");
+        return Err("opt: Not an Option");
     }
 }
 
@@ -125,7 +125,7 @@ sub t_opt(@checks) {
 sub t_has_keys (@keys) {
     return sub($hash) {
         for my $key ( @keys ) {
-            return Err("key $key not defined") if !defined $hash->{$key};
+            return Err("has_keys: key \"$key\" not defined") if !defined $hash->{$key};
         }
         return Ok 1;
     }
@@ -141,7 +141,7 @@ sub t_key($name, @checks) {
             }
             return Ok 1;
         }
-        return Err("$name does not exists on hash");
+        return Err("key: $name does not exists on hash");
     };
 }
 
@@ -323,7 +323,7 @@ sub t_or(@checks) {
             my $result = $check->($any);
             return $result if $result->is_ok;
         }
-        return Err("No check was successfull");
+        return Err("or: No check was successfull");
     }
 }
 
@@ -331,7 +331,7 @@ sub t_or(@checks) {
 sub t_parser($parser) {
     return sub($str) {
         return Ok 1 if p_valid($parser, $str);
-        return Err("string does not match Parser");
+        return Err("parser: string does not match Parser");
     }
 }
 
@@ -342,14 +342,14 @@ sub t_any() {
 sub t_sub() {
     return sub($any) {
         return Ok 1 if ref $any eq 'CODE';
-        return Err("Not a CODE reference.");
+        return Err("sub: Not a CODE reference.");
     };
 }
 
 sub t_regex() {
     return sub($any) {
         return Ok 1 if ref $any eq 'Regexp';
-        return Err("Not a Regex");
+        return Err("regex: Not a Regex");
     }
 }
 
@@ -358,14 +358,14 @@ sub t_bool() {
         if ( Scalar::Util::looks_like_number($any) && ($any == 0 || $any == 1) ) {
             return Ok 1;
         }
-        return Err("Not a boolean value");
+        return Err("bool: Not a boolean value");
     }
 }
 
 sub t_seq() {
     return sub($any) {
         return Ok 1 if ref $any eq 'Seq';
-        return Err("Not a sequence");
+        return Err("seq: Not a sequence");
     }
 }
 
@@ -373,7 +373,8 @@ sub t_void() {
     return sub {
         return Ok 1 if @_ == 0;
         return Ok 1 if @_ == 1 && !defined $_[0];
-        return Err("Not void");
+        return Err("void: Not void");
     }
 }
+
 1;
