@@ -656,7 +656,8 @@ is($range->none(sub($x) { $x > 10  }), 1, 'none value greater 10');
             (\d\d\d\d) - (\d\d) - (\d\d)  # Date
         T                                 # T
             (\d\d) : (\d\d) : (\d\d)      # Time
-        \z/xms, [3,2,1,4,5,6]);
+        \z/xms)
+        ->map(call 'slice', 2,1,0,3,4,5);
 
     is(
         $matches,
@@ -674,7 +675,7 @@ is($range->none(sub($x) { $x > 10  }), 1, 'none value greater 10');
             (.)(.)(.)(.)
             (.)(.)(.)(.)
             (.)(.)(.)(.)
-        \z/xms, [1..20]),
+        \z/xms),
         [
             [1 .. 9, 0, 1 .. 9, 0],
         ],
