@@ -23,6 +23,12 @@ sub around($func_name, $fn) {
     no strict 'refs';
     no warnings 'redefine';
     my $orig = *{$func_name}{CODE};
+    if ( !defined $orig ) {
+        my $msg =
+            "Function \"$func_name\" could not be found. "
+            . "Either you forgot to load a module or you have a typo.";
+        Carp::croak $msg;
+    }
     *{$func_name} = sub { $fn->($orig, @_) };
     return;
 }
