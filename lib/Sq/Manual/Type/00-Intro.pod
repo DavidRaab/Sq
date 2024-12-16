@@ -225,6 +225,8 @@ this.
 
 The problem of this code in my opinion is.
 
+=over
+
 =item * Too much code for what it does
 
 =item * More type-checking than the computation
@@ -232,6 +234,8 @@ The problem of this code in my opinion is.
 =item * Runtime type checking makes code slower
 
 =item * You must rewrite this checking for every function you write
+
+=back
 
 =head2 Function based checking
 
@@ -445,18 +449,19 @@ for all valid/invalid variations. To be practical you just must run some code
 to check your types.
 
 In C<Sq> we just completely omit the problem that we don't think of B<Nominal typing>
-and that something we built must be valid at every creation step. When you truly
-need to check for a certain type, you just call the function that checks it.
+and that something we built don't must be valid at every step/modification. When
+you truly need to check for a certain type, you just call the function that checks it.
 
 For example, also this is valid for creating an album.
 
-    my $album = {};
-    $album->{artist} = get_artist_from_db();
-    $album->{title}  = get_title_from_db();
-    for my $track ( get_tracks_from_db() ) {
+    my $album = {};                            # is not a valid album yet
+    $album->{artist} = get_artist_from_db();   # still not valid
+    $album->{title}  = get_title_from_db();    # nope
+    for my $track ( get_tracks_from_db() ) {   # maybe becomes valid
         push @{$album->{tracks}}, $track;
     }
 
+    # is $album now valid?
     if ( t_valid($is_album, $album) ) {
         # valid album
     }
@@ -473,10 +478,10 @@ are finished only then we check for the type (once).
 
 Also consider that this is a lot more easier in a lot of cases. Consider for example
 that you provide a function that can delete Tracks from an Album. Then to be valid
-you Track deletion code always must ensure that there must be at least one Track.
+your Track deletion code always must ensure that there must be at least one Track.
 
-Otherwise just checking for the B<Nominal type> and checking just for C<Album>
-would cause probably bugs when you depent on Tracks having at least one Track.
+If you forget that, you basically introduced a bug in your software. Code
+that now depends on having at least on Track defined would cause an error.
 
 On the other-side with the approach picked in C<Sq> we don't have that problem.
 We can remove all Tracks, but then it wouldn't pass the type check anymore!
