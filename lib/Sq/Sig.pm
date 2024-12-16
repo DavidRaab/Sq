@@ -4,3 +4,11 @@ use Sq;
 use Sq::Sig::Array;
 
 1;
+
+=pod
+
+=head1 Sq::Sig
+
+This module just loads all Signature files at once.
+
+=item * Sq::Sig::Array

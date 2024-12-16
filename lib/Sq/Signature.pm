@@ -10,6 +10,15 @@ use Sub::Exporter -setup => {
     },
 };
 
+# TODO:
+# + Need support for varargs
+# + back-reference an unknown type
+# + wrap lambdas with a type-check version
+# + functions with list context?
+# + easy way for default args
+# + define multiple signatures for one function
+# + even-sized array check
+
 sub around($func_name, $fn) {
     no strict 'refs';
     no warnings 'redefine';
