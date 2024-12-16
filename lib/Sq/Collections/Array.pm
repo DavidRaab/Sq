@@ -148,8 +148,8 @@ sub bind($array, $f) {
     return CORE::bless(\@new, 'Array');
 }
 
-sub flatten($array) {
-    return bind($array, \&Sq::id);
+sub flatten($array_of_array) {
+    return bind($array_of_array, \&Sq::id);
 }
 
 sub cartesian($as, $bs) {
