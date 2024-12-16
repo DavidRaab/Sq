@@ -244,4 +244,47 @@ ok(!t_valid($is_album2, $album_wrong2), 'album.tracks not an array');
     ok(!t_valid($tot, [[1, "foo"], [2, "bar"], [3, "baz"]]), 'tuple 19');
 }
 
+# t_any
+{
+    # How can i test if t_any really checks against any value? Don't know
+    # but i just check some common things.
+    ok(t_valid(t_any,             1), 't_any  1');
+    ok(t_valid(t_any,         "foo"), 't_any  2');
+    ok(t_valid(t_any,            []), 't_any  3');
+    ok(t_valid(t_any,            {}), 't_any  4');
+    ok(t_valid(t_any,         undef), 't_any  5');
+    ok(t_valid(t_any,         sub{}), 't_any  6');
+    ok(t_valid(t_any,         sq []), 't_any  7');
+    ok(t_valid(t_any,         sq {}), 't_any  8');
+    ok(t_valid(t_any,       Some(1)), 't_any  9');
+    ok(t_valid(t_any,          None), 't_any 10');
+    ok(t_valid(t_any,         Ok(1)), 't_any 11');
+    ok(t_valid(t_any,        Err(1)), 't_any 12');
+    ok(t_valid(t_any, Seq->new(1,2)), 't_any 13');
+    ok(t_valid(t_any,         t_any), 't_any 14');
+}
+
+# other simple checks
+{
+    ok( t_valid(t_sub,       sub{}), 't_sub 1');
+    ok(!t_valid(t_sub,          {}), 't_sub 2');
+    ok(!t_valid(t_sub,          []), 't_sub 3');
+    ok(!t_valid(t_sub,           1), 't_sub 4');
+    ok(!t_valid(t_sub,       "foo"), 't_sub 5');
+
+    ok( t_valid(t_regex,      qr//), 't_regex 1');
+    ok(!t_valid(t_regex,        ""), 't_regex 2');
+
+    ok( t_valid(t_bool,          0), 't_bool 1');
+    ok( t_valid(t_bool,          1), 't_bool 2');
+    ok(!t_valid(t_bool,         -1), 't_bool 3');
+    ok(!t_valid(t_bool,          2), 't_bool 4');
+
+    ok( t_valid(t_seq, Seq->new(1)), 't_seq 1');
+    ok( t_valid(t_seq,  Seq->empty), 't_seq 2');
+    ok(!t_valid(t_seq,          {}), 't_seq 3');
+    ok(!t_valid(t_seq,       sub{}), 't_seq 4');
+    ok(!t_valid(t_seq,          []), 't_seq 5');
+}
+
 done_testing;
