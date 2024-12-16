@@ -13,7 +13,7 @@ use Sub::Exporter -setup => {
         qw(t_hash t_has_keys t_key t_keys),           # Hash
         qw(t_array t_idx),                            # Array
         qw(t_all t_length),
-        qw(t_any t_sub),
+        qw(t_any t_sub t_regex t_bool t_seq),
     ],
     groups => {
         default => [
@@ -24,7 +24,7 @@ use Sub::Exporter -setup => {
             qw(t_hash t_has_keys t_key t_keys),           # Hash
             qw(t_array t_idx),                            # Array
             qw(t_all t_length),
-            qw(t_any t_sub),
+            qw(t_any t_sub t_regex t_bool t_seq),
         ],
     },
 };
@@ -57,7 +57,10 @@ sub t_valid($check, @values) {
 sub t_assert($check, @values) {
     for my $value ( @values ) {
         my $result = $check->($value);
-        Carp::croak 'Type check failed' if $result->is_err;
+        if ( $result->is_err ) {
+            my $err = $result->get;
+            Carp::croak "Type check failed: $err";
+        }
     }
     return;
 }
@@ -341,6 +344,29 @@ sub t_sub() {
         return Ok 1 if ref $any eq 'CODE';
         return Err("Not a CODE reference.");
     };
+}
+
+sub t_regex() {
+    return sub($any) {
+        return Ok 1 if ref $any eq 'Regexp';
+        return Err("Not a Regex");
+    }
+}
+
+sub t_bool() {
+    return sub($any) {
+        if ( Scalar::Util::looks_like_number($any) && ($any == 0 || $any == 1) ) {
+            return Ok 1;
+        }
+        return Err("Not a boolean value");
+    }
+}
+
+sub t_seq() {
+    return sub($any) {
+        return Ok 1 if ref $any eq 'Seq';
+        return Err("Not a sequence");
+    }
 }
 
 1;
