@@ -41,17 +41,13 @@ sub set_func($func_name, $new) {
     return;
 }
 
-sub around($func_name, $fn) {
-    my $orig = get_func($func_name);
-    set_func($func_name, sub { $fn->($orig, @_) });
-    return;
-}
-
 sub sig($func_name, @types) {
     Carp::croak "sig needs at least one type" if @types == 0;
     my $return    = pop @types;
     my $arg_count = @types;
-    around($func_name, sub($orig, @args) {
+    my $orig      = get_func($func_name);
+    set_func($func_name, sub {
+        my ( @args ) = @_;
         # when argument count is not correct
         if ( $arg_count != @args ) {
             Carp::croak(
