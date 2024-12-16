@@ -356,9 +356,13 @@ at some points, not all checks can be done at compilation time!
 Let's consider that we want to further restrict what a valid album should look
 like. We also want
 
+=over
+
 =item * Album Artist/Title must be at least 1 character long.
 
 =item * Tracks must at least contain 1 Track
+
+=back
 
 The only way to solve this additional constraints is by writing a constructor
 that checks the values. The typical approach in F# would be to create an
