@@ -65,10 +65,10 @@ sig('Array::extract',       t_array, t_int, t_int, t_array);
 
 ### SIDE-EFFECTS
 
-sig_void('Array::iter',     t_array, t_sub);
-sig_void('Array::iteri',    t_array, t_sub);
-sig_void('Array::foreachi', t_array, t_sub);
-sig_void('Array::foreachi', t_array, t_sub);
+sig('Array::iter',     t_array, t_sub, t_void);
+sig('Array::iteri',    t_array, t_sub, t_void);
+sig('Array::foreachi', t_array, t_sub, t_void);
+sig('Array::foreachi', t_array, t_sub, t_void);
 
 ### CONVERTER
 
@@ -114,7 +114,7 @@ sig('Array::to_seq',     t_array, t_seq);
 sig('Array::pop',          t_array, t_any);
 sig('Array::shift',        t_array, t_any);
 # sig_void('Array::unshift', t_array, t_any);
-sig_void('Array::blit',    t_array, t_int, t_array, t_int, t_int);
-sig_void('Array::shuffle', t_array);
+sig('Array::blit',    t_array, t_int, t_array, t_int, t_int, t_void);
+sig('Array::shuffle', t_array, t_void);
 
 1;

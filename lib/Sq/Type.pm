@@ -13,7 +13,7 @@ use Sub::Exporter -setup => {
         qw(t_hash t_has_keys t_key t_keys),           # Hash
         qw(t_array t_idx),                            # Array
         qw(t_all t_length),
-        qw(t_any t_sub t_regex t_bool t_seq),
+        qw(t_any t_sub t_regex t_bool t_seq t_void),
     ],
     groups => {
         default => [
@@ -24,7 +24,7 @@ use Sub::Exporter -setup => {
             qw(t_hash t_has_keys t_key t_keys),           # Hash
             qw(t_array t_idx),                            # Array
             qw(t_all t_length),
-            qw(t_any t_sub t_regex t_bool t_seq),
+            qw(t_any t_sub t_regex t_bool t_seq t_void),
         ],
     },
 };
@@ -369,4 +369,11 @@ sub t_seq() {
     }
 }
 
+sub t_void() {
+    return sub {
+        return Ok 1 if @_ == 0;
+        return Ok 1 if @_ == 1 && !defined $_[0];
+        return Err("Not void");
+    }
+}
 1;

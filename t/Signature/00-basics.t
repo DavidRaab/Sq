@@ -70,4 +70,13 @@ like(
     qr/\AType check failed/,
     'check return value');
 
+# test void
+sub whatever() { return 1 }
+sig('main::whatever', t_void);
+
+like(
+    dies { whatever() },
+    qr/Not void/,
+    'fails because returns something');
+
 done_testing;
