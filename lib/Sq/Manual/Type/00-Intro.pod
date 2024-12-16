@@ -1,9 +1,5 @@
 =encoding UTF-8
 
-* static vs dynamic
-* functions vs type declaration
-* runtime vs. compile-time (AOP)
-
 =head1 What is a Type?
 
 Let's say i want to define a C<Vector2> type. Most statical typed language
@@ -366,11 +362,11 @@ C<Album.create> function that does the additonal checking of the structure.
 
     module Album =
         let create artist title tracks =
-            if String.length artist = 0
+            if String.length artist = 0 then
                 failwithf "Artist must at least one character long"
-            if String.length title = 0
+            if String.length title = 0 then
                 failwithf "Title must at least one character long"
-            if List.length tracks = 0
+            if List.length tracks = 0 then
                 failwithf "One Track needed"
             {
                 Artist = artist
