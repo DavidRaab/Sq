@@ -334,7 +334,6 @@ sub snds($array) {
 }
 
 sub to_array($array, $count=undef) {
-    $count = Sq::is_num($count) ? int($count) : undef;
     if ( defined $count && $count < @$array ) {
         my $new     = new('Array');
         my $current = 0;
