@@ -184,4 +184,64 @@ ok(!t_valid($is_album2, $album_wrong2), 'album.tracks not an array');
     ok(!t_valid(t_int(t_range(0,10)), "11"), 't_int 7');
 }
 
+# t_tuple - size 2
+{
+    my $kv = t_tuple(t_str, t_int);
+    # correct
+    ok( t_valid($kv, ["foo", 1]),    'tuple 1');
+
+    # not correct size
+    ok(!t_valid($kv, ["foo", 1, 2]), 'tuple 2');
+    ok(!t_valid($kv, ["foo"]),       'tuple 3');
+    ok(!t_valid($kv, []),            'tuple 4');
+
+    # not array
+    ok(!t_valid($kv, {}),            'tuple 5');
+    ok(!t_valid($kv, ""),            'tuple 6');
+    ok(!t_valid($kv, 1),             'tuple 7');
+
+    # correct size, but types don't match
+    ok(!t_valid($kv, [1,"foo"]),     'tuple 8');
+}
+
+# t_tuple - size 1
+{
+    my $str = t_tuple(t_str);
+    # correct
+    ok( t_valid($str, ["foo"]), 'tuple 9');
+
+    # not correct size
+    ok(!t_valid($str,         []), 'tuple 10');
+    ok(!t_valid($str, ["foo", 1]), 'tuple 11');
+}
+
+# t_tuple - other sizes
+{
+    ok( t_valid(t_tuple(t_int, t_str, t_array), [12, "foo", []]), 'tuple 12');
+    ok(!t_valid(t_tuple(t_int, t_str, t_array), [12, "foo"]    ), 'tuple 13');
+    ok(!t_valid(t_tuple(t_int, t_str, t_array), []             ), 'tuple 14');
+    ok( t_valid(
+            t_tuple(t_int, t_str, t_array(t_all t_int)),
+            [12, "foo", [1,2,3]]
+        ),
+        'tuple 15'
+    );
+    ok(!t_valid(
+            t_tuple(t_int, t_str, t_array(t_all t_int)),
+            [12, "foo", [1,"foo",3]]
+        ),
+        'tuple 16'
+    );
+
+    # tuple of tuple
+    my $tot =
+        t_tuple(
+            t_tuple(t_int, t_str),
+            t_tuple(t_int, t_str),
+        );
+    ok( t_valid($tot, [[1, "foo"], [2, "bar"]]), 'tuple 17');
+    ok(!t_valid($tot, [["foo", 1], [2, "bar"]]), 'tuple 18');
+    ok(!t_valid($tot, [[1, "foo"], [2, "bar"], [3, "baz"]]), 'tuple 19');
+}
+
 done_testing;

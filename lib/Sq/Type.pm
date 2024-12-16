@@ -11,7 +11,7 @@ use Sub::Exporter -setup => {
         qw(t_num t_int t_min t_max t_range),          # Numbers
         qw(t_opt),
         qw(t_hash t_has_keys t_key t_keys),           # Hash
-        qw(t_array t_idx),                            # Array
+        qw(t_array t_idx t_tuple),                    # Array
         qw(t_all t_length),
         qw(t_any t_sub t_regex t_bool t_seq t_void),
     ],
@@ -22,7 +22,7 @@ use Sub::Exporter -setup => {
             qw(t_num t_int t_min t_max t_range),          # Numbers
             qw(t_opt),
             qw(t_hash t_has_keys t_key t_keys),           # Hash
-            qw(t_array t_idx),                            # Array
+            qw(t_array t_idx t_tuple),                    # Array
             qw(t_all t_length),
             qw(t_any t_sub t_regex t_bool t_seq t_void),
         ],
@@ -374,6 +374,31 @@ sub t_void() {
         return Ok 1 if @_ == 0;
         return Ok 1 if @_ == 1 && !defined $_[0];
         return Err("void: Not void");
+    }
+}
+
+sub t_tuple(@checks) {
+    return sub($array) {
+        my $type = ref $array;
+        if ( $type eq 'Array' || $type eq 'ARRAY' ) {
+            if ( @checks == @$array ) {
+                for (my $idx=0; $idx<@checks; $idx++ ) {
+                    my $type   = $checks[$idx];
+                    my $value  = $array->[$idx];
+                    my $result = $type->($value);
+                    if ( $result->is_err ) {
+                        return Err("tuple: Index $idx fails type-check");
+                    }
+                }
+                return Ok 1;
+            }
+            return Err(
+                sprintf "tuple: Tuple has not correct size. Expected: %d Got: %d",
+                scalar @checks,
+                scalar @$array
+            );
+        }
+        return Err("tuple: Tuple expects an Array");
     }
 }
 
