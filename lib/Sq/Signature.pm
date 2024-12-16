@@ -19,9 +19,10 @@ use Sub::Exporter -setup => {
 # + define multiple signatures for one function
 # + even-sized array check
 
-sub around($func_name, $fn) {
+# reads function from symbol table or throws error when function
+# does not exists
+sub get_func($func_name) {
     no strict 'refs';
-    no warnings 'redefine';
     my $orig = *{$func_name}{CODE};
     if ( !defined $orig ) {
         my $msg =
@@ -29,7 +30,20 @@ sub around($func_name, $fn) {
             . "Either you forgot to load a module or you have a typo.";
         Carp::croak $msg;
     }
-    *{$func_name} = sub { $fn->($orig, @_) };
+    return $orig;
+}
+
+# sets function in symbol table to a new function
+sub set_func($func_name, $new) {
+    no strict   'refs';
+    no warnings 'redefine';
+    *{$func_name} = $new;
+    return;
+}
+
+sub around($func_name, $fn) {
+    my $orig = get_func($func_name);
+    set_func($func_name, sub { $fn->($orig, @_) });
     return;
 }
 
