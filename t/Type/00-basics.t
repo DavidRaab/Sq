@@ -289,14 +289,32 @@ ok(!t_valid($is_album2, $album_wrong2), 'album.tracks not an array');
 
 # t_even_sized
 {
-    ok( t_valid(t_even_sized,        []), 't_even_sized 1');
-    ok(!t_valid(t_even_sized,       [1]), 't_even_sized 2');
-    ok( t_valid(t_even_sized,     [1,2]), 't_even_sized 3');
-    ok(!t_valid(t_even_sized,   [1,2,3]), 't_even_sized 4');
-    ok( t_valid(t_even_sized, [1,2,3,4]), 't_even_sized 5');
-    ok(!t_valid(t_even_sized,        {}), 't_even_sized 6');
-    ok(!t_valid(t_even_sized,     "foo"), 't_even_sized 7');
-    ok(!t_valid(t_even_sized,         1), 't_even_sized 8');
+    my $es1 = t_even_sized;
+    my $es2 = t_array(t_even_sized);
+
+    my $idx = 0;
+    for my $es ( $es1, $es2 ) {
+        ok( t_valid($es,        []), "$idx: t_even_sized 1");
+        ok(!t_valid($es,       [1]), "$idx: t_even_sized 2");
+        ok( t_valid($es,     [1,2]), "$idx: t_even_sized 3");
+        ok(!t_valid($es,   [1,2,3]), "$idx: t_even_sized 4");
+        ok( t_valid($es, [1,2,3,4]), "$idx: t_even_sized 5");
+        ok(!t_valid($es,        {}), "$idx: t_even_sized 6");
+        ok(!t_valid($es,     "foo"), "$idx: t_even_sized 7");
+        ok(!t_valid($es,         1), "$idx: t_even_sized 8");
+        $idx++;
+    }
+}
+
+# t_void
+{
+    ok( t_valid(t_void, undef), 't_void 1'); # empty return in scalar context
+    ok( t_valid(t_void),        't_void 2'); # empty return in list context
+
+    ok(!t_valid(t_void,     1), 't_void 3');
+    ok(!t_valid(t_void, "foo"), 't_void 4');
+    ok(!t_valid(t_void,    []), 't_void 5');
+    ok(!t_valid(t_void,    {}), 't_void 6');
 }
 
 done_testing;
