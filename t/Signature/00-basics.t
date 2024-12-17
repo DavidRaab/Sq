@@ -56,7 +56,7 @@ like(
 
 like(
     dies { add_point($unit, $unit, $unit) },
-    qr/Arity mismatch/,
+    qr/Tuple has not correct size/,
     'too many arguments');
 
 # expect a function that should add numbers but returns hash instead

@@ -47,22 +47,13 @@ sub sig($func_name, @types) {
     my $arg_count = @types;
     my $orig      = get_func($func_name);
     set_func($func_name, sub {
-        my ( @args ) = @_;
-        # when argument count is not correct
-        if ( $arg_count != @args ) {
-            Carp::croak(
-                sprintf("$func_name: Arity mismatch: Expected %d arguments. Got: %d",
-                    $arg_count, scalar @args)
-            );
-        }
-        # test input parameters
         local $Carp::CarpLevel = 1;
-        for (my $idx=0; $idx < $arg_count; $idx++) {
-            t_assert($types[$idx], $args[$idx]);
-        }
-        # call original function
-        my $single = $orig->(@args);
-        # check return value
+        # check all arguments by just consider the arguments as a tuple
+        t_assert(t_tuple(@types), \@_);
+
+        # execute original function
+        my $single = $orig->(@_);
+        # and check return value
         t_assert($return, $single);
         return $single;
     });
