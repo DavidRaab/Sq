@@ -19,4 +19,9 @@ like(
     qr//,
     'regex_match');
 
+like(
+    dies { sq([1,2,3])->as_hash },
+    qr//,
+    'not even sized');
+
 done_testing;

@@ -11,7 +11,7 @@ use Sub::Exporter -setup => {
         qw(t_num t_int t_min t_max t_range),          # Numbers
         qw(t_opt),
         qw(t_hash t_has_keys t_key t_keys),           # Hash
-        qw(t_array t_idx t_tuple),                    # Array
+        qw(t_array t_idx t_tuple t_even_sized),       # Array
         qw(t_all t_length),
         qw(t_any t_sub t_regex t_bool t_seq t_void),
     ],
@@ -22,7 +22,7 @@ use Sub::Exporter -setup => {
             qw(t_num t_int t_min t_max t_range),          # Numbers
             qw(t_opt),
             qw(t_hash t_has_keys t_key t_keys),           # Hash
-            qw(t_array t_idx t_tuple),                    # Array
+            qw(t_array t_idx t_tuple t_even_sized),       # Array
             qw(t_all t_length),
             qw(t_any t_sub t_regex t_bool t_seq t_void),
         ],
@@ -59,7 +59,7 @@ sub t_assert($check, @values) {
         my $result = $check->($value);
         if ( $result->is_err ) {
             my $err = $result->get;
-            Carp::croak "Type check failed: $err";
+            Carp::croak "Type Error: $err";
         }
     }
     return;
@@ -387,18 +387,31 @@ sub t_tuple(@checks) {
                     my $value  = $array->[$idx];
                     my $result = $type->($value);
                     if ( $result->is_err ) {
-                        return Err("tuple: Index $idx fails type-check");
+                        my $msg = $result->get;
+                        return Err("tuple: Index $idx: $msg");
                     }
                 }
                 return Ok 1;
             }
             return Err(
-                sprintf "tuple: Tuple has not correct size. Expected: %d Got: %d",
+                sprintf "tuple: Not correct size. Expected: %d Got: %d",
                 scalar @checks,
                 scalar @$array
             );
         }
-        return Err("tuple: Tuple expects an Array");
+        return Err("tuple: Must be an Array");
+    }
+}
+
+sub t_even_sized() {
+    return sub($array) {
+        my $type = ref $array;
+        if ( $type eq 'Array' || $type eq 'ARRAY' ) {
+            # binary and to decide if array count is even
+            return Ok 1 if ((@$array & 1) == 0);
+            return Err("even_sized: Array not even-sized");
+        }
+        return Err("even_sized: Not used on an array");
     }
 }
 

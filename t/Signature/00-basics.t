@@ -36,27 +36,27 @@ is(add_point($unit, $unit), {X => 2, Y => 2}, 'still works');
 
 like(
     dies { add_point($unit, {}) },
-    qr/\AType check failed/,
+    qr/\AType Error/,
     'throws exception 1');
 
 like(
     dies { add_point({}, $unit) },
-    qr/\AType check failed/,
+    qr/\AType Error/,
     'throws exception 2');
 
 like(
     dies { add_point({X => 1}, $unit) },
-    qr/\AType check failed/,
+    qr/\AType Error/,
     'throws exception 3');
 
 like(
     dies { add_point($unit, {X => 1}) },
-    qr/\AType check failed/,
+    qr/\AType Error/,
     'throws exception 4');
 
 like(
     dies { add_point($unit, $unit, $unit) },
-    qr/Tuple has not correct size/,
+    qr/Not correct size/,
     'too many arguments');
 
 # expect a function that should add numbers but returns hash instead
@@ -67,7 +67,7 @@ sig('main::add', t_int, t_int, t_int);
 
 like(
     dies { add(1,3) },
-    qr/\AType check failed/,
+    qr/\AType Error/,
     'check return value');
 
 # test void

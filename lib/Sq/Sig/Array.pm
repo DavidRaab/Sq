@@ -93,7 +93,7 @@ sig('Array::max_str_by', t_array, t_sub, t_opt);
 sig('Array::group_fold', t_array, t_sub, t_sub, t_sub, t_hash);
 sig('Array::to_hash',    t_array, t_sub, t_hash);
 sig('Array::to_hash_of_array', t_array, t_sub, $hoa);
-sig('Array::as_hash',    t_array, t_hash);
+sig('Array::as_hash',    t_array(t_even_sized), t_hash);
 sig('Array::keyed_by',   t_array, t_sub, t_hash);
 sig('Array::group_by',   t_array, t_sub, $hoa);
 sig('Array::count',      t_array, t_hash(t_all t_int));

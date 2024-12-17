@@ -133,7 +133,7 @@ ok(!t_valid($is_album2, $album_wrong2), 'album.tracks not an array');
 
     like(
         dies { t_assert(t_hash, []) },
-        qr/\AType check failed/,
+        qr/\AType Error/,
         't_assert throws exception'
     );
 }
@@ -285,6 +285,18 @@ ok(!t_valid($is_album2, $album_wrong2), 'album.tracks not an array');
     ok(!t_valid(t_seq,          {}), 't_seq 3');
     ok(!t_valid(t_seq,       sub{}), 't_seq 4');
     ok(!t_valid(t_seq,          []), 't_seq 5');
+}
+
+# t_even_sized
+{
+    ok( t_valid(t_even_sized,        []), 't_even_sized 1');
+    ok(!t_valid(t_even_sized,       [1]), 't_even_sized 2');
+    ok( t_valid(t_even_sized,     [1,2]), 't_even_sized 3');
+    ok(!t_valid(t_even_sized,   [1,2,3]), 't_even_sized 4');
+    ok( t_valid(t_even_sized, [1,2,3,4]), 't_even_sized 5');
+    ok(!t_valid(t_even_sized,        {}), 't_even_sized 6');
+    ok(!t_valid(t_even_sized,     "foo"), 't_even_sized 7');
+    ok(!t_valid(t_even_sized,         1), 't_even_sized 8');
 }
 
 done_testing;
