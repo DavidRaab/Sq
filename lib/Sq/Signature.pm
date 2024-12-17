@@ -66,7 +66,6 @@ sub sigm($func_name, @multi) {
 }
 
 # when a function has variable args
-sub sigv      { ... }
-sub sigv_void { ... }
+sub sigv { ... }
 
 1;
