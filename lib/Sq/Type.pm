@@ -171,7 +171,10 @@ sub t_num(@checks) {
         if ( Scalar::Util::looks_like_number($any) ) {
             for my $check ( @checks ) {
                 my $result = t_run($check, $any);
-                return $result if $result->is_err;
+                if ( $result->is_err ) {
+                    my $msg = $result->get;
+                    return Err("num: $msg");
+                }
             }
             return Ok 1;
         }
