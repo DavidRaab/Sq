@@ -49,7 +49,6 @@ sub sig($func_name, @types) {
         local $Carp::CarpLevel = 1;
         # check all arguments by just consider the arguments as a tuple
         t_assert(t_tuple(@types), \@_);
-
         # execute original function
         my $single = $orig->(@_);
         # and check return value
