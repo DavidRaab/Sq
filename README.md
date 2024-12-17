@@ -73,13 +73,14 @@ unless you are fine that you maybe need sometimes small-fixes to make code
 working again.
 
 * [Sq::Core::Option](lib/Sq/Core/Option.pod)
+* [Sq::Core::Result](lib/Sq/Core/Result.pod) (Partially implemented)
 * [Sq::Collections::Seq](lib/Sq/Collections/Seq.pod)
-* [Sq::Collections::Hash](lib/Sq/Collections/Hash.pm)
+* [Sq::Collections::Hash](lib/Sq/Collections/Hash.pod)
 * [Sq::Collections::Array](lib/Sq/Collections/Array.pod)
 * [Sq::Collections::Queue](lib/Sq/Collections/Queue.pm)
 * [Sq::Collections::List](lib/Sq/Collections/List.pm)
 * [Sq::Collections::Heap](lib/Sq/Collections/Heap.pod)
-* [Sq::Type](lib/Sq/Type.pm)
+* [Sq::Type](lib/Sq/Manual/Type/00-Intro.pod)
 * [Sq::Parser](lib/Sq/Manual/Parser/00-intro.pod)
 
 # Seq Module
