@@ -7,7 +7,6 @@ use Sq::Signature;
 my $aoa   = t_array(t_all t_array);
 my $aoh   = t_array(t_all t_hash);
 my $hoa   = t_hash (t_all t_array);
-my $tuple = t_array(t_length 2);
 
 ### CONSTRUCTORS
 
@@ -30,7 +29,7 @@ sig('Array::range',      t_any, t_int, t_int, t_array);
 sig('Array::copy',          t_array, t_array);
 sig('Array::bind',          t_array, t_sub, t_array);
 sig('Array::flatten',       $aoa,    t_array);
-sig('Array::cartesian',     t_array, t_array, t_array);
+sig('Array::cartesian',     t_array, t_array, t_array(t_all t_tuple(t_any, t_any)));
 sig('Array::append',        t_array, t_array, t_array);
 sig('Array::rev',           t_array, t_array);
 sig('Array::map',           t_array, t_sub, t_array);
@@ -41,25 +40,25 @@ sig('Array::filter',        t_array, t_sub, t_array);
 sig('Array::filter_e',      t_array, t_str, t_array);
 sig('Array::skip',          t_array, t_int, t_array);
 sig('Array::take',          t_array, t_int, t_array);
-sig('Array::indexed',       t_array, t_array(t_all $tuple));
-sig('Array::zip',           t_array, t_array, t_array);
+sig('Array::indexed',       t_array, t_array(t_all t_tuple(t_any, t_int)));
+sig('Array::zip',           t_array, t_array, t_array(t_all t_tuple(t_any, t_any)));
 sig('Array::sort',          t_array, t_sub, t_array);
 sig('Array::sort_by',       t_array, t_sub, t_sub, t_array);
 sig('Array::sort_num',      t_array(t_all t_num), t_array);
 sig('Array::sort_str',      t_array(t_all t_str), t_array);
 sig('Array::sort_hash_str', $aoh,    t_str, $aoh);
-sig('Array::fsts',          t_array, t_array);
-sig('Array::snds',          t_array, t_array);
+sig('Array::fsts',          $aoa,    t_array);
+sig('Array::snds',          $aoa,    t_array);
 #sig('Array::to_array',      t_array, t_int, t_array); # Needs solution
 sig('Array::to_array_of_array', $aoa, $aoa);
 sig('Array::distinct',      t_array, t_array);
-sig('Array::distinct_by',   t_array, t_sub, t_array);
-sig('Array::regex_match',   t_array, t_regex, t_array);
-sig('Array::windowed',      t_array, t_int, t_array);
-sig('Array::intersperse',   t_array, t_any, t_array);
-sig('Array::repeat',        t_array, t_int, t_array);
-sig('Array::take_while',    t_array, t_sub, t_array);
-sig('Array::skip_while',    t_array, t_sub, t_array);
+sig('Array::distinct_by',   t_array, t_sub,   t_array);
+sig('Array::regex_match',   t_array(t_all t_str), t_regex, t_array(t_all t_array(t_all t_str)));
+sig('Array::windowed',      t_array, t_int,   $aoa);
+sig('Array::intersperse',   t_array, t_any,   t_array);
+sig('Array::repeat',        t_array, t_int,   t_array);
+sig('Array::take_while',    t_array, t_sub,   t_array);
+sig('Array::skip_while',    t_array, t_sub,   t_array);
 #sig('Array::slice',         t_array, ...);
 sig('Array::extract',       t_array, t_int, t_int, t_array);
 

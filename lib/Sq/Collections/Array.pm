@@ -399,7 +399,7 @@ sub windowed($array, $window_size) {
     my $last_index = @$array - $length;
     my @new;
     for (my $index=0; $index < $last_index; $index++) {
-        push @new, [$array->@[$index .. ($index + $length)]];
+        push @new, CORE::bless([$array->@[$index .. ($index + $length)]], 'Array');
     }
     return CORE::bless(\@new, 'Array');
 }
