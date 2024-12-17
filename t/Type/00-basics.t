@@ -323,13 +323,69 @@ ok(!t_valid($is_album2, $album_wrong2), 'album.tracks not an array');
 
 # t_void
 {
-    ok( t_valid(t_void, undef), 't_void 1'); # empty return in scalar context
-    ok( t_valid(t_void),        't_void 2'); # empty return in list context
+    ok( t_valid(t_void, undef), 't_void 1'); # scalar context
+    ok( t_valid(t_void,    []), 't_void 2'); # list context
 
     ok(!t_valid(t_void,     1), 't_void 3');
     ok(!t_valid(t_void, "foo"), 't_void 4');
-    ok(!t_valid(t_void,    []), 't_void 5');
     ok(!t_valid(t_void,    {}), 't_void 6');
+}
+
+# t_ref
+{
+    my $point    = bless({X=>1, Y=>1}, 'Point');
+    my $is_point = t_ref('Point');
+
+    ok( t_valid($is_point, $point), 't_ref 1');
+    ok(!t_valid($is_point,     {}), 't_ref 2');
+    ok(!t_valid($is_point,     []), 't_ref 3');
+}
+
+# t_methods
+{
+    my $opt = None;
+    ok( t_valid(t_methods('map', 'iter'), $opt), 't_methods 1');
+    ok(!t_valid(t_methods('dope'),        $opt), 't_methods 2');
+    ok(!t_valid(t_methods('dope'),          []), 't_methods 3');
+    ok(!t_valid(t_methods('dope'),          {}), 't_methods 4');
+
+    my $is_seq = t_ref('Seq', t_methods('map', 'filter'));
+    ok( t_valid($is_seq, Seq->empty), 't_ref & t_methods');
+}
+
+# Build a stupid class with inheritance. Throughout Sq i don't have that
+package Stupid;
+use 5.036;
+sub new($class) { bless({}, $class) }
+sub foo() { ... }
+
+package MoreStupid;
+use 5.036;
+our @ISA = 'Stupid';
+sub new($class) { bless({}, $class) }
+sub bar() { ... }
+
+package main;
+
+# t_isa
+{
+    my $s  = Stupid->new;
+    my $ms = MoreStupid->new;
+
+    ok( t_valid(t_isa('Stupid'),     $s),  't_isa 1');
+    ok(!t_valid(t_isa('MoreStupid'), $s),  't_isa 2');
+    ok( t_valid(t_isa('Stupid'),     $ms), 't_isa 3');
+    ok( t_valid(t_isa('MoreStupid'), $ms), 't_isa 4');
+
+    ok( t_valid(t_isa('Stupid', t_methods('foo')),  $s), 't_isa 5');
+    ok(!t_valid(t_isa('Stupid', t_methods('bar')),  $s), 't_isa 6');
+    ok( t_valid(t_isa('Stupid', t_methods('foo')), $ms), 't_isa 7');
+    ok( t_valid(t_isa('Stupid', t_methods('bar')), $ms), 't_isa 8');
+
+    ok(!t_valid(t_isa('MoreStupid', t_methods('foo')),  $s), 't_isa 9');
+    ok(!t_valid(t_isa('MoreStupid', t_methods('bar')),  $s), 't_isa 10');
+    ok( t_valid(t_isa('MoreStupid', t_methods('foo')), $ms), 't_isa 11');
+    ok( t_valid(t_isa('MoreStupid', t_methods('bar')), $ms), 't_isa 12');
 }
 
 done_testing;

@@ -42,18 +42,26 @@ sub set_func($func_name, $new) {
 
 sub sig($func_name, @types) {
     Carp::croak "sig needs at least one type" if @types == 0;
-    my $return    = pop @types;
+    my $type_ret  = pop @types;
     my $arg_count = @types;
     my $orig      = get_func($func_name);
     set_func($func_name, sub {
         local $Carp::CarpLevel = 1;
-        # check all arguments by just consider the arguments as a tuple
+        # check input arguments by just consider the arguments as a tuple
         t_assert(t_tuple(@types), \@_);
         # execute original function
-        my $single = $orig->(@_);
-        # and check return value
-        t_assert($return, $single);
-        return $single;
+        # list context
+        if ( wantarray ) {
+            my $ret = [$orig->(@_)];
+            t_assert($type_ret, $ret);
+            return @$ret;
+        }
+        # scalar context
+        else {
+            my $ret = $orig->(@_);
+            t_assert($type_ret, $ret);
+            return $ret;
+        }
     });
     return;
 }

@@ -14,6 +14,7 @@ use Sub::Exporter -setup => {
         qw(t_array t_idx t_tuple t_even_sized),       # Array
         qw(t_all t_length),
         qw(t_any t_sub t_regex t_bool t_seq t_void),
+        qw(t_ref t_isa t_methods),                    # Objects
     ],
     groups => {
         default => [
@@ -25,6 +26,7 @@ use Sub::Exporter -setup => {
             qw(t_array t_idx t_tuple t_even_sized),       # Array
             qw(t_all t_length),
             qw(t_any t_sub t_regex t_bool t_seq t_void),
+            qw(t_ref t_isa t_methods),                    # Objects
         ],
     },
 };
@@ -37,6 +39,7 @@ use Sub::Exporter -setup => {
 
 # t_run: $type -> @values -> Result
 sub t_run($check, @values) {
+    Carp::croak "t_run needs a value to check against" if @values == 0;
     for my $value ( @values ) {
         my $result = $check->($value);
         return $result if $result->is_err;
@@ -46,6 +49,7 @@ sub t_run($check, @values) {
 
 # t_valid: $type -> @values -> bool
 sub t_valid($check, @values) {
+    Carp::croak "t_valid needs a value to check against" if @values == 0;
     for my $value ( @values ) {
         my $result = $check->($value);
         return 0 if $result->is_err;
@@ -55,6 +59,7 @@ sub t_valid($check, @values) {
 
 # t_assert: $type -> @values -> void | EXCEPTION
 sub t_assert($check, @values) {
+    Carp::croak "t_assert needs a value to check against" if @values == 0;
     for my $value ( @values ) {
         my $result = $check->($value);
         if ( $result->is_err ) {
@@ -67,10 +72,21 @@ sub t_assert($check, @values) {
 
 ### type checkers
 
-sub t_ref($ref, $f) {
+sub t_ref($ref, @checks) {
     return sub($any) {
-        return $f->($any) if ref $any eq $ref;
-        return Err("ref: Not a reference of type \"$ref\"");
+        my $type = ref $any;
+        if ( $type eq $ref ) {
+            for my $check ( @checks ) {
+                my $result = $check->($any);
+                if ( $result->is_err ) {
+                    my $msg = $result->get;
+                    return Err("ref: $msg");
+                }
+            }
+            return Ok 1;
+        }
+        return Err("ref: Expected '$ref' Got '$type'") if defined $type;
+        return Err("ref: Expected reference, got not reference.");
     }
 }
 
@@ -122,7 +138,7 @@ sub t_opt(@checks) {
 }
 
 # check hash keys
-sub t_has_keys (@keys) {
+sub t_has_keys(@keys) {
     return sub($hash) {
         for my $key ( @keys ) {
             return Err("has_keys: key \"$key\" not defined") if !defined $hash->{$key};
@@ -373,9 +389,15 @@ sub t_seq() {
 }
 
 sub t_void() {
-    return sub {
-        return Ok 1 if @_ == 0;
-        return Ok 1 if @_ == 1 && !defined $_[0];
+    return sub($any) {
+        # Scalar Context
+        return Ok 1 if !defined $any;
+        # List context will be checked that the whole list is passed
+        # as an array. So someone just can use array checks for list context
+        my $type = ref $any;
+        if ( $type eq 'Array' || $type eq 'ARRAY' ) {
+            return Ok 1 if @$any == 0;
+        }
         return Err("void: Not void");
     }
 }
@@ -415,6 +437,38 @@ sub t_even_sized() {
             return Err("even_sized: Array not even-sized");
         }
         return Err("even_sized: Not used on an array");
+    }
+}
+
+sub t_methods(@methods) {
+    return sub($any) {
+        my $class = Scalar::Util::blessed($any);
+        if ( defined $class ) {
+            for my $method ( @methods ) {
+                my $sub = $any->can($method);
+                if ( !defined $sub ) {
+                    return Err("methods: $class does not implement '$method'");
+                }
+            }
+            return Ok 1;
+        }
+        return Err("methods: not a blessed reference");
+    }
+}
+
+sub t_isa($class, @checks) {
+    return sub($any) {
+        if ( $any isa $class ) {
+            for my $check ( @checks ) {
+                my $result = $check->($any);
+                if ( $result->is_err ) {
+                    my $msg = $result->get;
+                    return Err("isa: $msg");
+                }
+            }
+            return Ok 1;
+        }
+        return Err("isa: not a blessed reference");
     }
 }
 
