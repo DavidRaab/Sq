@@ -138,6 +138,21 @@ ok(!t_valid($is_album2, $album_wrong2), 'album.tracks not an array');
     );
 }
 
+# t_num
+{
+    ok( t_valid(t_num,   "123"), 't_num 1');
+    ok( t_valid(t_num,  "12.3"), 't_num 2');
+    ok( t_valid(t_num, "+12.3"), 't_num 3');
+    ok( t_valid(t_num, "-12.3"), 't_num 4');
+    ok( t_valid(t_num,   "0E0"), 't_num 5');
+    ok( t_valid(t_num,       1), 't_num 6');
+    ok( t_valid(t_num,     1.2), 't_num 7');
+
+    ok(!t_valid(t_num,      []), 't_num 8');
+    ok(!t_valid(t_num,      {}), 't_num 9');
+    ok(!t_valid(t_num,   sub{}), 't_num 10');
+}
+
 # t_min / t_max / t_range
 {
     ok(!t_valid(t_min(10),  0), 't_min 1');
