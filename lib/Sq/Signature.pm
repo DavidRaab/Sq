@@ -22,8 +22,7 @@ use Sub::Exporter -setup => {
 # reads function from symbol table or throws error when function
 # does not exists
 sub get_func($func_name) {
-    no strict 'refs';
-    my $orig = *{$func_name}{CODE};
+    my $orig = \&{ $func_name };
     if ( !defined $orig ) {
         my $msg =
             "Function \"$func_name\" could not be found. "
