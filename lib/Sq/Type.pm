@@ -194,7 +194,7 @@ sub t_num(@checks) {
             }
             return Ok 1;
         }
-        return Err("num: Not a number");
+        return Err("num: Not a number '$any'");
     }
 }
 

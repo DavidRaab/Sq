@@ -51,17 +51,17 @@ sub sig($func_name, @types) {
         t_assert(t_tuple(@types), \@_);
         # execute original function
         # list context
-        if ( wantarray ) {
-            my $ret = [$orig->(@_)];
-            t_assert($type_ret, $ret);
-            return @$ret;
-        }
-        # scalar context
-        else {
+        # if ( wantarray ) {
+        #     my $ret = [$orig->(@_)];
+        #     t_assert($type_ret, $ret);
+        #     return @$ret;
+        # }
+        # # scalar context
+        # else {
             my $ret = $orig->(@_);
             t_assert($type_ret, $ret);
             return $ret;
-        }
+        # }
     });
     return;
 }
