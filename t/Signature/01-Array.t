@@ -16,12 +16,10 @@ like(dies { sq([5,"foo",2,1])->sort_num }, qr//, 'sort_num');
 
 like(
     dies { sq(["12-12", "10-10", []])->regex_match(qr/\A(\d\d)-(\d\d)\z/) },
-    qr//,
-    'regex_match');
+    qr//, 'regex_match');
 
-like(
-    dies { sq([1,2,3])->as_hash },
-    qr//,
-    'not even sized');
+like(dies { sq([1,2,3])->as_hash       }, qr/\AType Error:/,     'not even sized');
+like(dies { Array::to_array({})        }, qr/\AType Error: or:/, 'no array passed');
+like(dies { Array::to_array([], "foo") }, qr/\AType Error: or:/, 'no int passed');
 
 done_testing;

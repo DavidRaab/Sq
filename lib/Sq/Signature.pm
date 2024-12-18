@@ -4,9 +4,9 @@ use Sq;
 use Sq::Type;
 use Carp ();
 use Sub::Exporter -setup => {
-    exports => [qw(sig)],
+    exports => [qw(sig sigt)],
     groups  => {
-        default => [qw(sig)],
+        default => [qw(sig sigt)],
     },
 };
 
@@ -64,6 +64,21 @@ sub sig($func_name, @types) {
         # }
     });
     return;
+}
+
+# Tuple based function checking. Consider every function as just a function
+# with a single input and output. The whole input is passed as an array and
+# checked against $in_type. Output again is checked against $out_type.
+# So it usually makes sense to use t_tuple for $in_type.
+sub sigt($func_name, $in_type, $out_type) {
+    my $orig = get_func($func_name);
+    set_func($func_name, sub {
+        local $Carp::CarpLevel = 1;
+        t_assert($in_type, [@_]);
+        my $ret = $orig->(@_);
+        t_assert($out_type, $ret);
+        return $ret;
+    });
 }
 
 # a function with multiple different signatures

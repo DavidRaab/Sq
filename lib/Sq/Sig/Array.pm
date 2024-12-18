@@ -49,7 +49,13 @@ sig('Array::sort_str',      t_array(t_all t_str), t_array);
 sig('Array::sort_hash_str', $aoh,    t_str, $aoh);
 sig('Array::fsts',          $aoa,    t_array);
 sig('Array::snds',          $aoa,    t_array);
-#sig('Array::to_array',      t_array, t_int, t_array); # Needs solution
+sigt('Array::to_array',
+    t_or(
+        t_tuple(t_array),
+        t_tuple(t_array, t_int),
+    ),
+    t_array
+);
 sig('Array::to_array_of_array', $aoa, $aoa);
 sig('Array::distinct',      t_array, t_array);
 sig('Array::distinct_by',   t_array, t_sub,   t_array);
@@ -104,14 +110,28 @@ sig('Array::all',        t_array, t_sub, t_bool);
 sig('Array::none',       t_array, t_sub, t_bool);
 sig('Array::pick',       t_array, t_sub, t_opt);
 sig('Array::to_seq',     t_array, t_seq);
-#sig('Array::dump',       t_array, );
-#sig('Array::dumpw');
+sigt('Array::dump',
+    t_or(
+        t_tuple(t_array),
+        t_tuple(t_array, t_int),
+        t_tuple(t_array, t_int, t_int),
+    ),
+    t_void
+);
+sigt('Array::dumpw',
+    t_or(
+        t_tuple(t_array),
+        t_tuple(t_array, t_int),
+        t_tuple(t_array, t_int, t_int),
+    ),
+    t_void
+);
 
 ### MUTATION
 
 # sig('Array::push');
-sig('Array::pop',          t_array, t_any);
-sig('Array::shift',        t_array, t_any);
+sig('Array::pop',     t_array, t_any);
+sig('Array::shift',   t_array, t_any);
 # sig_void('Array::unshift', t_array, t_any);
 sig('Array::blit',    t_array, t_int, t_array, t_int, t_int, t_void);
 sig('Array::shuffle', t_array, t_void);
