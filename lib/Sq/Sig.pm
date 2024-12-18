@@ -9,6 +9,10 @@ use Sq::Sig::Array;
 
 =head1 Sq::Sig
 
-This module just loads all Signature files at once.
+This module just loads all Signature files at once. Currently loaded.
+
+=over
 
 =item * Sq::Sig::Array
+
+=back
