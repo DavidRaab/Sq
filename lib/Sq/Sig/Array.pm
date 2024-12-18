@@ -10,14 +10,14 @@ my $hoa   = t_hash (t_all t_array);
 
 ### CONSTRUCTORS
 
-sig('Array::empty',      t_any, t_array);
-sig('Array::replicate',  t_any, t_int, t_any, t_array);
-#sig('Array::new',       t_any, ... );
-#sig('Array::wrap',      t_any, ... );
-sig('Array::bless',      t_any, t_array, t_array);
-sig('Array::from_array', t_any, t_array, t_array);
-#sig('Array::concat',     t_any, ...);
-sig('Array::init',       t_any, t_int, t_sub, t_array);
+sig ('Array::empty',      t_any, t_array);
+sig ('Array::replicate',  t_any, t_int, t_any, t_array);
+sigt('Array::new',        t_tuplev(t_any, t_array), t_array);
+sigt('Array::wrap',       t_tuplev(t_any, t_array), t_array);
+sig ('Array::bless',      t_any, t_array, t_array);
+sig ('Array::from_array', t_any, t_array, t_array);
+sigt('Array::concat',     t_tuplev(t_any, $aoa), t_array);
+sig ('Array::init',       t_any, t_int, t_sub, t_array);
 
 # Second argument is 'State, would be good to back-reference the type
 sig('Array::unfold',     t_any, t_any, t_sub, t_array);
@@ -56,17 +56,17 @@ sigt('Array::to_array',
     ),
     t_array
 );
-sig('Array::to_array_of_array', $aoa, $aoa);
-sig('Array::distinct',      t_array, t_array);
-sig('Array::distinct_by',   t_array, t_sub,   t_array);
-sig('Array::regex_match',   t_array(t_all t_str), t_regex, t_array(t_all t_array(t_all t_str)));
-sig('Array::windowed',      t_array, t_int,   $aoa);
-sig('Array::intersperse',   t_array, t_any,   t_array);
-sig('Array::repeat',        t_array, t_int,   t_array);
-sig('Array::take_while',    t_array, t_sub,   t_array);
-sig('Array::skip_while',    t_array, t_sub,   t_array);
-#sig('Array::slice',         t_array, ...);
-sig('Array::extract',       t_array, t_int, t_int, t_array);
+sig ('Array::to_array_of_array', $aoa, $aoa);
+sig ('Array::distinct',     t_array, t_array);
+sig ('Array::distinct_by',  t_array, t_sub,   t_array);
+sig ('Array::regex_match',  t_array(t_all t_str), t_regex, t_array(t_all t_array(t_all t_str)));
+sig ('Array::windowed',     t_array, t_int,   $aoa);
+sig ('Array::intersperse',  t_array, t_any,   t_array);
+sig ('Array::repeat',       t_array, t_int,   t_array);
+sig ('Array::take_while',   t_array, t_sub,   t_array);
+sig ('Array::skip_while',   t_array, t_sub,   t_array);
+sigt('Array::slice',        t_tuplev(t_array, t_array(t_all t_int)), t_array);
+sig ('Array::extract',      t_array, t_int, t_int, t_array);
 
 ### SIDE-EFFECTS
 
@@ -129,11 +129,11 @@ sigt('Array::dumpw',
 
 ### MUTATION
 
-# sig('Array::push');
-sig('Array::pop',     t_array, t_any);
-sig('Array::shift',   t_array, t_any);
-# sig_void('Array::unshift', t_array, t_any);
-sig('Array::blit',    t_array, t_int, t_array, t_int, t_int, t_void);
-sig('Array::shuffle', t_array, t_void);
+sigt('Array::push',     t_tuplev(t_array, t_array), t_void);
+sig ('Array::pop',      t_array, t_any);
+sig ('Array::shift',    t_array, t_any);
+sigt('Array::unshift',  t_tuplev(t_array, t_array), t_void);
+sig ('Array::blit',     t_array, t_int, t_array, t_int, t_int, t_void);
+sig ('Array::shuffle',  t_array, t_void);
 
 1;

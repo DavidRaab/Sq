@@ -18,8 +18,10 @@ like(
     dies { sq(["12-12", "10-10", []])->regex_match(qr/\A(\d\d)-(\d\d)\z/) },
     qr//, 'regex_match');
 
-like(dies { sq([1,2,3])->as_hash       }, qr/\AType Error:/,     'not even sized');
-like(dies { Array::to_array({})        }, qr/\AType Error: or:/, 'no array passed');
-like(dies { Array::to_array([], "foo") }, qr/\AType Error: or:/, 'no int passed');
+like(dies { sq([1,2,3])->as_hash             }, qr/\AType Error:/,     'not even sized');
+like(dies { Array::to_array({})              }, qr/\AType Error: or:/, 'no array passed');
+like(dies { Array::to_array([], "foo")       }, qr/\AType Error: or:/, 'no int passed');
+like(dies { Array::slice([1,2,3], 1,2,'foo') }, qr/\AType Error:/,     'contains not number');
+like(dies { Array->concat([], [], 1)         }, qr/\AType Error:/,     'not all arrays');
 
 done_testing;
