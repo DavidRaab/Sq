@@ -4,10 +4,9 @@ use Sq::Type;
 use Sq::Signature;
 
 # Some predefined types
-my $aoa   = t_array(t_all t_array);
-my $aoh   = t_array(t_all t_hash);
-my $hoa   = t_hash (t_all t_array);
-
+my $aoa  = t_array(t_all t_array);
+my $aoh  = t_array(t_all t_hash);
+my $hoa  = t_hash (t_all t_array);
 my $aint = t_array(t_all t_int);
 my $anum = t_array(t_all t_num);
 my $astr = t_array(t_all t_str);
