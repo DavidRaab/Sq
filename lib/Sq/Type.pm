@@ -35,6 +35,12 @@ use Sub::Exporter -setup => {
 # Add: t_not
 # Add: t_none, t_any
 
+
+# At the moment I always return this value to be valid. Maybe the Ok value
+# will chance later, maybe not. But as long the value stays the same i just
+# need to create it once.
+my $valid = Ok(1);
+
 ### Runners
 
 # t_run: $type -> @values -> Result
@@ -44,7 +50,7 @@ sub t_run($check, @values) {
         my $result = $check->($value);
         return $result if $result->is_err;
     }
-    return Ok 1;
+    return $valid;
 }
 
 # t_valid: $type -> @values -> bool
@@ -83,7 +89,7 @@ sub t_ref($ref, @checks) {
                     return Err("ref: $msg");
                 }
             }
-            return Ok 1;
+            return $valid;
         }
         return Err("ref: Expected '$ref' Got '$type'") if defined $type;
         return Err("ref: Expected reference, got not reference.");
@@ -99,7 +105,7 @@ sub t_hash(@checks) {
                 my $result = $check->($any);
                 return $result if $result->is_err;
             }
-            return Ok 1;
+            return $valid;
         }
         return Err("hash: Not a Hash");
     }
@@ -113,7 +119,7 @@ sub t_array(@checks) {
                 my $result = $check->($any);
                 return $result if $result->is_err;
             }
-            return Ok 1;
+            return $valid;
         }
         return Err("array: Not an Array");
     }
@@ -131,7 +137,7 @@ sub t_opt(@checks) {
                 }
             }
             # when None or no checks
-            return Ok 1;
+            return $valid;
         }
         return Err("opt: Not an Option");
     }
@@ -143,7 +149,7 @@ sub t_has_keys(@keys) {
         for my $key ( @keys ) {
             return Err("has_keys: key \"$key\" not defined") if !defined $hash->{$key};
         }
-        return Ok 1;
+        return $valid;
     }
 }
 
@@ -155,7 +161,7 @@ sub t_key($name, @checks) {
                 my $result = $check->($value);
                 return $result if $result->is_err;
             }
-            return Ok 1;
+            return $valid;
         }
         return Err("key: $name does not exists on hash");
     };
@@ -169,14 +175,14 @@ sub t_keys(%kt) {
             return $result if $result->is_err;
             return Err("keys: $key failed type") if $result->is_err;
         }
-        return Ok 1;
+        return $valid;
     }
 }
 
 sub t_str_eq($expected) {
     return sub($any) {
         if ( ref $any eq "" ) {
-            return Ok(1) if $any eq $expected;
+            return $valid if $any eq $expected;
         }
         return Err("str_eq: Expected: '$expected' got '$any'");
     }
@@ -192,7 +198,7 @@ sub t_num(@checks) {
                     return Err("num: $msg");
                 }
             }
-            return Ok 1;
+            return $valid;
         }
         return Err("num: Not a number '$any'");
     }
@@ -205,7 +211,7 @@ sub t_int(@checks) {
                 my $result = $check->($any);
                 return $result if $result->is_err;
             }
-            return Ok 1;
+            return $valid;
         }
         return Err("int: Not an integer");
     }
@@ -218,7 +224,7 @@ sub t_str(@checks) {
                 my $result = t_run($check, $any);
                 return $result if $result->is_err;
             }
-            return Ok 1;
+            return $valid;
         }
         return Err("str: Not a string");
     }
@@ -230,13 +236,13 @@ sub t_idx($index, @checks) {
             my $result = $check->($array->[$index]);
             return $result if $result->is_err;
         }
-        return Ok 1;
+        return $valid;
     };
 }
 
 sub t_is($predicate) {
     return sub($any) {
-        return Ok 1 if $predicate->($any);
+        return $valid if $predicate->($any);
         return Err("is: \$predicate not succesful");
     }
 }
@@ -251,7 +257,7 @@ sub t_all($is_type) {
                     return Err("all: Element of Array does not match predicate");
                 }
             }
-            return Ok 1;
+            return $valid;
         }
         elsif ( $type eq 'Hash' || $type eq 'HASH' ) {
             for my $key ( keys %$any ) {
@@ -260,7 +266,7 @@ sub t_all($is_type) {
                     return Err("all: A value of a Hash does not match predicate");
                 }
             }
-            return Ok 1;
+            return $valid;
         }
         else {
             return Err("all: $type not supported by t_all");
@@ -277,20 +283,20 @@ sub t_length($min, $max=undef) {
             my $length = @$any;
             return Err("length: Not enough elements") if $length < $min;
             return Err("length: Too many elements")   if defined $max && $length > $max;
-            return Ok 1;
+            return $valid;
         }
         elsif ( $type eq 'Hash' || $type eq 'HASH' ) {
             my $length = keys %$any;
             return Err("length: Not enough elements") if $length < $min;
             return Err("length: Too many elements")   if defined $max && $length > $max;
-            return Ok 1;
+            return $valid;
         }
         # String
         elsif ( $type eq '' ) {
             my $length = length $any;
             return Err("lenght: string to short") if $length < $min;
             return Err("length: string to long")  if defined $max && $length > $max;
-            return Ok 1;
+            return $valid;
         }
         else {
             return Err("length: Not array-ref, hash-ref or string");
@@ -300,7 +306,7 @@ sub t_length($min, $max=undef) {
 
 sub t_match($regex) {
     return sub($any) {
-        return Ok 1 if $any =~ $regex;
+        return $valid if $any =~ $regex;
         return Err("match: $regex no match: $any");
     }
 }
@@ -308,7 +314,7 @@ sub t_match($regex) {
 sub t_matchf($regex, $predicate) {
     return sub($str) {
         if ( $str =~ $regex ) {
-            return Ok 1 if $predicate->(@{^CAPTURE});
+            return $valid if $predicate->(@{^CAPTURE});
             return Err("\$predicate not succesful");
         }
         return Err("matchf: $regex does not match");
@@ -317,21 +323,21 @@ sub t_matchf($regex, $predicate) {
 
 sub t_min($min) {
     return sub($num) {
-        return Ok 1 if $num >= $min;
+        return $valid if $num >= $min;
         return Err("min: $num >= $min");
     }
 }
 
 sub t_max($max) {
     return sub($num) {
-        return Ok 1 if $num <= $max;
+        return $valid if $num <= $max;
         return Err("max: $num <= $max");
     }
 }
 
 sub t_range($min, $max) {
     return sub($num) {
-        return Ok 1 if $num >= $min && $num <= $max;
+        return $valid if $num >= $min && $num <= $max;
         return Err("range: $num not between ($min,$max)");
     }
 }
@@ -349,57 +355,63 @@ sub t_or(@checks) {
 # Runs a Parser against a string
 sub t_parser($parser) {
     return sub($str) {
-        return Ok 1 if p_valid($parser, $str);
+        return $valid if p_valid($parser, $str);
         return Err("parser: string does not match Parser");
     }
 }
 
 sub t_any() {
-    return sub($any) { return Ok 1 };
+    state $fn = sub($any) { return Ok 1 };
+    return $fn;
 }
 
 sub t_sub() {
-    return sub($any) {
-        return Ok 1 if ref $any eq 'CODE';
+    state $fn = sub($any) {
+        return $valid if ref $any eq 'CODE';
         return Err("sub: Not a CODE reference.");
     };
+    return $fn;
 }
 
 sub t_regex() {
-    return sub($any) {
-        return Ok 1 if ref $any eq 'Regexp';
+    state $fn = sub($any) {
+        return $valid if ref $any eq 'Regexp';
         return Err("regex: Not a Regex");
-    }
+    };
+    return $fn;
 }
 
 sub t_bool() {
-    return sub($any) {
+    state $fn = sub($any) {
         if ( Scalar::Util::looks_like_number($any) && ($any == 0 || $any == 1) ) {
-            return Ok 1;
+            return $valid;
         }
         return Err("bool: Not a boolean value");
-    }
+    };
+    return $fn;
 }
 
 sub t_seq() {
-    return sub($any) {
-        return Ok 1 if ref $any eq 'Seq';
+    state $fn = sub($any) {
+        return $valid if ref $any eq 'Seq';
         return Err("seq: Not a sequence");
-    }
+    };
+    return $fn;
 }
 
 sub t_void() {
-    return sub($any) {
+    state $fn = sub($any) {
         # Scalar Context
-        return Ok 1 if !defined $any;
+        return $valid if !defined $any;
         # List context will be checked that the whole list is passed
         # as an array. So someone just can use array checks for list context
         my $type = ref $any;
         if ( $type eq 'Array' || $type eq 'ARRAY' ) {
-            return Ok 1 if @$any == 0;
+            return $valid if @$any == 0;
         }
         return Err("void: Not void");
-    }
+    };
+    return $fn;
 }
 
 sub t_tuple(@checks) {
@@ -407,16 +419,17 @@ sub t_tuple(@checks) {
         my $type = ref $array;
         if ( $type eq 'Array' || $type eq 'ARRAY' ) {
             if ( @checks == @$array ) {
+                my ($type, $value, $result);
                 for (my $idx=0; $idx<@checks; $idx++ ) {
-                    my $type   = $checks[$idx];
-                    my $value  = $array->[$idx];
-                    my $result = $type->($value);
+                    $type   = $checks[$idx];
+                    $value  = $array->[$idx];
+                    $result = $type->($value);
                     if ( $result->is_err ) {
                         my $msg = $result->get;
                         return Err("tuple: Index $idx: $msg");
                     }
                 }
-                return Ok 1;
+                return $valid;
             }
             return Err(
                 sprintf "tuple: Not correct size. Expected: %d Got: %d",
@@ -429,15 +442,16 @@ sub t_tuple(@checks) {
 }
 
 sub t_even_sized() {
-    return sub($array) {
+    state $fn = sub($array) {
         my $type = ref $array;
         if ( $type eq 'Array' || $type eq 'ARRAY' ) {
             # binary and to decide if array count is even
-            return Ok 1 if ((@$array & 1) == 0);
+            return $valid if ((@$array & 1) == 0);
             return Err("even_sized: Array not even-sized");
         }
         return Err("even_sized: Not used on an array");
-    }
+    };
+    return $fn;
 }
 
 sub t_methods(@methods) {
@@ -450,7 +464,7 @@ sub t_methods(@methods) {
                     return Err("methods: $class does not implement '$method'");
                 }
             }
-            return Ok 1;
+            return $valid;
         }
         return Err("methods: not a blessed reference");
     }
@@ -466,7 +480,7 @@ sub t_isa($class, @checks) {
                     return Err("isa: $msg");
                 }
             }
-            return Ok 1;
+            return $valid;
         }
         return Err("isa: not a blessed reference");
     }
