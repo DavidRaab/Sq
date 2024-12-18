@@ -388,4 +388,34 @@ package main;
     ok( t_valid(t_isa('MoreStupid', t_methods('bar')), $ms), 't_isa 12');
 }
 
+# t_tuplev
+{
+    my $t1 = t_tuplev(t_str, t_int, t_array(t_even_sized));
+    ok(!t_valid($t1, []),                    't_tuplev 1');
+    ok(!t_valid($t1, ["foo"]),               't_tuplev 2');
+    ok( t_valid($t1, ["foo" => 1]),          't_tuplev 3');
+    ok(!t_valid($t1, ["foo" => 1, 1]),       't_tuplev 4');
+    ok( t_valid($t1, ["foo" => 1, 1, 2]),    't_tuplev 5');
+    ok(!t_valid($t1, ["foo" => 1, 1, 2, 3]), 't_tuplev 6');
+
+    my $t2 = t_tuplev(t_int, t_array(t_all t_num));
+    ok(!t_valid($t2, []),         't_tuplev 7');
+    ok( t_valid($t2, [1]),        't_tuplev 8');
+    ok(!t_valid($t2, [1, "foo"]), 't_tuplev 9');
+    ok( t_valid($t2, [1, 2]),     't_tuplev 10');
+
+    my $t3 = t_tuplev(t_int, t_array, t_array(t_all t_int));
+    ok( t_valid($t3, [3,    [], 1,2,3]),     't_tuplev 11');
+    ok( t_valid($t3, [3, [1,2], 1,2,3]),     't_tuplev 12');
+    ok(!t_valid($t3, [3,    {}, 1,2,3]),     't_tuplev 13');
+    ok(!t_valid($t3, [3,    [], 1,"foo",3]), 't_tuplev 14');
+
+    my $t4 = t_tuplev(t_str, t_int, t_tuple(t_str, t_int));
+    ok( t_valid($t4, ["foo", 1]),              't_tuplev 15');
+    ok( t_valid($t4, ["foo", 1, "bar", 2]),    't_tuplev 16');
+    ok(!t_valid($t4, ["foo", 1, "bar"]),       't_tuplev 17');
+    ok(!t_valid($t4, ["foo", "t", "bar", 2]),  't_tuplev 18');
+    ok(!t_valid($t4, ["foo", 1, "bar", 2, 3]), 't_tuplev 19');
+}
+
 done_testing;

@@ -6,27 +6,27 @@ use Sq;
 use Sq::Parser qw(p_valid);
 use Sub::Exporter -setup => {
     exports => [
-        qw(t_run t_valid t_assert t_or t_is),         # Basic
-        qw(t_str t_str_eq t_match t_matchf t_parser), # String
-        qw(t_num t_int t_min t_max t_range),          # Numbers
+        qw(t_run t_valid t_assert t_or t_is),            # Basic
+        qw(t_str t_str_eq t_match t_matchf t_parser),    # String
+        qw(t_num t_int t_min t_max t_range),             # Numbers
         qw(t_opt),
-        qw(t_hash t_has_keys t_key t_keys),           # Hash
-        qw(t_array t_idx t_tuple t_even_sized),       # Array
+        qw(t_hash t_has_keys t_key t_keys),              # Hash
+        qw(t_array t_idx t_tuple t_tuplev t_even_sized), # Array
         qw(t_all t_length),
         qw(t_any t_sub t_regex t_bool t_seq t_void),
-        qw(t_ref t_isa t_methods),                    # Objects
+        qw(t_ref t_isa t_methods),                       # Objects
     ],
     groups => {
         default => [
-            qw(t_run t_valid t_assert t_or t_is),         # Basic
-            qw(t_str t_str_eq t_match t_matchf t_parser), # String
-            qw(t_num t_int t_min t_max t_range),          # Numbers
+            qw(t_run t_valid t_assert t_or t_is),            # Basic
+            qw(t_str t_str_eq t_match t_matchf t_parser),    # String
+            qw(t_num t_int t_min t_max t_range),             # Numbers
             qw(t_opt),
-            qw(t_hash t_has_keys t_key t_keys),           # Hash
-            qw(t_array t_idx t_tuple t_even_sized),       # Array
+            qw(t_hash t_has_keys t_key t_keys),              # Hash
+            qw(t_array t_idx t_tuple t_tuplev t_even_sized), # Array
             qw(t_all t_length),
             qw(t_any t_sub t_regex t_bool t_seq t_void),
-            qw(t_ref t_isa t_methods),                    # Objects
+            qw(t_ref t_isa t_methods),                       # Objects
         ],
     },
 };
@@ -438,6 +438,56 @@ sub t_tuple(@checks) {
             );
         }
         return Err("tuple: Must be an Array");
+    }
+}
+
+# variable tuple version. tuplev first expects a minimal fixed amoun of parameters.
+# But more than the fixed amount can be passed. All values more than the fixed amount
+# are passed as an array to the last type-check passed.
+#
+# so when someone calls t_tuplev(t_int, t_int, t_array)
+#
+# then this version has two fixed arguments. And the last check get's all
+# remaining variables passed to the last check. Obviously this must be another
+# t_array or another t_tuple check again to work.
+sub t_tuplev(@checks) {
+    my $varargs = pop @checks;
+    my $min     = @checks;
+    return sub($array) {
+        my $type = ref $array;
+        if ( $type eq 'Array' || $type eq 'ARRAY' ) {
+            # $array must have at least @checks entries
+            if ( @$array >= $min ) {
+                # first check entries that must be present
+                my ($type, $value, $result);
+                for (my $idx=0; $idx<@checks; $idx++ ) {
+                    $type   = $checks[$idx];
+                    $value  = $array->[$idx];
+                    $result = $type->($value);
+                    if ( $result->is_err ) {
+                        return Err("tuplev: Index $idx: " . $result->get);
+                    }
+                }
+
+                # slice the rest of the array and check against $varargs
+                my @rest = $array->@[$min .. $#$array];
+                if ( @rest > 0 ) {
+                    $result = $varargs->(\@rest);
+                    if ( $result->is_err ) {
+                        return Err("tuplev: varargs failed: " . $result->get);
+                    }
+                }
+
+                # Otherwise everything is ok
+                return $valid;
+            }
+            return Err(
+                sprintf "tuplev: To few elements: Needs at least: %d Got: %d",
+                scalar @checks,
+                scalar @$array
+            );
+        }
+        return Err("tuplev: Must be an Array");
     }
 }
 
