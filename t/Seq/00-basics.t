@@ -3,6 +3,7 @@ use 5.036;
 use Scalar::Util qw(refaddr);
 use List::Util qw(reduce);
 use Sq;
+use Sq::Sig;
 use Test2::V0 qw/is ok done_testing dies like check_isa/;
 
 # Some values, functions, ... for testing

@@ -2,6 +2,7 @@
 use 5.036;
 use Sq;
 use Sq::Parser;
+use Sq::Sig;
 use Test2::V0 qw(is ok done_testing);
 
 # This is the Test file created while writing the intro to Sq::Parser

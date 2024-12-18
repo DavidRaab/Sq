@@ -2,6 +2,7 @@
 use 5.036;
 use List::Util qw(reduce);
 use Sq;
+use Sq::Sig;
 use Test2::V0 qw/is ok done_testing dies like check_isa/;
 
 # Some values, functions, ... for testing

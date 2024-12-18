@@ -1,6 +1,7 @@
 #!perl
 use 5.036;
 use Sq;
+use Sq::Sig;
 use Scalar::Util qw(blessed);
 use Test2::V0 qw/is ok done_testing dies like check_isa/;
 

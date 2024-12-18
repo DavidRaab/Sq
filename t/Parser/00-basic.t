@@ -2,6 +2,7 @@
 use 5.036;
 use Sq;
 use Sq::Parser;
+use Sq::Sig;
 use Test2::V0 qw/is ok done_testing dies like check_isa/;
 
 # Some parsers
