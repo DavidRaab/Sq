@@ -13,19 +13,19 @@ my $astr = t_array(t_all t_str);
 
 ### CONSTRUCTORS
 
-sigt('Array::new',        t_tuplev(t_any, t_array), t_array);
-sigt('Array::wrap',       t_tuplev(t_any, t_array), t_array);
-sigt('Array::concat',     t_tuplev(t_any, $aoa),    t_array);
-sig ('Array::empty',      t_any,               t_array);
-sig ('Array::replicate',  t_any, t_int, t_any, t_array);
-sig ('Array::bless',      t_any, t_array,      t_array);
-sig ('Array::from_array', t_any, t_array,      t_array);
-sig ('Array::init',       t_any, t_int, t_sub, t_array);
-
+sigt('Array::new',        t_tuplev(t_any, t_array),   t_array);
+sigt('Array::wrap',       t_tuplev(t_any, t_array),   t_array);
+sigt('Array::concat',     t_tuplev(t_any, $aoa),      t_array);
+sig ('Array::empty',      t_any,                      t_array);
+sig ('Array::replicate',  t_any, t_int, t_any,        t_array);
+sig ('Array::bless',      t_any, t_array,             t_array);
+sig ('Array::from_array', t_any, t_array,             t_array);
+sig ('Array::init',       t_any, t_int, t_sub,        t_array);
 # Second argument is 'State, would be good to back-reference the type
-sig('Array::unfold',     t_any, t_any, t_sub, t_array);
-sig('Array::range_step', t_any, t_num, t_num, t_num, t_array);
-sig('Array::range',      t_any, t_int, t_int, t_array);
+sig ('Array::unfold',     t_any, t_any, t_sub,        t_array);
+sig ('Array::range_step', t_any, t_num, t_num, t_num, t_array);
+sig ('Array::range',      t_any, t_int, t_int,        t_array);
+
 
 ### METHODS
 
@@ -71,12 +71,14 @@ sig ('Array::skip_while',        t_array, t_sub,           t_array);
 sigt('Array::slice',             t_tuplev(t_array, $aint), t_array);
 sig ('Array::extract',           t_array, t_int, t_int,    t_array);
 
+
 ### SIDE-EFFECTS
 
 sig('Array::iter',     t_array, t_sub, t_void);
 sig('Array::iteri',    t_array, t_sub, t_void);
 sig('Array::foreachi', t_array, t_sub, t_void);
 sig('Array::foreachi', t_array, t_sub, t_void);
+
 
 ### CONVERTER
 
@@ -129,6 +131,7 @@ sigt('Array::dumpw',
     ),
     t_void
 );
+
 
 ### MUTATION
 
