@@ -198,7 +198,7 @@ I<Aspect-Oriented-Programming>.
 
 =head2 Array::sum
 
-Let's fo through another function to fully understand the whole benefits of
+Let's go through another function to fully understand the whole benefits of
 everything. Here is the implementation of C<Array::sum> in C<Sq> at the moment.
 
     sub sum($array) {
@@ -217,7 +217,7 @@ style. So you also can for example call C<Array::sum({})> or in another word.
 You can pass anything else, not just an array.
 
 This is also sometimes a reminder that again dynamic-typing is often less
-dynamic-typed as you expect. because passing anything else to C<sum> then
+dynamic-typed as you expect. Because passing anything else to C<sum> than
 an array will just break the code.
 
 The next problem is that it is supposed to add numbers. But. You also can pass
@@ -284,7 +284,7 @@ of code.
 
 The benefit is that the type-checking is excluded from your normal code you write.
 C<Array::sum> does not contain any type-checking at all! And I consider this
-as an very important topic.
+as an very important feature.
 
 The idea is that while you develope, test and build your system you load your
 signature file and it helps you identify bugs where you passed the wrong parameters
@@ -350,10 +350,10 @@ When you have an uneven list and try to tansform it into an array, then usually
 you have some kind of bug in your code. This kind of type-checking is not
 something that should be I<active> all the time.
 
-This is also the case for the other stuff. When you try to sort numbers and you
-array doesn't contain numbers, then you have a bug in your code! I guess you
+This is also the case for the other stuff. When you try to sort numbers and your
+array doesn't contain numbers then you have a bug in your code! I guess you
 forget somewhere to check for a number. Did no parsing of a number and so on.
-When you encounter a number you usually want to abort.
+When you encounter something that isn't a number you usually want to abort.
 
 Correct code would be that you first C<filter/grep> for a number, do some
 input validation and then sum up. Once your code is written this way, you again
@@ -371,12 +371,12 @@ Just write your code as you are supposed to write code in a dynamic-typed langua
 
 But don't try to rely on the type-checking or that a function
 throws an error or other kind of I<garbage programming>. When you want to return
-Errors you use C<Result> or C<Option> not throw exceptions!
+Errors you use C<Result> or C<Option> B<not throw exceptions!>
 
-Write code in such a way that you always expect correct things are passed and
-just something as an array, hash and just use the keys like you need them.
+Write code in such a way that expect that correct things are passed and
+just use something as an array, hash, integer and so on.
 
-This way you get the benefits if both worlds! You write like in a dynamic-typed language.
+This way you get the benefits of both worlds! You write like in a dynamic-typed language.
 You don't need to clutter your code with all kinds of type-checking stuff, you
 still can add them to identify error. And remove them once again you found errors/bugs
-in your code, and get fast code.
+in your code without slowing done your normal code execution.
