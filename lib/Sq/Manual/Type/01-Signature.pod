@@ -1,0 +1,377 @@
+=encoding UTF-8
+
+=head1 Sq::Signature
+
+In this section we will look into Sq::Signature. But first a small recap
+of the Intro.
+
+When we talk about typing, a lot of languages use a B<Nominal typing> approach.
+Something is of a specific type by a B<name> that is somehow attached to it.
+This can be the name of a struct (C), Record (F#) or a class name (Java,C#,Perl,...).
+
+We also can use classes in Perl, and purely by using C<isa> just check wether
+something is of a type or not. But this kind of checking also has it's
+disadvantages. The code itself must ensure that your data is always in
+a valid state. And even in a static typed language you usually need some
+code that must be executed to fully check all kinds of code variants.
+
+The typing approach suggested in C<Sq> is a structural approach. That means
+we use C<Sq::Type> to built a type-representation that fully checks a
+data-structure for compatibility.
+
+So we still can use simple data-structure from Arrays/Hashes to just built
+any data, and run them against any type-check. Those type-checks can even be
+more complicated as a simple B<Nominal type> approach can be. When we use such
+a complete approach of type-checking we also don't need to ensure that
+something is always valid with every single mutation/change. It also
+can make writing code easier as we don't need to check everything everywhere.
+
+The disadvantage of this approach is that it costs more performance of just
+checking a B<Name>. But this is debatable. Because when all your functions/methods
+are full of type-checks and you must ensure correct/valid data at every modification
+then this also has a performance impact.
+
+Another advantage of the C<Sq> approach is that one data-type can be of many types.
+
+When we for example have a Position type
+
+    my $pos = t_hash(t_keys(
+        X => t_num,
+        Y => t_num,
+    ));
+
+then this data-structure would be compatible.
+
+    my $player = {
+        name   => 'Main Character',
+        X      => 123,
+        Y      => 5000,
+        health => {
+            min     => 0,
+            max     => 100,
+            current => 50,
+        },
+    };
+
+but also this one.
+
+    my $circle = {
+        X      => 100,
+        Y      => 200,
+        radius => 20,
+    };
+
+how about a health type?
+
+    my $has_health = t_hash(
+        t_key(health => t_hash(t_keys(
+            min     => t_num,
+            max     => t_num,
+            current => t_num.
+        ))),
+    );
+
+and now you also can define enemies with health.
+
+    my $enemy = {
+        X      => 100,
+        Y      => 200,
+        health => {
+            min     => 0,
+            max     => 9_000,
+            current => 9_000,
+        },
+    }
+
+It also makes tetsing very easy. You just need to compare data! That's all.
+And actually that's always what you do in testing. But with objects for example
+you usually need to query the data from it, over a dozens of method calls
+and hope you get a correct representation of the internal state of an object.
+
+So as we have seen some advantages let's now look deeper at C<Sq::Signature>.
+
+=head1 Signature in practice
+
+Before I go into how you use C<Sq::Signature> you must understand how it works,
+and why it is built the way it is built to understand the benefits over other
+solutions.
+
+So let's say you start and load C<Sq> and you want to create an Array in a certain
+range. You write this code.
+
+    my $array = Array->range(1, 10);
+
+This creates an array containing the numbers from C<1> to C<10>. Everything
+works, but here is a common problem we face in dynamic typing. What happens
+when you don't pass integers to the call of C<range>?
+
+Let's try.
+
+    my $array = Array->range("foo", "bar");
+
+Executing this prints the following warnings
+
+    Argument "foo" isn't numeric in int at /home/david/perl5/perlbrew/perls/perl-5.40.0/lib/site_perl/5.40.0/Sq/Collections/Array.pm line 105.
+    Argument "bar" isn't numeric in int at /home/david/perl5/perlbrew/perls/perl-5.40.0/lib/site_perl/5.40.0/Sq/Collections/Array.pm line 106.
+
+but still it somehow returns an array just containg C<[0]>. Actually not what
+I expected. So here is one problem why I actually dislike dynamic-typing
+sometimes.
+
+Dynamic-typing only works well when you pass the I<correct> things. it
+also shows another problem. Dynamic-Typing usually is less dynamic as it really
+is. When I call C<range> I must pass integers, otherwise the code doesn't work.
+I cannot pass anything of any type to it. That's not how it works. It also
+has the biggest flaw in dynamic-typing and that is that errors are not shown
+at the place who they are truly occur.
+
+In the above it prints an error inside the C<Sq::Collections::Array> module.
+But that is not the place where the real error is. The real error was that
+you called C<range> and passed it C<"foo","bar">.
+
+This is the reason why I sometimes wish to have a static-typed language or some
+kind of type-checking. And actually, i am not alone. Perl has like a dozens
+of modules just dedicated to type-checking. C<Moose> has some stuff built-in
+for their attributes. We have C<Type::Tiny>, for checking we get stuff like
+C<Params::Validate>. Modules dedicated to type-checking are endless.
+
+But you know what, I don't like doing that because writing type-checking
+is tedious and usually makes code a lot slower to execute.
+
+So how does C<Sq> helps here? Well in C<Sq> the idea is that you actually load
+a so called signature file. C<Sq> ships with C<Sq::Sig> that you can load.
+So now look what happens.
+
+    use Sq;
+    use Sq::Sig; # Must be loaded last
+
+    my $array = Array->range("foo", "bar");
+
+Executing this code now prints the following.
+
+    Type Error: tuple: Index 1: int: Not an integer at ./sq_test.pl line 7.
+
+Maybe the Error messages are not the best at the moment and they are a
+work in progress. But here you can see the following.
+
+=over
+
+=item Type-checking can be loaded
+
+=item When loaded you pay the price of it, when not loaded you get full type-checking free code.
+
+=item throws an error, not just warning.
+
+=item Correct place where the error occured.
+
+=back
+
+The whole idea of B<loading> is actually what it seperates it from all other
+modules out there. The idea is that when you write code. Usually you are in
+development, testing and so on. Then you load a I<Signature> file that does
+a correct type-checking. This type-checking helps you in writing correct code.
+
+But once your code works and you go into I<production>, I<release> or whatever you
+want to call it. You just don't load C<Sq::Sig> or your signature file and you
+get type-check free code with full performance.
+
+You already can look into C<Sq::Sig::Array> and see how the different signatures
+for all the Array functions look, but here is what you need to write
+when you want to add type-checking to C<range> yourself.
+
+    use Sq::Type;
+    use Sq::Signature;
+
+    sig ('Array::range', t_any, t_int, t_int, t_array);
+
+This is all you need to write. It loads a C<sig> function that allows you to
+add type-checking to any function defined in Perl. When you wonder how it works.
+
+It's the same technique used by C<Memoize>. That means a function is replaced
+in the symbol table and is replaced with a new function that has the type-check
+added. This kind of programming is also sometimes named I<Aspect-Oriented-Programming>.
+
+=head2 Array::sum
+
+Let's fo through another function to fully understand the whole benefits of
+everything. Here is the implementation of C<Array::sum> in C<Sq> at the moment.
+
+    sub sum($array) {
+        my $sum = 0;
+        for my $x ( @$array ) {
+            $sum += $x;
+        }
+        return $sum;
+    }
+
+as you see. Completely boring and nearly stupid. But again. Here is one problem
+you have with such a function and also a little bit of dynamic typing.
+
+First of. In C<Sq> it is also fine to call every function in a functional
+style. So you also can for example call C<Array::sum({})> or in another word.
+You can pass anything else, not just an array.
+
+This is also sometimes a reminder that again dynamic-typing is often less
+dynamic-typed as you expect. because passing anything else to C<sum> then
+an array will just break the code.
+
+The next problem is that it is supposed to add numbers. But. You also can pass
+non numbers to it. Here are some calls that you can do and just create some
+garbage.
+
+Calling
+
+    my $sum = Array::sum({});
+    say $sum;
+
+will at least produce
+
+    Not an ARRAY reference at /home/david/perl5/perlbrew/perls/perl-5.40.0/lib/site_perl/5.40.0/Sq/Collections/Array.pm line 550.
+
+but the place of the error is obviously wrong. The error again is not in the
+Array module!
+
+Calling
+
+    my $sum = Array::sum([ 1,2,3,[] ]);
+    say $sum;
+
+will give you something like
+
+    94209245107742
+
+the number changes whenever you call that code. So what happens here?
+
+An experienced Perl programmer can immediately tell. The problem is that we pass
+an array reference. C<[]> and when you use an array reference in an addition C<+>
+then this reference is turned into a number and returns it's memory address.
+
+So what the codes does is it adds C<1 + 2 + 3 + 98765363637>. Not what you expect!
+
+Here again. This is the signature defined in C<Sq::Sig::Array>
+
+    sig('Array::sum', t_array(t_all t_num), t_num);
+
+So once you loaded C<Sq::Sig> (this loads all Signature files). This are the two
+new error messages you get.
+
+    my $sum = Array::sum( {} );
+
+    # produces
+    Type Error: tuple: Index 0: array: Not an Array at ./sq_test.pl line 7.
+
+and the second call
+
+    my $sum = Array::sum([ 1,2,3,[] ]);
+    Type Error: tuple: Index 0: all: index 3: num: Not a number 'ARRAY(0x55ff394f1618)' at ./sq_test.pl line 8.
+
+Again, the error messages will improve. But what it tells you is that there
+is a type-mismatch of the first argument I<index 0> passed to C<sum>. This
+is the whole array C<[1,2,3,[]]>. Then it further tells you that the C<all>
+match failed at I<index 3> and the C<num> check failed because you passed
+an C<ARRAY>.
+
+So here i hope you see the following.
+
+First of. The signature file and writing a single C<sig> function is really
+small to write. You can add type-checking to any function with a single line
+of code.
+
+The benefit is that the type-checking is excluded from your normal code you write.
+C<Array::sum> does not contain any type-checking at all! And I consider this
+as an very important topic.
+
+The idea is that while you develope, test and build your system you load your
+signature file and it helps you identify bugs where you passed the wrong parameters
+and find potential bugs in your code.
+
+Once you have found them. You remove C<Sq::Sig> and you get a type-checking
+free function!
+
+I cannot stress further how annoying it is to write type-checking code. For example
+you could add the type-checking to C<sum>. Then the function will look like.
+
+    sub sum($array) {
+        Carp::croak "No an Array" if ref $array ne 'ARRAY';
+        my $sum = 0;
+        my $idx = 0;
+        for my $x ( @$array ) {
+            if ( not Scalar::Util::looks_like_number($x) ) {
+                Carp::croak "index $idx: Not a number $x";
+            }
+            $sum += $x;
+            $idx++;
+        }
+        return $sum;
+    }
+
+but again. Then you always have a slow version of C<sum>! You always check for
+the input and every element of your array is checked against of being a number.
+
+This is also what loading the C<Sq::Sig> does, or just writing.
+
+    sig('Array::sum', t_array(t_all t_num), t_num);
+
+but you get it all in a single line of code, with probably already a lot more
+useful error messages as you are currently used. You can leave the type-check
+active or don't load the signature at all. And you have a C<sum> function with
+full performance!
+
+Did you wonder about the last C<t_num>? C<Sq::Signature> not only tests
+the input arguments. But also tests the output arguments. So when you now
+would change C<sum> to return something different than a number, then also
+the type-check will fail!
+
+This helps greatly in writing and refactoring code. Because once you have written
+a definition your function must stick to it, otherwise you get an error.
+
+Here are some other kinds of code examples and the error-messages.
+
+    my $sum = sq([1,2,3])->as_hash;
+    # Type Error: tuple: Index 0: even_sized: Array not even-sized at ./sq_test.pl line 11.
+
+    my $sorted = sq([1,2,3,"foo" ])->sort_num;
+    # Type Error: tuple: Index 0: all: index 3: num: Not a number 'foo' at ./sq_test.pl line 11.
+
+    my $matches = sq(["12-12", "10-10", []])->regex_match(qr/\A(\d\d)-(\d\d)\z/);
+    # Type Error: tuple: Index 0: all: index 2: str: Not a string at ./sq_test.pl line 11.
+
+=head1 Optional type-checking
+
+But again, a very important thing I consider is that this kind of type-checking
+is completely optional.
+
+When you have an uneven list and try to tansform it into an array, then usually
+you have some kind of bug in your code. This kind of type-checking is not
+something that should be I<active> all the time.
+
+This is also the case for the other stuff. When you try to sort numbers and you
+array doesn't contain numbers, then you have a bug in your code! I guess you
+forget somewhere to check for a number. Did no parsing of a number and so on.
+When you encounter a number you usually want to abort.
+
+Correct code would be that you first C<filter/grep> for a number, do some
+input validation and then sum up. Once your code is written this way, you again
+can remove the type-check.
+
+When you try todo a regex match against not a string. Well again. You somewhere
+have a bug! It's that simple.
+
+Because C<Sq::Signature> uses C<Sq::Type> you can use all kind of complicated
+tests to define any structure to type-check against. Use it to define really
+expressive constraints on your data. It will help you to write correct code.
+
+It also helps you as all of your I<normal code> has no type-checking logic in it.
+Just write your code as you are supposed to write code in a dynamic-typed language.
+
+But don't try to rely on the type-checking or that a function
+throws an error or other kind of I<garbage programming>. When you want to return
+Errors you use C<Result> or C<Option> not throw exceptions!
+
+Write code in such a way that you always expect correct things are passed and
+just something as an array, hash and just use the keys like you need them.
+
+This way you get the benefits if both worlds! You write like in a dynamic-typed language.
+You don't need to clutter your code with all kinds of type-checking stuff, you
+still can add them to identify error. And remove them once again you found errors/bugs
+in your code, and get fast code.
