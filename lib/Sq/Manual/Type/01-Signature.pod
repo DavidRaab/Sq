@@ -187,7 +187,7 @@ when you want to add type-checking to C<range> yourself.
 This is all you need to write. It loads a C<sig> function that allows you to
 add type-checking to any function defined in Perl. When you wonder how it works.
 
-It's the same technique used by C<Memoize>. That means a function is replaced
+It's the same technique used by the  L<Memoize> module. That means a function is replaced
 in the symbol table and is replaced with a new function that has the type-check
 added. This kind of programming is also sometimes named I<Aspect-Oriented-Programming>.
 
