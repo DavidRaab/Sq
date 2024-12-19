@@ -154,15 +154,15 @@ Executing this code now prints the following.
 Maybe the Error messages are not the best at the moment and they are a
 work in progress. But here you can see the following.
 
-=over
+=over 4
 
-=item Type-checking can be loaded
+=item * Type-checking can be loaded
 
-=item When loaded you pay the price of it, when not loaded you get full type-checking free code.
+=item * When loaded you pay the price of it, when not loaded you get full type-checking free code.
 
-=item throws an error, not just warning.
+=item * throws an error, not just warning.
 
-=item Correct place where the error occured.
+=item * Correct place where the error occured.
 
 =back
 
