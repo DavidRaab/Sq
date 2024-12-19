@@ -166,12 +166,16 @@ work in progress. But here you can see the following.
 
 =back
 
-The whole idea of B<loading> is actually what it seperates it from all other
-modules out there. The idea is that when you write code. Usually you are in
-development, testing and so on. Then you load a I<Signature> file that does
-a correct type-checking. This type-checking helps you in writing correct code.
+The whole idea of B<loading> is what it seperates it from all other
+modules out there. You don't include the type-checks directly in your functions.
+Instead you define a signature in a module that you can load, or don't
+load.
 
-But once your code works and you go into I<production>, I<release> or whatever you
+The idea is that you only load the I<Signature> files as long you are
+actively writing code or in your test-suite to find bugs or just don't need
+to test for stupid correct/incorrect passing of arguments.
+
+Once your code works and you go into I<production>, I<release> or whatever you
 want to call it. You just don't load C<Sq::Sig> or your signature file and you
 get type-check free code with full performance.
 
@@ -182,14 +186,15 @@ when you want to add type-checking to C<range> yourself.
     use Sq::Type;
     use Sq::Signature;
 
-    sig ('Array::range', t_any, t_int, t_int, t_array);
+    sig('Array::range', t_any, t_int, t_int, t_array);
 
-This is all you need to write. It loads a C<sig> function that allows you to
-add type-checking to any function defined in Perl. When you wonder how it works.
+C<Sq::Signature> loads a C<sig> function that allows you to add type-checking
+to any function defined in Perl. When you wonder how it works.
 
-It's the same technique used by the  L<Memoize> module. That means a function is replaced
-in the symbol table and is replaced with a new function that has the type-check
-added. This kind of programming is also sometimes named I<Aspect-Oriented-Programming>.
+It's the same technique used by the  L<Memoize> module. This means a function is
+replaced in the symbol table and is replaced with a new function that has the
+type-check added. This kind of programming is also sometimes named
+I<Aspect-Oriented-Programming>.
 
 =head2 Array::sum
 
