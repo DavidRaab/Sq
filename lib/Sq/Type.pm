@@ -251,11 +251,13 @@ sub t_all($is_type) {
     return sub($any) {
         my $type = ref $any;
         if ( $type eq 'Array' || $type eq 'ARRAY' ) {
+            my $idx = 0;
             for my $x ( @$any ) {
                 my $result = $is_type->($x);
                 if ( $result->is_err ) {
-                    return Err("all: Element of Array does not match predicate");
+                    return Err("all: index $idx: " . $result->get);
                 }
+                $idx++;
             }
             return $valid;
         }
@@ -263,7 +265,7 @@ sub t_all($is_type) {
             for my $key ( keys %$any ) {
                 my $result = $is_type->($any->{$key});
                 if ( $result->is_err ) {
-                    return Err("all: A value of a Hash does not match predicate");
+                    return Err("all: key $key: " . $result->get);
                 }
             }
             return $valid;
