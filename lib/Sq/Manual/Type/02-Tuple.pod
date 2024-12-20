@@ -23,7 +23,7 @@ a list in F#
 
     let foo arg =
         ...
-        [x,y]
+        [x;y]
 
 but. This only works partially. Because in F#, and this is in most static-typed
 languages (also C#, Java) lists are restricted in a way that all elements must
@@ -38,7 +38,7 @@ write.
 
     let foo arg =
         ...
-        x, y
+        x,y
 
 what actually is pretty much the same as in Perl. The only difference is that
 still only one argument is returned. A Tuple that contains two values. And additional
