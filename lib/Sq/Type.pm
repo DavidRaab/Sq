@@ -8,11 +8,11 @@ use Sub::Exporter -setup => {
     exports => [
         qw(t_run t_valid t_assert t_or t_is),            # Basic
         qw(t_str t_enum t_match t_matchf t_parser),      # String
-        qw(t_num t_int t_min t_max t_range),             # Numbers
+        qw(t_num t_int t_positive t_negative t_range),   # Numbers
         qw(t_opt),
-        qw(t_hash t_with_keys t_keys),                    # Hash
+        qw(t_hash t_with_keys t_keys),                   # Hash
         qw(t_array t_idx t_tuple t_tuplev t_even_sized), # Array
-        qw(t_of t_length),
+        qw(t_of t_min t_max t_length),
         qw(t_any t_sub t_regex t_bool t_seq t_void),
         qw(t_ref t_isa t_can),                           # Objects
     ],
@@ -20,11 +20,11 @@ use Sub::Exporter -setup => {
         default => [
             qw(t_run t_valid t_assert t_or t_is),            # Basic
             qw(t_str t_enum t_match t_matchf t_parser),      # String
-            qw(t_num t_int t_min t_max t_range),             # Numbers
+            qw(t_num t_int t_positive t_negative t_range),   # Numbers
             qw(t_opt),
-            qw(t_hash t_with_keys t_keys),                    # Hash
+            qw(t_hash t_with_keys t_keys),                   # Hash
             qw(t_array t_idx t_tuple t_tuplev t_even_sized), # Array
-            qw(t_of t_length),
+            qw(t_of t_min t_max t_length),
             qw(t_any t_sub t_regex t_bool t_seq t_void),
             qw(t_ref t_isa t_can),                           # Objects
         ],
@@ -34,7 +34,6 @@ use Sub::Exporter -setup => {
 # TODO
 # Add: t_not
 # Add: t_none, t_any
-# Add: t_positive, t_negative
 # Add: t_tuplen
 # Add: t_result
 # Add: t_repeat(t_int, t_str, t_int)
@@ -218,6 +217,30 @@ sub t_int(@checks) {
         }
         return Err("int: Not an integer");
     }
+}
+
+sub t_positive() {
+    state $fn = sub($any) {
+        my $type = ref $any;
+        if ( $type eq "" && Scalar::Util::looks_like_number($any) ) {
+            return $valid if $any >= 0;
+            return Err("positive: '$any' not >= 0");
+        }
+        return Err("positive: Not a number");
+    };
+    return $fn;
+}
+
+sub t_negative() {
+    state $fn = sub($any) {
+        my $type = ref $any;
+        if ( $type eq "" && Scalar::Util::looks_like_number($any) ) {
+            return $valid if $any <= 0;
+            return Err("negative: '$any' not <= 0");
+        }
+        return Err("negative: Not a number");
+    };
+    return $fn;
 }
 
 sub t_str(@checks) {

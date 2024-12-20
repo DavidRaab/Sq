@@ -214,6 +214,16 @@ ok(!t_valid($is_album2, $album_wrong2), 'album.tracks not an array');
     ok(!t_valid(t_max(1), Seq->empty), 't_max 13');
 }
 
+# t_positive & t_negative
+{
+    ok(!t_valid(t_positive, -1), 't_positive 1');
+    ok( t_valid(t_positive,  0), 't_positive 2');
+    ok( t_valid(t_positive,  1), 't_positive 3');
+    ok( t_valid(t_negative, -1), 't_negative 1');
+    ok( t_valid(t_negative,  0), 't_negative 2');
+    ok(!t_valid(t_negative,  1), 't_negative 3');
+}
+
 # t_or
 {
     my $date = t_or(
