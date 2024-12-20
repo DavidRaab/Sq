@@ -45,13 +45,13 @@ my $is_album2 =
             t_idx(0,
                 t_hash(
                     t_key(name     => t_str),
-                    t_key(duration => t_str_eq('03:16')),
+                    t_key(duration => t_enum('03:16')),
                 ),
             ),
             t_idx(1,
                 t_hash(
-                    t_key(name     => t_str_eq('bar')),
-                    t_key(duration => t_str_eq('03:45')),
+                    t_key(name     => t_enum('bar')),
+                    t_key(duration => t_enum('03:45')),
                 ),
             ),
         )),
@@ -74,10 +74,21 @@ ok(
 ok( t_valid(t_key(artist => t_str), $album), 'check if album.artist is_str');
 ok(!t_valid(t_key(foo    => t_str), $album), 'album.foo must fail');
 ok(
-    t_valid(t_key(artist => t_str_eq('Michael Jackson')), $album),
+    t_valid(t_key(artist => t_enum('Michael Jackson')), $album),
     'album is from Michael Jackson');
 ok( t_valid($is_album2, $album),        'full album check');
 ok(!t_valid($is_album2, $album_wrong2), 'album.tracks not an array');
+
+# t_enum
+{
+    my $choices = t_enum(qw/yes no maybe/);
+    ok( t_valid($choices,   'yes'), 't_enum 1');
+    ok( t_valid($choices,    'no'), 't_enum 2');
+    ok( t_valid($choices, 'maybe'), 't_enum 3');
+    ok(!t_valid($choices,      ''), 't_enum 4');
+    ok(!t_valid($choices,      []), 't_enum 5');
+    ok(!t_valid($choices,      {}), 't_enum 6');
+}
 
 # t_length
 {

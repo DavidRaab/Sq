@@ -7,7 +7,7 @@ use Sq::Parser qw(p_valid);
 use Sub::Exporter -setup => {
     exports => [
         qw(t_run t_valid t_assert t_or t_is),            # Basic
-        qw(t_str t_str_eq t_match t_matchf t_parser),    # String
+        qw(t_str t_enum t_match t_matchf t_parser),      # String
         qw(t_num t_int t_min t_max t_range),             # Numbers
         qw(t_opt),
         qw(t_hash t_has_keys t_key t_keys),              # Hash
@@ -19,7 +19,7 @@ use Sub::Exporter -setup => {
     groups => {
         default => [
             qw(t_run t_valid t_assert t_or t_is),            # Basic
-            qw(t_str t_str_eq t_match t_matchf t_parser),    # String
+            qw(t_str t_enum t_match t_matchf t_parser),      # String
             qw(t_num t_int t_min t_max t_range),             # Numbers
             qw(t_opt),
             qw(t_hash t_has_keys t_key t_keys),              # Hash
@@ -187,12 +187,15 @@ sub t_keys(%kt) {
     }
 }
 
-sub t_str_eq($expected) {
+sub t_enum(@expected) {
     return sub($any) {
         if ( ref $any eq "" ) {
-            return $valid if $any eq $expected;
+            for my $expected ( @expected ) {
+                return $valid if $any eq $expected;
+            }
+            return Err("enum: Not one of the valid choices");
         }
-        return Err("str_eq: Expected: '$expected' got '$any'");
+        return Err("enum: Not a string");
     }
 }
 
