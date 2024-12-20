@@ -313,11 +313,11 @@ my $is_album = assign {
         t_hash(
             t_with_keys(qw/artist title tracks/),
             t_keys(
-                artist => t_str(t_length 1),   # string must have at least 1 char
-                title  => t_str(t_length 1),
+                artist => t_str(t_min 1),   # string must have at least 1 char
+                title  => t_str(t_min 1),
                 tracks => t_array(
-                    t_length(1),              # Array must have at least 1 entry
-                    t_of(t_hash(              # All entries must be hashes
+                    t_min(1),              # Array must have at least 1 entry
+                    t_of(t_hash(           # All entries must be hashes
                         t_with_keys(qw/name duration/),
                         t_keys(
                             name     => t_str,

@@ -93,13 +93,12 @@ ok(!t_valid($is_album2, $album_wrong2), 'album.tracks not an array');
 
 # t_length
 {
-    # only min
-    ok(!t_valid(t_length(1), []         ), 't_length 1');
-    ok( t_valid(t_length(1), [1]        ), 't_length 2');
-    ok( t_valid(t_length(1), [1,2]      ), 't_length 3');
-    ok(!t_valid(t_length(1), {}         ), 't_length 4');
-    ok( t_valid(t_length(1), {f=>1}     ), 't_length 5');
-    ok( t_valid(t_length(1), {f=>1,g=>1}), 't_length 6');
+    ok(!t_valid(t_length(1,10), []         ), 't_length 1');
+    ok( t_valid(t_length(1,10), [1]        ), 't_length 2');
+    ok( t_valid(t_length(1,10), [1,2]      ), 't_length 3');
+    ok(!t_valid(t_length(1,10), {}         ), 't_length 4');
+    ok( t_valid(t_length(1,10), {f=>1}     ), 't_length 5');
+    ok( t_valid(t_length(1,10), {f=>1,g=>1}), 't_length 6');
 
     # min and max
     ok(!t_valid(t_length(1,3), []       ), 't_length 7');
@@ -115,9 +114,9 @@ ok(!t_valid($is_album2, $album_wrong2), 'album.tracks not an array');
     ok(!t_valid(t_length(1,3), {a=>1,b=>2,c=>3,d=>4}), 't_length 16');
 
     # string
-    ok(!t_valid(t_length(1),  "" ), 't_length 17');
-    ok( t_valid(t_length(1),  "a"), 't_length 18');
-    ok( t_valid(t_length(1), "ab"), 't_length 19');
+    ok(!t_valid(t_length(1,10),  "" ), 't_length 17');
+    ok( t_valid(t_length(1,10),  "a"), 't_length 18');
+    ok( t_valid(t_length(1,10), "ab"), 't_length 19');
 
     ok(!t_valid(t_length(1,3), ""    ), 't_length 17');
     ok( t_valid(t_length(1,3), "a"   ), 't_length 18');
@@ -168,13 +167,6 @@ ok(!t_valid($is_album2, $album_wrong2), 'album.tracks not an array');
 
 # t_min / t_max / t_range
 {
-    ok(!t_valid(t_min(10),  0), 't_min 1');
-    ok( t_valid(t_min(10), 10), 't_min 2');
-    ok( t_valid(t_min(10), 20), 't_min 3');
-    ok( t_valid(t_max(10),  0), 't_max 1');
-    ok( t_valid(t_max(10), 10), 't_max 2');
-    ok(!t_valid(t_max(10), 20), 't_max 3');
-
     ok(!t_valid(t_num(t_min(0), t_max(10)), -1), 't_min & t_max 1');
     ok( t_valid(t_num(t_min(0), t_max(10)),  0), 't_min & t_max 2');
     ok( t_valid(t_num(t_min(0), t_max(10)),  5), 't_min & t_max 3');
@@ -186,6 +178,40 @@ ok(!t_valid($is_album2, $album_wrong2), 'album.tracks not an array');
     ok( t_valid(t_range(0, 10),  5), 't_range 3');
     ok( t_valid(t_range(0, 10), 10), 't_range 4');
     ok(!t_valid(t_range(0, 10), 11), 't_range 5');
+}
+
+# t_min
+{
+    ok(!t_valid(t_min(10),         0), 't_min 1');
+    ok( t_valid(t_min(10),        10), 't_min 2');
+    ok( t_valid(t_min(10),        20), 't_min 3');
+    ok(!t_valid(t_min(1),         ""), 't_min 4');
+    ok( t_valid(t_min(1),        "a"), 't_min 5');
+    ok( t_valid(t_min(1),       "ab"), 't_min 6');
+    ok(!t_valid(t_min(1),         []), 't_min 7');
+    ok( t_valid(t_min(1),        [1]), 't_min 8');
+    ok( t_valid(t_min(1),      [1,2]), 't_min 9');
+    ok(!t_valid(t_min(1),         {}), 't_min 10');
+    ok( t_valid(t_min(1),     {1=>2}), 't_min 11');
+    ok( t_valid(t_min(1),     {1..4}), 't_min 12');
+    ok(!t_valid(t_min(1), Seq->empty), 't_min 13');
+}
+
+# t_max
+{
+    ok( t_valid(t_max(10),         0), 't_max 1');
+    ok( t_valid(t_max(10),        10), 't_max 2');
+    ok(!t_valid(t_max(10),        20), 't_max 3');
+    ok( t_valid(t_max(1),         ""), 't_max 4');
+    ok( t_valid(t_max(1),        "a"), 't_max 5');
+    ok(!t_valid(t_max(1),       "ab"), 't_max 6');
+    ok( t_valid(t_max(1),         []), 't_max 7');
+    ok( t_valid(t_max(1),        [1]), 't_max 8');
+    ok(!t_valid(t_max(1),      [1,2]), 't_max 9');
+    ok( t_valid(t_max(1),         {}), 't_max 10');
+    ok( t_valid(t_max(1),     {1=>2}), 't_max 11');
+    ok(!t_valid(t_max(1),     {1..4}), 't_max 12');
+    ok(!t_valid(t_max(1), Seq->empty), 't_max 13');
 }
 
 # t_or

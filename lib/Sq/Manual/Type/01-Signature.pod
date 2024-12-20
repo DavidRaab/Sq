@@ -83,7 +83,7 @@ and now you also can define enemies with health.
         },
     }
 
-It also makes tetsing very easy. You just need to compare data! That's all.
+It also makes testing very easy. You just need to compare data! That's all.
 And actually that's always what you do in testing. But with objects for example
 you usually need to query the data from it, over a dozens of method calls
 and hope you get a correct representation of the internal state of an object.

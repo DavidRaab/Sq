@@ -280,27 +280,27 @@ sub t_of($is_type) {
 }
 
 # checks if Array/Hash/string has minimum upto maximum amount of elements
-sub t_length($min, $max=undef) {
+sub t_length($min, $max) {
     return sub($any) {
         my $type = ref $any;
 
         if ( $type eq 'Array' || $type eq 'ARRAY' ) {
             my $length = @$any;
             return Err("length: Not enough elements") if $length < $min;
-            return Err("length: Too many elements")   if defined $max && $length > $max;
+            return Err("length: Too many elements")   if $length > $max;
             return $valid;
         }
         elsif ( $type eq 'Hash' || $type eq 'HASH' ) {
             my $length = keys %$any;
             return Err("length: Not enough elements") if $length < $min;
-            return Err("length: Too many elements")   if defined $max && $length > $max;
+            return Err("length: Too many elements")   if $length > $max;
             return $valid;
         }
         # String
         elsif ( $type eq '' ) {
             my $length = length $any;
             return Err("lenght: string to short") if $length < $min;
-            return Err("length: string to long")  if defined $max && $length > $max;
+            return Err("length: string to long")  if $length > $max;
             return $valid;
         }
         else {
@@ -327,16 +327,54 @@ sub t_matchf($regex, $predicate) {
 }
 
 sub t_min($min) {
-    return sub($num) {
-        return $valid if $num >= $min;
-        return Err("min: $num >= $min");
+    return sub($any) {
+        my $type = ref $any;
+        if ( $type eq "" ) {
+            if ( Scalar::Util::looks_like_number($any) ) {
+                return $valid if $any >= $min;
+                return Err("min: $any > $min");
+            }
+            else {
+                return $valid if length($any) >= $min;
+                return Err("min: string '$any' shorter than $min");
+            }
+        }
+        elsif ( $type eq 'Array' || $type eq 'ARRAY' ) {
+            return $valid if @$any >= $min;
+            return Err("min: Array count smaller than $min");
+        }
+        elsif ( $type eq 'Hash' || $type eq 'HASH' ) {
+            my $length = keys %$any;
+            return $valid if $length >= $min;
+            return Err("min: Hash count smaller than $min");
+        }
+        return Err("min: Type '$type' not supported");
     }
 }
 
 sub t_max($max) {
-    return sub($num) {
-        return $valid if $num <= $max;
-        return Err("max: $num <= $max");
+    return sub($any) {
+        my $type = ref $any;
+        if ( $type eq "" ) {
+            if ( Scalar::Util::looks_like_number($any) ) {
+                return $valid if $any <= $max;
+                return Err("max: $any > $max");
+            }
+            else {
+                return $valid if length($any) <= $max;
+                return Err("max: string '$any' greater than $max");
+            }
+        }
+        elsif ( $type eq 'Array' || $type eq 'ARRAY' ) {
+            return $valid if @$any <= $max;
+            return Err("max: Array count greater than $max");
+        }
+        elsif ( $type eq 'Hash' || $type eq 'HASH' ) {
+            my $length = keys %$any;
+            return $valid if $length <= $max;
+            return Err("max: Hash count greater than $max");
+        }
+        return Err("max: Type '$type' not supported");
     }
 }
 

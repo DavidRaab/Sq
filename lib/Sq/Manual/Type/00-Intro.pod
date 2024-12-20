@@ -408,11 +408,11 @@ For example look at this Album type definition.
             t_hash(
                 t_with_keys(qw/artist title tracks/),
                 t_keys(
-                    artist => t_str(t_length 1),   # String must be one character long
-                    title  => t_str(t_length 1),
+                    artist => t_str(t_min 1),  # String must be one character long
+                    title  => t_str(t_min 1),
                     tracks => t_array(
-                        t_length(1),              # Array must have at least 1 entry
-                        t_of(t_hash(              # All entries must be hashes
+                        t_min(1),              # Array must have at least 1 entry
+                        t_of(t_hash(           # All entries must be hashes
                             t_with_keys(qw/name duration/),
                             t_keys(
                                 name     => t_str,
@@ -423,14 +423,18 @@ First C<$duration> here is defined as a type-check with a Regular Expression.
 it matches on time values like C<"12:23">. But also consider that it correctly
 checks the numbers. So C<"60:00"> would be invalid.
 
-C<t_length> can check the length of a string, array or hash, depending on
-where you use it. here you also see that any type can be further extended.
+C<t_min> can check the length of a string, array, hash or compares numbers depending on
+where you use it. Here you also see that any type can be further extended.
 
 Writing just C<t_str> only checks for a value being a string. But when you
-write C<t_str(t_length 1)> it also checks it's minimum length!
+write C<t_str(t_min 1)> it also checks it's minimum length!
 
-Writing C<t_str(t_length 1, 255)> would restrict the string to be between
-1 and 255 characters.
+You also could limit the maximum with C<t_max>. Then you write.
+C<t_str(t_min(1), t_max(255))>. Or you can use C<t_length> to specifiy
+a minimum and maximum at the same time C<t_str(t_length 1, 255)>.
+
+C<t_min>, C<t_max>, C<t_length> all work with numbers, strings, arrays
+and hashes!
 
 You also could additionally pass a C<t_match> to C<t_str> when you want
 the string to match against a certain regex.
