@@ -69,7 +69,7 @@ because C<,> is used for creating tuples, that's also the reason why F# uses
 C<;> to separate elements from each other.
 
 But the difference is. In Perl we actually had 6 elements. In F# on the other
-hand we just get three elements. The type ov the above C<data> would be
+hand we just get three elements. The type of the above C<data> would be
 C<< list<string * int> >>.
 
 We also could assign this to a C<Map> in F#.
@@ -96,10 +96,10 @@ a tuple. A tuple that contains a "string" and an int.
 So while Perl itself don't need any extra data-structure to represent tuples.
 We just can use Arrays. That doesn't mean the concept of a Tuple in itself
 wouldn't make any sense. We still can think of Tuples in the way that they
-are arrays of a specifix fixed-size array and it contains exact values.
+are arrays of a specifix fixed-size array and it must contain values of
+specific types.
 
-And in C<Sq::Type> we can use C<t_tuple> to exactly create such a type.
-We just can write.
+In C<Sq::Type> we can use C<t_tuple> to exactly create such a type. We just write.
 
     my $string_int = t_tuple(t_str, t_int);
 
@@ -124,6 +124,11 @@ that has an C<int> as input and just returns a C<string>.
 
 The concept is interesting, because even I<nothing> has it's own type. In
 F# its called B<unit> but in Perl i just sticked to the more common C<t_void>.
+
+For example C<Array::iter> that iterates through an array and returns nothing
+is defined as.
+
+    sig('Array::iter', t_array, t_sub, t_void);
 
 In F# you actually will see two types of functions. First you see
 
@@ -156,7 +161,7 @@ Even if it doesn't seems that way on the first look. But Perl has a symbol table
 and you just can access a defined subroutine through it and get a sub-ref or
 change that value again.
 
-In Perl you could achieve the same kinf of curried function by writing.
+In Perl you could achieve the same kind of curried function by writing.
 
     my $func =
         sub($x) {
@@ -179,10 +184,18 @@ functions that are defined in C# from F#? Well here it is.
 
 but. You see what happens here? From the perspective of F# this is not
 a function with three arguments. It's a function call only having a single
-argument, a tuple containing three elements.
+argument, a tuple containing three elements. That's also why F# programmers
+put a space between the function call and the openening parenthesis!
 
-This is actually the same as you see in mathematics. For example you see
-stuff like
+    func (x,y) (w,z)
+
+for example the above is a function call with two arguments and both of them
+containing two values. In Perl we would write.
+
+    func([$x,$y], [$w,$z]);
+
+to achieve something similar. The whole thing is very similar to what you see
+in mathematics. For example you see stuff like
 
     f(x,y) = x * y
 
@@ -190,7 +203,8 @@ and in F# you just write
 
     let f (x,y) = x * y
 
-and it would be the same. A function C<f> expecting a single argument. A Tuple
+and it would be the same. Also mathematics thinks  about (x,y) being tuple.
+The above represents a function C<f> expecting a single argument. A Tuple
 containing two values.
 
 So why is all of this important?
