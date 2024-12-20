@@ -290,18 +290,16 @@ Checking for an album now becomes.
 
     my $is_album =
         t_hash(
-            t_has_keys(qw/artist title tracks/),
+            t_with_keys(qw/artist title tracks/),
             t_keys(
                 artist => t_str,
                 title  => t_str,
-                tracks => t_array(
-                    t_all(t_hash(
-                        t_keys(
-                            title    => t_str,
-                            duration => t_int,
-                        )
-                    )),
-                ),
+                tracks => t_array(t_of(t_hash(
+                    t_keys(
+                        title    => t_str,
+                        duration => t_int,
+                    )
+                )))
             )
         );
 
@@ -408,14 +406,14 @@ For example look at this Album type definition.
 
         return
             t_hash(
-                t_has_keys(qw/artist title tracks/),
+                t_with_keys(qw/artist title tracks/),
                 t_keys(
                     artist => t_str(t_length 1),   # String must be one character long
                     title  => t_str(t_length 1),
                     tracks => t_array(
-                        t_length(1),               # Array must have at least 1 entry
-                        t_all(t_hash(              # All entries must be hashes
-                            t_has_keys(qw/name duration/),
+                        t_length(1),              # Array must have at least 1 entry
+                        t_of(t_hash(              # All entries must be hashes
+                            t_with_keys(qw/name duration/),
                             t_keys(
                                 name     => t_str,
                                 duration => $duration))))));
@@ -435,10 +433,17 @@ Writing C<t_str(t_length 1, 255)> would restrict the string to be between
 1 and 255 characters.
 
 You also could additionally pass a C<t_match> to C<t_str> when you want
-the string to match against a certain regex!
+the string to match against a certain regex.
 
 Using C<t_length 1> inside a C<t_array()> call actually checks the length
 of the Array. You also could pass a maximum.
+
+Writing C<t_of> runs a type-check against all elements of the Array.
+When you use C<t_of> inside a C<t_hash> then this type-check would be run
+against every value of a Hash.
+
+For example writing C<t_array(t_of(t_array))> would be a type-check that
+checks if you have an array of an array.
 
 =head2 Bypassing the checks
 

@@ -63,13 +63,13 @@ but also this one.
 
 how about a health type?
 
-    my $has_health = t_hash(
-        t_key(health => t_hash(t_keys(
+    my $has_health = t_hash(t_keys(
+        health => t_hash(t_keys(
             min     => t_num,
             max     => t_num,
             current => t_num.
-        ))),
-    );
+        ))
+    ));
 
 and now you also can define enemies with health.
 
@@ -315,7 +315,7 @@ the input and every element of your array is checked against of being a number.
 
 This is also what loading the C<Sq::Sig> does, or just writing.
 
-    sig('Array::sum', t_array(t_all t_num), t_num);
+    sig('Array::sum', t_array(t_of t_num), t_num);
 
 but you get it all in a single line of code, with probably already a lot more
 useful error messages as you are currently used. You can leave the type-check
@@ -370,10 +370,10 @@ It also helps you as all of your I<normal code> has no type-checking logic in it
 Just write your code as you are supposed to write code in a dynamic-typed language.
 
 But don't try to rely on the type-checking or that a function
-throws an error or other kind of I<garbage programming>. When you want to return
+throws an exception or other kind of I<garbage programming>. When you want to return
 Errors you use C<Result> or C<Option> B<not throw exceptions!>
 
-Write code in such a way that expect that correct things are passed and
+Write code in such a way that expects that correct things are passed and
 just use something as an array, hash, integer and so on.
 
 This way you get the benefits of both worlds! You write like in a dynamic-typed language.

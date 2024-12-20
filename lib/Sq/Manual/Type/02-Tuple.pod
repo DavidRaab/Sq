@@ -109,7 +109,7 @@ second one being an integer.
 
 You also can wrap this again in a C<t_array>
 
-    my $tuple_list = t_array(t_all(t_tuple(t_str, t_int)));
+    my $tuple_list = t_array(t_of(t_tuple(t_str, t_int)));
 
 this now represents a type exactly like C<< list<string * int> >> would
 in F#!
@@ -203,7 +203,7 @@ and in F# you just write
 
     let f (x,y) = x * y
 
-and it would be the same. Also mathematics thinks  about (x,y) being tuple.
+and it would be the same. Also mathematics thinks  about (x,y) being a tuple.
 The above represents a function C<f> expecting a single argument. A Tuple
 containing two values.
 
