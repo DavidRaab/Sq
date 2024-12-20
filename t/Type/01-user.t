@@ -50,7 +50,7 @@ is(t_run($address, $users[0]{address}), Ok(1),
     '$users[0] is addr');
 is(t_run($user, $users[0]), Ok(1),
     '$users[0] is a user');
-is(t_run($user, $users[1]), Err("key: first does not exists on hash"),
+is(t_run($user, $users[1]), Err("keys: 'first' not defined on hash"),
     '$users[1] has a typo');
 
 done_testing;

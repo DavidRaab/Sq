@@ -177,11 +177,19 @@ sub t_key($name, @checks) {
 
 sub t_keys(%kt) {
     return sub($any) {
+        my ($type, $result);
         for my $key ( keys %kt ) {
-            my $type   = $kt{$key};
-            my $result = t_run(t_key($key, $type), $any);
-            return $result if $result->is_err;
-            return Err("keys: $key failed type") if $result->is_err;
+            my $value = $any->{$key};
+            if ( !defined $value ) {
+                return Err("keys: '$key' not defined on hash");
+            }
+
+            $type   = $kt{$key};
+            $result = $type->($value);
+
+            if ( $result->is_err ) {
+                return Err("keys: $key " . $result->get);
+            }
         }
         return $valid;
     }
