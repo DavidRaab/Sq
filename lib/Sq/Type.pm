@@ -10,7 +10,7 @@ use Sub::Exporter -setup => {
         qw(t_str t_enum t_match t_matchf t_parser),      # String
         qw(t_num t_int t_min t_max t_range),             # Numbers
         qw(t_opt),
-        qw(t_hash t_has_keys t_key t_keys),              # Hash
+        qw(t_hash t_has_keys t_keys),                    # Hash
         qw(t_array t_idx t_tuple t_tuplev t_even_sized), # Array
         qw(t_of t_length),
         qw(t_any t_sub t_regex t_bool t_seq t_void),
@@ -22,7 +22,7 @@ use Sub::Exporter -setup => {
             qw(t_str t_enum t_match t_matchf t_parser),      # String
             qw(t_num t_int t_min t_max t_range),             # Numbers
             qw(t_opt),
-            qw(t_hash t_has_keys t_key t_keys),              # Hash
+            qw(t_hash t_has_keys t_keys),                    # Hash
             qw(t_array t_idx t_tuple t_tuplev t_even_sized), # Array
             qw(t_of t_length),
             qw(t_any t_sub t_regex t_bool t_seq t_void),
@@ -159,20 +159,6 @@ sub t_has_keys(@keys) {
         }
         return $valid;
     }
-}
-
-sub t_key($name, @checks) {
-    return sub($hash) {
-        my $value = $hash->{$name};
-        if ( defined $value ) {
-            for my $check ( @checks ) {
-                my $result = $check->($value);
-                return $result if $result->is_err;
-            }
-            return $valid;
-        }
-        return Err("key: $name does not exists on hash");
-    };
 }
 
 sub t_keys(%kt) {

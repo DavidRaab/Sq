@@ -41,20 +41,22 @@ my $is_album =
 my $is_album2 =
     t_hash(
         t_has_keys('artist', 'title'),
-        t_key('tracks', t_array(
-            t_idx(0,
-                t_hash(
-                    t_key(name     => t_str),
-                    t_key(duration => t_enum('03:16')),
+        t_keys(
+            tracks => t_array(
+                t_idx(0,
+                    t_hash(t_keys(
+                        name     => t_str,
+                        duration => t_enum('03:16'),
+                    )),
                 ),
-            ),
-            t_idx(1,
-                t_hash(
-                    t_key(name     => t_enum('bar')),
-                    t_key(duration => t_enum('03:45')),
+                t_idx(1,
+                    t_hash(t_keys(
+                        name     => t_enum('bar'),
+                        duration => t_enum('03:45'),
+                    )),
                 ),
-            ),
-        )),
+            )
+        ),
     );
 
 is(t_run(t_hash,  {}), Ok(1),                      '{} is hash');
@@ -71,10 +73,10 @@ ok(
     t_valid($is_album, $album_wrong2),
     '$album_wrong2 is a valid $album because tracks only need to be defined');
 
-ok( t_valid(t_key(artist => t_str), $album), 'check if album.artist is_str');
-ok(!t_valid(t_key(foo    => t_str), $album), 'album.foo must fail');
+ok( t_valid(t_keys(artist => t_str), $album), 'check if album.artist is_str');
+ok(!t_valid(t_keys(foo    => t_str), $album), 'album.foo must fail');
 ok(
-    t_valid(t_key(artist => t_enum('Michael Jackson')), $album),
+    t_valid(t_keys(artist => t_enum('Michael Jackson')), $album),
     'album is from Michael Jackson');
 ok( t_valid($is_album2, $album),        'full album check');
 ok(!t_valid($is_album2, $album_wrong2), 'album.tracks not an array');
