@@ -122,7 +122,9 @@ sub t_array(@checks) {
         if ( $type eq 'Array' || $type eq 'ARRAY' ) {
             for my $check ( @checks ) {
                 my $result = $check->($any);
-                return $result if $result->is_err;
+                if ( $result->is_err ) {
+                    return Err("array: " . $result->get);
+                }
             }
             return $valid;
         }
