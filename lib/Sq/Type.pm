@@ -14,7 +14,7 @@ use Sub::Exporter -setup => {
         qw(t_array t_idx t_tuple t_tuplev t_even_sized), # Array
         qw(t_all t_length),
         qw(t_any t_sub t_regex t_bool t_seq t_void),
-        qw(t_ref t_isa t_methods),                       # Objects
+        qw(t_ref t_isa t_can),                           # Objects
     ],
     groups => {
         default => [
@@ -26,7 +26,7 @@ use Sub::Exporter -setup => {
             qw(t_array t_idx t_tuple t_tuplev t_even_sized), # Array
             qw(t_all t_length),
             qw(t_any t_sub t_regex t_bool t_seq t_void),
-            qw(t_ref t_isa t_methods),                       # Objects
+            qw(t_ref t_isa t_can),                           # Objects
         ],
     },
 };
@@ -506,7 +506,7 @@ sub t_even_sized() {
     return $fn;
 }
 
-sub t_methods(@methods) {
+sub t_can(@methods) {
     return sub($any) {
         my $class = Scalar::Util::blessed($any);
         if ( defined $class ) {

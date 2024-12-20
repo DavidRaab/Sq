@@ -342,15 +342,15 @@ ok(!t_valid($is_album2, $album_wrong2), 'album.tracks not an array');
     ok(!t_valid($is_point,     []), 't_ref 3');
 }
 
-# t_methods
+# t_can
 {
     my $opt = None;
-    ok( t_valid(t_methods('map', 'iter'), $opt), 't_methods 1');
-    ok(!t_valid(t_methods('dope'),        $opt), 't_methods 2');
-    ok(!t_valid(t_methods('dope'),          []), 't_methods 3');
-    ok(!t_valid(t_methods('dope'),          {}), 't_methods 4');
+    ok( t_valid(t_can('map', 'iter'), $opt), 't_methods 1');
+    ok(!t_valid(t_can('dope'),        $opt), 't_methods 2');
+    ok(!t_valid(t_can('dope'),          []), 't_methods 3');
+    ok(!t_valid(t_can('dope'),          {}), 't_methods 4');
 
-    my $is_seq = t_ref('Seq', t_methods('map', 'filter'));
+    my $is_seq = t_ref('Seq', t_can('map', 'filter'));
     ok( t_valid($is_seq, Seq->empty), 't_ref & t_methods');
 }
 
@@ -378,15 +378,15 @@ package main;
     ok( t_valid(t_isa('Stupid'),     $ms), 't_isa 3');
     ok( t_valid(t_isa('MoreStupid'), $ms), 't_isa 4');
 
-    ok( t_valid(t_isa('Stupid', t_methods('foo')),  $s), 't_isa 5');
-    ok(!t_valid(t_isa('Stupid', t_methods('bar')),  $s), 't_isa 6');
-    ok( t_valid(t_isa('Stupid', t_methods('foo')), $ms), 't_isa 7');
-    ok( t_valid(t_isa('Stupid', t_methods('bar')), $ms), 't_isa 8');
+    ok( t_valid(t_isa('Stupid', t_can('foo')),  $s), 't_isa 5');
+    ok(!t_valid(t_isa('Stupid', t_can('bar')),  $s), 't_isa 6');
+    ok( t_valid(t_isa('Stupid', t_can('foo')), $ms), 't_isa 7');
+    ok( t_valid(t_isa('Stupid', t_can('bar')), $ms), 't_isa 8');
 
-    ok(!t_valid(t_isa('MoreStupid', t_methods('foo')),  $s), 't_isa 9');
-    ok(!t_valid(t_isa('MoreStupid', t_methods('bar')),  $s), 't_isa 10');
-    ok( t_valid(t_isa('MoreStupid', t_methods('foo')), $ms), 't_isa 11');
-    ok( t_valid(t_isa('MoreStupid', t_methods('bar')), $ms), 't_isa 12');
+    ok(!t_valid(t_isa('MoreStupid', t_can('foo')),  $s), 't_isa 9');
+    ok(!t_valid(t_isa('MoreStupid', t_can('bar')),  $s), 't_isa 10');
+    ok( t_valid(t_isa('MoreStupid', t_can('foo')), $ms), 't_isa 11');
+    ok( t_valid(t_isa('MoreStupid', t_can('bar')), $ms), 't_isa 12');
 }
 
 # t_tuplev
