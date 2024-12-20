@@ -39,7 +39,7 @@ my $is_album_manual = sub ($album) {
 
 my $is_album_type =
     t_hash(
-        t_has_keys(qw/artist title tracks/),
+        t_with_keys(qw/artist title tracks/),
         t_keys(
             artist => t_str,
             title  => t_str,

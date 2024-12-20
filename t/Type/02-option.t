@@ -21,12 +21,12 @@ my $album = sq {
 
 # checks for an album
 my $is_album1 = t_hash(
-    t_has_keys(qw/artist title tracks rating desc tags/),
+    t_with_keys(qw/artist title tracks rating desc tags/),
     t_keys(
         artist => t_str,
         title  => t_str,
         tracks => t_array(
-            t_of(t_hash(t_has_keys(qw/name duration/))),
+            t_of(t_hash(t_with_keys(qw/name duration/))),
         ),
         rating => t_opt(
             t_is(sub($x) { is_num $x }),
@@ -43,7 +43,7 @@ my $is_album2 = t_hash(
         artist => t_str,
         title  => t_str,
         tracks => t_array(
-            t_of(t_hash(t_has_keys(qw/name duration/))),
+            t_of(t_hash(t_with_keys(qw/name duration/))),
         ),
         rating => t_opt(
             t_is(sub($x) { is_num $x }),
@@ -93,14 +93,14 @@ my $is_album_parser = assign {
 
     return
         t_hash(
-            t_has_keys(qw/artist title tracks/),
+            t_with_keys(qw/artist title tracks/),
             t_keys(
                 artist => t_str(t_length 1),
                 title  => t_str(t_length 1),
                 tracks => t_array(
                     t_length(1),               # Array must have at least 1 entry
                     t_of(t_hash(              # All entries must be hashes
-                        t_has_keys(qw/name duration/),
+                        t_with_keys(qw/name duration/),
                         t_keys(
                             name     => t_str,
                             duration => t_parser($duration)))))));
@@ -115,14 +115,14 @@ my $is_album_matchf = assign {
 
     return
         t_hash(
-            t_has_keys(qw/artist title tracks/),
+            t_with_keys(qw/artist title tracks/),
             t_keys(
                 artist => t_str(t_length 1),
                 title  => t_str(t_length 1),
                 tracks => t_array(
                     t_length(1),               # Array must have at least 1 entry
                     t_of(t_hash(              # All entries must be hashes
-                        t_has_keys(qw/name duration/),
+                        t_with_keys(qw/name duration/),
                         t_keys(
                             name     => t_str,
                             duration => $duration))))));
