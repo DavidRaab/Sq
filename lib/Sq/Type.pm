@@ -247,8 +247,10 @@ sub t_str(@checks) {
     return sub($any) {
         if ( ref $any eq '' ) {
             for my $check ( @checks ) {
-                my $result = t_run($check, $any);
-                return $result if $result->is_err;
+                my $result = $check->($any);
+                if ( $result->is_err ) {
+                    return Err("str: " . $result->get);
+                }
             }
             return $valid;
         }
