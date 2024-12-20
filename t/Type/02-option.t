@@ -25,7 +25,7 @@ my $is_album1 = t_hash(
     t_key(artist => t_str),
     t_key(title  => t_str),
     t_key(tracks => t_array(
-        t_all(t_hash(t_has_keys(qw/name duration/))),
+        t_of(t_hash(t_has_keys(qw/name duration/))),
     )),
     t_key(rating => t_opt(
         t_is(sub($x) { is_num $x }),
@@ -42,7 +42,7 @@ my $is_album2 = t_hash(
         artist => t_str,
         title  => t_str,
         tracks => t_array(
-            t_all(t_hash(t_has_keys(qw/name duration/))),
+            t_of(t_hash(t_has_keys(qw/name duration/))),
         ),
         rating => t_opt(
             t_is(sub($x) { is_num $x }),
@@ -72,7 +72,7 @@ ok(
 ok(
     t_valid(
         t_hash(t_key(
-            tracks => t_array(t_all(t_hash(t_keys(
+            tracks => t_array(t_of(t_hash(t_keys(
                 name     => t_str,
                 duration => t_match(qr/\A(\d\d):(\d\d)\z/)
             ))))
@@ -98,7 +98,7 @@ my $is_album_parser = assign {
                 title  => t_str(t_length 1),
                 tracks => t_array(
                     t_length(1),               # Array must have at least 1 entry
-                    t_all(t_hash(              # All entries must be hashes
+                    t_of(t_hash(              # All entries must be hashes
                         t_has_keys(qw/name duration/),
                         t_keys(
                             name     => t_str,
@@ -120,7 +120,7 @@ my $is_album_matchf = assign {
                 title  => t_str(t_length 1),
                 tracks => t_array(
                     t_length(1),               # Array must have at least 1 entry
-                    t_all(t_hash(              # All entries must be hashes
+                    t_of(t_hash(              # All entries must be hashes
                         t_has_keys(qw/name duration/),
                         t_keys(
                             name     => t_str,

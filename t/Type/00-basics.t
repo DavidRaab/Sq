@@ -114,16 +114,16 @@ ok(!t_valid($is_album2, $album_wrong2), 'album.tracks not an array');
     ok(!t_valid(t_length(1,3), "abcd"), 't_length 21');
 }
 
-# t_all
+# t_of
 {
-    ok( t_valid(t_all(t_hash), []         ), 't_all 1');
-    ok( t_valid(t_all(t_hash), [{}, {}]   ), 't_all 2');
-    ok(!t_valid(t_all(t_hash), [{}, {}, 1]), 't_all 3');
+    ok( t_valid(t_of(t_hash), []         ), 't_of 1');
+    ok( t_valid(t_of(t_hash), [{}, {}]   ), 't_of 2');
+    ok(!t_valid(t_of(t_hash), [{}, {}, 1]), 't_of 3');
 
-    ok( t_valid(t_all(t_array), {}                ), 't_all 4');
-    ok( t_valid(t_all(t_array), {a=>[]}           ), 't_all 5');
-    ok( t_valid(t_all(t_array), {a=>[],b=>[]}     ), 't_all 6');
-    ok(!t_valid(t_all(t_array), {a=>[],b=>[],c=>1}), 't_all 7');
+    ok( t_valid(t_of(t_array), {}                ), 't_of 4');
+    ok( t_valid(t_of(t_array), {a=>[]}           ), 't_of 5');
+    ok( t_valid(t_of(t_array), {a=>[],b=>[]}     ), 't_of 6');
+    ok(!t_valid(t_of(t_array), {a=>[],b=>[],c=>1}), 't_of 7');
 }
 
 # t_valid & t_assert
@@ -237,13 +237,13 @@ ok(!t_valid($is_album2, $album_wrong2), 'album.tracks not an array');
     ok(!t_valid(t_tuple(t_int, t_str, t_array), [12, "foo"]    ), 'tuple 13');
     ok(!t_valid(t_tuple(t_int, t_str, t_array), []             ), 'tuple 14');
     ok( t_valid(
-            t_tuple(t_int, t_str, t_array(t_all t_int)),
+            t_tuple(t_int, t_str, t_array(t_of t_int)),
             [12, "foo", [1,2,3]]
         ),
         'tuple 15'
     );
     ok(!t_valid(
-            t_tuple(t_int, t_str, t_array(t_all t_int)),
+            t_tuple(t_int, t_str, t_array(t_of t_int)),
             [12, "foo", [1,"foo",3]]
         ),
         'tuple 16'
@@ -399,13 +399,13 @@ package main;
     ok( t_valid($t1, ["foo" => 1, 1, 2]),    't_tuplev 5');
     ok(!t_valid($t1, ["foo" => 1, 1, 2, 3]), 't_tuplev 6');
 
-    my $t2 = t_tuplev(t_int, t_array(t_all t_num));
+    my $t2 = t_tuplev(t_int, t_array(t_of t_num));
     ok(!t_valid($t2, []),         't_tuplev 7');
     ok( t_valid($t2, [1]),        't_tuplev 8');
     ok(!t_valid($t2, [1, "foo"]), 't_tuplev 9');
     ok( t_valid($t2, [1, 2]),     't_tuplev 10');
 
-    my $t3 = t_tuplev(t_int, t_array, t_array(t_all t_int));
+    my $t3 = t_tuplev(t_int, t_array, t_array(t_of t_int));
     ok( t_valid($t3, [3,    [], 1,2,3]),     't_tuplev 11');
     ok( t_valid($t3, [3, [1,2], 1,2,3]),     't_tuplev 12');
     ok(!t_valid($t3, [3,    {}, 1,2,3]),     't_tuplev 13');

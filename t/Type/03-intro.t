@@ -43,14 +43,12 @@ my $is_album_type =
         t_keys(
             artist => t_str,
             title  => t_str,
-            tracks => t_array(
-                t_all(t_hash(
-                    t_keys(
-                        title    => t_str,
-                        duration => t_int,
-                    )
-                )),
-            ),
+            tracks => t_array(t_of(t_hash(
+                t_keys(
+                    title    => t_str,
+                    duration => t_int,
+                )
+            ))),
         )
     );
 

@@ -255,7 +255,7 @@ So what the codes does is it adds C<1 + 2 + 3 + 98765363637>. Not what you expec
 
 Here again. This is the signature defined in C<Sq::Sig::Array>
 
-    sig('Array::sum', t_array(t_all t_num), t_num);
+    sig('Array::sum', t_array(t_of t_num), t_num);
 
 So once you loaded C<Sq::Sig> (this loads all Signature files). This are the two
 new error messages you get.

@@ -12,7 +12,7 @@ use Sub::Exporter -setup => {
         qw(t_opt),
         qw(t_hash t_has_keys t_key t_keys),              # Hash
         qw(t_array t_idx t_tuple t_tuplev t_even_sized), # Array
-        qw(t_all t_length),
+        qw(t_of t_length),
         qw(t_any t_sub t_regex t_bool t_seq t_void),
         qw(t_ref t_isa t_can),                           # Objects
     ],
@@ -24,7 +24,7 @@ use Sub::Exporter -setup => {
             qw(t_opt),
             qw(t_hash t_has_keys t_key t_keys),              # Hash
             qw(t_array t_idx t_tuple t_tuplev t_even_sized), # Array
-            qw(t_all t_length),
+            qw(t_of t_length),
             qw(t_any t_sub t_regex t_bool t_seq t_void),
             qw(t_ref t_isa t_can),                           # Objects
         ],
@@ -39,7 +39,6 @@ use Sub::Exporter -setup => {
 # Add: t_result
 # Change: t_str_eq() expects a whole list of alternative strings: t_enum?
 # Remove: t_key
-# Change: t_all -> t_of
 # Add: t_repeat(t_int, t_str, t_int)
 #      would be a function that expects the types one or many times in a single array
 #      [1,"foo",2,   1,"foo",2,   1,"foo",2, ...]
@@ -256,7 +255,7 @@ sub t_is($predicate) {
     }
 }
 
-sub t_all($is_type) {
+sub t_of($is_type) {
     return sub($any) {
         my $type = ref $any;
         if ( $type eq 'Array' || $type eq 'ARRAY' ) {
@@ -264,7 +263,7 @@ sub t_all($is_type) {
             for my $x ( @$any ) {
                 my $result = $is_type->($x);
                 if ( $result->is_err ) {
-                    return Err("all: index $idx: " . $result->get);
+                    return Err("of: index $idx: " . $result->get);
                 }
                 $idx++;
             }
@@ -274,13 +273,13 @@ sub t_all($is_type) {
             for my $key ( keys %$any ) {
                 my $result = $is_type->($any->{$key});
                 if ( $result->is_err ) {
-                    return Err("all: key $key: " . $result->get);
+                    return Err("of: key $key: " . $result->get);
                 }
             }
             return $valid;
         }
         else {
-            return Err("all: $type not supported by t_all");
+            return Err("of: $type not supported by t_of");
         }
     }
 }
