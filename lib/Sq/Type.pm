@@ -574,17 +574,17 @@ sub t_even_sized() {
 
 sub t_can(@methods) {
     return sub($any) {
-        my $class = Scalar::Util::blessed($any);
+        my $class = builtin::blessed($any);
         if ( defined $class ) {
             for my $method ( @methods ) {
                 my $sub = $any->can($method);
                 if ( !defined $sub ) {
-                    return Err("methods: $class does not implement '$method'");
+                    return Err("can: $class does not implement '$method'");
                 }
             }
             return $valid;
         }
-        return Err("methods: not a blessed reference");
+        return Err("can: not a blessed reference");
     }
 }
 
