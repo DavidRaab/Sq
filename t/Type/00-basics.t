@@ -32,12 +32,11 @@ my $album_wrong2 = {
     },
 };
 
-# my $is_album =
-my $is_album =
-    t_hash(
-        t_with_keys(qw/artist title tracks/),
-    );
+# Simple check
+my $is_album  =
+    t_hash(t_with_keys(qw/artist title tracks/));
 
+# Extended check
 my $is_album2 =
     t_hash(
         t_with_keys('artist', 'title'),
