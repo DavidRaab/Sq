@@ -37,8 +37,6 @@ use Sub::Exporter -setup => {
 # Add: t_positive, t_negative
 # Add: t_tuplen
 # Add: t_result
-# Change: t_str_eq() expects a whole list of alternative strings: t_enum?
-# Remove: t_key
 # Add: t_repeat(t_int, t_str, t_int)
 #      would be a function that expects the types one or many times in a single array
 #      [1,"foo",2,   1,"foo",2,   1,"foo",2, ...]
