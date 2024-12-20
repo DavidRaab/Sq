@@ -1,0 +1,288 @@
+=encoding UTF-8
+
+=head1 Tuples
+
+In this section we talk about Tuples, what they are and how you use them
+in C<Sq::Type>.
+
+The concept of Tuples actually comes from static-typed functional languages.
+They allow some concept that from a Perl perspective are without any problem
+possible, but otherwise in a static-typed language wouldn't be possible.
+Or actually just a little bit harder.
+
+Let's say you want to return multiple arguments in Perl. You just can write.
+
+    sub foo($arg) {
+        ...
+        return $x, $y;
+    }
+
+No problem at all. But let's say in F# functions are restricted to only return
+a single argument. You cannot return multiple arguments. You could instead return
+a list in F#
+
+    let foo arg =
+        ...
+        [x,y]
+
+but. This only works partially. Because in F#, and this is in most static-typed
+languages (also C#, Java) lists are restricted in a way that all elements must
+be of the same type. Or you must cast all objectes to C<object> and basically
+you end up with a dynamic-typed language again.
+
+Here comes Tuples into play. In F# you just can create them with the comma C<,>
+operator. A Tuple actually is just like a container usually at minimum with
+two arguments, but they can be multiple. The difference to a list is that each
+slot can have it's own type. So to return multiple arguments in F#. You just
+write.
+
+    let foo arg =
+        ...
+        x, y
+
+what actually is pretty much the same as in Perl. The only difference is that
+still only one argument is returned. A Tuple that contains two values. And additional
+each value can be of different type.
+
+Another thing you can do easily in Perl is for example create an array with
+different types. We could for example create a list containg a string and then
+an integer and repeat that.
+
+    my $array = ["foo", 1, "bar", 2, "baz", 3];
+
+you have seen that all of the time in Perl. Because that is the foundation of
+creating hashes in Perl. By assigning such a list to a hash, we actually
+create a hash.
+
+    my %hash = ("foo", 1, "bar", 2, "baz", 3);
+
+or we can use C<< => >> that is actually just the same as C<,> but automatically
+consider it's left part as a string, so we don't need to quote it.
+
+    my %hash = ( foo => 1, bar => 2, baz => 3 );
+
+In F# we also could create a list containing "string,int" repeated by using tuples.
+
+    let data = ["foo", 1; "bar", 2; "baz", 3]
+
+because C<,> is used for creating tuples, that's also the reason why F# uses
+C<;> to separate elements from each other.
+
+But the difference is. In Perl we actually had 6 elements. In F# on the other
+hand we just get three elements. The type ov the above C<data> would be
+C<< list<string * int> >>.
+
+We also could assign this to a C<Map> in F#.
+
+    let data = Map [
+        "foo", 1
+        "bar", 2
+        "baz", 3
+    ]
+
+and get an immutable C<Map>. This is basically an immutable Hash.
+
+But instead of 6 values we also could do something similar in Perl. The difference
+is, because of dynamic-typing, we don't need any kind of extra data-structure.
+We just can use an C<Array> to represent tuples. We also could pick the following
+approach instead in Perl.
+
+    my $data = [ [foo => 1], [bar => 2], [baz => 3] ];
+
+this is now basically an array of an array. But like F# the outer array also
+contains just three elements. And each element on the other hand is considered
+a tuple. A tuple that contains a "string" and an int.
+
+So while Perl itself don't need any extra data-structure to represent tuples.
+We just can use Arrays. That doesn't mean the concept of a Tuple in itself
+wouldn't make any sense. We still can think of Tuples in the way that they
+are arrays of a specifix fixed-size array and it contains exact values.
+
+And in C<Sq::Type> we can use C<t_tuple> to exactly create such a type.
+We just can write.
+
+    my $string_int = t_tuple(t_str, t_int);
+
+and what you get is a C<$string_int> type that exactly represents an array that
+must contain exactly two values with the first one being a string, and the
+second one being an integer.
+
+You also can wrap this again in a C<t_array>
+
+    my $tuple_list = t_array(t_all(t_tuple(t_str, t_int)));
+
+this now represents a type exactly like C<< list<string * int> >> would
+in F#!
+
+Here is another concept in F#. In F# there actually doesn't exists functions
+with multiple arguments. There only exists functions with a single input and
+output argument.
+
+All functions are input to output mapping. That's why functions are also
+represented as arrows. C<< int -> string >> for example represents a function
+that has an C<int> as input and just returns a C<string>.
+
+The concept is interesting, because even I<nothing> has it's own type. In
+F# its called B<unit> but in Perl i just sticked to the more common C<t_void>.
+
+In F# you actually will see two types of functions. First you see
+
+    let func x y z =
+        // do something with x,y,z
+
+while this looks like a three argument function. It isn't. They are actually
+curried. You could write the following in F#
+
+    let func x =
+        (fun y ->
+            (fun z ->
+                // do something with x,y,z
+        ))
+
+and it would be the same! Actually the later is just a shortcut. Actually
+even C<func> is just a variable containg an anoynmous function.
+
+    let func =
+        (fun x ->
+            (fun y ->
+                (fun z ->
+                // do something with x,y,z
+        )))
+
+When you ever programed in Lisp. Well, it's exactly the same in Lisp/Scheme!
+
+In Perl you could achieve the same by writing.
+
+    my $func =
+        sub($x) {
+            sub($y) {
+                sub($z) {
+                    # do something with $x,$y,$z
+                }
+            }
+        }
+
+Now, while this is interesting. C<Sq> doesn't try to emulate Currying. If you
+wanna do that, you must do it on your own. The important concept is to understand
+that there are only functions with a single input and output. There doesn't
+exists functions with more than one argument.
+
+Maybe you wonder. How can you call Classes, Methods, functions that are defined
+in C# from F#? Well here it is.
+
+    Class.StaticFunc (x,y,z)
+
+but. You see what happens here? Actualy from F# perspective this is not
+a function with three arguments. It's a function call only having a single
+argument. but instead you give it a tuple containg three elements.
+
+This is actually the same as you see in mathematics. For example you see
+stuff like
+
+    f (x,y) = x * y
+
+well in F# you just write
+
+    f (x,y) = x * y
+
+and it would be the same. A function C<f> expecting a single argument. A Tuple
+containing two values.
+
+So why is all of this important?
+
+Because this is also the way how C<Sq::Signature> thinks about functions in Perl.
+From the perspective of C<Sq::Signature> all input arguments are just considered
+as a Tuple and every function has a single output. So far you have seen C<sig>
+that is used most of the time. It's there for convenience. It wraps
+all input arguments into a tuple, and also wraps all input arguments of
+a Perl function into an array.
+
+Then it uses C<t_assert> to run your type-check against the whole input. It's
+done this way because this is the easiest and most powerful way to think about
+functions!
+
+That's also the reason why the error messages talked about "Tuples", when you maybe
+wondered.
+
+C<sig> automatically does the wrapping inside of a Tuple. But there is also
+a function C<sigt> that doesn't do that. But then you ony can specify a single
+input and output. So let's say you have a function expecting three arguments.
+
+    sub whatever($array, $int, $string) {
+        ...
+        return $int;
+    }
+
+then you can write
+
+    #                     1        2      3         Output
+    sig('main::whatever', t_array, t_int, t_string, t_int);
+
+and this would be the same as
+
+    #                              1        2      3          Output
+    sigt('main::whatever', t_tuple(t_array, t_int, t_string), t_int);
+
+maybe you wonder why you ever want to use C<sigt>? Well, technically
+because the tuple is not build for you, you actually have more flexibility
+when it comes to allowing different function signatures for a function.
+
+Let's consider the function C<Array::to_array>. So first of, this function
+seems silly because an array already is an array. That function exists because
+of an API compatibility with the C<Seq> data-structure so you can easily convert
+between them. See L<Sq::Manual::SeqOrArray> for a deeper understanding
+for this.
+
+But the function C<to_array> still can do something. Usually you have code like
+C<< $seq->to_array >> to convert a whole sequence to an array. But C<to_array>
+also allows to pass a maximum amount like.
+
+    my $array = $seq->to_array(10);
+
+so only the first 10 elements of a sequence a put into an array. This behaviour
+is still the same for an Array. When you do
+
+    my $array = $array->to_array;
+
+it actually does nothing. But when you type
+
+    my $array = $array->to_array(10);
+
+then a copy of the first 10 elements are made. But here you see one problem.
+C<to_array> actually has a default argument. C<to_array> is defined as.
+
+    sub to_array($array, $count=undef) {
+        ...
+    }
+
+with just C<sig> we cannot really express this optional argument. But
+with C<sigt> we can. We write.
+
+    sigt('Array::to_array',
+        t_or(
+            t_tuple(t_array),
+            t_tuple(t_array, t_int),
+        ),
+        t_array
+    );
+
+Here we use C<t_or> to describe an alternative. So the function must be
+either just accept an C<Array> or it must accept an C<Array,int> as an
+argument.
+
+This idea that there are only functions with a single argument and all input
+arguments are just passed as an array is what makes checking argument so easy.
+So all your input is just an array and you can consider a function argument
+just as a data-structure and do any kind of data-constraint checking on them.
+
+C<t_tuple> helps in specifing exact amount of input arguments. For example.
+
+    my $input = t_tuple(t_array, t_int);
+
+is basically a (more efficent) shortcut for
+
+    my $input = t_array(
+        t_length(2),
+        t_idx(0, t_array),
+        t_idx(1, t_int),
+    );
