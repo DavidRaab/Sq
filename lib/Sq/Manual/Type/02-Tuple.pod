@@ -301,7 +301,7 @@ C<t_tuple> helps in specifing exact amount of input arguments. For example.
 is basically a (more efficent) shortcut for
 
     my $input = t_array(
-        t_length(2),
+        t_length(2,2),     # min,max
         t_idx(0, t_array),
         t_idx(1, t_int),
     );
