@@ -5,6 +5,7 @@ use Sq::Sig::Option;
 use Sq::Sig::Result;
 use Sq::Sig::Array;
 use Sq::Sig::Hash;
+use Sq::Sig::Queue;
 
 1;
 
@@ -25,6 +26,8 @@ load.
 =item * Sq::Sig::Option
 
 =item * Sq::Sig::Result
+
+=item * Sq::Sig::Queue
 
 =back
 
