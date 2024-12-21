@@ -35,7 +35,6 @@ use Sub::Exporter -setup => {
 # Add: t_not
 # Add: t_none, t_any
 # Add: t_tuplen
-# Add: t_result
 # Add: t_repeat(t_int, t_str, t_int)
 #      would be a function that expects the types one or many times in a single array
 #      [1,"foo",2,   1,"foo",2,   1,"foo",2, ...]
