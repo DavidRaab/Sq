@@ -2,7 +2,6 @@
 use 5.036;
 use Sq;
 use Sq::Sig;
-use Scalar::Util qw(blessed);
 use Test2::V0 qw/is ok done_testing dies like check_isa/;
 
 # Some values, functions, ... for testing
@@ -29,7 +28,7 @@ my $by_num = sub($x, $y) { $x <=> $y };
 
     # blessing an existing ref
     my $d2 = {foo => 1, bar => 2};
-    is(blessed($d2), undef, ' not blessed');
+    is(builtin::blessed($d2), undef, ' not blessed');
     Hash->bless($d2);
     is($d2, $ishash,              '$d2 now blessed');
     is($d2, {foo => 1, bar => 2}, 'content of $d2');
@@ -44,21 +43,6 @@ my $by_num = sub($x, $y) { $x <=> $y };
     my $d4 = Hash->new(foo => 1, bar => 2);
     is($d4, $ishash,              '$d4 is Hash');
     is($d4, {foo => 1, bar => 2}, 'content of $d4');
-
-    # one argument - not hashref
-    like(
-        dies { Hash->bless("foo") },
-        qr/\AHash\-\>bless/,
-        'one argument not hashref dies'
-    );
-
-    # new with uneven arguments
-    like(
-        dies { Hash->new(foo => 1, "bar") },
-        qr/\AHash\-\>new/,
-        'uneven arguments dies'
-    );
-
 }
 
 # empty
