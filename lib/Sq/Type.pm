@@ -264,7 +264,9 @@ sub t_idx($index, @checks) {
     return sub($array) {
         for my $check ( @checks ) {
             my $result = $check->($array->[$index]);
-            return $result if $result->is_err;
+            if ( $result->is_err ) {
+                return Err("idx: $index " . $result->get);
+            }
         }
         return $valid;
     };
