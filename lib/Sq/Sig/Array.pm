@@ -132,7 +132,6 @@ sigt('Array::dumpw',
     t_void
 );
 
-
 ### MUTATION
 
 sigt('Array::push',     t_tuplev(t_array, t_array), t_void);
