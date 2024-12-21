@@ -51,8 +51,9 @@ my $valid = undef;
 # t_run: $type -> @values -> Result
 sub t_run($check, @values) {
     state $ok = Ok(1);
+    my $err;
     for my $value ( @values ) {
-        my $err = $check->($value);
+        $err = $check->($value);
         return Err($err) if defined $err;
     }
     return $ok;
@@ -60,8 +61,9 @@ sub t_run($check, @values) {
 
 # t_valid: $type -> @values -> bool
 sub t_valid($check, @values) {
+    my $err;
     for my $value ( @values ) {
-        my $err = $check->($value);
+        $err = $check->($value);
         return 0 if defined $err;
     }
     return 1;
@@ -69,8 +71,9 @@ sub t_valid($check, @values) {
 
 # t_assert: $type -> @values -> void | EXCEPTION
 sub t_assert($check, @values) {
+    my $err;
     for my $value ( @values ) {
-        my $err = $check->($value);
+        $err = $check->($value);
         Carp::croak "Type Error: $err" if defined $err;
     }
     return;
