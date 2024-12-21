@@ -334,7 +334,7 @@ t_assert($is_album, $album);             # Throws exception when not valid
 The Type system can be used to add type-checking to any function. But the
 idea is that this kind of type-checking is only added in developing / testing
 and for code running in production the type-check is removed. It works like
-L<Memoize> works by replacing a function with type-checking.
+the **Memoize** module by replacing a function with type-checking.
 
 So in production you don't pay the price of type-checking in every function.
 You just enable it when you need to find errors/bugs.
