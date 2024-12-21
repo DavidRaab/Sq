@@ -200,7 +200,7 @@ is(p_run($num, "1 Mb"),              Some([1048576]), '1 mb');
 is(p_run($num, "1 gb"),           Some([1073741824]), '1 gb');
 ```
 
-# Data vs Classes
+# Data over Classes
 
 ```perl
 use Sq;
@@ -327,6 +327,44 @@ my $is_album = assign {
 my $result = t_run  ($is_album, $album); # Returns Result
 my $bool   = t_valid($is_album, $album); # Returns boolean
 t_assert($is_album, $album);             # Throws exception when not valid
+```
+
+# Signatures
+
+The Type system can be used to add type-checking to any function. But the
+idea is that this kind of type-checking is only added in developing / testing
+and for code running in production the type-check is removed. It works like
+L<Memoize> works by replacing a function with type-checking.
+
+So in production you don't pay the price of type-checking in every function.
+You just enable it when you need to find errors/bugs.
+
+```perl
+use Sq;
+use Sq::Sig; # this adds type-checking to all kind of modules in Sq.
+
+# throws an exception when Sq::Sig is loaded complaining that the array is not
+# even-sized. Otherwise without Sq::Sig it gives some warnings but continues.
+my $hash = sq([1,2,3])->as_hash;
+```
+
+You can add type-checking to any function.
+
+```perl
+use Sq;
+use Sq::Type;
+use Sq::Signature;
+
+sub whatever($int, $str, $array_of_nums) {
+    # ...
+    return $hash;
+}
+
+# this adds type-checking to the function. Usually you put those signatures
+# in its own file that can be loaded at will. This also correctly checks
+# the return value of a function. So when you refactor/change code you get
+# errors when you return the wrong things.
+sig('main::whatever', t_int, t_str, t_array(t_of t_num), t_hash);
 ```
 
 # EXPORT
