@@ -303,14 +303,9 @@ sub lock($hash, @keys) {
 #
 
 sub set($hash, @kvs) {
-    if ( @kvs % 2 == 0 ) {
-        my $count = @kvs;
-        for (my $idx=0; $idx < $count; $idx+=2) {
-            $hash->{ $kvs[$idx] } = $kvs[$idx+1];
-        }
-    }
-    else {
-        Carp::croak("Hash->set expects an even number of arguments.");
+    my $count = @kvs;
+    for (my $idx=0; $idx < $count; $idx+=2) {
+        $hash->{ $kvs[$idx] } = $kvs[$idx+1];
     }
     return;
 }
@@ -323,33 +318,33 @@ sub change($hash, %kfs) {
     return;
 }
 
-sub push($hash, $key, $value, @values) {
+sub push($hash, $key, @values) {
     my $v = $hash->{$key};
     if ( defined $v ) {
         my $ref = ref $v;
         # if Array we just push onto it
         if ( $ref eq 'Array' ) {
-            CORE::push @$v, $value, @values;
+            CORE::push @$v, @values;
         }
         # if perl plain array then Array blessing is added.
         elsif ( $ref eq 'ARRAY' ) {
             Array->bless($v);
-            CORE::push @$v, $value, @values;
+            CORE::push @$v, @values;
         }
         # otherwise we "upgrade" element to an array
         else {
-            $hash->{$key} = Array->new($v, $value, @values);
+            $hash->{$key} = Array->new($v, @values);
         }
     }
     # when not exists/undef, we create array
     else {
-        $hash->{$key} = Array->new($value, @values);
+        $hash->{$key} = Array->new(@values);
     }
     return;
 }
 
-sub delete($hash, $key, @keys) {
-    for my $key ( $key, @keys ) {
+sub delete($hash, @keys) {
+    for my $key ( @keys ) {
         CORE::delete $hash->{$key};
     }
     return;

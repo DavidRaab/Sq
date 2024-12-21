@@ -61,12 +61,6 @@ my $by_num = sub($x, $y) { $x <=> $y };
 
     $h->set(bar => 2, baz => 3);
     is($h, {foo => 1, bar => 2, baz => 3}, 'content of $h 2');
-
-    like(
-        dies { $h->set(maz => 1, "raz") },
-        qr/\AHash\-\>set/,
-        'Hash->set with uneven arguments dies.'
-    );
 }
 
 my $data = Hash->bless({
