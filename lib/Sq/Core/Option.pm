@@ -36,10 +36,6 @@ sub None :prototype() () {
 
 ### Methods
 
-sub is_opt($, $any) {
-    return ref $any eq 'Option' ? 1 : 0;
-}
-
 sub is_some($any) {
     return ref $any eq 'Option' && @$any ? 1 : 0;
 }
@@ -235,6 +231,10 @@ sub get($opt) {
 }
 
 ### Module Functions
+
+sub is_opt($, $any) {
+    return ref $any eq 'Option' ? 1 : 0;
+}
 
 sub all_valid($, $array_of_opt) {
     my $new = Array->new;
