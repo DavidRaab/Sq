@@ -69,19 +69,19 @@ sig('Option::filter_valid',    t_any, $aopt,          t_array);
 sig('Option::filter_valid_by', t_any, t_array, t_sub, t_array);
 # sigt('Option::extract',        t_tuplev(t_any, ), )  # list context
 
-sigt('Array::dump',
+sigt('Option::dump',
     t_or(
-        t_tuple(t_array),
-        t_tuple(t_array, t_int),
-        t_tuple(t_array, t_int, t_int),
+        t_tuple(t_opt),
+        t_tuple(t_opt, t_int),
+        t_tuple(t_opt, t_int, t_int),
     ),
     t_str
 );
-sigt('Array::dumpw',
+sigt('Option::dumpw',
     t_or(
-        t_tuple(t_array),
-        t_tuple(t_array, t_int),
-        t_tuple(t_array, t_int, t_int),
+        t_tuple(t_opt),
+        t_tuple(t_opt, t_int),
+        t_tuple(t_opt, t_int, t_int),
     ),
     t_void
 );
