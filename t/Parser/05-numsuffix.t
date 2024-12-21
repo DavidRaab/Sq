@@ -3,6 +3,7 @@ use 5.036;
 use Sq;
 use Sq::Parser;
 use Sq::Sig;
+use Sq::Sig::Parser;
 use Test2::V0 qw(is ok done_testing);
 
 {
