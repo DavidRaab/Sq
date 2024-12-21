@@ -262,13 +262,13 @@ use Test2::V0 qw/is ok done_testing dies like check_isa/;
 
 # all_valid & filter_valid
 {
-    my $valids = Array->new(
+    my $valids = sq [
         Some(10),
         Some(3),
         Some(42),
         Some("Hello"),
         Some("World"),
-    );
+    ];
 
     is(
         Option->all_valid($valids),
