@@ -287,10 +287,10 @@ sub p_split($regex, $parser) {
 }
 
 # parses a string - no capture
-sub p_str($strings, @strings) {
+sub p_str(@strings) {
     return sub($ctx,$str) {
         my $pos = $ctx->{pos};
-        for my $string ( $strings, @strings ) {
+        for my $string ( @strings ) {
             my $length = length $string;
             if ( $string eq substr($str, $pos, $length) ) {
                 return {
@@ -305,10 +305,10 @@ sub p_str($strings, @strings) {
 }
 
 # parses string - and captures string
-sub p_strc($strings, @strings) {
+sub p_strc(@strings) {
     return sub($ctx,$str) {
         my $pos = $ctx->{pos};
-        for my $string ( $strings, @strings ) {
+        for my $string ( @strings ) {
             my $length = length $string;
             if ( $string eq substr($str, $pos, $length) ) {
                 return {
