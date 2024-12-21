@@ -182,23 +182,33 @@ my $array;
         $current = int( $current + 1 + rand(3) );
     }
 }
-my $by_num = sub { $a <=> $b };
+say "Max: " , $array->[-1];
 
+my $by_num = sub { $a <=> $b };
 # Benchmark different solutions
 cmpthese(-2, {
     bsearch => sub {
-        for ( 1 .. 1_000 ) {
-            my $idx = bsearch($by_num, $array, 50_000);
+        for ( 1 .. 250 ) {
+            my $idx1 = bsearch($by_num, $array,  25_000);
+            my $idx2 = bsearch($by_num, $array,  50_000);
+            my $idx3 = bsearch($by_num, $array, 150_000);
+            my $idx4 = bsearch($by_num, $array, 200_000);
         }
     },
     bsearch_sq => sub {
-        for ( 1 .. 1_000 ) {
-            my $idx = bsearch_sq($by_num, $array, 50_000);
+        for ( 1 .. 250 ) {
+            my $idx1 = bsearch_sq($by_num, $array,  25_000);
+            my $idx2 = bsearch_sq($by_num, $array,  50_000);
+            my $idx3 = bsearch_sq($by_num, $array, 150_000);
+            my $idx4 = bsearch_sq($by_num, $array, 200_000);
         }
     },
     bsearch_pvc => sub {
-        for ( 1 .. 1_000 ) {
-            my $idx = bsearch_pvc($by_num, $array, 50_000);
+        for ( 1 .. 250 ) {
+            my $idx1 = bsearch_pvc($by_num, $array,  25_000);
+            my $idx2 = bsearch_pvc($by_num, $array,  50_000);
+            my $idx3 = bsearch_pvc($by_num, $array, 150_000);
+            my $idx4 = bsearch_pvc($by_num, $array, 200_000);
         }
     },
 });
