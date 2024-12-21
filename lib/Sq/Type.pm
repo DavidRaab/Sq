@@ -71,9 +71,7 @@ sub t_valid($check, @values) {
 sub t_assert($check, @values) {
     for my $value ( @values ) {
         my $err = $check->($value);
-        if ( defined $err ) {
-            Carp::croak "Type Error: $err";
-        }
+        Carp::croak "Type Error: $err" if defined $err;
     }
     return;
 }
