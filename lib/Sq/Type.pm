@@ -85,8 +85,9 @@ sub t_ref($ref, @checks) {
     return sub($any) {
         my $type = ref $any;
         if ( $type eq $ref ) {
+            my $err;
             for my $check ( @checks ) {
-                my $err = $check->($any);
+                $err = $check->($any);
                 return "ref: $err" if defined $err;
             }
             return $valid;
@@ -118,7 +119,7 @@ sub t_array(@checks) {
         if ( $type eq 'Array' || $type eq 'ARRAY' ) {
             my $err;
             for my $check ( @checks ) {
-                my $err = $check->($any);
+                $err = $check->($any);
                 return "array: $err" if defined $err;
             }
             return $valid;
@@ -135,7 +136,7 @@ sub t_opt(@checks) {
             if ( @$any ) {
                 my $err;
                 for my $check ( @checks ) {
-                    my $err = $check->($any->[0]);
+                    $err = $check->($any->[0]);
                     return "opt: $err" if defined $err;
                 }
             }
@@ -568,8 +569,9 @@ sub t_can(@methods) {
     return sub($any) {
         my $class = builtin::blessed($any);
         if ( defined $class ) {
+            my $sub;
             for my $method ( @methods ) {
-                my $sub = $any->can($method);
+                $sub = $any->can($method);
                 if ( !defined $sub ) {
                     return "can: $class does not implement '$method'";
                 }
