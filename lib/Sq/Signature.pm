@@ -11,13 +11,10 @@ use Sub::Exporter -setup => {
 };
 
 # TODO:
-# + Need support for varargs
 # + back-reference an unknown type
 # + wrap lambdas with a type-check version
 # + functions with list context?
-# + easy way for default args
-# + define multiple signatures for one function
-# + even-sized array check
+# + easier way for default args
 
 # reads function from symbol table or throws error when function
 # does not exists
