@@ -121,7 +121,7 @@ sigt('Array::dump',
         t_tuple(t_array, t_int),
         t_tuple(t_array, t_int, t_int),
     ),
-    t_void
+    t_str
 );
 sigt('Array::dumpw',
     t_or(
