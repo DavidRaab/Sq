@@ -1,8 +1,9 @@
 package Sq::Sig;
 use 5.036;
 use Sq;
-use Sq::Sig::Array;
 use Sq::Sig::Option;
+use Sq::Sig::Result;
+use Sq::Sig::Array;
 use Sq::Sig::Hash;
 
 1;
@@ -11,14 +12,26 @@ use Sq::Sig::Hash;
 
 =head1 Sq::Sig
 
-This module just loads all Signature files at once. Currently loaded.
+This module loads all Signature files for every file that is also
+automatically loaded by C<Sq>. By loading C<Sq::Sig> it will now automatically
+load.
 
-=over
+=over 4
 
 =item * Sq::Sig::Array
 
 =item * Sq::Sig::Hash
 
 =item * Sq::Sig::Option
+
+=item * Sq::Sig::Result
+
+=back
+
+=head1 Optional Loadable
+
+=over 4
+
+=item * Sq::Sig::Parser
 
 =back
