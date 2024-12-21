@@ -4,6 +4,10 @@ use Sq;
 use Sq::Type;
 use Sq::Signature;
 
+# Some predefined types
+my $aopt = t_array(t_of t_opt);
+
+
 sigt('Option::Some', t_tuplev(t_array), t_opt);
 # sigt('Option::None', t_tuple(),         t_opt); # doesn't work because of Prototype
 
@@ -20,9 +24,9 @@ sig ('Option::match', t_opt, $case, t_sub, $case, t_sub, t_any);
 # sigt('Option::or',    t_tuplev(t_opt, t_array(t_min(1), t_of(t_any))), t_any);
 # sigt('Option::or_with', ...)
 
-sig('Option::or_else',      t_opt, t_opt, t_opt);
-sig('Option::or_else_with', t_opt, t_sub, t_opt);
-sig('Option::bind',         t_opt, t_sub, t_opt);
+sig('Option::or_else',      t_opt, t_opt,                      t_opt);
+sig('Option::or_else_with', t_opt, t_sub,                      t_opt);
+sig('Option::bind',         t_opt, t_sub,                      t_opt);
 sig('Option::bind2',        t_opt, t_opt,               t_sub, t_opt);
 sig('Option::bind3',        t_opt, t_opt, t_opt,        t_sub, t_opt);
 sig('Option::bind4',        t_opt, t_opt, t_opt, t_opt, t_sub, t_opt);
@@ -58,11 +62,11 @@ sig('Option::to_seq',    t_opt,               t_seq);
 
 ### Module Functions
 
-sig('Option::is_opt',          t_any, t_any,               t_bool);
-sig('Option::all_valid',       t_any, t_array(t_of t_opt), t_opt);
-sig('Option::all_valid_by',    t_any, t_array, t_sub,      t_opt);
-sig('Option::filter_valid',    t_any, t_array(t_of t_opt), t_array);
-sig('Option::filter_valid_by', t_any, t_array, t_sub,      t_array);
+sig('Option::is_opt',          t_any, t_any,          t_bool);
+sig('Option::all_valid',       t_any, $aopt,          t_opt);
+sig('Option::all_valid_by',    t_any, t_array, t_sub, t_opt);
+sig('Option::filter_valid',    t_any, $aopt,          t_array);
+sig('Option::filter_valid_by', t_any, t_array, t_sub, t_array);
 # sigt('Option::extract',        t_tuplev(t_any, ), )  # list context
 
 sigt('Array::dump',
