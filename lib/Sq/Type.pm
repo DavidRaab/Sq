@@ -114,7 +114,7 @@ sub t_hash(@checks) {
         if ( $type eq 'Hash' || $type eq 'HASH' ) {
             for my $check ( @checks ) {
                 my $result = $check->($any);
-                return $result if is_err $result;
+                return invalid("hash: " . get($result)) if is_err $result;
             }
             return $valid;
         }
@@ -160,7 +160,7 @@ sub t_opt(@checks) {
 sub t_with_keys(@keys) {
     return sub($hash) {
         for my $key ( @keys ) {
-            return invalid("with_keys: key \"$key\" not defined") if !defined $hash->{$key};
+            return invalid("with_keys: '$key' not defined") if !defined $hash->{$key};
         }
         return $valid;
     }
@@ -172,7 +172,7 @@ sub t_keys(%kt) {
         for my $key ( keys %kt ) {
             my $value = $any->{$key};
             if ( !defined $value ) {
-                return invalid("keys: '$key' not defined on hash");
+                return invalid("keys: '$key' not defined");
             }
             $type   = $kt{$key};
             $result = $type->($value);
