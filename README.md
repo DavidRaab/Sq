@@ -341,7 +341,7 @@ You just enable it when you need to find errors/bugs.
 
 ```perl
 use Sq;
-use Sq::Sig; # this adds type-checking to all kind of modules in Sq.
+use Sq::Sig; # this adds type-checking to all kind of functions in Sq.
 
 # throws an exception when Sq::Sig is loaded complaining that the array is not
 # even-sized. Otherwise without Sq::Sig it gives some warnings but continues.
@@ -365,6 +365,12 @@ sub whatever($int, $str, $array_of_nums) {
 # the return value of a function. So when you refactor/change code you get
 # errors when you return the wrong things.
 sig('main::whatever', t_int, t_str, t_array(t_of t_num), t_hash);
+
+whatever("foo", "foo" [1,2,3]); # fails
+whatever(123, 123, []);         # fails
+whatever(123, "foo", ["foo"]);  # fails
+whatever(123, "foo", []);       # ok
+whatever(123, "foo", [1,2,3]);  # ok
 ```
 
 # EXPORT
