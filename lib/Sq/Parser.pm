@@ -463,7 +463,8 @@ sub p_not($parser) {
 }
 
 sub p_empty() {
-    return sub($ctx,$str) { return $ctx }
+    state $fn = sub($ctx,$str) { return $ctx };
+    return $fn;
 }
 
 1;
