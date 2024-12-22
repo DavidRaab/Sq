@@ -366,11 +366,12 @@ sub whatever($int, $str, $array_of_nums) {
 # errors when you return the wrong things.
 sig('main::whatever', t_int, t_str, t_array(t_of t_num), t_hash);
 
-whatever("foo", "foo" [1,2,3]); # fails
-whatever(123, 123, []);         # fails
-whatever(123, "foo", ["foo"]);  # fails
-whatever(123, "foo", []);       # ok
-whatever(123, "foo", [1,2,3]);  # ok
+whatever("foo", "foo", [1,2,3]); # fails
+whatever(  123, "foo", ["foo"]); # fails
+whatever(  123,    [], [1,2,3]); # fails
+whatever(  123,   123,      []); # ok - because "123" is also a valid string
+whatever(  123, "foo",      []); # ok
+whatever(  123, "foo", [1,2,3]); # ok
 ```
 
 # EXPORT
