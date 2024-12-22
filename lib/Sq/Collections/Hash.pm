@@ -246,18 +246,6 @@ sub has_keys($hash, @keys) {
     return 1;
 }
 
-# TODO: shallow at the moment. Maybe add recursion so Hash/HASH and Array/Array
-#       get compared deeply. All other references must be reference-equal
-sub equal($hash, $other) {
-    return 0 if ref $other ne 'Hash' && ref $other ne 'HASH';
-    return 0 if length($hash) != length($other);
-    for my $key ( CORE::keys %$hash ) {
-        return 0 if not exists $other->{$key};
-        return 0 if $hash->{$key} ne $other->{$key};
-    }
-    return 1;
-}
-
 sub to_array($hash, $f) {
     my $a = Array->new;
     while ( my ($key, $value) = each %$hash ) {

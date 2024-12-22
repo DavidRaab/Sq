@@ -679,7 +679,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 
     # replace a shared array, but same data
     $i->set(array => [1,2,3]);
-    ok(!$h->equal($i), 'no recursive comparision yet');
+    ok($h->equal($i), 'recursive comparision');
 
     # same keys, but different data
     $h->set(array => "foo");

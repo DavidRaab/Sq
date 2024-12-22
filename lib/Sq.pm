@@ -33,8 +33,9 @@ use Sq::Collections::List;
 use Sq::Collections::Seq;
 use Sq::Collections::Heap;
 
-# Load Dumping
+# Load Extras
 use Sq::Dump;
+use Sq::Equality;
 
 # IO
 use Sq::Io;
