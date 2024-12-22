@@ -9,7 +9,7 @@ my $address = t_hash(t_keys(
     street => t_str,
     city   => t_str,
     state  => t_str,
-    zip    => t_str,
+    zip    => t_match(qr/\A\d+\z/),
 ));
 
 my $user  = t_hash(t_keys(

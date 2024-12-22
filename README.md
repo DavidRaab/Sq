@@ -21,8 +21,8 @@ or representing **Ok/Err** values.
 It is planned to implement **Discriminated Unions**.
 
 Instead of classes, typing is done with an Structural Typing approach. It is
-available under `Sq::Type` but not completed and documented yet.
-This can be used as an argument validator or even as a testing tool.
+available under `Sq::Type` but not fully documented yet. This can be used as
+an argument validator or even as a testing tool.
 
 Under `Sq::Parser` there is a Combinator based approach to parsing. It
 is already usuable and can be used for certain things but sill lacks some
@@ -82,6 +82,8 @@ working again.
 * [Sq::Collections::Heap](lib/Sq/Collections/Heap.pod)
 * [Sq::Type](lib/Sq/Manual/Type/00-Intro.pod)
 * [Sq::Parser](lib/Sq/Manual/Parser/00-intro.pod)
+* [Sq::Signature](lib/Sq/Manual/Type/00-Intro.pod)
+* [Sq::Dump](lib/Sq/Dump.pm) (used for `->dump` and `->dumpw` methods on types)
 
 # Seq Module
 
@@ -104,7 +106,7 @@ use Sq;
 # Fibonacci Generator
 my $fib =
     Seq->concat(
-        Seq->wrap(1,1),
+        Seq->new(1,1),
         Seq->unfold([1,1], sub($state) {
             my $next = $state->[0] + $state->[1];
             return $next, [$state->[1],$next];
@@ -125,8 +127,8 @@ $fib->take(5)->iter(sub($x) {
 # [[clubs => 7], [clubs => 8], [clubs => 9], ...]
 my $cards =
     Seq::cartesian(
-        Seq->wrap(qw/clubs spades hearts diamond/),
-        Seq->wrap(qw/7 8 9 10 J Q K A/)
+        Seq->new(qw/clubs spades hearts diamond/),
+        Seq->new(qw/7 8 9 10 J Q K A/)
     );
 
 use Path::Tiny qw(path);
@@ -174,8 +176,9 @@ is(p_run($num, "1 gb"),           Some([1073741824]), '1 gb');
 ```
 
 this is an exhausted example. `Sq::Parser` does not try to replace Regexes. Quite
-the opposite. It allows creating Parser with regexes in mind. So here is the above
-parser re-written using Perl Regexes.
+the opposite. It allows creating Parser with regexes in mind and for good
+performance you should try to cramp as much as possible into Perl's regeyes. So
+here is the above parser re-written using Perl Regexes.
 
 ```perl
 use Sq;
@@ -221,8 +224,8 @@ my $album = sq {
     ],
 };
 
-# 3 - it has 3 keys
-my $length = $album->length;
+my $length = $album->length;           # 3 - hash has 3 keys
+my $tracks = $album->{tracks}->length; # 9 - nine tracks
 
 # 2559 - shortest version
 my $album_runtime = $album->get('tracks')->map(call 'sum_by', key 'duration')->or(0);
@@ -234,7 +237,9 @@ my $album_runtime = $album->get('tracks')->map(sub ($tracks) {
 
 # 2559 - expanded the "key" function
 my $album_runtime = $album->get('tracks')->map(sub ($tracks) {
-    $tracks->sum_by(sub($hash) { $hash->{duration} });
+    $tracks->sum_by(sub($hash) {
+        $hash->{duration}
+    });
 })->or(0);
 
 # 2559 - Pure Perl version
@@ -256,12 +261,12 @@ my $album_runtime = assign {
 use Sq;
 use Sq::Type;
 
-# Describes a Address
+# Describes an address
 my $address = t_hash(t_keys(
     street => t_str,
     city   => t_str,
     state  => t_str,
-    zip    => t_str,
+    zip    => t_match(qr/\A\d+\z/),
 ));
 
 # A user containing an address
@@ -387,7 +392,7 @@ You can find documentation for this module with the perldoc command.
 
     perldoc Sq
 
-You can also look for information at [my Blog on Perl Seq](https://davidraab.github.io/tags/perl-seq/)
+You can also look for information at [my Blog on Perl Sq/Seq](https://davidraab.github.io/tags/perl-sq/)
 
 # AUTHOR
 
