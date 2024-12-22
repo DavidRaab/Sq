@@ -80,4 +80,20 @@ like(
     qr/Not void/,
     'fails because returns something');
 
+
+# Examples in README
+sub what($int, $str, $array_of_nums) {
+    return {};
+}
+sig('main::what', t_int, t_str, t_array(t_of t_num), t_hash);
+
+like( dies { what("foo", "foo", [1,2,3]) }, qr/\AType Error:/, 'what fails 1'); # fails
+like( dies { what(  123, "foo", ["foo"]) }, qr/\AType Error:/, 'what fails 2'); # fails
+like( dies { what(  123,    [], [1,2,3]) }, qr/\AType Error:/, 'what fails 3'); # fails
+like( dies { what(123.3, 123.3,      []) }, qr/\AType Error:/, 'what fails 4'); # fails
+
+is( what(123,   123,      []), {}, 'what ok 1');
+is( what(123, "foo",      []), {}, 'what ok 2');
+is( what(123, "foo", [1,2,3]), {}, 'what ok 3');
+
 done_testing;
