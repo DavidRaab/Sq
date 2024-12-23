@@ -1,6 +1,7 @@
 #!perl
 use 5.036;
 use Sq;
+use Sq::Sig;
 use Test2::V0 qw/is ok done_testing dies like check_isa/;
 
 # basic tests
@@ -286,6 +287,28 @@ ok(sq({
         ),
         Tags => Some(qw/80/),
     }), 'struct 52');
+
+
+{
+    my $character = sq {
+        Name   => 'Me',
+        X      => 100,
+        Y      => 100,
+        Health => 100,
+    };
+
+    my $circle = sq {
+        X      => 100,
+        Y      => 100,
+        Radius => 50,
+    };
+
+    # equal on portion of two hashes
+    ok(equal(
+        $character->slice(qw/X Y/),
+        $circle->slice(qw/X Y/),
+    ), 'struct 53');
+}
 
 ### Check adding another class to Equality
 package Stupid;
