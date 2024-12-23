@@ -24,7 +24,18 @@ sub array($array, $other) {
 
 sub seq($seq, $other) {
     return 1 if refaddr($seq) == refaddr($other);
-    return array($seq->to_array, $other->to_array);
+    my $itA = $seq->();
+    my $itB = $seq->();
+    my ($x,$y);
+    NEXT:
+    $x = $itA->();
+    $y = $itB->();
+    if ( defined $x && defined $y ) {
+        return 0 if equal($x,$y) == 0;
+        goto NEXT;
+    }
+    return 1 if !defined($x) && !defined($y);
+    return 0;
 }
 
 sub option($opt, $other) {
