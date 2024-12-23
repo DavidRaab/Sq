@@ -3,7 +3,7 @@ use v5.36;
 use open ':std', ':encoding(UTF-8)';
 use Sq;
 use Sq::Parser;
-use Test2::V0 qw(is done_testing);
+use Sq::Test;
 use Benchmark qw(cmpthese);
 
 # Benchmark that shows two different ways to get the same result. Mainly

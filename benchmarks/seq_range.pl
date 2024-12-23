@@ -2,8 +2,8 @@
 use v5.36;
 use open ':std', ':encoding(UTF-8)';
 use Sq;
+use Sq::Test;
 use Benchmark qw(cmpthese);
-use Test2::V0;
 
 sub range1($, $start, $stop) {
     return Seq::range_step(undef, $start, 1, $stop);

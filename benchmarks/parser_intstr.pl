@@ -3,8 +3,8 @@ use v5.36;
 use open ':std', ':encoding(UTF-8)';
 use Sq;
 use Sq::Parser;
+use Sq::Test;
 use Benchmark qw(cmpthese);
-use Test2::V0 qw(is ok done_testing);
 
 # Benchmark that test performance of p_str with multiple values compared
 # to using p_or( p_str, p_str )

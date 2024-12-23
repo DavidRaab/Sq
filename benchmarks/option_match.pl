@@ -2,7 +2,7 @@
 use v5.36;
 use open ':std', ':encoding(UTF-8)';
 use Sq;
-use Test2::V0 qw(is done_testing);
+use Sq::Test;
 use Benchmark qw(cmpthese);
 
 # Using goto on a subroutine reference means that no call-stack is created.
@@ -23,10 +23,19 @@ sub match_opt($opt, %args) {
     my $fSome = $args{Some} or Carp::croak "Some not defined";
     my $fNone = $args{None} or Carp::croak "None not defined";
     if ( @$opt ) {
-        return $fSome->($opt->[0]);
+        return $fSome->(@$opt);
     }
     else {
         return $fNone->();
+    }
+}
+
+sub match_opt_unsafe($opt, %args) {
+    if ( @$opt ) {
+        return $args{Some}(@$opt);
+    }
+    else {
+        return $args{None}();
     }
 }
 
@@ -35,7 +44,7 @@ sub match_goto {
     my $fSome = $args{Some} or Carp::croak "Some not defined";
     my $fNone = $args{None} or Carp::croak "None not defined";
     if ( @$opt ) {
-        @_ = $opt->[0];
+        @_ = @$opt;
         goto $fSome;
     }
     else {
@@ -62,6 +71,11 @@ sub match_goto {
         match_goto($y, Some => $some, None => $none),
         'match on y');
 
+    is(
+        match_opt       ($y, Some => $some, None => $none),
+        match_opt_unsafe($y, Some => $some, None => $none),
+        'match on y');
+
     done_testing;
 }
 
@@ -69,7 +83,15 @@ my $opts = Array->init(10_000, sub($idx) { Some $idx });
 cmpthese(-1, {
     match_opt => sub {
         for my $opt ( @$opts ) {
-            match_opt($opt,
+            my $x = match_opt($opt,
+                Some => sub($x) { $x },
+                None => sub($x) { 0  },
+            );
+        }
+    },
+    match_opt_unsafe => sub {
+        for my $opt ( @$opts ) {
+            my $x = match_opt_unsafe($opt,
                 Some => sub($x) { $x },
                 None => sub($x) { 0  },
             );
@@ -77,10 +99,18 @@ cmpthese(-1, {
     },
     match_goto => sub {
         for my $opt ( @$opts ) {
-            match_goto($opt,
+            my $x = match_goto($opt,
                 Some => sub($x) { $x },
                 None => sub($x) { 0  },
             );
         }
     },
+    current => sub {
+        for my $opt ( @$opts ) {
+            my $x = Option::match($opt,
+                Some => sub($x) { $x },
+                None => sub($x) { 0  },
+            );
+        }
+    }
 });

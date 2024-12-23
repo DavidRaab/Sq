@@ -2,8 +2,9 @@
 use v5.36;
 use open ':std', ':encoding(UTF-8)';
 use Sq;
+use Sq::Sig;
+use Sq::Test;
 use Benchmark qw(cmpthese);
-use Test2::V0 qw(is done_testing);
 
 ### map, map2 and map_v
 
@@ -17,14 +18,14 @@ sub map1($opt, $f) {
 
 sub map2($optA, $optB, $f) {
     if ( @$optA && @$optB ) {
-        return Some $f->($optA->[0], $optB->[0]);
+        return Some $f->(@$optA, @$optB);
     }
     return $None;
 }
 
 sub map3($optA, $optB, $optC, $f) {
     if ( @$optA && @$optB && @$optC ) {
-        return Some $f->($optA->[0], $optB->[0], $optC->[0]);
+        return Some $f->(@$optA, @$optB, @$optC);
     }
     return $None;
 }
@@ -36,7 +37,7 @@ sub map_v {
     my @unpack;
     for my $opt ( @opts ) {
         if ( @$opt ) {
-            push @unpack, $opt->[0];
+            push @unpack, @$opt;
         }
         else {
             return $None;
@@ -53,8 +54,8 @@ sub map_v2 {
     my $max = @_ - 2;
     my @unpack;
     for (my $idx=0; $idx <= $max; $idx++) {
-        if ( @{ $_[$idx] } ) {
-            push @unpack, $_[$idx][0];
+        if ( $_[$idx]->@* ) {
+            push @unpack, $_[$idx]->@* ;
         }
         else {
             return $None;
@@ -65,9 +66,9 @@ sub map_v2 {
 }
 
 ## Some tests
-is(map_v (Some 1, Some 2, sub($x,$y) { $x + $y }), Some(3), 'map_v');
-is(map_v2(Some 1, Some 2, sub($x,$y) { $x + $y }), Some(3), 'map_v2');
-is(map_v2(Some 1, Some 2, Some 3, sub($x,$y,$z) { $x + $y + $z }), Some(6), 'map_v2');
+is(map_v (Some(1), Some(2), sub($x,$y) { $x + $y }), Some(3), 'map_v');
+is(map_v2(Some(1), Some(2), sub($x,$y) { $x + $y }), Some(3), 'map_v2');
+is(map_v2(Some(1), Some(2), Some(3), sub($x,$y,$z) { $x + $y + $z }), Some(6), 'map_v2');
 done_testing;
 
 ### Benchmarks

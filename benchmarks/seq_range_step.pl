@@ -2,8 +2,8 @@
 use v5.36;
 use open ':std', ':encoding(UTF-8)';
 use Sq;
+use Sq::Test;
 use Benchmark qw(cmpthese);
-use Test2::V0 qw(is done_testing);
 
 sub range_step1($, $start, $step, $stop) {
     Carp::croak '$step is 0. Will run forever.' if $step == 0;

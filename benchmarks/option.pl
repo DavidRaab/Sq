@@ -1,8 +1,8 @@
 #!/usr/bin/env perl
 use v5.36;
 use open ':std', ':encoding(UTF-8)';
+use Sq::Test;
 use Benchmark qw(cmpthese);
-use Test2::V0;
 
 # Benchmark for checking implementation of either array-ref or
 # scalar-ref
