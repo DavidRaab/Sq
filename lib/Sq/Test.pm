@@ -18,15 +18,24 @@ use Sub::Exporter -setup => {
 
 # Actually Testing is always just about comparing data!
 
+BEGIN {
+    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+    $year += 1900;
+    $mon  += 1;
+    my $srand = sprintf("%4d%2d%2d", $year,$mon,$mday);
+    srand($srand);
+    printf "# Seeded srand with seed '%s' from local date.\n", $srand;
+}
+
 my $count = 0;
 
 sub ok($bool, $message) {
     $count++;
     if ( $bool ) {
-        print "ok - $message\n"
+        print "ok $count - $message\n"
     }
     else {
-        print "not ok - $message\n";
+        print "not ok $count - $message\n";
     }
     return;
 }
@@ -34,10 +43,10 @@ sub ok($bool, $message) {
 sub nok($bool, $message) {
     $count++;
     if ( $bool ) {
-        print "not ok - $message\n";
+        print "not ok $count - $message\n";
     }
     else {
-        print "ok - $message\n"
+        print "ok $count - $message\n"
     }
     return;
 }
@@ -45,10 +54,10 @@ sub nok($bool, $message) {
 sub is($got, $expected, $message) {
     $count++;
     if ( equal($got, $expected) ) {
-        print "ok - $message\n";
+        print "ok $count - $message\n";
     }
     else {
-        print "not ok - $message\n";
+        print "not ok $count - $message\n";
         my $dump_1 = Sq::Dump::dump($got);
         my $dump_2 = Sq::Dump::dump($expected);
         # add # to beginning of every starting line
