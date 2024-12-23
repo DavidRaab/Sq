@@ -84,6 +84,7 @@ working again.
 * [Sq::Parser](lib/Sq/Manual/Parser/00-intro.pod)
 * [Sq::Signature](lib/Sq/Manual/Type/00-Intro.pod)
 * [Sq::Dump](lib/Sq/Dump.pm) (used for `->dump` and `->dumpw` methods on types)
+* [Sq::Equality](lib/Sq/Equality.pm) (implements `equal` function and adds methods)
 
 # Seq Module
 
