@@ -6,10 +6,6 @@ use Sq;
 use Sq::Sig;
 use Sq::Test;
 
-sub seq :prototype(&) {
-    return Seq->new($_[0]->());
-}
-
 # Some values, functions, ... for testing
 my $range     = Seq->range(1, 10);
 my $rangeDesc = Seq->range(10, 1);

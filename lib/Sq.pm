@@ -7,6 +7,7 @@ use Sub::Exporter -setup => {
         qw(sq call key assign),
         qw(is_num is_str),
         qw(id fst snd),
+        qw(seq),
         Some  => sub { \&Option::Some            },
         None  => sub { \&Option::None            },
         Ok    => sub { \&Result::Ok              },
@@ -15,7 +16,7 @@ use Sub::Exporter -setup => {
         equal => sub { \&Sq::Equality::equal     },
     ],
     groups => {
-        default => [qw(id fst snd key assign is_str is_num Some None sq Ok Err call lazy equal)],
+        default => [qw(id fst snd key assign is_str is_num Some None sq Ok Err call lazy equal seq)],
     },
 };
 
@@ -106,6 +107,14 @@ sub sq($any) {
         # Do nothing for unknown type
     }
     return $any;
+}
+
+# allows writing "seq { 1,2,3 }" for a sequence
+#
+# actually {} is a code-reference and it can be any code in there. Whatever
+# it returns in list context becomes part of a sequence.
+sub seq :prototype(&) {
+    return Seq->new($_[0]->());
 }
 
 # Access to Sq::Io
