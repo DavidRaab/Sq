@@ -219,23 +219,23 @@ is(
     sq({
         Artist => 'Queen',
         Title  => 'Greatest Hits',
-        Tracks => Seq->new(
+        Tracks => seq {
             { Title => 'We will Rock You'          },
             { Title => 'Radio Gaga'                },
             { Title => 'Who Wants To Life Forever' },
             { Title => "You Don't Fool Me"         },
-        ),
+        },
         Tags => Some(qw/80/),
     }),
     {
         Artist => 'Queen',
         Title  => 'Greatest Hits',
-        Tracks => Seq->new(
+        Tracks => seq {
             { Title => 'We will Rock You'          },
             { Title => 'Radio Gaga'                },
             { Title => 'Who Wants To Life Forever' },
             { Title => "You Don't Fool Me"         },
-        ),
+        },
         Tags => Some(qw/80/),
     },
     'struct 50');
@@ -244,23 +244,23 @@ nok(equal(
     sq({
         Artist => 'Queen',
         Title  => 'Greatest Hits',
-        Tracks => Seq->new(
+        Tracks => seq {
             { Title => 'We will Rock You'          },
             { Title => 'Radio Gaga'                },
             { Title => 'Who Wants To Life Forever' },
             { Title => "You Don't Fool Me"         },
-        ),
+        },
         Tags => Some(qw/80/),
     }),
     {
         Artist => 'Queen',
         Title  => 'Greatest Hits',
-        Tracks => Seq->new(
+        Tracks => seq {
             { Title => 'We will Rock You'          },
             { Title => 'Radio Gaga!'               },
             { Title => 'Who Wants To Life Forever' },
             { Title => "You Don't Fool Me"         },
-        ),
+        },
         Tags => Some(qw/80/),
     }),
     'struct 51');
@@ -268,22 +268,22 @@ nok(equal(
 ok(sq({
         Artist => 'Queen',
         Title  => 'Greatest Hits',
-        Tracks => Seq->new(
+        Tracks => seq {
             { Title => 'We will Rock You'          },
             { Title => 'Radio Gaga'                },
             { Title => 'Who Wants To Life Forever' },
             { Title => "You Don't Fool Me"         },
-        ),
+        },
         Tags => Some(qw/80/),
     })->equal({
         Artist => 'Queen',
         Title  => 'Greatest Hits',
-        Tracks => Seq->new(
+        Tracks => seq {
             { Title => 'We will Rock You'          },
             { Title => 'Radio Gaga'                },
             { Title => 'Who Wants To Life Forever' },
             { Title => "You Don't Fool Me"         },
-        ),
+        },
         Tags => Some(qw/80/),
     }), 'struct 52');
 
