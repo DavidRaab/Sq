@@ -114,7 +114,7 @@ sub sq($any) {
 # actually {} is a code-reference and it can be any code in there. Whatever
 # it returns in list context becomes part of a sequence.
 sub seq :prototype(&) {
-    return Seq->new($_[0]->());
+    return Seq->from_array([$_[0]->()]);
 }
 
 # Access to Sq::Io
