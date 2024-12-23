@@ -112,4 +112,37 @@ is(
         'sq on Err');
 }
 
+# equal
+{
+    my $data1 = {
+        Artist => 'Artist1',
+        Title  => 'Title1',
+        Tracks => [
+            { Title => 'What' },
+            { Title => 'Not'  },
+        ]
+    };
+
+    my $data2 = {
+        Artist => 'Artist1',
+        Title  => 'Title1',
+        Tracks => [
+            { Title => 'What' },
+            { Title => 'Not'  },
+        ]
+    };
+
+    my $data3 = {
+        Artist => 'Artist1',
+        Title  => 'Title1',
+        Tracks => [
+            { Title => 'What'    },
+            { Title => 'Whoooop' },
+        ]
+    };
+
+     ok(equal($data1, $data2), 'comparision of data-structures 1');
+    nok(equal($data2, $data3), 'comparision of data-structures 2');
+}
+
 done_testing;
