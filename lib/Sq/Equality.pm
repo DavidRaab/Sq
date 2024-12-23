@@ -80,13 +80,11 @@ sub add_equality($type, $func) {
     return;
 }
 
-# Add equal function to multiple packages
-{
-    *{Hash::equal}   = \&equal;
-    *{Array::equal}  = \&equal;
-    *{Option::equal} = \&equal;
-    *{Result::equal} = \&equal;
-    *{Seq::equal}    = \&equal;
-}
+# Add equal function to other packages
+*{Hash::equal}   = \&equal;
+*{Array::equal}  = \&equal;
+*{Option::equal} = \&equal;
+*{Result::equal} = \&equal;
+*{Seq::equal}    = \&equal;
 
 1;

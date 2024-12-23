@@ -136,18 +136,16 @@ sub add_dump($type, $func) {
     return;
 }
 
-# Add dumping to other classes
-{
-    *{Array::dump}   = \&dump;
-    *{Array::dumpw}  = \&dumpw;
-    *{Hash::dump}    = \&dump;
-    *{Hash::dumpw}   = \&dumpw;
-    *{Seq::dump}     = \&dump;
-    *{Seq::dumpw}    = \&dumpw;
-    *{Option::dump}  = \&dump;
-    *{Option::dumpw} = \&dumpw;
-    *{Result::dump}  = \&dump;
-    *{Result::dumpw} = \&dumpw;
-}
+# Add dumping to other packages
+*{Array::dump}   = \&dump;
+*{Array::dumpw}  = \&dumpw;
+*{Hash::dump}    = \&dump;
+*{Hash::dumpw}   = \&dumpw;
+*{Seq::dump}     = \&dump;
+*{Seq::dumpw}    = \&dumpw;
+*{Option::dump}  = \&dump;
+*{Option::dumpw} = \&dumpw;
+*{Result::dump}  = \&dump;
+*{Result::dumpw} = \&dumpw;
 
 1;
