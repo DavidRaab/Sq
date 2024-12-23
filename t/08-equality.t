@@ -241,6 +241,30 @@ ok(equal(
         Tags => Some(qw/80/),
     }), 'struct 50');
 
+ok(!equal(
+    sq({
+        Artist => 'Queen',
+        Title  => 'Greatest Hits',
+        Tracks => Seq->new(
+            { Title => 'We will Rock You'          },
+            { Title => 'Radio Gaga'                },
+            { Title => 'Who Wants To Life Forever' },
+            { Title => "You Don't Fool Me"         },
+        ),
+        Tags => Some(qw/80/),
+    }),
+    {
+        Artist => 'Queen',
+        Title  => 'Greatest Hits',
+        Tracks => Seq->new(
+            { Title => 'We will Rock You'          },
+            { Title => 'Radio Gaga!'               },
+            { Title => 'Who Wants To Life Forever' },
+            { Title => "You Don't Fool Me"         },
+        ),
+        Tags => Some(qw/80/),
+    }), 'struct 51');
+
 ### Check adding another class to Equality
 package Stupid;
 sub new($class) { bless({}, $class) }
