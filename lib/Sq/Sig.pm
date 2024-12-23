@@ -5,6 +5,7 @@ use Sq::Sig::Option;
 use Sq::Sig::Result;
 use Sq::Sig::Array;
 use Sq::Sig::Hash;
+use Sq::Sig::Seq;
 use Sq::Sig::Queue;
 use Sq::Sig::Heap;
 
@@ -20,13 +21,15 @@ load.
 
 =over 4
 
-=item * Sq::Sig::Array
-
-=item * Sq::Sig::Hash
-
 =item * Sq::Sig::Option
 
 =item * Sq::Sig::Result
+
+=item * Sq::Sig::Seq
+
+=item * Sq::Sig::Array
+
+=item * Sq::Sig::Hash
 
 =item * Sq::Sig::Queue
 

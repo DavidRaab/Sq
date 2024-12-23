@@ -84,11 +84,11 @@ sig('Array::foreachi', t_array, t_sub, t_void);
 
 sig('Array::fold',       t_array, t_any, t_sub,         t_any);
 sig('Array::fold_mut',   t_array, t_any, t_sub,         t_any);
-sig('Array::reduce',     t_array, t_sub,                t_opt(t_any));
+sig('Array::reduce',     t_array, t_sub,                t_opt);
 sig('Array::length',     t_array,                       t_int);
 #sig('Array::expand',   t_array, ...);
-sig('Array::first',      t_array,                       t_opt(t_any));
-sig('Array::last',       t_array,                       t_opt(t_any));
+sig('Array::first',      t_array,                       t_opt);
+sig('Array::last',       t_array,                       t_opt);
 sig('Array::sum',        $anum,                         t_num);
 sig('Array::sum_by',     t_array, t_sub,                t_num);
 sig('Array::join',       $astr, t_str,                  t_str);

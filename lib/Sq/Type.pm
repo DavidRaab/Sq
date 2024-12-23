@@ -468,7 +468,7 @@ sub t_bool() {
 sub t_seq() {
     state $fn = sub($any) {
         return $valid if ref $any eq 'Seq';
-        return "seq: Not a sequence";
+        return "seq: Not a sequence $any";
     };
     return $fn;
 }

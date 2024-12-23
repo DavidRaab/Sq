@@ -209,7 +209,7 @@ sub to_array($opt) {
 }
 
 sub to_seq($opt) {
-    return Seq->from_array($opt);
+    return Seq->from_array([@$opt]);
 }
 
 sub get($opt) {

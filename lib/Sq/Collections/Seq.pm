@@ -609,7 +609,7 @@ sub skip_while($seq, $predicate) {
     });
 }
 
-# indexed : Seq<'a> -> Seq<int * 'a>
+# indexed : Seq<'a> -> Seq<'a * int>
 sub indexed($seq) {
     my $index = 0;
     return Seq::map($seq, sub($x) {
@@ -714,33 +714,6 @@ sub sort_by($seq, $comparer, $get_key) {
             return $sorted[$idx++];
         }
     });
-}
-
-# group_fold :
-#   Seq<'a>
-#   -> (unit -> 'State)
-#   -> ('a -> 'Key)
-#   -> ('State -> 'a -> 'State)
-#   -> Hash<'Key,'State>
-sub group_fold($seq, $get_state, $get_key, $folder) {
-    my $new = Hash->new;
-    iter($seq, sub($a) {
-        my $key = $get_key->($a);
-        if ( exists $new->{$key} ) {
-            $new->{$key} = $folder->($new->{$key}, $a);
-        }
-        else {
-            $new->{$key} = $folder->($get_state->(), $a);
-        }
-    });
-    return $new;
-}
-
-# group_by : Seq<'a> -> ('a -> 'Key) -> Hash<'Key,Array<'a>>
-sub group_by($seq, $get_key) {
-    state $new_array = sub()      { Array->new        };
-    state $folder    = sub($s,$x) { push(@$s, $x); $s };
-    return group_fold($seq, $new_array, $get_key, $folder);
 }
 
 # cache : Seq<'a> -> Seq<'a>
@@ -955,6 +928,33 @@ sub doi($seq, $f) {
 # CONVERTER                                                            #
 #         Those are functions converting Seq to none Seq types         #
 #----------------------------------------------------------------------#
+
+# group_fold :
+#   Seq<'a>
+#   -> (unit -> 'State)
+#   -> ('a -> 'Key)
+#   -> ('State -> 'a -> 'State)
+#   -> Hash<'Key,'State>
+sub group_fold($seq, $get_state, $get_key, $folder) {
+    my $new = Hash->new;
+    iter($seq, sub($a) {
+        my $key = $get_key->($a);
+        if ( exists $new->{$key} ) {
+            $new->{$key} = $folder->($new->{$key}, $a);
+        }
+        else {
+            $new->{$key} = $folder->($get_state->(), $a);
+        }
+    });
+    return $new;
+}
+
+# group_by : Seq<'a> -> ('a -> 'Key) -> Hash<'Key,Array<'a>>
+sub group_by($seq, $get_key) {
+    state $new_array = sub()      { Array->new        };
+    state $folder    = sub($s,$x) { push(@$s, $x); $s };
+    return group_fold($seq, $new_array, $get_key, $folder);
+}
 
 # fold : Seq<'a> -> 'State -> ('a -> 'State -> 'State) -> 'State
 sub fold($seq, $state, $f_state) {
@@ -1230,8 +1230,6 @@ sub to_array_of_array($seq) {
     return $outer;
 }
 
-# returns first element for which the given $predicate returns true
-#
 # find : Seq<'a> -> ('a -> bool) -> Option<'a>
 sub find($seq, $predicate) {
     my $it = $seq->();
