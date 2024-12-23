@@ -89,4 +89,14 @@ is(
     is($data->min_str_by(key 'title'), Some({id => 3, title => "A"}), 'min_str_by');
     is($data->max_str_by(key 'title'), Some({id => 5, title => "E"}), 'max_str_by');
 }
+
+# sq with option
+{
+    my $data = sq Some([1,2], [3,4,5]);
+    is(
+        $data->map(sub($x,$y) { $x->length, $y->length }),
+        Some([2,3]),
+        'sq on multiple values in option');
+}
+
 done_testing;
