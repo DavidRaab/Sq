@@ -129,6 +129,13 @@ sub dumpw($any, $inline=60, $depth=0) {
     warn to_string($any, $inline, $depth), "\n";
 }
 
+sub add_dump($type, $func) {
+    Carp::croak "You must provide a string" if not Sq::is_str($type);
+    Carp::croak "You must provide an comparison function" if ref $func ne 'CODE';
+    $dispatch->{$type} = $func;
+    return;
+}
+
 # Add dumping to other classes
 {
     *{Array::dump}   = \&dump;
