@@ -2,7 +2,7 @@
 use 5.036;
 use Sq;
 use Sq::Sig;
-use Test2::V0 qw/is ok done_testing dies like check_isa/;
+use Sq::Test;
 use FindBin qw($Bin);
 use Path::Tiny;
 use IO::File;
