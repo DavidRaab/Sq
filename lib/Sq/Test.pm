@@ -54,7 +54,7 @@ sub is($got, $expected, $message) {
         # add # to beginning of every starting line
         $dump_1 =~ s/^/# /mg;
         $dump_2 =~ s/^/# /mg;
-        print "# Got:\n", $dump_1, "\n# Expected:\n", $dump_2;
+        print "# Got:\n", $dump_1, "\n# Expected:\n", $dump_2, "\n";
     }
     return;
 }

@@ -9,12 +9,12 @@ ok(sq({})->equal(sq {}), 'hash');
 ok(sq([])->equal(sq []), 'array');
 
 # check equal import
-is([], [],     'array');
-is({}, {},     'hash');
-is(sq({}), {}, 'hash mixed 1');
-is({}, sq({}), 'hash mixed 2');
-is(sq([]), [], 'array mixed 1');
-is([], sq([]), 'array mixed 2');
+is([],          [], 'array');
+is({},          {}, 'hash');
+is(sq({}),      {}, 'hash mixed 1');
+is({},      sq({}), 'hash mixed 2');
+is(sq([]),      [], 'array mixed 1');
+is([],      sq([]), 'array mixed 2');
 
 is(
     {foo => 1, bar => 2},
@@ -262,7 +262,8 @@ nok(equal(
             { Title => "You Don't Fool Me"         },
         ),
         Tags => Some(qw/80/),
-    }), 'struct 51');
+    }),
+    'struct 51');
 
 ok(sq({
         Artist => 'Queen',
