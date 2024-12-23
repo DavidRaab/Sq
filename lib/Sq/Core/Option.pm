@@ -14,7 +14,6 @@ my $None = bless([], 'Option');
 # Constructor functions that are importet by Sq
 sub Some(@values) {
     return $None if @values == 0;
-
     my @new;
     for my $value ( @values ) {
         return $None if !defined $value;
@@ -26,7 +25,6 @@ sub Some(@values) {
             push @new, $value;
         }
     }
-
     return bless(\@new, 'Option');
 }
 
@@ -50,12 +48,12 @@ sub match($opt, %args) {
 }
 
 # or: Option<'a> -> 'a -> 'a
-sub or($opt, $default, @defaults) {
+sub or($opt, @defaults) {
     if ( wantarray ) {
-        return @$opt ? @$opt : ($default, @defaults);
+        return @$opt ? @$opt : (@defaults);
     }
     else {
-        return @$opt ? $opt->[0] : $default;
+        return @$opt ? $opt->[0] : $defaults[0];
     }
 }
 
