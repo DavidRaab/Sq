@@ -467,4 +467,14 @@ package main;
     ok(!t_valid($t4, ["foo", 1, "bar", 2, 3]), 't_tuplev 19');
 }
 
+# t_result
+{
+    my $res = t_result(t_hash, t_array(t_of t_int));
+    ok( t_valid($res,   Ok({foo => 1})), 't_result 1');
+    ok( t_valid($res,       Err([1,2])), 't_result 2');
+    nok(t_valid($res,        Ok("foo")), 't_result 3');
+    nok(t_valid($res,       Err("foo")), 't_result 4');
+    nok(t_valid($res, Err([1,"foo",2])), 't_result 5');
+}
+
 done_testing;

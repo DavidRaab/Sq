@@ -596,10 +596,24 @@ sub t_isa($class, @checks) {
     }
 }
 
-sub t_result() {
-    state $fn = sub($any) {
-        return $valid if ref $any eq 'Result';
-        return "result: Not a Result";
+sub t_result {
+    Carp::croak 't_result() or t_result($ok,$err)' if not (@_ == 0 || @_ == 2);
+    my ($ok,$err) = @_;
+    my $args      = @_;
+    return sub($any) {
+        return "result: Not a Result" if ref $any ne 'Result';
+        return $valid if $args == 0;
+        # Ok
+        if ( $any->[0] == 0 ) {
+            my $msg = $err->($any->[1]);
+            return $msg if defined $msg;
+        }
+        # Err
+        else {
+            my $msg = $ok->($any->[1]);
+            return $msg if defined $msg;
+        }
+        return;
     }
 }
 
