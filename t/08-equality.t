@@ -194,6 +194,21 @@ ok( equal(Some(),        None), 'struct 42');
 ok(!equal(Some(1),      Ok(1)), 'struct 43');
 ok(!equal({}, [1,2,3]),         'struct 44');
 
+ok(equal(
+    Seq->init(3, sub($idx) { $idx }),
+    Seq->new(0,1,2)
+), 'struct 45');
+
+ok(equal(
+    Seq
+    ->init(100, sub($idx) { $idx })
+    ->filter(sub($num) { $num % 2 == 0 })
+    ->take(10),
+    Seq->new(0,2,4,6,8,10,12,14,16,18)
+), 'struct 46');
+
+
+### Check adding another class to Equality
 package Stupid;
 sub new($class) { bless({}, $class) }
 
@@ -201,7 +216,7 @@ package main;
 
 my $o1 = Stupid->new;
 my $o2 = Stupid->new;
-ok(!equal($o1, $o2), 'Not equal');
+ok(!equal($o1, $o2), 'objects not equal');
 
 # Add Equality for Stupid
 Sq::Equality::add_equality(Stupid => sub($o1, $o2) {
@@ -210,6 +225,6 @@ Sq::Equality::add_equality(Stupid => sub($o1, $o2) {
 });
 
 # now check must pass
-ok(equal($o1, $o2), 'Now equal');
+ok(equal($o1, $o2), 'objects now equal');
 
 done_testing;

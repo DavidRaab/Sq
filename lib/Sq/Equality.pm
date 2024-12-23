@@ -22,6 +22,11 @@ sub array($array, $other) {
     return 1;
 }
 
+sub seq($seq, $other) {
+    return 1 if refaddr($seq) == refaddr($other);
+    return array($seq->to_array, $other->to_array);
+}
+
 sub option($opt, $other) {
     return 1 if refaddr($opt) == refaddr($other);
     return 0 if @$opt != @$other;
@@ -45,6 +50,7 @@ my $dispatch = {
     'Array'   => \&array,
     'Option'  => \&option,
     'Result'  => \&result,
+    'Seq'     => \&seq,
 };
 
 sub type($any) {
