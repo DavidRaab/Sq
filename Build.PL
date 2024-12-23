@@ -13,11 +13,11 @@ my $builder = Module::Build->new(
         'Module::Build' => '0.4004',
     },
     requires => {
+        'Scalar::Util'  => '0',
         'Sub::Exporter' => '0',
         'Carp'          => '0',
     },
     test_requires => {
-        'Test2::V0'  => '0.000156',
         'Path::Tiny' => '0',
         'List::Util' => '0',
     },
