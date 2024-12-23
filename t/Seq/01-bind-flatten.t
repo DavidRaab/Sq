@@ -47,8 +47,8 @@ my $bind = sub($s, $f) {
 
 # check if bind is same as map->flatten
 is(
-    $data1->bind(\&id)->to_array,
-    $bind->($data1, \&id)->to_array,
+    $data1->bind(\&id),
+    $bind->($data1, \&id),
     'bind implemented with map and flatten');
 
 done_testing;

@@ -4,16 +4,6 @@ use Sq;
 use Sq::Sig;
 use Sq::Test;
 
-# Some values, functions, ... for testing
-# my $range     = Seq->range(1, 10);
-# my $rangeDesc = Seq->range(10, 1);
-
-my $add     = sub($x,$y) { $x + $y     };
-my $add1    = sub($x)    { $x + 1      };
-my $double  = sub($x)    { $x * 2      };
-my $square  = sub($x)    { $x * $x     };
-my $is_even = sub($x)    { $x % 2 == 0 };
-
 #---------- Check if cache really caches the iterator
 
 my $calls  = 0;
@@ -32,21 +22,22 @@ my $cache = $range->cache;
 
 # there are 11 calls to the iterator. 10 calls to get 10 values.
 # And the 11 call returns undef
+my $r = Seq->range(1,10);
 
-is($calls,                11, '$calls at 11 because cache executed $range once');
-is($range->to_array, [1..10], 'generate range');
-is($calls,                22, '$calls now 22');
-is($range->to_array, [1..10], 'generate range again');
-is($calls,                33, '$calls now 33');
+is($calls, 11, '$calls at 11 because cache executed $range once');
+is($range, $r, 'generate range');
+is($calls, 22, '$calls now 22');
+is($range, $r, 'generate range again');
+is($calls, 33, '$calls now 33');
 
-is($cache->to_array, [1..10], 'cache same result');
-is($calls,                33, 'but calls did not get called anymore');
+is($cache, $r, 'cache same result');
+is($calls, 33, 'but calls did not get called anymore');
 
-is($range->to_array, [1..10], 'But $range increases again');
-is($calls,                44, '$calls now 44');
+is($range, $r, 'But $range increases again');
+is($calls, 44, '$calls now 44');
 
-is($cache->to_array, [1..10], 'check cache once again');
-is($calls,                44, '$calls stay at 44');
+is($cache, $r, 'check cache once again');
+is($calls, 44, '$calls stay at 44');
 
 
 #--- Test cache with sort
@@ -63,7 +54,7 @@ my @data = (3,10,67,123,21,2,6,8578,34);
 my $sorted       = Seq->from_array(\@data)->sort(sub($x,$y) { $x <=> $y });
 my $sorted_cache = $sorted->cache;
 
-is($sorted->to_array,       $sorted_cache->to_array,      'must be the same');
+is($sorted,                 $sorted_cache,                'must be the same');
 is($sorted->to_array,       [2,3,6,10,21,34,67,123,8578], 'check sorted');
 is($sorted_cache->to_array, [2,3,6,10,21,34,67,123,8578], 'check sorted cache');
 

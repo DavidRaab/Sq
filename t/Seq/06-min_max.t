@@ -5,21 +5,7 @@ use Sq::Sig;
 use Sq::Test;
 
 # Some values, functions, ... for testing
-my $range     = Seq->range(1, 10);
-my $rangeDesc = Seq->range(10, 1);
-
-my $id      = sub($x) { $x          };
-my $add1    = sub($x) { $x + 1      };
-my $double  = sub($x) { $x * 2      };
-my $square  = sub($x) { $x * $x     };
-my $is_even = sub($x) { $x % 2 == 0 };
-
-my $fst     = sub($array) { $array->[0] };
-my $snd     = sub($array) { $array->[1] };
-
-
-#----------
-
+my $range = Seq->range(1, 10);
 
 # min
 is($range->min,                   Some(1), 'min');
@@ -49,14 +35,11 @@ is(Seq->empty->max_str,                None, 'max_str on empty');
 is(Seq->empty->max_str->or('A'),        'A', 'max_str on empty with option::or');
 
 
-# --- ---
-
-
-my $data = Seq->wrap(
+my $data = seq {
     { id => 1, name => 'A' },
     { id => 2, name => 'B' },
     { id => 3, name => 'C' },
-);
+};
 
 my $by_id   = key "id";
 my $by_name = key "name";

@@ -4,19 +4,6 @@ use Sq;
 use Sq::Sig;
 use Sq::Test;
 
-# Some values, functions, ... for testing
-my $range     = Seq->range(1, 10);
-my $rangeDesc = Seq->range(10, 1);
-
-my $add     = sub($x,$y) { $x + $y     };
-my $add1    = sub($x)    { $x + 1      };
-my $double  = sub($x)    { $x * 2      };
-my $square  = sub($x)    { $x * $x     };
-my $is_even = sub($x)    { $x % 2 == 0 };
-
-#----------
-
-
 # Helpers
 sub new_hash() {
     return sub() { return Hash->new };

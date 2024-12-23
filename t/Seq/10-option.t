@@ -15,8 +15,8 @@ use Sq::Test;
             return $x, $x+1;
         }
         return undef;
-    })->to_array;
-    is($nums_def, [0 .. 19], 'unfold with list');
+    });
+    is($nums_def, seq{0..19}, 'unfold with list');
 
 
     my $nums_opt = Seq->unfold(0, sub($x) {
@@ -24,8 +24,8 @@ use Sq::Test;
             return Some($x, $x+1);
         }
         return None;
-    })->to_array;
-    is($nums_opt, [0 .. 19], 'unfold with option');
+    });
+    is($nums_opt, seq{0..19}, 'unfold with option');
 
 
     my $nums_list = Seq->unfold(0, sub($x) {
@@ -33,23 +33,23 @@ use Sq::Test;
             return $x, $x+1;
         }
         return;
-    })->to_array;
-    is($nums_opt, [0 .. 19], 'unfold with just return');
+    });
+    is($nums_opt, seq{0..19}, 'unfold with just return');
 }
 
 # choose
 {
     my $range  = Seq->range(10,20);
-    my $result = [20,24,28,32,36,40];
+    my $result = seq { 20,24,28,32,36,40 };
 
     my $evens_opt = $range->choose(sub($x) { $x % 2 == 0 ? Some($x*2) : None  });
-    is($evens_opt->to_array, $result, 'choose with option');
+    is($evens_opt, $result, 'choose with option');
 
     my $evens_def = $range->choose(sub($x) { $x % 2 == 0 ? $x*2       : undef });
-    is($evens_def->to_array, $result, 'choose with defined');
+    is($evens_def, $result, 'choose with defined');
 
     my $evens_lst = $range->choose(sub($x) { $x % 2 == 0 ? $x*2       : ()    });
-    is($evens_lst->to_array, $result, 'choose with list');
+    is($evens_lst, $result, 'choose with list');
 }
 
 # pick

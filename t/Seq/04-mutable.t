@@ -4,21 +4,6 @@ use Sq;
 use Sq::Sig;
 use Sq::Test;
 
-# Some values, functions, ... for testing
-my $range     = Seq->range(1, 10);
-my $rangeDesc = Seq->range(10, 1);
-
-my $id      = sub($x) { $x          };
-my $add1    = sub($x) { $x + 1      };
-my $double  = sub($x) { $x * 2      };
-my $square  = sub($x) { $x * $x     };
-my $is_even = sub($x) { $x % 2 == 0 };
-
-my $fst     = sub($array) { $array->[0] };
-my $snd     = sub($array) { $array->[1] };
-
-#----------
-
 # Stuff that is possible because arrayref are mutable
 {
     my @data = (1,2,3,4,5);
@@ -30,7 +15,7 @@ my $snd     = sub($array) { $array->[1] };
     # change @data
     push @data, 6;
     is($data->length, 6, 'length is 6');
-    is($data->to_array, [1..6], '$data is now 6');
+    is($data->to_array, [1..6], '$data now contains 6 elements');
 }
 
 # Same mutable tests with a hashref

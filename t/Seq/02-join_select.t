@@ -4,18 +4,6 @@ use Sq;
 use Sq::Sig;
 use Sq::Test;
 
-# Some values, functions, ... for testing
-my $range     = Seq->range(1, 10);
-my $rangeDesc = Seq->range(10, 1);
-
-my $id      = sub($x) { $x          };
-my $add1    = sub($x) { $x + 1      };
-my $double  = sub($x) { $x * 2      };
-my $square  = sub($x) { $x * $x     };
-my $is_even = sub($x) { $x % 2 == 0 };
-
-#--- ---
-
 my $cards =
     Seq::cartesian(
         Seq->wrap(qw/clubs spades hearts diamond/),
@@ -71,24 +59,24 @@ is(
 
 
 # Some data tables
-my $objects = Seq->wrap(
+my $objects = seq {
     {id => 1, name => 'David'},
     {id => 2, name => 'Bob'  },
     {id => 3, name => 'Alex' },
-);
+};
 
-my $tags = Seq->wrap(
+my $tags = seq {
     {id => 1, name => 'WoW'     },
     {id => 2, name => 'Super'   },
     {id => 3, name => 'Awesome' },
-);
+};
 
-my $objects_to_tags = Seq->wrap(
+my $objects_to_tags = seq {
     {id => 1, object_id => 1, tag_id => 1},
     {id => 2, object_id => 1, tag_id => 2},
     {id => 3, object_id => 2, tag_id => 3},
     {is => 4, object_id => 3, tag_id => 2},
-);
+};
 
 # A query to join the data together
 my $query =
@@ -100,8 +88,8 @@ my $query =
 
 # check if query contains correct data
 is(
-    $query->to_array,
-    [
+    $query,
+    seq {
         {
             object_id   => 1,
             object_name => "David",
@@ -126,7 +114,7 @@ is(
             tag_id      => 2,
             tag_name    => 'Super',
         },
-    ],
+    },
     'join and select');
 
 # reuse query again and get tags of specific perons

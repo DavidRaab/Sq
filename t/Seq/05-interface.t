@@ -4,74 +4,47 @@ use Sq;
 use Sq::Sig;
 use Sq::Test;
 
-# Some values, functions, ... for testing
-my $range     = Seq->range(1, 10);
-my $rangeDesc = Seq->range(10, 1);
-
-my $id      = sub($x) { $x          };
-my $add1    = sub($x) { $x + 1      };
-my $double  = sub($x) { $x * 2      };
-my $square  = sub($x) { $x * $x     };
-my $is_even = sub($x) { $x % 2 == 0 };
-
-my $fst     = sub($array) { $array->[0] };
-my $snd     = sub($array) { $array->[1] };
-
-#----------
-
 # OO and functional interface -- both work
 
 # chained
 is(
     Seq
     ->wrap(1,2,3)
-    ->append(Seq->wrap(4,5,6))
-    ->to_array,
-
-    [1..6],
+    ->append(Seq->wrap(4,5,6)),
+    seq {1 .. 6},
     'append with chaining');
 
 # nested
 is(
-    Seq::to_array(
-        Seq::append(
-            Seq->wrap(1,2,3),
-            Seq->wrap(4,5,6),
-        )
+    Seq::append(
+        seq { 1,2,3 },
+        seq { 4,5,6 },
     ),
-
-    [1..6],
+    Seq->range(1,6),
     'append as function');
 
 # chained vs nested
 is(
-    Seq::to_array(
-        Seq::append(
-            Seq->range(1,5),
-            Seq->range(5,1),
-        )
+    Seq::append(
+        Seq->range(1,5),
+        Seq->range(5,1),
     ),
-
     Seq
     ->range(1,5)
-    ->append(Seq->range(5,1))
-    ->to_array,
+    ->append(Seq->range(5,1)),
 
     'chaining vs nesting');
 
 # another chained version
 is(
-    Seq::to_array(
-        Seq::append(
-            Seq->range(1,5),
-            Seq->range(5,1),
-        )
+    Seq::append(
+        Seq->range(1,5),
+        Seq->range(5,1),
     ),
 
     Seq->empty
     ->append(Seq->range(1,5))
-    ->append(Seq->range(5,1))
-    ->to_array,
+    ->append(Seq->range(5,1)),
 
     'chaining and starting with empty');
 

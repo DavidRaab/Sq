@@ -7,16 +7,7 @@ use FindBin qw($Bin);
 use Path::Tiny;
 use IO::File;
 
-# Some values, functions, ... for testing
-my $range     = Seq->range(1, 10);
-my $rangeDesc = Seq->range(10, 1);
-
-my $add     = sub($x,$y) { $x + $y     };
-my $add1    = sub($x)    { $x + 1      };
-my $double  = sub($x)    { $x * 2      };
-my $square  = sub($x)    { $x * $x     };
-my $is_even = sub($x)    { $x % 2 == 0 };
-
+my $add = sub($x,$y) { $x + $y };
 
 #------ range wit Seq->from_sub ------#
 
@@ -52,9 +43,8 @@ sub range($start, $stop) {
 }
 
 my $r = range(1,10);
-is($r->to_array, Seq->range(1,10)->to_array, 'from_sub');
-is($r->to_array, Seq->range(1,10)->to_array, 'testing that $r is not exhausted');
-
+is($r, Seq->range(1,10), 'from_sub');
+is($r, Seq->range(1,10), 'testing that $r is not exhausted');
 
 #------ Creating iterator from file ------#
 
@@ -82,12 +72,12 @@ my $test_dir = path($Bin, qw/data 07-from_sub/);
 my $file     = from_file($test_dir->child('text.txt'));
 
 is(
-    $file->to_array,
-    [
+    $file,
+    seq {
         "Testing\n",
         "File\n",
         "Handle\n",
-    ],
+    },
     'check content of file');
 
 is($file->length, 3, 'line count');
@@ -113,7 +103,7 @@ is($length_of_lines->reduce($add), Some(20), 'characters in file');
 
 #------ Create a temp-file for testing lazyiness
 
-my $temp_name = Path::Tiny->tempfile('PerlSeqTmpXXXXXX');
+my $temp_name = Path::Tiny->tempfile('PerlSqTmpXXXXXX');
 my $fh        = $temp_name->openrw;
 
 my $temp   = from_file($temp_name);
@@ -164,7 +154,7 @@ my $always = Seq->from_sub(sub {
     }
 });
 
-is($always->take(10)->to_array, [1,1,1,1,1,1,1,1,1,1], '10 times 1');
+is($always->take(10), seq { (1) x 10 }, '10 times 1');
 
 
 #------ Check if from_sub stops on first undef ------#
@@ -180,11 +170,11 @@ my $contains_undef = Seq->from_sub(sub {
     }
 });
 
-is($contains_undef->to_array,      [1,2,3], 'contains undef 1');
-is($contains_undef->skip(2)->to_array, [3], 'contains undef 2');
-is($contains_undef->skip(3)->to_array,  [], 'contains undef 3');
-is($contains_undef->skip(4)->to_array,  [], 'contains undef 4');
-is($contains_undef->skip(5)->to_array,  [], 'contains undef 5');
+is($contains_undef,         seq {1,2,3}, 'contains undef 1');
+is($contains_undef->skip(2),    seq {3}, 'contains undef 2');
+is($contains_undef->skip(3), Seq->empty, 'contains undef 3');
+is($contains_undef->skip(4), Seq->empty, 'contains undef 4');
+is($contains_undef->skip(5), Seq->empty, 'contains undef 5');
 
 # test internal
 my $it = $contains_undef->();
