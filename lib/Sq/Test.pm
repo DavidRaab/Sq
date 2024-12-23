@@ -51,7 +51,8 @@ sub nok($bool, $message) {
     return;
 }
 
-sub is($got, $expected, $message) {
+sub is :prototype($$$) {
+    my ($got, $expected, $message) = @_;
     $count++;
     if ( equal($got, $expected) ) {
         print "ok $count - $message\n";
