@@ -7,14 +7,15 @@ use Sub::Exporter -setup => {
         qw(sq call key assign),
         qw(is_num is_str),
         qw(id fst snd),
-        Some => sub { \&Option::Some            },
-        None => sub { \&Option::None            },
-        Ok   => sub { \&Result::Ok              },
-        Err  => sub { \&Result::Err             },
-        lazy => sub { \&Sq::Control::Lazy::lazy },
+        Some  => sub { \&Option::Some            },
+        None  => sub { \&Option::None            },
+        Ok    => sub { \&Result::Ok              },
+        Err   => sub { \&Result::Err             },
+        lazy  => sub { \&Sq::Control::Lazy::lazy },
+        equal => sub { \&Sq::Equality::equal     },
     ],
     groups => {
-        default => [qw(id fst snd key assign is_str is_num Some None sq Ok Err call lazy)],
+        default => [qw(id fst snd key assign is_str is_num Some None sq Ok Err call lazy equal)],
     },
 };
 

@@ -22,12 +22,29 @@ sub array($array, $other) {
     return 1;
 }
 
+sub option($opt, $other) {
+    return 1 if refaddr($opt) == refaddr($other);
+    return 0 if @$opt != @$other;
+    for ( my $idx=0; $idx < @$opt; $idx++ ) {
+        return 0 if equal($opt->[$idx], $other->[$idx]) == 0;
+    }
+    return 1;
+}
+
+sub result($result, $other) {
+    return 1 if refaddr($result) == refaddr($other);
+    return 0 if $result->[0] != $other->[0];
+    return equal($result->[1], $other->[1]);
+}
+
 my $dispatch = {
     '_UNDEF'  => sub { 1              },
     '_NUM'    => sub { $_[0] == $_[1] },
     '_STRING' => sub { $_[0] eq $_[1] },
     'Hash'    => \&hash,
     'Array'   => \&array,
+    'Option'  => \&option,
+    'Result'  => \&result,
 };
 
 sub type($any) {
@@ -48,6 +65,13 @@ sub equal($any1, $any2) {
         return $fn->($any1, $any2);
     }
     return 0;
+}
+
+sub add_equality($type, $func) {
+    Carp::croak "You must provide a string" if not Sq::is_str($type);
+    Carp::croak "You must provide an comparison function" if ref $func ne 'CODE';
+    $dispatch->{$type} = $func;
+    return;
 }
 
 # Add equal function to multiple packages

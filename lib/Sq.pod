@@ -135,6 +135,19 @@ an error.
     my $result = Err([]);
     my $result = Err("data not found");
 
+=head2 equal($any1, $any2) : $bool
+
+Compares two data structures recursively. Works with the builtin structures
+C<Array>, C<Hash>, C<Seq>, C<Option>, C<Result> and just the built-in numbers
+and strings.
+
+    my $bool = equal({foo => 1}, {foo => 2});             # 1
+    my $bool = equal([1,{foo => 1},3], [1,{foo => 2},3]); # 1
+
+This function is also available as a method on the types.
+
+    my $bool = Array->replicate(3, "foo")->equal(["foo", "foo", "foo"]);
+
 =head2 is_num($str) : $bool
 
 returns a truish value if C<$str> is a number.
