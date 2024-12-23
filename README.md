@@ -255,6 +255,46 @@ my $album_runtime = assign {
 };
 ```
 
+# Default Equality
+
+Loading `Sq` automatically loads an `equal` function that can recursively check
+a data-structure to be equal or not. By default it supports checking of `Array`,
+`Hash`, `Seq`, `Option` and `Result` and sure also comparing numbers and strings.
+
+By default this function is also installed as a method/function into the above
+packages, so you also can call `equal` as a method on those types.
+
+```perl
+# Sq enhanced data-structure
+my $album1 = sq {
+    Artist => 'Queen',
+    Title  => 'Greatest Hits',
+    Tracks => Seq->new(
+        { Title => 'We will Rock You'          },
+        { Title => 'Radio Gaga'                },
+        { Title => 'Who Wants To Life Forever' },
+        { Title => "You Don't Fool Me"         },
+    ),
+    Tags => Some(qw/80/),
+};
+
+# pure perl data-structure
+my $album2 = {
+    Artist => 'Queen',
+    Title  => 'Greatest Hits',
+    Tracks => Seq->new(
+        { Title => 'We will Rock You'          },
+        { Title => 'Radio Gaga'                },
+        { Title => 'Who Wants To Life Forever' },
+        { Title => "You Don't Fool Me"         },
+    ),
+    Tags => Some(qw/80/),
+};
+
+my $bool = equal($album1, $album2); # 1
+my $bool = $album1->equal($album2); # 1
+```
+
 # Typing
 
 ```perl
@@ -337,12 +377,13 @@ t_assert($is_album, $album);             # Throws exception when not valid
 # Signatures
 
 The Type system can be used to add type-checking to any function. But the
-idea is that this kind of type-checking is only added in developing / testing
-and for code running in production the type-check is removed. It works like
+idea is that this kind of type-checking is only added in developing / testing.
+For code running in production the type-check is removed. It works like
 the **Memoize** module by replacing a function with type-checking.
 
 So in production you don't pay the price of type-checking in every function.
-You just enable it when you need to find errors/bugs.
+You just enable it when you need to find errors/bugs or during normal development
+to find quickly type-errors.
 
 ```perl
 use Sq;
@@ -382,7 +423,7 @@ whatever(  123, "foo", [1,2,3]); # ok
 
 # EXPORT
 
-It exports the following functions by default: sq, call, key, id, fst, snd, assign, is_str, is_num, Some, None, Ok, Err.
+It exports the following functions by default: sq, equal, call, key, id, fst, snd, assign, is_str, is_num, Some, None, Ok, Err.
 
 # SUPPORT
 
