@@ -99,4 +99,17 @@ is(
         'sq on multiple values in option');
 }
 
+# sq with result
+{
+    is(
+        sq(Ok([1,2,3]))->map(sub { $_[0]->length }),
+        Ok(3),
+        'sq on Ok');
+
+    is(
+        sq(Err([1,2,3]))->mapErr(sub { $_[0]->length }),
+        Err(3),
+        'sq on Err');
+}
+
 done_testing;
