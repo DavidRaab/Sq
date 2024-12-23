@@ -3,16 +3,21 @@ use 5.036;
 use Scalar::Util qw/looks_like_number/;
 use builtin 'refaddr';
 
+# This is inlined in equal() but i still provide this function as an API
+# called by other code
 sub hash($hash, $other) {
     return 1 if refaddr($hash) == refaddr($other);
-    return 0 if keys %$hash != keys %$other;
-    for my $key ( keys %$hash ) {
+    my @keys = keys %$hash;
+    return 0 if @keys != keys %$other;
+    for my $key ( @keys ) {
         return 0 if not exists $other->{$key};
         return 0 if equal($hash->{$key}, $other->{$key}) == 0;
     }
     return 1;
 }
 
+# This is inlined in equal() but i still provide this function as an API
+# called by other code
 sub array($array, $other) {
     return 1 if refaddr($array) == refaddr($other);
     return 0 if @$array != @$other;
@@ -54,25 +59,10 @@ sub result($result, $other) {
 }
 
 my $dispatch = {
-    '_UNDEF'  => sub { 1              },
-    '_NUM'    => sub { $_[0] == $_[1] },
-    '_STRING' => sub { $_[0] eq $_[1] },
-    'Hash'    => \&hash,
-    'Array'   => \&array,
-    'Option'  => \&option,
-    'Result'  => \&result,
-    'Seq'     => \&seq,
+    'Option' => \&option,
+    'Result' => \&result,
+    'Seq'    => \&seq,
 };
-
-sub type($any) {
-    return '_UNDEF'  if !defined $any;
-    return '_NUM'    if looks_like_number($any);
-    my $type = ref $any;
-    return '_STRING' if $type eq "";
-    return 'Array'   if $type eq 'Array' || $type eq 'ARRAY';
-    return 'Hash'    if $type eq 'Hash'  || $type eq 'HASH';
-    return $type;
-}
 
 sub equal($any1, $any2) {
     if ( defined $any1 && defined $any2 ) {
@@ -83,36 +73,31 @@ sub equal($any1, $any2) {
         elsif ( $t1 eq 'HASH'  ) { $t1 = 'Hash'  }
         if    ( $t2 eq 'ARRAY' ) { $t2 = 'Array' }
         elsif ( $t2 eq 'HASH'  ) { $t2 = 'Hash'  }
+        return 0              if $t1 ne $t2;
+        return $any1 eq $any2 if $t1 eq "";
 
-        if ( $t1 eq $t2 ) {
-            if ( $t1 eq '' ) {
-                return $any1 eq $any2;
+        if ( $t1 eq 'Array' ) {
+            return 1 if refaddr($any1) == refaddr($any2);
+            return 0 if @$any1 != @$any2;
+            for ( my $idx=0; $idx < @$any1; $idx++ ) {
+                return 0 if equal($any1->[$idx], $any2->[$idx]) == 0;
             }
-            elsif ( $t1 eq 'Array' ) {
-                return 1 if refaddr($any1) == refaddr($any2);
-                return 0 if @$any1 != @$any2;
-                for ( my $idx=0; $idx < @$any1; $idx++ ) {
-                    return 0 if equal($any1->[$idx], $any2->[$idx]) == 0;
-                }
-                return 1;
-            }
-            elsif ( $t1 eq 'Hash' ) {
-                return 1 if refaddr($any1) == refaddr($any2);
-                return 0 if keys %$any1 != keys %$any2;
-                for my $key ( keys %$any1 ) {
-                    return 0 if not exists $any2->{$key};
-                    return 0 if equal($any1->{$key}, $any2->{$key}) == 0;
-                }
-                return 1;
-            }
-            # all other types
-            else {
-                my $fn = $dispatch->{$t1};
-                return 0 if !defined $fn;
-                return $fn->($any1, $any2);
-            }
+            return 1;
         }
-        return 0;
+        elsif ( $t1 eq 'Hash' ) {
+            return 1 if refaddr($any1) == refaddr($any2);
+            my @keys = keys %$any1;
+            return 0 if @keys != keys %$any2;
+            for my $key ( @keys ) {
+                return 0 if not exists $any2->{$key};
+                return 0 if equal($any1->{$key}, $any2->{$key}) == 0;
+            }
+            return 1;
+        }
+
+        my $fn = $dispatch->{$t1};
+        return 0 if !defined $fn;
+        return $fn->($any1, $any2);
     }
     return 0 if defined $any1;
     return 0 if defined $any2;
