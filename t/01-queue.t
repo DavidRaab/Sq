@@ -2,7 +2,7 @@
 use 5.036;
 use Sq;
 use Sq::Sig;
-use Test2::V0 qw/is ok done_testing/;
+use Sq::Test;
 
 # Some values, functions, ... for testing
 my $add     = sub($x,$y) { $x + $y     };
