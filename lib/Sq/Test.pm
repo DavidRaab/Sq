@@ -1,6 +1,7 @@
 package Sq::Test;
 use 5.036;
 use Sq;
+use builtin 'blessed';
 use Sub::Exporter -setup => {
     exports => [qw/is ok nok done_testing dies like check_isa/],
     groups  => {
@@ -64,7 +65,12 @@ sub is :prototype($$$) {
         # add # to beginning of every starting line
         $dump_1 =~ s/^/# /mg;
         $dump_2 =~ s/^/# /mg;
-        print "# Got:\n", $dump_1, "\n# Expected:\n", $dump_2, "\n";
+        # but remove leading "#" on starting string
+        $dump_1 =~ s/\A#\s*//;
+        $dump_2 =~ s/\A#\s*//;
+        warn "# not ok $count - $message\n",
+             "# Got:      ", $dump_1, "\n",
+             "# Expected: ", $dump_2, "\n";
     }
     return;
 }
@@ -89,21 +95,31 @@ sub like($str, $regex, $message) {
         print "not ok $count - $message\n";
         $str =~ s/^/# /mg;
         $str =~ s/\A# //;
-        print "Got: $str\n", "Expected: $regex\n";
+        warn "# not ok $count - $message\n",
+             "# Got:      $str\n",
+             "# Expected: $regex\n";
     }
     return;
 }
 
 sub check_isa($any, $class, $message) {
+    Carp::croak "Not a valid class name" if $class =~ m/\s/;
     $count++;
-    my $type = ref $any;
-    if ( $type eq $class ) {
+    if ( $any isa $class ) {
         print "ok $count - $message\n";
     }
     else {
         print "not ok $count - $message\n";
-        $class =~ s/\s+//g;
-        print "# Got: $type Expected: $class\n";
+        my $type = blessed $any;
+        if ( defined $type ) {
+            warn "# not ok $count - $message\n",
+                 "# Got:      $type\n",
+                 "# Expected: $class\n";
+        }
+        else {
+            warn "# not ok $count - $message\n",
+                 "# Expected an object of $class, got unblessed value\n";
+        }
     }
 }
 
