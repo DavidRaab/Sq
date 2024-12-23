@@ -2,9 +2,9 @@ package Sq::Test;
 use 5.036;
 use Sq;
 use Sub::Exporter -setup => {
-    exports => [qw/is ok nok done_testing/],
+    exports => [qw/is ok nok done_testing dies like check_isa/],
     groups  => {
-        default => [qw/is ok nok done_testing/],
+        default => [qw/is ok nok done_testing dies like check_isa/],
     }
 };
 # use Carp qw(carp);
@@ -70,6 +70,40 @@ sub is($got, $expected, $message) {
 
 sub done_testing() {
     print "1..$count\n";
+}
+
+sub dies :prototype(&) {
+    my ($fn) = @_;
+    local $@;
+    eval { $fn->() };
+    return $@ eq "" ? undef : $@;
+}
+
+sub like($str, $regex, $message) {
+    $count++;
+    if ( $str =~ $regex ) {
+        print "ok $count - $message\n";
+    }
+    else {
+        print "not ok $count - $message\n";
+        $str =~ s/^/# /mg;
+        $str =~ s/\A# //;
+        print "Got: $str\n", "Expected: $regex\n";
+    }
+    return;
+}
+
+sub check_isa($any, $class, $message) {
+    $count++;
+    my $type = ref $any;
+    if ( $type eq $class ) {
+        print "ok $count - $message\n";
+    }
+    else {
+        print "not ok $count - $message\n";
+        $class =~ s/\s+//g;
+        print "# Got: $type Expected: $class\n";
+    }
 }
 
 1;

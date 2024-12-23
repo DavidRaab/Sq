@@ -2,7 +2,7 @@
 use 5.036;
 use Sq;
 use Sq::Sig;
-use Test2::V0 qw/is ok done_testing dies like check_isa/;
+use Sq::Test;
 
 # Some values, functions, ... for testing
 my $add     = sub($x,$y) { $x + $y     };
@@ -14,7 +14,6 @@ my $is_even = sub($x)    { $x % 2 == 0 };
 #----------
 
 # Helper functions
-my $ishash = check_isa('Hash');
 my $by_str = sub($x, $y) { $x cmp $y };
 my $by_num = sub($x, $y) { $x <=> $y };
 
@@ -23,31 +22,31 @@ my $by_num = sub($x, $y) { $x <=> $y };
 
     # passing a hashref
     my $d = Hash->bless({foo => 1, bar => 2});
-    is($d, $ishash,              'bless');
+    check_isa($d, 'Hash', 'bless');
     is($d, {foo => 1, bar => 2}, 'content of $d');
 
     # blessing an existing ref
     my $d2 = {foo => 1, bar => 2};
     is(builtin::blessed($d2), undef, ' not blessed');
     Hash->bless($d2);
-    is($d2, $ishash,              '$d2 now blessed');
+    check_isa($d2, 'Hash',           '$d2 now blessed');
     is($d2, {foo => 1, bar => 2}, 'content of $d2');
 
     # new without arguments
     my $d3 = Hash->new;
     $d3->set(foo => 1);
-    is($d3, $ishash,    '$d3 is Hash');
-    is($d3, {foo => 1}, 'content of $d3');
+    check_isa($d3, 'Hash', '$d3 is Hash');
+    is($d3, {foo => 1},    'content of $d3');
 
     # new with many arguments
     my $d4 = Hash->new(foo => 1, bar => 2);
-    is($d4, $ishash,              '$d4 is Hash');
+    check_isa($d4, 'Hash',        '$d4 is Hash');
     is($d4, {foo => 1, bar => 2}, 'content of $d4');
 }
 
 # empty
 {
-    is(Hash->empty,   $ishash, 'empty');
+    check_isa(Hash->empty, 'Hash', 'empty');
     is(Hash->empty,        {}, 'empty hash');
     is(Hash->new, Hash->empty, 'new() same as empty');
 }
@@ -80,7 +79,7 @@ my $data2 = $data->map(sub($k,$v) {
 
 is($data,  {foo  => 1, bar  => 10, baz  =>  5}, '$data stays the same');
 is($data2, {foos => 2, bars => 20, bazs => 10}, 'map');
-is($data2, $ishash,                             '$data2 isa Hash');
+check_isa($data2, 'Hash',                       '$data2 isa Hash');
 
 # filter
 my $data3 = $data->filter(sub($k,$v) {
@@ -89,7 +88,7 @@ my $data3 = $data->filter(sub($k,$v) {
 
 is($data,  {foo  => 1, bar  => 10, baz  =>  5}, '$data stays the same');
 is($data3, {bar => 10, baz => 5},               'filter');
-is($data3, $ishash,                             '$data3 isa Hash');
+check_isa($data3, 'Hash',                       '$data3 isa Hash');
 
 {
     my $player_points = Hash->new(
@@ -276,7 +275,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 
     is($t1, {id => 1, tags => [qw/foo bar/]}, 'push onto plain perl array');
     is($t2, {id => 2, tags => [qw/foo bar/]}, 'push onto Sq Array');
-    is($t1->{tags}, check_isa('Array'), 'pushin on perl plain array adds blessing');
+    check_isa($t1->{tags}, 'Array', 'pushin on perl plain array adds blessing');
 
     # testing "upgrade"
     my $data = Hash->new(
