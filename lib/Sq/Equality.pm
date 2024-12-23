@@ -25,7 +25,7 @@ sub array($array, $other) {
 sub seq($seq, $other) {
     return 1 if refaddr($seq) == refaddr($other);
     my $itA = $seq->();
-    my $itB = $seq->();
+    my $itB = $other->();
     my ($x,$y);
     NEXT:
     $x = $itA->();

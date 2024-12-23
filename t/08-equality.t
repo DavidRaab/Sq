@@ -207,6 +207,15 @@ ok(equal(
     Seq->new(0,2,4,6,8,10,12,14,16,18)
 ), 'struct 46');
 
+ok(!equal(
+    Seq->new(1,2,3),
+    Seq->new(4,5,6),
+), 'struct 48');
+
+ok(!equal(
+    Seq->init(1_000_000_000, sub($idx) { $idx }),
+    Seq->new(3),
+), 'struct 49');
 
 ### Check adding another class to Equality
 package Stupid;
