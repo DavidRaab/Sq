@@ -194,4 +194,22 @@ ok( equal(Some(),        None), 'struct 42');
 ok(!equal(Some(1),      Ok(1)), 'struct 43');
 ok(!equal({}, [1,2,3]),         'struct 44');
 
+package Stupid;
+sub new($class) { bless({}, $class) }
+
+package main;
+
+my $o1 = Stupid->new;
+my $o2 = Stupid->new;
+ok(!equal($o1, $o2), 'Not equal');
+
+# Add Equality for Stupid
+Sq::Equality::add_equality(Stupid => sub($o1, $o2) {
+    return 1 if builtin::refaddr($o1) == builtin::refaddr($o2);
+    return Sq::Equality::hash($o1, $o2);
+});
+
+# now check must pass
+ok(equal($o1, $o2), 'Now equal');
+
 done_testing;
