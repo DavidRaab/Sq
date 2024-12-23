@@ -2,9 +2,7 @@
 use 5.036;
 use Sq;
 use Sq::Sig;
-use Test2::V0 qw/is ok done_testing dies like check_isa/;
-
-#----------
+use Sq::Test;
 
 my $heap = Heap->new(sub($x,$y) { $x <=> $y });
 
