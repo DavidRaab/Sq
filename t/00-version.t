@@ -2,10 +2,10 @@
 use 5.036;
 use Sq;
 use Sq::Sig;
-use Test2::V0 qw(is diag done_testing number_ge);
+use Sq::Test;
 
-diag( "Testing Sq $Sq::VERSION, Perl $], $^X" );
-is($Sq::VERSION, number_ge("0.006"), 'Check minimum version number');
+warn("# Testing Sq $Sq::VERSION, Perl $], $^X");
+ok($Sq::VERSION >= "0.006", 'Check minimum version number');
 
 # check default imported functions
 my $data = sq [
