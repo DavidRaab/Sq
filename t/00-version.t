@@ -95,7 +95,7 @@ is(
     my $data = sq Some([1,2], [3,4,5]);
     is(
         $data->map(sub($x,$y) { $x->length, $y->length }),
-        Some([2,3]),
+        Some(2,3),
         'sq on multiple values in option');
 }
 

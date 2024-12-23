@@ -107,7 +107,12 @@ sub sq($any) {
         }
     }
     elsif ( $type eq 'Option' ) {
-        sq($any->[0]) if @$any;
+        for my $x ( @$any ) {
+            sq($x);
+        }
+    }
+    elsif ( $type eq 'Result' ) {
+        sq($any->[1]);
     }
     else {
         # Do nothing for unknown type
