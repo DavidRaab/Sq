@@ -45,14 +45,8 @@ sub is_none($any) {
 }
 
 sub match($opt, %args) {
-    my $fSome = $args{Some} or Carp::croak "Some not defined";
-    my $fNone = $args{None} or Carp::croak "None not defined";
-    if ( @$opt ) {
-        return $fSome->(@$opt);
-    }
-    else {
-        return $fNone->();
-    }
+    if ( @$opt ) { return $args{Some}(@$opt) }
+    else         { return $args{None}()      }
 }
 
 # or: Option<'a> -> 'a -> 'a

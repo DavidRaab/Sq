@@ -14,11 +14,11 @@ sigt('Option::Some', t_tuplev(t_array), t_opt);
 sig('Option::is_some', t_any, t_bool);
 sig('Option::is_none', t_any, t_bool);
 
-# this is not "perfect" as this also would allow passing Some => ..., Some ...
-# but its fine enough for a type-check because I don't plan to remove the Carp::croak
-# calls in match() at the moment. But, should I?
-my $case = t_enum('Some', 'None');
-sig ('Option::match', t_opt, $case, t_sub, $case, t_sub, t_any);
+my $matches = t_hash(t_keys(
+    Some => t_sub,
+    None => t_sub,
+));
+sigt('Option::match', t_tuplev(t_opt, t_as_hash($matches)), t_any);
 
 # Still need a solution for signature with list context
 # sigt('Option::or',    t_tuplev(t_opt, t_array(t_min(1), t_of(t_any))), t_any);

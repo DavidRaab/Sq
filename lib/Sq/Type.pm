@@ -10,7 +10,7 @@ use Sub::Exporter -setup => {
         qw(t_str t_enum t_match t_matchf t_parser),      # String
         qw(t_num t_int t_positive t_negative t_range),   # Numbers
         qw(t_opt),
-        qw(t_hash t_with_keys t_keys),                   # Hash
+        qw(t_hash t_with_keys t_keys t_as_hash),         # Hash
         qw(t_array t_idx t_tuple t_tuplev t_even_sized), # Array
         qw(t_of t_min t_max t_length),
         qw(t_any t_sub t_regex t_bool t_seq t_void t_result),
@@ -22,7 +22,7 @@ use Sub::Exporter -setup => {
             qw(t_str t_enum t_match t_matchf t_parser),      # String
             qw(t_num t_int t_positive t_negative t_range),   # Numbers
             qw(t_opt),
-            qw(t_hash t_with_keys t_keys),                   # Hash
+            qw(t_hash t_with_keys t_keys t_as_hash),         # Hash
             qw(t_array t_idx t_tuple t_tuplev t_even_sized), # Array
             qw(t_of t_min t_max t_length),
             qw(t_any t_sub t_regex t_bool t_seq t_void t_result),
@@ -600,6 +600,23 @@ sub t_result() {
     state $fn = sub($any) {
         return $valid if ref $any eq 'Result';
         return "result: Not a Result";
+    }
+}
+
+sub t_as_hash(@checks) {
+    return sub($any) {
+        my $type = ref $any;
+        if ( $type eq 'Array' || $type eq 'ARRAY' ) {
+            return "as_hash: Not even-sized array" if @$any % 2 == 1;
+            my $hash = { @$any };
+            my $err;
+            for my $check ( @checks ) {
+                $err = $check->($hash);
+                return $err if defined $err;
+            }
+            return;
+        }
+        return "as_hash: Not an array";
     }
 }
 
