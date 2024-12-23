@@ -64,7 +64,13 @@ sub key :prototype($) {
 
 # returns a function that calls $method with its arguments on an object
 sub call($method, @args) {
-    return sub($obj) { $obj->$method(@args) };
+    no strict 'refs';
+    return sub($obj) {
+        my $type = ref $obj;
+        if    ( $type eq 'ARRAY' ) { return &{"Array::$method"}($obj,@args) }
+        elsif ( $type eq 'HASH'  ) { return &{"Hash::$method" }($obj,@args) }
+        else                       { return $obj->$method(@args)            }
+    };
 }
 
 # allows writing a code block to create a value
