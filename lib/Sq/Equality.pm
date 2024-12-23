@@ -75,13 +75,48 @@ sub type($any) {
 }
 
 sub equal($any1, $any2) {
-    my $type = type($any1);
-    if ( $type eq type($any2) ) {
-        my $fn = $dispatch->{$type};
-        return 0 if !defined $fn;
-        return $fn->($any1, $any2);
+    if ( defined $any1 && defined $any2 ) {
+        return $any1 == $any2 if looks_like_number($any1) && looks_like_number($any2);
+        my $t1 = ref $any1;
+        my $t2 = ref $any2;
+        if    ( $t1 eq 'ARRAY' ) { $t1 = 'Array' }
+        elsif ( $t1 eq 'HASH'  ) { $t1 = 'Hash'  }
+        if    ( $t2 eq 'ARRAY' ) { $t2 = 'Array' }
+        elsif ( $t2 eq 'HASH'  ) { $t2 = 'Hash'  }
+
+        if ( $t1 eq $t2 ) {
+            if ( $t1 eq '' ) {
+                return $any1 eq $any2;
+            }
+            elsif ( $t1 eq 'Array' ) {
+                return 1 if refaddr($any1) == refaddr($any2);
+                return 0 if @$any1 != @$any2;
+                for ( my $idx=0; $idx < @$any1; $idx++ ) {
+                    return 0 if equal($any1->[$idx], $any2->[$idx]) == 0;
+                }
+                return 1;
+            }
+            elsif ( $t1 eq 'Hash' ) {
+                return 1 if refaddr($any1) == refaddr($any2);
+                return 0 if keys %$any1 != keys %$any2;
+                for my $key ( keys %$any1 ) {
+                    return 0 if not exists $any2->{$key};
+                    return 0 if equal($any1->{$key}, $any2->{$key}) == 0;
+                }
+                return 1;
+            }
+            # all other types
+            else {
+                my $fn = $dispatch->{$t1};
+                return 0 if !defined $fn;
+                return $fn->($any1, $any2);
+            }
+        }
+        return 0;
     }
-    return 0;
+    return 0 if defined $any1;
+    return 0 if defined $any2;
+    return 1;
 }
 
 sub add_equality($type, $func) {
