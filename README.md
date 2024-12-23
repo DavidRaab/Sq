@@ -434,7 +434,7 @@ You can find documentation for this module with the perldoc command.
 
     perldoc Sq
 
-You can also look for information at [my Blog on Perl Sq/Seq](https://davidraab.github.io/tags/sq/)
+You can also look for information at [my Blog on Perl Sq](https://davidraab.github.io/tags/sq/)
 
 # AUTHOR
 
