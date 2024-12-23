@@ -4,7 +4,7 @@ use Sq;
 use Sq::Parser;
 use Sq::Sig;
 use Sq::Sig::Parser;
-use Test2::V0 qw(is ok done_testing);
+use Sq::Test;
 
 # Some functions now take multiple parsers and p_and or p_or them
 

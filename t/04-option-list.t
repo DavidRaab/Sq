@@ -2,7 +2,7 @@
 use 5.036;
 use Sq;
 use Sq::Sig;
-use Test2::V0 qw/is ok done_testing dies like check_isa/;
+use Sq::Test;
 
 # map
 is(Some(1,2)     ->map(sub(@v) { Array::sum(\@v) }), Some(3), 'map 1');

@@ -4,7 +4,7 @@ use Sq;
 use Sq::Type;
 use Sq::Parser;
 use Sq::Sig;
-use Test2::V0 qw/is ok done_testing dies like check_isa/;
+use Sq::Test;
 
 # data used for checking
 my $album = sq {

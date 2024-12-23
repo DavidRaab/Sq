@@ -2,7 +2,7 @@
 use 5.036;
 use Sq;
 use Sq::Sig;
-use Test2::V0 qw/is ok done_testing dies like check_isa/;
+use Sq::Test;
 
 # Some values, functions, ... for testing
 my $range     = Seq->range(1, 10);
@@ -43,7 +43,7 @@ my $data = Array->new(
 # group_by
 {
     my $grouped = $data->group_by(key 'id');
-    is($grouped, check_isa('Hash'), 'group_by return Hash');
+    check_isa($grouped, 'Hash', 'group_by return Hash');
     is($grouped->length, 3, '3 elements');
 
     is(

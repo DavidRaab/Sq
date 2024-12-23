@@ -2,9 +2,7 @@
 use 5.036;
 use Sq;
 use Sq::Sig;
-use Test2::V0 qw/is ok done_testing dies like check_isa/;
-
-#----------
+use Sq::Test;
 
 # basic loading and initialization
 {
@@ -12,9 +10,9 @@ use Test2::V0 qw/is ok done_testing dies like check_isa/;
     my $y = Some(undef);
     my $z = None;
 
-    is($x, check_isa('Option'), '$x is option');
-    is($y, check_isa('Option'), '$y is option');
-    is($z, check_isa('Option'), '$z is option');
+    check_isa($x, 'Option', '$x is option');
+    check_isa($y, 'Option', '$y is option');
+    check_isa($z, 'Option', '$z is option');
 
     ok($x->is_some, 'some value');
     ok($y->is_none, 'none value');
@@ -247,8 +245,8 @@ use Test2::V0 qw/is ok done_testing dies like check_isa/;
 
     is($a, [1], '$a is [1]');
     is($b, [],  '$a is []');
-    is($a, check_isa('Array'), '$a is blessed');
-    is($b, check_isa('Array'), '$b is blessed');
+    check_isa($a, 'Array', '$a is blessed');
+    check_isa($b, 'Array', '$b is blessed');
 }
 
 # get

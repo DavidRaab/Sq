@@ -4,7 +4,7 @@ use Sq;
 use Sq::Parser;
 use Sq::Sig;
 use Sq::Sig::Parser;
-use Test2::V0 qw/is ok done_testing dies like check_isa/;
+use Sq::Test;
 
 # Helper function to build result
 sub result(@xs) { Some([@xs]) }

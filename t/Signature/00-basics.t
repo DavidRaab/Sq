@@ -4,7 +4,7 @@ use Sq;
 use Sq::Type;
 use Sq::Signature;
 use Sq::Sig;
-use Test2::V0 qw/is ok done_testing dies like check_isa/;
+use Sq::Test;
 
 my $is_point = t_hash(t_keys(
     X => t_num,

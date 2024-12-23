@@ -4,7 +4,7 @@ use Sq;
 use Sq::Parser;
 use Sq::Sig;
 use Sq::Sig::Parser;
-use Test2::V0 qw(is ok done_testing);
+use Sq::Test;
 
 # This is the Test file created while writing the intro to Sq::Parser
 

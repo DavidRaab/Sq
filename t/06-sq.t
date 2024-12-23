@@ -2,7 +2,7 @@
 use 5.036;
 use Sq;
 use Sq::Sig;
-use Test2::V0 qw/is ok done_testing dies like check_isa/;
+use Sq::Test;
 
 # Some values, functions, ... for testing
 my $add     = sub($x,$y) { $x + $y     };
@@ -13,19 +13,16 @@ my $is_even = sub($x)    { $x % 2 == 0 };
 
 #----------
 
-my $is_array = check_isa('Array');
-my $is_hash  = check_isa('Hash');
-
 my $a1 = sq([1..10]);
-is($a1, $is_array, '$a1');
+check_isa($a1, 'Array', '$a1');
 
 my $a2 = sq([
     [1,2,3],
     [4,5,6],
     [7,8,9],
 ]);
-is($a2, $is_array, '$a2');
-$a2->iter(sub($x) { is($x, $is_array, 'inner of $a2') });
+check_isa($a2, 'Array', '$a2');
+$a2->iter(sub($x) { check_isa($x, 'Array', 'inner of $a2') });
 
 my $album = sq {
     artist => 'Michael Jackson',
@@ -43,10 +40,10 @@ my $album = sq {
     ],
 };
 
-is($album, $is_hash, '$album');
-is($album->{tracks}, $is_array, 'album->tracks');
+check_isa($album, 'Hash', '$album');
+check_isa($album->{tracks}, 'Array', 'album->tracks');
 $album->{tracks}->iteri(sub($hash,$idx) {
-    is($hash, $is_hash, "album->tracks $idx is Hash");
+    check_isa($hash, 'Hash', "album->tracks $idx is Hash");
 });
 is(
     $album->get('tracks')->map(call 'sum_by', key 'duration')->or(0),
@@ -95,15 +92,15 @@ my $opt = Some(sq {
 });
 
 $opt->iter(sub($album) {
-    is($album, $is_hash, '$album');
-    is($album->{tracks}, $is_array, 'album->tracks');
+    check_isa($album, 'Hash', '$album');
+    check_isa($album->{tracks}, 'Array', 'album->tracks');
     $album->{tracks}->iteri(sub($hash,$idx) {
-        is($hash, $is_hash, "album->tracks $idx is Hash");
+        check_isa($hash, 'Hash', "album->tracks $idx is Hash");
     });
     $album->{tags}->iter(sub($tags) {
-        is($tags, $is_array, 'tags is array');
-        is($tags->[2], $is_hash, 'index 2 is Hash');
-        is($tags->[2]{foo}, $is_array, '$tags->[2]{foo} is array');
+        check_isa($tags,           'Array', 'tags is array');
+        check_isa($tags->[2],      'Hash',  'index 2 is Hash');
+        check_isa($tags->[2]{foo}, 'Array', '$tags->[2]{foo} is array');
     });
 });
 
@@ -114,10 +111,8 @@ my $mixed = sq Array->new(
     ),
 );
 
-is($mixed, $is_array, '$deep is array');
-$mixed->iter(sub($x) { is($x, $is_hash, 'mixed contains Hash') });
-is($mixed->[1]{bar}, $is_array, '$mixed->[1]{bar} is Array');
-
-
+check_isa($mixed, 'Array', '$deep is array');
+$mixed->iter(sub($x) { check_isa($x, 'Hash', 'mixed contains Hash') });
+check_isa($mixed->[1]{bar}, 'Array', '$mixed->[1]{bar} is Array');
 
 done_testing;

@@ -2,7 +2,7 @@
 use 5.036;
 use Sq;
 use Sq::Sig;
-use Test2::V0 qw/is ok done_testing dies like check_isa/;
+use Sq::Test;
 
 # Testing some function that expects the lambdas to return optional values.
 # Those functions are written in a way that it also should work with returning

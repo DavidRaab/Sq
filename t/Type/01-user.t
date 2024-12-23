@@ -3,7 +3,7 @@ use 5.036;
 use Sq;
 use Sq::Type;
 use Sq::Sig;
-use Test2::V0 qw/is ok done_testing dies like check_isa/;
+use Sq::Test;
 
 my $address = t_hash(t_keys(
     street => t_str,

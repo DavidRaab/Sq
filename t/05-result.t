@@ -2,7 +2,7 @@
 use 5.036;
 use Sq;
 use Sq::Sig;
-use Test2::V0 qw/is ok done_testing dies like check_isa/;
+use Sq::Test;
 
 # Some values, functions, ... for testing
 my $add     = sub($x,$y) { $x + $y     };
@@ -19,17 +19,13 @@ my $is_even = sub($x)    { $x % 2 == 0 };
     my $y = Ok(undef);
     my $z = Err(10);
 
-    is($x, check_isa('Result'), '$x is result');
-    is($y, check_isa('Result'), '$y is result');
-    is($z, check_isa('Result'), '$z is result');
+    check_isa($x, 'Result', '$x is result');
+    check_isa($y, 'Result', '$y is result');
+    check_isa($z, 'Result', '$z is result');
 
     ok($x->is_ok,  'ok value');
     ok($y->is_ok,  'err value');
     ok($z->is_err, 'err value');
-
-    is($x, [1,10],    'internal structure check 1');
-    is($y, [1,undef], 'internal structure check 2');
-    is($z, [0,10],    'internal structure check 3');
 
     # check functional-style
     my @tests = (

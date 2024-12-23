@@ -2,7 +2,7 @@
 use 5.036;
 use Sq;
 use Sq::Sig;
-use Test2::V0 qw/is ok done_testing dies like check_isa/;
+use Sq::Test;
 
 # Some values, functions, ... for testing
 my $range     = Array->range(1, 10);
@@ -12,9 +12,6 @@ my $add1    = sub($x) { $x + 1      };
 my $double  = sub($x) { $x * 2      };
 my $square  = sub($x) { $x * $x     };
 my $is_even = sub($x) { $x % 2 == 0 };
-
-
-#----------
 
 
 # min
