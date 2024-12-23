@@ -37,6 +37,7 @@ sub ok($bool, $message) {
     }
     else {
         print "not ok $count - $message\n";
+        warn  "# not ok $count - $message\n";
     }
     return;
 }
@@ -45,9 +46,10 @@ sub nok($bool, $message) {
     $count++;
     if ( $bool ) {
         print "not ok $count - $message\n";
+        warn  "# not ok $count - $message\n";
     }
     else {
-        print "ok $count - $message\n"
+        print "ok $count - $message\n";
     }
     return;
 }
