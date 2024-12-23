@@ -1283,13 +1283,4 @@ sub pick($seq, $f_opt) {
     return Option::None();
 }
 
-sub dump($seq, $inline=60, $depth=0) {
-    return Sq::Dump::dump($seq, $inline, $depth);
-}
-
-sub dumpw($seq, $inline=60, $depth=0) {
-    Sq::Dump::dumpw($seq, $inline, $depth);
-    return;
-}
-
 1;

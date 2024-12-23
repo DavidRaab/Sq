@@ -808,15 +808,6 @@ sub to_seq($array) {
     return Seq->from_array($array);
 }
 
-sub dump($array, $inline=60, $depth=0) {
-    return Sq::Dump::dump($array, $inline, $depth);
-}
-
-sub dumpw($array, $inline=60, $depth=0) {
-    Sq::Dump::dumpw($array, $inline, $depth);
-    return;
-}
-
 #-----------------------------------------------------------------------------#
 # MUTATION                                                                    #
 #         Those are functions mutating an array                               #

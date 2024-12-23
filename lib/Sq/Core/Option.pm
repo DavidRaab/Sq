@@ -287,13 +287,4 @@ sub extract($, @anys) {
     return @ret > 0 ? (1,@ret) : 0;
 }
 
-sub dump($opt, $inline=60, $depth=0) {
-    return Sq::Dump::dump($opt, $inline, $depth);
-}
-
-sub dumpw($opt, $inline=60, $depth=0) {
-    Sq::Dump::dumpw($opt, $inline, $depth);
-    return;
-}
-
 1;
