@@ -136,6 +136,7 @@ LICENSE
 MANIFEST			This list of files
 META.json
 META.yml
+notes/2024-12-24-Realase-0.006.md
 perlcriticrc
 profile_tests.pl
 README
