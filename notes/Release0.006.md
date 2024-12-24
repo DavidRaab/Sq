@@ -1,0 +1,379 @@
+# Sq Release 0.6
+
+I am now bumping the version to `0.7`, so this commit will be the last to define
+`0.6` or how Perl versions are used for this as `0.006`.
+
+I cannot provide a full Changelog and I also do not care. I am working
+on this alone and cannot provide full professional support for everything.
+If someone else want to have a changelog he can go through the commit and
+create it itself. Contributions are welcome.
+
+There is still much todo. Even in the current state there are some crucial
+features missing like signature for functions in list context. Some
+methods in `Seq` are not lazy. The `Queue` probably needs a full rework. `List`
+isn't that important at the moment. I just concentrate of getting `Seq/Array`
+right, correct, feature complete and fully documented.
+
+# Type-Checking
+
+I consider the current state as a breakthrough because it now offers
+a basic type check system how I imagined it. This type-check system can
+not only be used for checking any data-structure but also for function
+signatures.
+
+Type-checking can be enabled by loading a module and is off by default.
+I consider this a crucial feature of the system because you get type-checking
+and just can disable it. It somehow works like in a static-typed language.
+
+In a static-typed language usually the compiler checks all kind of types
+and validation before the program is runned. But because of that it doesn't
+need todo it anymore at runtime. This is one reason why static-typed languages
+are faster.
+
+In some way the `Sq::Signature` provides the same benefits. Because of
+Perl's dynamic-typing and Lisp-like features, i am also using, it's hard todo
+type-checking in a pre-compiled state. The idea of Signatures and loading
+the type-check with `Sq::Sig` means we can temporarily add type-checking for
+functions, use it by default in development to catch a lot of mostly silly
+mistakes upfront. Once a program/library runs and it's test-suite runs fine
+with Signatures active (without crashing) then we can assume the program is
+correct enough. We never can be 100% sure everything is correct. But that's 
+how programming is.
+
+This gives confidence that we can disable `Sq::Sig` and use the library/program
+without any type-checks activated at all. It's an idea I wanted to implement
+a long time. Because `Sq` itself already uses `Sq::Sig` and type-checks for 
+all modules are activated and loaded in the test-files and i have over 2000+ 
+tests at the moment, i consider that this approach works well.
+
+# Equality
+
+You know one thing I hated in Perl and loved in F# a lot? It is that all
+data-structures in F# are **comparable** by default. Here i really mean *comparable*
+not just *equal*. But I mostly just care about equality at the most time.
+
+It is completely annoying that we can built any kind of complex data like
+
+```perl
+my $album1 = {
+    Artist => 'Queen',
+    Title  => 'Greatest Hits',
+    Tracks => seq {
+        { Title => 'We will Rock You'          },
+        { Title => 'Radio Gaga'                },
+        { Title => 'Who Wants To Life Forever' },
+        { Title => "You Don't Fool Me"         },
+    },
+    Tags => Some(qw/80/),
+};
+
+my $album2 = {
+    Artist => 'Queen',
+    Title  => 'Greatest Hits',
+    Tracks => seq {
+        { Title => 'We will Rock You'          },
+        { Title => 'Radio Gaga'                },
+        { Title => 'Who Wants To Life Forever' },
+        { Title => "You Don't Fool Me"         },
+    },
+    Tags => Some(qw/80/),
+};
+```
+
+but then we cannot write.
+
+```perl
+# does not work
+if ( $album1 == $album2 ) { ... }
+```
+
+It doesn't work because of the typical way how *old*, *outdated*, 
+*object-oriented*?, ... languages thinks abot the above. They think about the
+above as memory and just compare memory addresses. It's a completely dump and
+fully useless default equality that most languages have, and it provides nearly
+no purpose at all.
+
+I mean, sometimes we can make equality checks *easy/fast* when something refers
+to the same memory-address. So it makes sense to be able to also check for memory
+addresses. But this shouldn't be the default!
+
+The interesting part is **Testing**. Because I claim that **Testing** is
+primarily just comparing data. When I am testing `Sq` I restrict
+myself to just two functions. `ok`, `is`. This maybe does all testing in I guess
+over 98% of all cases.
+
+The funny part is that `is` basically just compares two data-structures. And
+that's it. And i somehow feel cheated by it. Why? Why is a function like `is`
+that can compare deep-datastructures only available as a testing tool?
+
+What a shame. So I made it part of the language. In `Sq` you just get an `equal`
+function that checks data-structures recursively. So you can write.
+
+```perl
+if ( equal($album1, $album2) ) {
+    # goes in here
+}
+```
+
+and it will correctly return a *truish* value for the data-structure. Gosh, here
+is a small rant about object-orientation again. Why do object-oriented programmer
+think that you must rewrite an `equal` function yourself every time for every damn
+class? Again, the claim you read about OO all the time is that it provides 
+re-use of code, right?
+
+Something like data equality should be implemented **ONCE** and should be the
+default for everything.
+
+# Testing
+
+Then i have rewritten my own **Testing** and put it into `Sq::Test`. Because
+i just use 6 functions in total: `is`, `ok`, `like`, `dies`, `check_isa`, `done_testing`
+this was done pretty quickly. And those functions just work by using
+`equal` as the default comparison.
+
+I consider replacing `Test2` with my own Test-Suite a crucial step. It's like
+a Compiler you write first in another language and then re-write the new compiler
+in your own language and use the old compiler to compile your own language.
+
+I guess we developers know the chicken-egg problem got enough. So the Test-Suite
+runs fine. I only needed to change the `check_isa` calls because my API
+looked different to the one in `Test2`.
+
+The most interesting part was also that everything became faster, what I expected.
+From running the total test-suite in 5 CPU seconds it went down to just 2 CPU
+seconds.
+
+When something is not `equal` I just create a data-dump of what you `$got` and
+what is `$expected`. This is something i didn't like about `Test2` at all.
+
+By default it creates a *diff-like* comparision. I guess it is done for the
+following reasons:
+
+* Focus on what is different, so you can see faster what didn't match
+* *Shorter* because not the whole data-structure must be dumped.
+
+Seems logical, but in practice it is useless.
+
+When a test fails rarerly i see just a small change in data. Most of the
+time everything is so different that the *diff-like* approach anyway just
+prints the whole data-structure. But it puts every change in a flat like
+table and every change on its own line. The problem is.
+
+* I cannot read/comprehend *diff-like* structures.
+* This is usually longer as just a dump of the whole data-structure.
+
+That's why I just stick to dumping. I guess anybody who also did some
+web-devlopment with JavaScript, what probably most developers are used today,
+have no problem of working, dumping and understanding JSON structures.
+Perl data-structures are the same. We just use `=>` primarily in hashes instead
+of `:`, and we really have Arrays, not like in JavaScript where there are actually
+hashes, but this is probably another topic.
+
+# Why my own Test-Suite is so important
+
+I cannot underestimate the replacement of the Test-Suite. It's not that I have
+a big problem with `Test2`. It works for the most part and I am also adopting
+the exact same API. Changing to my own just meant to load another module.
+
+But i maybe don't need the whole feature-set of `Test2`, and this is actually
+a feature. Still that change was a crucial and important step.
+
+Because `Sq::Test` itself just uses the default `equal` implementation it's a
+stress test for the `equal` function. How well everything works and that this
+function is correct. It's also a test on how fast it is.
+
+Using my own `equal` function is so important because in `Sq` i also built my
+own Core data-structures and the `Seq` is part of it. But also `Option`
+and `Result` are like primarily data-types in `Sq`. `equal` understands them
+and so does the test-suite now understands those types.
+
+But also dumping understand those data-types. When I Dump a data-structure instead
+of getting.
+
+```perl
+tags => bless([80], 'Option'),
+```
+
+what most Dumping modules would give me. I now get the *logical/meaning* of
+what I have hear. My Dumping instead shows.
+
+```perl
+tags => Some(80),
+```
+
+So it shows how `Option` itself has become part as a core data-structure and
+it print's itself how you would create it, not how it's internal representation
+in data looks like.
+
+But also comparing `Seq` is somehow, hmm *cool* i guess? Consider that `Seq`
+is a lazy sequence and i now can write.
+
+```perl
+my $first  = Seq->range(1,1_000_000_000);
+my $second = Seq->range(2,1_000_000_000);
+
+if ( equal($first, $second) ) {
+}
+```
+
+so those sequence are not identical. But the `equal` correctly implements equality
+in a lazy way. That means it will only run as long it needs. In the case above
+it will only compare a single element and then aborts immediately. 
+
+It doesn't have to create two arrays with a billion elements just to check
+if they are equal or not. When the above would be equal then the `equal`
+check would take some time but otherwise will not consume much memory.
+
+Because `equal` also implements `Seq` correctly it also can be used as a
+core data-type in defining data-structures. With just `Test2` this wouldn't
+be possible.
+
+Because instead of comparing a *sequence* it would instead compare the internal
+representation of a *sequence*. And those would be just some blessed subroutine
+references.
+
+Also dumping understands a *sequence* and will dump it's data (not completely)
+instead of trying to dump a subroutine-reference.
+
+# Equality / Dumping
+
+Equality and Dumping is closed and open at the same time. What does that mean?
+
+It's closed because by default it only tries to equal things it knows about.
+At the moment it means it understands, `Array`, `ARRAY`, `Hash`, `HASH`, `Option`,
+`Result`, `Seq`.
+
+Here it is important that `Array` and `ARRAY` are considered the same. Great
+care in `Sq` was done that those are interchangeable. As described in `Array`
+the blessing is only done so you can call methods on an array instead of
+just using everything in a functional style. No real object-orientation is
+done here.
+
+Same goes with `Hash` and `Hash`. So it is closed by default because everything
+that is of any unknown type is considered unequal by default. As soon you put
+any object into a data-structure that is not of those types everything is always
+considered *not equal*.
+
+It is done this way because `Sq` is all about the idea that you separate data
+and behaviour. You should stick to data and functions that operate over functions.
+Not objects that contain methods with some hidden state.
+
+But this closing step is also done because in Perl we cannot really rely on a
+default equality. Perl separates number equality and string equality and those
+could be different. But how do I know which kind of equality I should choose
+for an unknown object?
+
+Or are those number and string representation even built to be used for equality?
+
+Here is another interesting challenge. How would you try to represent this
+data-structure as a string?
+
+```perl
+my $album = sq {
+    artist => 'Michael Jackson',
+    title  => 'Thriller',
+    tracks => [
+        {title => "Wanna Be Startin’ Somethin", duration => 363},
+        {title => "Baby Be Mine",               duration => 260},
+        {title => "The Girl Is Mine",           duration => 242},
+        {title => "Thriller",                   duration => 357},
+        {title => "Beat It",                    duration => 258},
+        {title => "Billie Jean",                duration => 294},
+        {title => "Human Nature",               duration => 246},
+        {title => "P.Y.T.",                     duration => 239},
+        {title => "The Lady in My Life",        duration => 300},
+    ],
+};
+```
+
+I guess many possible strings can be the result of that structure. Even
+a representation as `JSON` would be another string representation. Or
+maybe some other text format with a table? I don't know, but I wouldn't come
+to the idea to try to convert the above to a string and then compare it.
+
+That's why `equal` is closed and by default doesn't try to compare the
+internal structure of any other object. And I also consider that right.
+
+Because that is one of the *advantages* of object-orientation right? You have 
+that encapsulation and hidden state that no one should look at? Cool, do that,
+but then you must implement equality yourself and I didn't care about your crap.
+
+But here is the deal. If you come up with a useful equality. Then just add it.
+`equal` is written in a way that it is extendible. It uses a dispatch-table
+by default for every unknown type. You want your special object to
+also be `equal` by default? Then just add it to `Sq`.
+
+```perl
+Sq::Equality::add_equality('YourReference', sub($obj, $other) {
+    # decide how equality should look like and return 0,1
+    return 0;
+});
+```
+
+Once you have done this. `equal` also can correctly compare your objects. And
+when `equal` can compare your objects it also means the test-suite is able to correctly
+compare your objects! Including that those objects can be part of any recursive
+data-structure and it will work as expected.
+
+So it closed by default. But it is open as you can add your types. But then 
+you must be explicitly about how comparision works for your objects.
+
+But consider one thing. The above function you can add to equality only is called
+for two things of the exact same reference-type. Inheritance isn't supported
+and will not be supported.
+
+# Future Changes
+
+I constantly change `Sq`. Sometimes I also rename some functions, even if that
+happens less often. Sometimes I change function signatures or expect different
+things. Still the more I write the more stable the API becomes.
+
+In a dynamic-typed language this is sometimes annoying because we don't have
+a compiler telling us where we need to make changes. But that's why `Sq::Sig`
+and it's signatures was also so important. Just load it by default in your
+test-suite, when something changes you hopefully get a useful enough error
+and your test-suite will immediately bail-out and telling you what you need
+to fix.
+
+This is also the exact same way how I use and develope `Sq` itself and it
+works fine so far. When I change something i just go through all errors/exceptions
+and fix everything. Update test, write new tests and so on. Until everything
+runs again.
+
+# No Equality for Heap/Queue
+
+Here is another interesting concept. `Heap` and `Queue` are default data-structures
+in `Sq`. Still no equality is defined for them and i wouldn't do that. Why?
+
+Because those data-structures are not for describing data. A `Heap` is a special
+data-structure that solves the porblem of quickly inserting elements and always
+getting the minimum value. It's not a concept to represent compareable data.
+
+Same goes for `Queue`. The idea of a `Queue` is that you usually put things
+at the end so you can process items in a FIFO way. Its not meant to be used
+as a comparable data-structure.
+
+# What's Next?
+
+Next I will optimize some function on `Seq`. I still need to make `Seq` and
+`Array` API compatible as much as possible. I need to implement a way to handle
+functions with List context so they can be supported with the `Signature`
+feature.
+
+I also want to implement Signatures to work with lambdas. I also have an idea
+to implement *generics* and need to check how good/well this will work.
+
+The Type/Parser are written with Combinators and maybe I want to switch to
+a data-approach in the future. A data-approach would allow some additional
+features that are easier to implement and I guess it would be faster.
+
+I have written the Parser because i wanted a better approach for parsing. This
+will be tested by writing some Parser for typical stuff like CSV, JSON, Markdown,
+POD but also Command Line Arguments.
+
+Then I need a lot better handling of quering files/folders. Here the `Seq` will
+be more heavily used. Because everything from a file, socket, pipe, ...
+or opened directorie-handles are usually iterators and can be represented 
+perfectly with a `Seq`.
+
+And sure, I need to document a lot more and write some Tutorials on everything.
