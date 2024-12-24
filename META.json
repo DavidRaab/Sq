@@ -60,7 +60,7 @@
       },
       "Sq" : {
          "file" : "lib/Sq.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "Sq::Args" : {
          "file" : "lib/Sq/Args.pm"
@@ -183,6 +183,6 @@
          "http://www.opensource.org/licenses/mit-license.php"
       ]
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

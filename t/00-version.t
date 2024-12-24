@@ -5,7 +5,7 @@ use Sq::Sig;
 use Sq::Test;
 
 warn("# Testing Sq $Sq::VERSION, Perl $], $^X");
-ok($Sq::VERSION >= "0.006", 'Check minimum version number');
+ok($Sq::VERSION >= "0.007", 'Check minimum version number');
 
 # check default imported functions
 

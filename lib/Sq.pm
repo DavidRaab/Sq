@@ -1,6 +1,6 @@
 package Sq;
 use 5.036;
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 use Scalar::Util ();
 use Sub::Exporter -setup => {
     exports => [

@@ -33,7 +33,7 @@ provides:
     file: lib/Sq/Collections/Seq.pm
   Sq:
     file: lib/Sq.pm
-    version: '0.006'
+    version: '0.007'
   Sq::Args:
     file: lib/Sq/Args.pm
   Sq::Cmd:
@@ -116,5 +116,5 @@ requires:
   Sub::Exporter: '0'
 resources:
   license: http://www.opensource.org/licenses/mit-license.php
-version: '0.006'
+version: '0.007'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
