@@ -145,4 +145,10 @@ is(
     nok(equal($data2, $data3), 'comparision of data-structures 2');
 }
 
+{
+    my $first  = Seq->range(1,1_000_000_000);
+    my $second = Seq->range(2,1_000_000_000);
+    nok(equal($first, $second), 'seq not equal');
+}
+
 done_testing;

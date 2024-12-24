@@ -309,6 +309,10 @@ ok(sq({
         'struct 53');
 }
 
+ ok(equal(undef, undef), 'undef is equal');
+nok(equal(undef, 1),     'one value is undef 1');
+nok(equal(1, undef),     'one value is undef 2');
+
 ### Check adding another class to Equality
 package Stupid;
 sub new($class) { bless({}, $class) }
