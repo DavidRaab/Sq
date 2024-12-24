@@ -1,11 +1,10 @@
 ---
-abstract: 'The Sq language'
+abstract: 'The Sq Language'
 author:
   - 'David Raab <davidraab83@gmail.com>'
 build_requires:
   List::Util: '0'
   Path::Tiny: '0'
-  Test2::V0: '0.000156'
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
@@ -24,8 +23,6 @@ provides:
     file: lib/Sq/Collections/Heap.pm
   List:
     file: lib/Sq/Collections/List.pm
-  Measure:
-    file: lib/Sq/Core/Measure.pm
   Option:
     file: lib/Sq/Core/Option.pm
   Queue:
@@ -37,10 +34,85 @@ provides:
   Sq:
     file: lib/Sq.pm
     version: '0.006'
+  Sq::Args:
+    file: lib/Sq/Args.pm
+  Sq::Cmd:
+    file: lib/Sq/Cmd.pm
+  Sq::Collections::Query:
+    file: lib/Sq/Collections/Query.pm
+  Sq::Concurrency::Async:
+    file: lib/Sq/Concurrency/Async.pm
+  Sq::Concurrency::Fork:
+    file: lib/Sq/Concurrency/Fork.pm
+  Sq::Concurrency::Mailbox:
+    file: lib/Sq/Concurrency/Mailbox.pm
+  Sq::Concurrency::Threads:
+    file: lib/Sq/Concurrency/Threads.pm
+  Sq::Control::Event:
+    file: lib/Sq/Control/Event.pm
+  Sq::Control::Lazy:
+    file: lib/Sq/Control/Lazy.pm
+  Sq::Core::DU:
+    file: lib/Sq/Core/DU.pm
+  Sq::Core::Date:
+    file: lib/Sq/Core/Date.pm
+  Sq::Core::Measure:
+    file: lib/Sq/Core/Measure.pm
+  Sq::Data::CSV:
+    file: lib/Sq/Data/CSV.pm
+  Sq::Data::JSON:
+    file: lib/Sq/Data/JSON.pm
+  Sq::Data::XML:
+    file: lib/Sq/Data/XML.pm
+  Sq::Dump:
+    file: lib/Sq/Dump.pm
+  Sq::Equality:
+    file: lib/Sq/Equality.pm
+  Sq::Exporter:
+    file: lib/Sq/Exporter.pm
+  Sq::Fs:
+    file: lib/Sq/Fs.pm
   Sq::Io:
     file: lib/Sq/Io.pm
+  Sq::L:
+    file: lib/Sq/L.pm
+  Sq::Language:
+    file: lib/Sq/Language.pm
+  Sq::Parser:
+    file: lib/Sq/Parser.pm
+  Sq::Parser::HTML:
+    file: lib/Sq/Parser/HTML.pm
+  Sq::Parser::Markdown:
+    file: lib/Sq/Parser/Markdown.pm
+  Sq::Reflection:
+    file: lib/Sq/Reflection.pm
+  Sq::Sig:
+    file: lib/Sq/Sig.pm
+  Sq::Sig::Array:
+    file: lib/Sq/Sig/Array.pm
+  Sq::Sig::Hash:
+    file: lib/Sq/Sig/Hash.pm
+  Sq::Sig::Heap:
+    file: lib/Sq/Sig/Heap.pm
+  Sq::Sig::Option:
+    file: lib/Sq/Sig/Option.pm
+  Sq::Sig::Parser:
+    file: lib/Sq/Sig/Parser.pm
+  Sq::Sig::Queue:
+    file: lib/Sq/Sig/Queue.pm
+  Sq::Sig::Result:
+    file: lib/Sq/Sig/Result.pm
+  Sq::Sig::Seq:
+    file: lib/Sq/Sig/Seq.pm
+  Sq::Signature:
+    file: lib/Sq/Signature.pm
+  Sq::Test:
+    file: lib/Sq/Test.pm
+  Sq::Type:
+    file: lib/Sq/Type.pm
 requires:
   Carp: '0'
+  Scalar::Util: '0'
   Sub::Exporter: '0'
 resources:
   license: http://www.opensource.org/licenses/mit-license.php
