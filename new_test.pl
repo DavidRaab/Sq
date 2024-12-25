@@ -13,9 +13,11 @@ use Sq::Sig;
 # a single time.
 my $use = lazy {
     my $folders =
-        seq { path('t')->children }
+        Sq->io->children('t')
         ->filter(call 'is_dir')
         ->map(sub ($str) { $str =~ s[\At/][ + ]r })
+        ->to_array
+        ->sort_str
         ->join("\n");
 
     return join("\n",
