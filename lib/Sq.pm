@@ -2,23 +2,21 @@ package Sq;
 use 5.036;
 our $VERSION = '0.007';
 use Scalar::Util ();
-use Sub::Exporter -setup => {
-    exports => [
-        qw(sq call key assign),
-        qw(is_num is_str),
-        qw(id fst snd),
-        qw(seq),
-        Some  => sub { \&Option::Some            },
-        None  => sub { \&Option::None            },
-        Ok    => sub { \&Result::Ok              },
-        Err   => sub { \&Result::Err             },
-        lazy  => sub { \&Sq::Control::Lazy::lazy },
-        equal => sub { \&Sq::Equality::equal     },
-    ],
-    groups => {
-        default => [qw(id fst snd key assign is_str is_num Some None sq Ok Err call lazy equal seq)],
-    },
-};
+sub import {
+    my ( $pkg ) = caller;
+    no strict 'refs';
+    state @funcs = qw(sq call key assign is_num is_str id fst snd seq);
+    for my $func ( @funcs ) {
+        *{"${pkg}::$func"} = \&$func;
+    }
+
+    *{"${pkg}::Some"}  = \&Option::Some;
+    *{"${pkg}::None"}  = \&Option::None;
+    *{"${pkg}::Ok"}    = \&Result::Ok;
+    *{"${pkg}::Err"}   = \&Result::Err;
+    *{"${pkg}::lazy"}  = \&Sq::Control::Lazy::lazy;
+    *{"${pkg}::equal"} = \&Sq::Equality::equal;
+}
 
 # Load lazy keyword
 use Sq::Control::Lazy;

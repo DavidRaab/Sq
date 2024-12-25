@@ -3,12 +3,14 @@ use 5.036;
 use Sq;
 use Sq::Type;
 use Carp ();
-use Sub::Exporter -setup => {
-    exports => [qw(sig sigt)],
-    groups  => {
-        default => [qw(sig sigt)],
-    },
-};
+sub import {
+    no strict 'refs';
+    my ( $pkg ) = caller;
+    state @funcs = qw(sig sigt);
+    for my $func ( @funcs ) {
+        *{"${pkg}::$func"} = \&$func;
+    }
+}
 
 # TODO:
 # + back-reference an unknown type

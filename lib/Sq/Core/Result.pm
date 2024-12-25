@@ -1,10 +1,6 @@
 package Result;
 use 5.036;
 use Carp ();
-use Sub::Exporter -setup => {
-    exports => [qw(Ok Err)],
-    groups  => {},
-};
 
 # enum values representing Ok/Err
 my $err = 0;

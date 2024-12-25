@@ -1,7 +1,6 @@
 package Sq::Equality;
 use 5.036;
-use Scalar::Util qw/looks_like_number/;
-use Scalar::Util 'refaddr';
+use Scalar::Util qw/looks_like_number refaddr/;
 
 # This is inlined in equal() but i still provide this function as an API
 # called by other code
@@ -115,10 +114,10 @@ sub add_equality($type, $func) {
 }
 
 # Add equal function to other packages
-*{Hash::equal}   = \&equal;
-*{Array::equal}  = \&equal;
-*{Option::equal} = \&equal;
-*{Result::equal} = \&equal;
-*{Seq::equal}    = \&equal;
+*Hash::equal   = \&equal;
+*Array::equal  = \&equal;
+*Option::equal = \&equal;
+*Result::equal = \&equal;
+*Seq::equal    = \&equal;
 
 1;

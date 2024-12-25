@@ -128,6 +128,7 @@ sub dump($any, $inline=60, $depth=0) {
 
 sub dumpw($any, $inline=60, $depth=0) {
     warn to_string($any, $inline, $depth), "\n";
+    return;
 }
 
 sub add_dump($type, $func) {
@@ -138,17 +139,17 @@ sub add_dump($type, $func) {
 }
 
 # Add dumping to other packages
-*{Array::dump}       = \&dump;
-*{Array::dumpw}      = \&dumpw;
-*{Hash::dump}        = \&dump;
-*{Hash::dumpw}       = \&dumpw;
-*{Seq::dump}         = \&dump;
-*{Seq::dumpw}        = \&dumpw;
-*{Option::dump}      = \&dump;
-*{Option::dumpw}     = \&dumpw;
-*{Result::dump}      = \&dump;
-*{Result::dumpw}     = \&dumpw;
-*{Sq::Control::Lazy::dump}  = \&dump;
-*{Sq::Control::Lazy::dumpw} = \&dumpw;
+*Array::dump       = \&dump;
+*Array::dumpw      = \&dumpw;
+*Hash::dump        = \&dump;
+*Hash::dumpw       = \&dumpw;
+*Seq::dump         = \&dump;
+*Seq::dumpw        = \&dumpw;
+*Option::dump      = \&dump;
+*Option::dumpw     = \&dumpw;
+*Result::dump      = \&dump;
+*Result::dumpw     = \&dumpw;
+*Sq::Control::Lazy::dump  = \&dump;
+*Sq::Control::Lazy::dumpw = \&dumpw;
 
 1;
