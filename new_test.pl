@@ -6,14 +6,19 @@ use Path::Tiny;
 use Sq;
 use Sq::Sig;
 
-my $folders =
-    seq { path('t')->children }
-    ->filter(call 'is_dir')
-    ->map(sub ($str) { $str =~ s[\At/][ + ]r })
-    ->join("\n");
+# This makes the code Lazy. That means the code is basically just wrapped
+# in a subroutine. But it has an intent over just a sub-ref. The idea is that
+# this code is not executed immediately, but maybe at a later time. lazy {}
+# returns a lazy object. This object ensures that when it is run, only runs
+# a single time.
+my $use = lazy {
+    my $folders =
+        seq { path('t')->children }
+        ->filter(call 'is_dir')
+        ->map(sub ($str) { $str =~ s[\At/][ + ]r })
+        ->join("\n");
 
-my $use =
-    join("\n",
+    return join("\n",
         q(USAGE:),
         qq(\t%c %o),
         q(),
@@ -26,9 +31,14 @@ my $use =
         q(),
         q(OPTIONS:)
     );
+};
 
+# Here lazy{} not really makes sense, because the `$use->force` is always evaluated.
+# So we don't really need that. But what makes lazy different is that another new
+# call `$use->force` will not run the function twice. Code is only runned once
+# and the result is saved/cached.
 my ($opt, $usage) = describe_options(
-    $use,
+    $use->force,
     ['folder|f=s', 'folder inside t/ to create test-file',    {default      => '.'}],
     ['test|t=s',   'name of the test. Without number and .t', {required     =>   1}],
     ['help|h',     'Print this message',                      {shortcircuit =>   1}],
@@ -36,13 +46,12 @@ my ($opt, $usage) = describe_options(
 
 $usage->die if $opt->help;
 
-
 # get the maximum id from test-files so far
 my $maximum_id =
-    seq { path('t', $opt->folder)->children }
-    ->map(call 'basename')
-    ->regex_match(qr/\A(\d+) .* \.t\z/xms)
-    ->flatten
+    seq  {         path('t', $opt->folder)->children }
+    ->map(         call 'basename'                   )
+    ->regex_match( qr/\A(\d+) .* \.t\z/xms           )
+    ->fsts
     ->max
     ->or(-1);
 
@@ -55,9 +64,9 @@ my $file     = path('t', $opt->folder => $basename);
 
 # abort when file exists
 if ( -e $file ) {
-    die "Requested file to create already exists.\n";
+    die "Abort: Requested file already exists. Not created.\n";
 }
-# create template test file
+# create test file from template
 else {
     $file->spew_utf8(@content);
     printf "Created '%s' ...\n", $file;
