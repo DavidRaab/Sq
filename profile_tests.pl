@@ -20,8 +20,6 @@ $files->iter(sub($file) {
     system('perl', '-Ilib', '-d:NYTProf', $file);
 });
 
-my @profiles = glob("*.out.*");
-system('nytprofmerge', @profiles, '-o', 'merge.out');
-unlink @profiles;
+system('nytprofmerge', glob('nytprof.out.*'), '-o', 'nytprof.out');
 system('nytprofhtml', '-f', 'nytprof.out', '--open');
-unlink 'nytprof.out';
+unlink glob('nytprof.out.*');
