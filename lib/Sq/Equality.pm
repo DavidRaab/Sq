@@ -60,10 +60,6 @@ sub equal($any1, $any2) {
         # get type of references
         my $t1 = ref $any1;
         my $t2 = ref $any2;
-        # when string
-        return $any1 eq $any2 if $t1 eq '' && $t2 eq '';
-        # when references are the same, abort as equal
-        return 1 if refaddr($any1) == refaddr($any2);
         # otherwise map references
         if    ( $t1 eq 'ARRAY' ) { $t1 = 'Array' }
         elsif ( $t1 eq 'HASH'  ) { $t1 = 'Hash'  }
@@ -71,6 +67,10 @@ sub equal($any1, $any2) {
         elsif ( $t2 eq 'HASH'  ) { $t2 = 'Hash'  }
         # when not the same type, not equal
         return 0 if $t1 ne $t2;
+        # when string
+        return $any1 eq $any2 if $t1 eq '' && $t2 eq '';
+        # when references are the same, abort as equal
+        return 1 if refaddr($any1) == refaddr($any2);
 
         # otherwise compare references. Some are inlined
         if ( $t1 eq 'Array' ) {
