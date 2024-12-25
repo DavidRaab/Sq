@@ -4,6 +4,7 @@ use open ':std', ':encoding(UTF-8)';
 use Getopt::Long::Descriptive;
 use Path::Tiny;
 use Sq;
+use Sq::Sig;
 
 my $use =
     join("\n",
@@ -19,7 +20,7 @@ my $use =
 
 my ($opt, $usage) = describe_options(
     $use,
-    ['folder|f=s', 'folder to create test-file',              {default      => '.'}],
+    ['folder|f=s', 'folder inside t/ to create test-file',    {default      => '.'}],
     ['test|t=s',   'name of the test. Without number and .t', {required     =>   1}],
     ['help|h',     'Print this message',                      {shortcircuit =>   1}],
 );
@@ -29,18 +30,19 @@ $usage->die if $opt->help;
 # get the maximum id from test-files so far
 my $maximum_id =
     Seq
-    ->new( path($opt->folder)->children )
+    ->new( path('t', $opt->folder)->children )
     ->map( sub($x) { $x->basename })
     ->regex_match( qr/\A(\d+) .* \.t\z/xms)
     ->fsts
-    ->max->or(-1);
+    ->max
+    ->or(-1);
 
 # Load DATA into array
 my @content = <DATA>;
 
 # file to create
 my $basename = sprintf "%02d-%s.t", ($maximum_id + 1), $opt->test;
-my $file     = path($opt->folder => $basename);
+my $file     = path('t', $opt->folder => $basename);
 
 # abort when file exists
 if ( -e $file ) {
