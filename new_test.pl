@@ -6,6 +6,12 @@ use Path::Tiny;
 use Sq;
 use Sq::Sig;
 
+my $folders =
+    seq { path('t')->children }
+    ->filter(call 'is_dir')
+    ->map(sub ($str) { $str =~ s[\At/][ + ]r })
+    ->join("\n");
+
 my $use =
     join("\n",
         q(USAGE:),
@@ -14,6 +20,9 @@ my $use =
         q(EXAMPLE:),
         qq(\t\$ new_test.pl -f Seq -t hello),
         qq(\tCreated 't/Seq/02-hello.t' ...),
+        q(),
+        q(FOLDERS:),
+        $folders,
         q(),
         q(OPTIONS:)
     );
@@ -27,13 +36,13 @@ my ($opt, $usage) = describe_options(
 
 $usage->die if $opt->help;
 
+
 # get the maximum id from test-files so far
 my $maximum_id =
-    Seq
-    ->new( path('t', $opt->folder)->children )
-    ->map( sub($x) { $x->basename })
-    ->regex_match( qr/\A(\d+) .* \.t\z/xms)
-    ->fsts
+    seq { path('t', $opt->folder)->children }
+    ->map(call 'basename')
+    ->regex_match(qr/\A(\d+) .* \.t\z/xms)
+    ->flatten
     ->max
     ->or(-1);
 
