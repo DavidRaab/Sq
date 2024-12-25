@@ -101,7 +101,7 @@ sub t_ref($ref, @checks) {
 sub t_hash(@checks) {
     return sub($any) {
         my $type = ref $any;
-        if ( $type eq 'Hash' || $type eq 'HASH' ) {
+        if ( lc $type eq 'hash' ) {
             my $err;
             for my $check ( @checks ) {
                 $err = $check->($any);
@@ -116,7 +116,7 @@ sub t_hash(@checks) {
 sub t_array(@checks) {
     return sub($any) {
         my $type = ref $any;
-        if ( $type eq 'Array' || $type eq 'ARRAY' ) {
+        if ( lc $type eq 'array' ) {
             my $err;
             for my $check ( @checks ) {
                 $err = $check->($any);
@@ -151,7 +151,7 @@ sub t_opt(@checks) {
 sub t_with_keys(@keys) {
     return sub($hash) {
         my $type = ref $hash;
-        if ( $type eq 'Hash' || $type eq 'HASH' ) {
+        if ( lc $type eq 'hash' ) {
             for my $key ( @keys ) {
                 return "with_keys: '$key' not defined" if !defined $hash->{$key};
             }
@@ -164,7 +164,7 @@ sub t_with_keys(@keys) {
 sub t_keys(%kt) {
     return sub($any) {
         my $type = ref $any;
-        if ( $type eq 'Hash' || $type eq 'HASH' ) {
+        if ( lc $type eq 'hash' ) {
             my ($err, $value);
             for my $key ( keys %kt ) {
                 $value = $any->{$key};
@@ -222,8 +222,7 @@ sub t_int(@checks) {
 
 sub t_positive() {
     state $fn = sub($any) {
-        my $type = ref $any;
-        if ( $type eq "" && Scalar::Util::looks_like_number($any) ) {
+        if ( Scalar::Util::looks_like_number($any) ) {
             return $valid if $any >= 0;
             return "positive: '$any' not >= 0";
         }
@@ -234,8 +233,7 @@ sub t_positive() {
 
 sub t_negative() {
     state $fn = sub($any) {
-        my $type = ref $any;
-        if ( $type eq "" && Scalar::Util::looks_like_number($any) ) {
+        if ( Scalar::Util::looks_like_number($any) ) {
             return $valid if $any <= 0;
             return "negative: '$any' not <= 0";
         }
@@ -261,7 +259,7 @@ sub t_str(@checks) {
 sub t_idx($index, @checks) {
     return sub($array) {
         my $type = ref $array;
-        if ( $type eq 'Array' || $type eq 'ARRAY' ) {
+        if ( lc $type eq 'array' ) {
             my $err;
             for my $check ( @checks ) {
                 $err = $check->($array->[$index]);
@@ -283,7 +281,7 @@ sub t_is($predicate) {
 sub t_of($is_type) {
     return sub($any) {
         my $type = ref $any;
-        if ( $type eq 'Array' || $type eq 'ARRAY' ) {
+        if ( lc $type eq 'array' ) {
             my ($idx, $err) = (0);
             for my $x ( @$any ) {
                 $err = $is_type->($x);
@@ -292,7 +290,7 @@ sub t_of($is_type) {
             }
             return $valid;
         }
-        elsif ( $type eq 'Hash' || $type eq 'HASH' ) {
+        elsif ( lc $type eq 'hash' ) {
             my $err;
             for my $key ( keys %$any ) {
                 $err = $is_type->($any->{$key});
@@ -311,13 +309,13 @@ sub t_length($min, $max) {
     return sub($any) {
         my $type = ref $any;
 
-        if ( $type eq 'Array' || $type eq 'ARRAY' ) {
+        if ( lc $type eq 'array' ) {
             my $length = @$any;
             return "length: Not enough elements" if $length < $min;
             return "length: Too many elements"   if $length > $max;
             return $valid;
         }
-        elsif ( $type eq 'Hash' || $type eq 'HASH' ) {
+        elsif ( lc $type eq 'hash' ) {
             my $length = keys %$any;
             return "length: Not enough elements" if $length < $min;
             return "length: Too many elements"   if $length > $max;
@@ -366,11 +364,11 @@ sub t_min($min) {
                 return "min: string '$any' shorter than $min";
             }
         }
-        elsif ( $type eq 'Array' || $type eq 'ARRAY' ) {
+        elsif ( lc $type eq 'array' ) {
             return $valid if @$any >= $min;
             return "min: Array count smaller than $min";
         }
-        elsif ( $type eq 'Hash' || $type eq 'HASH' ) {
+        elsif ( lc $type eq 'hash' ) {
             my $length = keys %$any;
             return $valid if $length >= $min;
             return "min: Hash count smaller than $min";
@@ -392,11 +390,11 @@ sub t_max($max) {
                 return "max: string '$any' greater than $max";
             }
         }
-        elsif ( $type eq 'Array' || $type eq 'ARRAY' ) {
+        elsif ( lc $type eq 'array' ) {
             return $valid if @$any <= $max;
             return "max: Array count greater than $max";
         }
-        elsif ( $type eq 'Hash' || $type eq 'HASH' ) {
+        elsif ( lc $type eq 'hash' ) {
             my $length = keys %$any;
             return $valid if $length <= $max;
             return "max: Hash count greater than $max";
@@ -480,7 +478,7 @@ sub t_void() {
         # List context will be checked that the whole list is passed
         # as an array. So someone just can use array checks for list context
         my $type = ref $any;
-        if ( $type eq 'Array' || $type eq 'ARRAY' ) {
+        if ( lc $type eq 'array' ) {
             return $valid if @$any == 0;
         }
         return "void: Not void";
@@ -491,7 +489,7 @@ sub t_void() {
 sub t_tuple(@checks) {
     return sub($array) {
         my $type = ref $array;
-        if ( $type eq 'Array' || $type eq 'ARRAY' ) {
+        if ( lc $type eq 'array' ) {
             if ( @checks == @$array ) {
                 my $err;
                 for my $idx ( 0 .. $#checks ) {
@@ -523,7 +521,7 @@ sub t_tuplev(@checks) {
     my $min     = @checks;
     return sub($array) {
         my $type = ref $array;
-        if ( $type eq 'Array' || $type eq 'ARRAY' ) {
+        if ( lc $type eq 'array' ) {
             # $array must have at least @checks entries
             if ( @$array >= $min ) {
                 # first check entries that must be present
@@ -555,7 +553,7 @@ sub t_tuplev(@checks) {
 sub t_even_sized() {
     state $fn = sub($array) {
         my $type = ref $array;
-        if ( $type eq 'Array' || $type eq 'ARRAY' ) {
+        if ( lc $type eq 'array' ) {
             # binary-and to decide if array count is even
             return $valid if ((@$array & 1) == 0);
             return "even_sized: Array not even-sized";
@@ -620,7 +618,7 @@ sub t_result {
 sub t_as_hash(@checks) {
     return sub($any) {
         my $type = ref $any;
-        if ( $type eq 'Array' || $type eq 'ARRAY' ) {
+        if ( lc $type eq 'array' ) {
             return "as_hash: Not even-sized array" if @$any % 2 == 1;
             my $hash = { @$any };
             my $err;
