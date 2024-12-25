@@ -62,18 +62,19 @@ sub result($result, $inline=60, $depth=0) {
 
 # Dumping Logic
 my $dispatch = {
-    '_UNDEF'      => sub { 'undef'                        },
-    '_NUM'        => sub { sprintf "%s", $_[0]            },
-    '_STRING'     => sub { sprintf "\"%s\"", quote($_[0]) },
-    'ARRAY'      => \&array,
-    'Array'      => \&array,
-    'HASH'       => \&hash,
-    'Hash'       => \&hash,
-    'Option'     => \&option,
-    'Seq'        => \&seq,
-    'Result'     => \&result,
-    'CODE'       => sub { 'sub { DUMMY }' },
-    'Path::Tiny' => sub { '"' . quote($_[0]->stringify) .'"' },
+    '_UNDEF'            => sub { 'undef'                        },
+    '_NUM'              => sub { sprintf "%s", $_[0]            },
+    '_STRING'           => sub { sprintf "\"%s\"", quote($_[0]) },
+    'ARRAY'             => \&array,
+    'Array'             => \&array,
+    'HASH'              => \&hash,
+    'Hash'              => \&hash,
+    'Option'            => \&option,
+    'Seq'               => \&seq,
+    'Result'            => \&result,
+    'CODE'              => sub { 'sub { DUMMY }'                    },
+    'Path::Tiny'        => sub { '"' . quote($_[0]->stringify) .'"' },
+    'Sq::Control::Lazy' => sub { 'lazy { DUMMY }'                   },
 };
 
 sub to_string($any, $inline=60, $depth=0) {
@@ -137,15 +138,17 @@ sub add_dump($type, $func) {
 }
 
 # Add dumping to other packages
-*{Array::dump}   = \&dump;
-*{Array::dumpw}  = \&dumpw;
-*{Hash::dump}    = \&dump;
-*{Hash::dumpw}   = \&dumpw;
-*{Seq::dump}     = \&dump;
-*{Seq::dumpw}    = \&dumpw;
-*{Option::dump}  = \&dump;
-*{Option::dumpw} = \&dumpw;
-*{Result::dump}  = \&dump;
-*{Result::dumpw} = \&dumpw;
+*{Array::dump}       = \&dump;
+*{Array::dumpw}      = \&dumpw;
+*{Hash::dump}        = \&dump;
+*{Hash::dumpw}       = \&dumpw;
+*{Seq::dump}         = \&dump;
+*{Seq::dumpw}        = \&dumpw;
+*{Option::dump}      = \&dump;
+*{Option::dumpw}     = \&dumpw;
+*{Result::dump}      = \&dump;
+*{Result::dumpw}     = \&dumpw;
+*{Sq::Control::Lazy::dump}  = \&dump;
+*{Sq::Control::Lazy::dumpw} = \&dumpw;
 
 1;
