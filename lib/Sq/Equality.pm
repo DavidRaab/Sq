@@ -43,15 +43,6 @@ sub seq($seq, $other) {
     return 0;
 }
 
-sub option($opt, $other) {
-    return 1 if refaddr($opt) == refaddr($other);
-    return 0 if @$opt != @$other;
-    for ( my $idx=0; $idx < @$opt; $idx++ ) {
-        return 0 if equal($opt->[$idx], $other->[$idx]) == 0;
-    }
-    return 1;
-}
-
 sub result($result, $other) {
     return 1 if refaddr($result) == refaddr($other);
     return 0 if $result->[0] != $other->[0];
@@ -59,23 +50,29 @@ sub result($result, $other) {
 }
 
 my $dispatch = {
-    'Option' => \&option,
     'Result' => \&result,
     'Seq'    => \&seq,
 };
 
 sub equal($any1, $any2) {
     if ( defined $any1 && defined $any2 ) {
+        # number check / comparison
         return $any1 == $any2 if looks_like_number($any1) && looks_like_number($any2);
+
+        # get type of references
         my $t1 = ref $any1;
         my $t2 = ref $any2;
         if    ( $t1 eq 'ARRAY' ) { $t1 = 'Array' }
         elsif ( $t1 eq 'HASH'  ) { $t1 = 'Hash'  }
         if    ( $t2 eq 'ARRAY' ) { $t2 = 'Array' }
         elsif ( $t2 eq 'HASH'  ) { $t2 = 'Hash'  }
+
+        # not the same refs, abort
         return 0              if $t1 ne $t2;
+        # compare as string when not a reference
         return $any1 eq $any2 if $t1 eq "";
 
+        # otherwise compare references. Some are inlined
         if ( $t1 eq 'Array' ) {
             return 1 if refaddr($any1) == refaddr($any2);
             return 0 if @$any1 != @$any2;
@@ -94,7 +91,16 @@ sub equal($any1, $any2) {
             }
             return 1;
         }
+        elsif ( $t1 eq 'Option' ) {
+            return 1 if refaddr($any1) == refaddr($any2);
+            return 0 if @$any1 != @$any2;
+            for ( my $idx=0; $idx < @$any1; $idx++ ) {
+                return 0 if equal($any1->[$idx], $any2->[$idx]) == 0;
+            }
+            return 1;
+        }
 
+        # dispatch all other types
         my $fn = $dispatch->{$t1};
         return 0 if !defined $fn;
         return $fn->($any1, $any2);
