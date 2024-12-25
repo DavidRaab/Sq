@@ -4,7 +4,7 @@ use open ':std', ':encoding(UTF-8)';
 use Sq;
 use Sq::Sig;
 
-my $first  = 
+my $first  =
     Seq
     ->range(1,1_000_000_000)
     ->do(sub($num){ print "$num\n" if $num % 100_000 == 0 });

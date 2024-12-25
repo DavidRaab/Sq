@@ -4,15 +4,6 @@ use Sq;
 use Sq::Sig;
 use Sq::Test;
 
-# Some values, functions, ... for testing
-my $add     = sub($x,$y) { $x + $y     };
-my $add1    = sub($x)    { $x + 1      };
-my $double  = sub($x)    { $x * 2      };
-my $square  = sub($x)    { $x * $x     };
-my $is_even = sub($x)    { $x % 2 == 0 };
-
-#----------
-
 # Helper functions
 my $by_str = sub($x, $y) { $x cmp $y };
 my $by_num = sub($x, $y) { $x <=> $y };
