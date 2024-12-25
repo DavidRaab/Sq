@@ -3,6 +3,7 @@ use 5.036;
 use Sq;
 use Sq::Sig;
 use Sq::Test;
+use Scalar::Util qw(refaddr);
 
 # test method
 ok(sq({})->equal(sq {}), 'hash');
@@ -328,7 +329,7 @@ nok(equal($o1, $o2), 'objects not equal');
 
 # Add Equality for Stupid
 Sq::Equality::add_equality(Stupid => sub($o1, $o2) {
-    return 1 if builtin::refaddr($o1) == builtin::refaddr($o2);
+    return 1 if refaddr($o1) == refaddr($o2);
     return Sq::Equality::hash($o1, $o2);
 });
 
