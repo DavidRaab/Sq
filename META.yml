@@ -94,6 +94,8 @@ provides:
     file: lib/Sq/Sig/Hash.pm
   Sq::Sig::Heap:
     file: lib/Sq/Sig/Heap.pm
+  Sq::Sig::Io:
+    file: lib/Sq/Sig/Io.pm
   Sq::Sig::Option:
     file: lib/Sq/Sig/Option.pm
   Sq::Sig::Parser:
@@ -112,8 +114,9 @@ provides:
     file: lib/Sq/Type.pm
 requires:
   Carp: '0'
+  List::Util: '0'
+  Path::Tiny: '0'
   Scalar::Util: '0'
-  Sub::Exporter: '0'
 resources:
   license: http://www.opensource.org/licenses/mit-license.php
 version: '0.007'

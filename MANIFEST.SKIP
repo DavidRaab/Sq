@@ -96,4 +96,8 @@
 ^new_test.pl$
 
 # Avoid VS Code
-.vscode/
+^\.vscode/
+
+# Avoid NYTProf
+^nytprof/
+^merge.out$

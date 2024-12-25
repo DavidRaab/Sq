@@ -22,8 +22,9 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Scalar::Util" : "0",
-            "Sub::Exporter" : "0"
+            "List::Util" : "0",
+            "Path::Tiny" : "0",
+            "Scalar::Util" : "0"
          }
       },
       "test" : {
@@ -151,6 +152,9 @@
       },
       "Sq::Sig::Heap" : {
          "file" : "lib/Sq/Sig/Heap.pm"
+      },
+      "Sq::Sig::Io" : {
+         "file" : "lib/Sq/Sig/Io.pm"
       },
       "Sq::Sig::Option" : {
          "file" : "lib/Sq/Sig/Option.pm"

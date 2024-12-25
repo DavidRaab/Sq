@@ -14,8 +14,9 @@ my $builder = Module::Build->new(
     },
     requires => {
         'Scalar::Util'  => '0',
-        'Sub::Exporter' => '0',
         'Carp'          => '0',
+        'Path::Tiny'    => '0',
+        'List::Util'    => '0',
     },
     test_requires => {
         'Path::Tiny' => '0',

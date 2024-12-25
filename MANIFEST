@@ -1,3 +1,4 @@
+benchmarks/array_check.pl
 benchmarks/array_choose.pl
 benchmarks/array_init.pl
 benchmarks/array_map.pl
@@ -21,6 +22,7 @@ benchmarks/seq_range_step.pl
 benchmarks/signature.pl
 Build.PL
 Changes
+examples/1bill.pl
 examples/album.pl
 examples/AoC-2023/01p1.pl
 examples/AoC-2023/01p1.txt
@@ -121,6 +123,7 @@ lib/Sq/Sig/Async.pm
 lib/Sq/Sig/Fork.pm
 lib/Sq/Sig/Hash.pm
 lib/Sq/Sig/Heap.pm
+lib/Sq/Sig/Io.pm
 lib/Sq/Sig/List.pm
 lib/Sq/Sig/Option.pm
 lib/Sq/Sig/Parser.pm
@@ -151,6 +154,7 @@ t/05-result.t
 t/06-sq.t
 t/07-lazy.t
 t/08-equality.t
+t/09-type_option.t
 t/Array/00-basics.t
 t/Array/01-bind-flatten.t
 t/Array/03-fibonacci.t
@@ -159,7 +163,6 @@ t/Array/08-group_by.t
 t/Array/10-option.t
 t/List/00-basics.t
 t/manifest.t
-t/new_test.pl
 t/Parser/00-basic.t
 t/Parser/01-array.t
 t/Parser/02-nested-array.t
