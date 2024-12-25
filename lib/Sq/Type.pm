@@ -74,7 +74,7 @@ sub t_assert($check, @values) {
     my $err;
     for my $value ( @values ) {
         $err = $check->($value);
-        Carp::croak "Type Error: $err" if defined $err;
+        Carp::croak "Type Error: $err\n" if defined $err;
     }
     return;
 }
@@ -415,12 +415,13 @@ sub t_range($min, $max) {
 
 sub t_or(@checks) {
     return sub($any) {
-        my $err;
+        my @errs;
         for my $check ( @checks ) {
-            $err = $check->($any);
+            my $err = $check->($any);
             return $valid if !defined $err;
+            push @errs, $err;
         }
-        return "or: No check was successfull";
+        return "or: No check succesfull\n    " . join("\n    ", @errs);
     }
 }
 
@@ -590,7 +591,7 @@ sub t_isa($class, @checks) {
             }
             return $valid;
         }
-        return "isa: not a blessed reference";
+        return "isa: Not $class";
     }
 }
 
