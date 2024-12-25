@@ -3,6 +3,7 @@ use 5.036;
 use Sq;
 use Sq::Sig;
 use Sq::Test;
+use Scalar::Util ();
 
 # Helper functions
 my $by_str = sub($x, $y) { $x cmp $y };
@@ -12,13 +13,13 @@ my $by_num = sub($x, $y) { $x <=> $y };
 {
 
     # passing a hashref
-    my $d = Hash->bless({foo => 1, bar => 2});
+    my $d = Hash->new(foo => 1, bar => 2);
     check_isa($d, 'Hash', 'bless');
     is($d, {foo => 1, bar => 2}, 'content of $d');
 
     # blessing an existing ref
     my $d2 = {foo => 1, bar => 2};
-    is(builtin::blessed($d2), undef, ' not blessed');
+    is(Scalar::Util::blessed($d2), undef, ' not blessed');
     Hash->bless($d2);
     check_isa($d2, 'Hash',           '$d2 now blessed');
     is($d2, {foo => 1, bar => 2}, 'content of $d2');
