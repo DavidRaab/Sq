@@ -1,7 +1,7 @@
 package Sq::Equality;
 use 5.036;
 use Scalar::Util qw/looks_like_number/;
-use builtin 'refaddr';
+use Scalar::Util 'refaddr';
 
 # This is inlined in equal() but i still provide this function as an API
 # called by other code
