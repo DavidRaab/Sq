@@ -1,12 +1,13 @@
 package Sq::Io;
 use v5.36;
-use Path::Tiny;
+# use Path::Tiny;
 
 # Here will be most I/O stuff for reading/writing files and going through file-system.
 # Maybe also IO::Socket and network?
 
 # Opens a file as UTF-8 text
 sub open_text($class, $file) {
+    require Path::Tiny;
     return Seq->from_sub(sub {
         open my $fh, '<:encoding(UTF-8)', $file or die "Cannot open: $!\n";
 
@@ -26,6 +27,7 @@ sub open_text($class, $file) {
 }
 
 sub recurse($class, $path) {
+    require Path::Tiny;
     Seq->from_sub(sub {
         my $it = path($path)->iterator({
             recurse         => 1,
@@ -38,6 +40,7 @@ sub recurse($class, $path) {
 }
 
 sub children($class, $path) {
+    require Path::Tiny;
     return Seq->new(path($path)->children);
 }
 
