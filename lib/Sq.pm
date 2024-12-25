@@ -102,10 +102,10 @@ sub sq($any) {
         }
     }
     elsif ( $type eq 'Array' ) {
-        sq($_) for @$any;
+        for my $x ( @$any ) { sq($x) }
     }
     elsif ( $type eq 'Option' ) {
-        sq($_) for @$any;
+        for my $x ( @$any ) { sq($x) }
     }
     elsif ( $type eq 'Result' ) {
         sq($any->[1]);
