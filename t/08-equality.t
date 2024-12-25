@@ -203,17 +203,17 @@ is(
     ->init(100, sub($idx) { $idx })
     ->filter(sub($num) { $num % 2 == 0 })
     ->take(10),
-    Seq->new(0,2,4,6,8,10,12,14,16,18),
+    seq { 0,2,4,6,8,10,12,14,16,18 },
     'struct 46');
 
 nok(equal(
-    Seq->new(1,2,3),
-    Seq->new(4,5,6),
+    seq { 1,2,3 },
+    seq { 4,5,6 },
 ), 'struct 48');
 
 nok(equal(
     Seq->init(1_000_000_000, sub($idx) { $idx }),
-    Seq->new(3),
+    seq { 3 },
 ), 'struct 49');
 
 is(
