@@ -576,14 +576,14 @@ is(Option::is_none({}),          0, 'is_none 8');
 
 # Extract max of Array of Array
 {
-    my $data = Array->new(
-        Array->range(10,100),
-        Array->new(50, 10, 16),
-        Array->new(100,1000),
-        Array->empty,
-        Array->new(1,2,3),
-        Array->new(3,2,1),
-    );
+    my $data = sq [
+        [10 .. 100],
+        [50, 10, 16],
+        [100, 1000],
+        [],
+        [1,2,3 ],
+        [3,2,1],
+    ];
 
     my $maxs = $data->choose(sub($array) { $array->max });
 
