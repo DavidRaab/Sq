@@ -100,4 +100,3 @@
 
 # Avoid NYTProf
 ^nytprof/
-^merge.out$

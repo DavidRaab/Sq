@@ -23,4 +23,5 @@ $files->iter(sub($file) {
 my @profiles = glob("*.out.*");
 system('nytprofmerge', @profiles, '-o', 'merge.out');
 unlink @profiles;
-system('nytprofhtml', '-f', 'merge.out', '--open');
+system('nytprofhtml', '-f', 'nytprof.out', '--open');
+unlink 'nytprof.out';

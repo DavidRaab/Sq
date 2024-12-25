@@ -162,15 +162,12 @@ t/Array/06-min_max.t
 t/Array/08-group_by.t
 t/Array/10-option.t
 t/List/00-basics.t
-t/manifest.t
 t/Parser/00-basic.t
 t/Parser/01-array.t
 t/Parser/02-nested-array.t
 t/Parser/03-int-list.t
 t/Parser/04-varargs.t
 t/Parser/05-numsuffix.t
-t/pod-coverage.t
-t/pod.t
 t/Seq/00-basics.t
 t/Seq/01-bind-flatten.t
 t/Seq/02-join_select.t
