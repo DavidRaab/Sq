@@ -737,6 +737,19 @@ sub regex_match($seq, $regex) {
     });
 }
 
+sub regex_sub($seq, $regex, $fn) {
+    from_sub(Seq => sub {
+        my $it = $seq->();
+        return sub {
+            NEXT_LINE:
+            my $str = $it->();
+            return undef if not defined $str;
+            $str =~ s/$regex/$fn->()/oe;
+            return $str;
+        };
+    });
+}
+
 # TODO: Really Seq<Array<'a>> as return value? Seq<Seq<'a>> instead?
 # TODO: Not completely lazy
 # windowed : Seq<'a> -> int -> Seq<Array<'a>>

@@ -16,6 +16,7 @@ my $use = lazy {
         Sq->io->children('t')
         ->filter(call 'is_dir')
         ->map(sub ($str) { $str =~ s[\At/][ + ]r })
+        ->regex_sub(qr/\At/, lazy { " + " })
         ->to_array
         ->sort_str
         ->join("\n");

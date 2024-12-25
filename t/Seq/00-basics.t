@@ -817,4 +817,11 @@ is(
     is(refaddr($seq1), refaddr($seq2), 'to_seq returns same $seq');
 }
 
+is(
+    seq { qw/foo1bar maz2bar/ }
+    ->regex_sub(qr/([a-z]+) \d+ ([a-z]+)/xi, sub { "$1$2" }),
+
+    seq { qw/foobar mazbar/ },
+    'regex_sub');
+
 done_testing;
