@@ -38,8 +38,9 @@ sub init($, $amount, $f) {
 sub from_array($, $array, $f) {
     my $new  = new('Hash');
     my $stop = @$array;
+    my ($k,$v);
     for (my $i=0; $i < $stop; $i++) {
-        my ($k,$v) = $f->($i,$array->[$i]);
+        ($k,$v) = $f->($i,$array->[$i]);
         $new->{$k} = $v;
     }
     return $new;
@@ -57,8 +58,9 @@ sub values($hash) {
 
 sub map($hash, $f) {
     my %new;
-    while ( my ($key, $value) = each %$hash ) {
-        my ($k, $v) = $f->($key, $value);
+    my ($k,$v);
+    for my ($key,$value) ( %$hash ) {
+        ($k, $v) = $f->($key, $value);
         $new{$k} = $v;
     }
     return CORE::bless(\%new, 'Hash');
@@ -69,16 +71,16 @@ sub find($hash, $predicate) {
     # using 'each' causes a bug as not going through all elements does not
     # reset the internal iterator. So calling `find` multiple times on the
     # same hash leads to buggy behaviour.
-    for my $k ( CORE::keys %$hash ) {
-        my $v = $hash->{$k};
+    for my ($k,$v) ( %$hash ) {
         return Option::Some(Array->new($k,$v)) if $predicate->($k,$v);
     }
     return Option::None();
 }
 
 sub pick($hash, $f_opt) {
-    for my $k ( CORE::keys %$hash ) {
-        my $opt = $f_opt->($k,$hash->{$k});
+    my $opt;
+    for my ($k,$v) ( %$hash ) {
+        $opt = $f_opt->($k,$v);
         return $opt if Option::is_some($opt);
     }
     return Option::None();
@@ -86,7 +88,7 @@ sub pick($hash, $f_opt) {
 
 sub filter($hash, $predicate) {
     my %new;
-    while ( my ($key, $value) = each %$hash ) {
+    for my ($key,$value) ( %$hash ) {
         if ( $predicate->($key, $value) ) {
             $new{$key} = $value;
         }
@@ -95,7 +97,7 @@ sub filter($hash, $predicate) {
 }
 
 sub fold($hash, $state, $f) {
-    while ( my ($key, $value) = each %$hash ) {
+    for my ($key,$value) ( %$hash ) {
         $state = $f->($key, $value, $state);
     }
     return $state;
@@ -112,7 +114,7 @@ sub is_empty($hash) {
 # Hash<'a> -> ('a -> Hash<'b>) -> Hash<'b>
 sub bind($hash, $f) {
     my %new;
-    while ( my ($key, $value) = each %$hash ) {
+    for my ($key,$value) ( %$hash ) {
         my $tmp_hash = $f->($key, $value);
         while ( my ($key, $value) = each %$tmp_hash ) {
             $new{$key} = $value;
@@ -123,7 +125,7 @@ sub bind($hash, $f) {
 
 sub append($hashA, $hashB) {
     my %new = %$hashA;
-    while ( my ($key,$value) = each %$hashB ) {
+    for my ($key,$value) ( %$hashB ) {
         $new{$key} = $value;
     }
     return CORE::bless(\%new, 'Hash');
@@ -131,14 +133,14 @@ sub append($hashA, $hashB) {
 
 sub union($hash, $other, $f) {
     my %new;
-    while ( my ($key, $value) = each %$hash ) {
+    for my ($key,$value) ( %$hash ) {
         $new{$key} =
-            exists $other->{$key}
+            defined $other->{$key}
                 ? $f->($key, $value, $other->{$key})
                 : $value;
     }
-    while ( my ($key, $value) = each %$other ) {
-        if ( not exists $new{$key} ) {
+    for my ($key,$value) ( %$other ) {
+        if ( !defined $new{$key} ) {
             $new{$key} = $value;
         }
     }
@@ -157,7 +159,7 @@ sub intersection($hash, $other, $f) {
 
     # build intersection
     my %new;
-    while ( my ($key, $value) = each %$hash ) {
+    for my ($key,$value) ( %$hash ) {
         if ( exists $other->{$key} ) {
             $new{$key} = $f->($key, $value, $other->{$key});
         }
@@ -168,18 +170,18 @@ sub intersection($hash, $other, $f) {
 # Hash<'a,'b> -> Hash<'a,'b> -> Hash<'a,'b>
 sub difference($hash, $other) {
     my %new;
-    while ( my ($key, $value) = each %$hash ) {
-        if ( not exists $other->{$key} ) {
+    for my ($key,$value) ( %$hash ) {
+        if ( !defined $other->{$key} ) {
             $new{$key} = $value;
         }
     }
     return CORE::bless(\%new, 'Hash');
 }
 
-sub concat($hash, @others) {
+sub concat(@hashes) {
     my %new;
-    for my $hash ( $hash, @others ) {
-        while ( my ($key, $value) = each %$hash ) {
+    for my $hash ( @hashes ) {
+        for my ($key,$value) ( %$hash ) {
             $new{$key} = $value;
         }
     }
@@ -222,33 +224,35 @@ sub slice($hash, @keys) {
 }
 
 sub with($hash, @kvs) {
-    my $new = copy($hash);
-    set($new, @kvs);
-    return $new;
+    my $new = {%$hash};
+    for my ($k,$v) ( @kvs ) {
+        $new->{$k} = $v;
+    }
+    return CORE::bless($new, 'Hash');
 }
 
 sub withf($hash, %kfs) {
-    my $new   = Hash->new;
-    for my $key ( CORE::keys %$hash ) {
-        my $value = $hash->{$key};
+    my $new = {};
+    my $f;
+    for my ($key,$value) ( %$hash ) {
         if ( defined $value ) {
-            my $f = $kfs{$key};
+            $f = $kfs{$key};
             $new->{$key} = defined $f ? $f->($value) : $value;
         }
     }
-    return $new;
+    return CORE::bless($new, 'Hash');
 }
 
 sub has_keys($hash, @keys) {
     for my $key ( @keys ) {
-        return 0 if !exists $hash->{$key} || !defined $hash->{$key};
+        return 0 if !defined $hash->{$key};
     }
     return 1;
 }
 
 sub to_array($hash, $f) {
     my $a = Array->new;
-    while ( my ($key, $value) = each %$hash ) {
+    for my ($key,$value) ( %$hash ) {
         CORE::push @$a, $f->($key, $value);
     }
     return $a;
@@ -259,24 +263,22 @@ sub to_array($hash, $f) {
 #
 
 sub on($hash, %kfs) {
-    for my $key ( CORE::keys %kfs ) {
+    for my ($key,$f) ( %kfs ) {
         my $value = $hash->{$key};
-        if ( defined $value ) {
-            $kfs{$key}($value);
-        }
+        $f->($value) if defined $value;
     }
     return;
 }
 
 sub iter($hash, $f) {
-    while ( my ($key, $value) = each %$hash ) {
+    for my ($key,$value) ( %$hash ) {
         $f->($key, $value);
     }
     return;
 }
 
 sub foreach($hash, $f) {
-    while ( my ($key, $value) = each %$hash ) {
+    for my ($key,$value) ( %$hash ) {
         $f->($key, $value);
     }
     return;
@@ -299,7 +301,7 @@ sub set($hash, @kvs) {
 }
 
 sub change($hash, %kfs) {
-    while ( my ($key, $f) = each %kfs ) {
+    for my ($key,$f) ( %kfs ) {
         my $value = $hash->{$key};
         $hash->{$key} = $f->($value) if defined $value;
     }
@@ -314,19 +316,19 @@ sub push($hash, $key, @values) {
         if ( $ref eq 'Array' ) {
             CORE::push @$v, @values;
         }
-        # if perl plain array then Array blessing is added.
+        # if plain perl array then Array blessing is added.
         elsif ( $ref eq 'ARRAY' ) {
-            Array->bless($v);
+            CORE::bless($v, 'Array');
             CORE::push @$v, @values;
         }
         # otherwise we "upgrade" element to an array
         else {
-            $hash->{$key} = Array->new($v, @values);
+            $hash->{$key} = CORE::bless([$v, @values], 'Array');
         }
     }
     # when not exists/undef, we create array
     else {
-        $hash->{$key} = Array->new(@values);
+        $hash->{$key} = CORE::bless([@values], 'Array');
     }
     return;
 }
