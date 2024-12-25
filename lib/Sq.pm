@@ -126,6 +126,7 @@ sub seq :prototype(&) {
         my $abort = 0;
         my $idx   = 0;
         return sub {
+            return undef if $abort;
             my $v = $data[$idx++];
             return $v if defined $v;
             $abort = 1;
