@@ -1181,5 +1181,27 @@ is(
         'pod example. pure perl');
 }
 
+# chunked
+{
+    is(
+        Array->range(1,10)->chunked(1),
+        [[1], [2], [3], [4], [5], [6], [7], [8], [9], [10]],
+        'chunked 1');
+
+    is(
+        Array->range(1,10)->chunked(2),
+        [[1,2], [3,4], [5,6], [7,8], [9,10]],
+        'chunked 2');
+
+    is(
+        Array->range(1,10)->chunked(3),
+        [[1,2,3], [4,5,6], [7,8,9], [10]],
+        'chunked 3');
+
+    is(
+        Array->range(1,10)->chunked(4),
+        [[1,2,3,4], [5,6,7,8], [9,10]],
+        'chunked 4');
+}
 
 done_testing;

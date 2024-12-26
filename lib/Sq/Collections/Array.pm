@@ -212,6 +212,19 @@ sub map_e($array, $expr) {
     return CORE::bless($new, 'Array');
 }
 
+sub chunked($array, $size) {
+    my @new;
+    my $max = @$array;
+    my $upto = 0;
+    for (my $idx=0; $idx < $max; $idx+=$size) {
+        $upto = ($idx + $size) - 1;
+        $upto = $upto < $max ? $upto : ($max-1);
+        my @slice = $array->@[$idx .. $upto];
+        push @new, CORE::bless(\@slice, 'Array');
+    }
+    return CORE::bless(\@new, 'Array');
+}
+
 sub choose($array, $f_opt) {
     my $new = new('Array');
     my ($is_some, $v);
