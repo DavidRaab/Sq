@@ -2,7 +2,6 @@ package Sq::Collections::Seq;
 use 5.036;
 use subs 'bind', 'join', 'select', 'last', 'sort', 'map', 'foreach', 'length';
 use Scalar::Util ();
-use List::Util ();
 use Carp ();
 my $loaded = 0;
 sub import {
@@ -257,7 +256,11 @@ sub concat($, @seqs) {
     # one element can be returned as-is
     return $seqs[0]     if $count == 1;
     # at least two items
-    return List::Util::reduce { append($a, $b) } @seqs;
+    my $concat = append($seqs[0], $seqs[1]);
+    for ( my $idx=2; $idx < @seqs; $idx++ ) {
+        $concat = append($concat,$seqs[$idx]);
+    }
+    return $concat;
 }
 
 #----------------------------------------------------------------------------#
