@@ -1,9 +1,21 @@
-package Seq;
+package Sq::Collections::Seq;
 use 5.036;
 use subs 'bind', 'join', 'select', 'last', 'sort', 'map', 'foreach', 'length';
 use Scalar::Util ();
 use List::Util ();
 use Carp ();
+my $loaded = 0;
+sub import {
+    no strict 'refs'; ## no critic
+    my $target = 'Seq::';
+    if ( $loaded == 0 ) {
+        for my $func ( Sq::Reflection::all_funcs(__PACKAGE__) ) {
+            *{$target . $func} = \&$func;
+        }
+        $loaded = 1;
+    }
+    return;
+}
 
 # TODO:
 #       Find another name for 'from_list'
