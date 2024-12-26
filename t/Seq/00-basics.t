@@ -845,13 +845,15 @@ is(
         Seq->range(1,10)->chunked(4),
         seq { [1,2,3,4], [5,6,7,8], [9,10] },
         'chunked 4');
+
+    is(
+        Seq->range(1,1_000_000_000)->chunked(10)->take(3),
+        seq { [1..10], [11..20], [21..30] },
+        'chunked on large Seq');
 }
 
 is(
-    Seq
-    ->range(1,1_000_000_000)
-    ->windowed(10)
-    ->take(3),
+    Seq->range(1,1_000_000_000)->windowed(10)->take(3),
     seq { [1 .. 10], [2 .. 11], [3 .. 12] },
     'windowed on large Seq');
 
