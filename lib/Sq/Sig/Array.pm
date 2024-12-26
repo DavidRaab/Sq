@@ -63,6 +63,7 @@ sig ('Array::to_array_of_array', $aoa,                     $aoa);
 sig ('Array::distinct',          t_array,                  t_array);
 sig ('Array::distinct_by',       t_array, t_sub,           t_array);
 sig ('Array::regex_match',       $astr,   t_regex,         t_array(t_of $astr));
+sig ('Array::chunked',           t_array, t_int,           $aoa);
 sig ('Array::windowed',          t_array, t_int,           $aoa);
 sig ('Array::intersperse',       t_array, t_any,           t_array);
 sig ('Array::repeat',            t_array, t_int,           t_array);
