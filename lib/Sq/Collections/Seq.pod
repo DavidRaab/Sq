@@ -717,6 +717,14 @@ into an array.
     #     [qw/1900 01 01 00 00 01/],
     # ],
 
+=head2 chunked($seq, $size) : $seq_of_array
+
+Process sequence in chunks. Reads C<$size> amount of elements at once
+and returns them as an array.
+
+    # seq { [1,2,3], [4,5,6], [7,8,9], [10] }
+    my $chunked = Seq->range(1,10)->chunked(3);
+
 =head2 windowed($seq, $window_size) : $seq_of_array
 
 TODO

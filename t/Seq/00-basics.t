@@ -824,4 +824,27 @@ is(
     seq { qw/foobar mazbar/ },
     'regex_sub');
 
+# chunked
+{
+    is(
+        Seq->range(1,10)->chunked(1),
+        seq { [1], [2], [3], [4], [5], [6], [7], [8], [9], [10] },
+        'chunked 1');
+
+    is(
+        Seq->range(1,10)->chunked(2),
+        seq { [1,2], [3,4], [5,6], [7,8], [9,10] },
+        'chunked 2');
+
+    is(
+        Seq->range(1,10)->chunked(3),
+        seq { [1,2,3], [4,5,6], [7,8,9], [10] },
+        'chunked 3');
+
+    is(
+        Seq->range(1,10)->chunked(4),
+        seq { [1,2,3,4], [5,6,7,8], [9,10] },
+        'chunked 4');
+}
+
 done_testing;

@@ -779,6 +779,30 @@ sub windowed($seq, $window_size) {
     });
 }
 
+sub chunked($seq, $size) {
+    return bless(sub {
+        my $abort = 0;
+        my $it    = $seq->();
+
+        return sub {
+            return undef if $abort;
+            my $count = 0;
+            my $new   = Array->new;
+            ITEM:
+
+            my $x;
+            while ( defined($x = $it->()) ) {
+                push @$new, $x;
+                return $new if ++$count >= $size;
+            }
+
+            $abort = 1;
+            undef $it;
+            return @$new == 0 ? undef : $new;
+        }
+    }, 'Seq');
+}
+
 # intersperse : Seq<'a> -> 'a -> Seq<'a>
 sub intersperse($seq, $sep) {
     from_sub(Seq => sub() {

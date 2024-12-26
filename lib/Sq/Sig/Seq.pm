@@ -60,6 +60,7 @@ sig('Seq::sort_by',       $seq, $sub, $sub,     $seq);
 sig('Seq::cache',         $seq,                 $seq);
 sig('Seq::regex_match',   $seq, t_regex,        $seq);
 sig('Seq::regex_sub',     $seq, t_regex, t_sub, $seq);
+sig('Seq::chunked',       $seq, t_int,          $seq);
 sig('Seq::windowed',      $seq, t_int,          $seq);
 sig('Seq::intersperse',   $seq, $any,           $seq);
 sig('Seq::infinity',      $seq,                 $seq);
