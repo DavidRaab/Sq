@@ -9,14 +9,14 @@ sub entry($id, $name, $tag) {
     return { id => $id, name => $name, tag => $tag }
 }
 
-my $data = Array->new(
+my $data = sq [
     entry(1, 'David', 'WoW'),
     entry(1, 'David', 'How'),
     entry(1, 'David', 'Super'),
     entry(2, 'Alex',  'Mega'),
     entry(2, 'Alex',  'Huhu'),
     entry(3, 'Bob',   'Toll'),
-);
+];
 
 # group_by
 {
