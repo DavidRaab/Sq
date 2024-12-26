@@ -73,13 +73,16 @@ sub empty($) {
 
 # replicates an $initial value $count times
 sub replicate($, $count, $initial) {
-    from_sub(Seq => sub {
+    bless(sub {
+        my $abort  = 0;
         my $amount = 0;
         return sub {
-            return undef if $amount++ >= $count;
-            return $initial;
+            return undef if $abort;
+            return $initial if ++$amount <= $count;
+            $abort = 1;
+            return undef;
         }
-    });
+    }, 'Seq');
 }
 
 # TODO: When $state is a reference. Same handling as in fold?
