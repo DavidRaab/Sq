@@ -1,0 +1,28 @@
+=encoding UTF-8
+
+=head1 Sq::Reflection
+
+Module that contains function to manipulate or query Perl's symbol-table.
+
+=head1 Functions
+
+All functions are automatically exported by default.
+
+=head2 get_func($func_name) : $sub | EXCEPTION
+
+Write a function with full package name and get back the subroutine
+reference. When the function you want to read does not exists, it throws
+an exception.
+
+    my $map = get_func('Array::map');
+
+=head2 set_func($func_name, $sub) : void
+
+Sets a function to a new function by providing the subroutine reference.
+
+    my $orig = get_func('Array::map');
+
+    set_func('Array::map' => sub($array, $sub) {
+        warn "Array::map was called!\n";
+        return $orig->($array, $sub);
+    });
