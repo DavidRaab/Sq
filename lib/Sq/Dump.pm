@@ -13,6 +13,17 @@ sub array($array, $inline=60, $depth=0) {
     return $str;
 }
 
+sub queue($queue, $inline=60, $depth=0) {
+    my $str    = "Queue [\n";
+    my $indent = " " x ($depth + 2);
+    for my $x ( @$queue ) {
+        $str .= $indent . to_string($x, $inline, $depth+2) . ",\n";
+    }
+    $str =~ s/,\n\z/\n/;
+    $str .= (" " x $depth) . "]";
+    return $str;
+}
+
 sub hash($hash, $inline=60, $depth=0) {
     my $str    = "{\n";
     my $indent = " " x ($depth + 2);
@@ -67,6 +78,7 @@ my $dispatch = {
     '_STRING'           => sub { sprintf "\"%s\"", quote($_[0]) },
     'ARRAY'             => \&array,
     'Array'             => \&array,
+    'Queue'             => \&queue,
     'HASH'              => \&hash,
     'Hash'              => \&hash,
     'Option'            => \&option,
