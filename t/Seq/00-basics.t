@@ -143,7 +143,6 @@ is(
     Seq->wrap(Seq->range(1,10)->expand)->to_array,
     [1 .. 10],
     'expand and wrap is isomorph');
-
 is(
     Seq->wrap(1..5)->append(
         Seq->wrap(6..10)
@@ -158,7 +157,6 @@ is(
     Seq->empty->append(Seq->range(1,5))->append(Seq->range(6,10)),
     $range,
     'append on empty');
-
 is(
     Seq->concat(
         Seq->empty,
@@ -171,6 +169,28 @@ is(
     ),
     Seq->wrap(1..5, 10..12, "Hello"),
     'concat with empties');
+is(Seq->concat(seq { 1,2,3 }), seq { 1,2,3 }, 'concat 1');
+is(
+    Seq->concat(seq { 1,2,3 }, seq { 4,5,6 }),
+    seq { 1 .. 6 },
+    'concat 2');
+is(
+    Seq::zip(
+        Seq->concat(
+            Seq->range(1,1_000_000_000),
+            Seq->range(1,1_000_000_000),
+        ),
+        Seq->concat(
+            Seq->range(1,1_000_000_000),
+            Seq->range(1,1_000_000_000),
+        )
+    )->chunked(10)->take(3),
+    seq {
+        [map { [$_,$_] }  1..10],
+        [map { [$_,$_] } 11..20],
+        [map { [$_,$_] } 21..30],
+    },
+    'concat, zip, chunked');
 is(
     Seq->from_array([1..10]),
     Seq->wrap(1..10),
