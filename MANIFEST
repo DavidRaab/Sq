@@ -4,6 +4,7 @@ benchmarks/array_init.pl
 benchmarks/array_map.pl
 benchmarks/array_min.pl
 benchmarks/array_reverse.pl
+benchmarks/even_num.pl
 benchmarks/filtering.pl
 benchmarks/func_key.pl
 benchmarks/hash_append.pl
@@ -16,6 +17,8 @@ benchmarks/parser_int.pl
 benchmarks/parser_intstr.pl
 benchmarks/parser_str.pl
 benchmarks/queue.pl
+benchmarks/queue_size.pl
+benchmarks/queue_size_array.pl
 benchmarks/range.pl
 benchmarks/seq_range.pl
 benchmarks/seq_range_step.pl
@@ -24,6 +27,7 @@ Build.PL
 Changes
 examples/1bill.pl
 examples/album.pl
+examples/all_funcs.pl
 examples/AoC-2023/01p1.pl
 examples/AoC-2023/01p1.txt
 examples/AoC-2023/01p2.pl
@@ -61,12 +65,10 @@ lib/Sq/Concurrency/Async.pm
 lib/Sq/Concurrency/Fork.pm
 lib/Sq/Concurrency/Mailbox.pm
 lib/Sq/Concurrency/Threads.pm
-lib/Sq/Control.pm
-lib/Sq/Control/Event.pm
-lib/Sq/Control/Lazy.pm
 lib/Sq/Core.pod
 lib/Sq/Core/Date.pm
 lib/Sq/Core/DU.pm
+lib/Sq/Core/Lazy.pm
 lib/Sq/Core/Measure.pm
 lib/Sq/Core/Option.pm
 lib/Sq/Core/Option.pod
@@ -79,6 +81,7 @@ lib/Sq/Data/XML.pm
 lib/Sq/Dump.pm
 lib/Sq/Equality.pm
 lib/Sq/Exporter.pm
+lib/Sq/Fmt.pm
 lib/Sq/Fs.pm
 lib/Sq/Fs/Stat.pm
 lib/Sq/Io.pm
@@ -99,6 +102,8 @@ lib/Sq/Manual/Design/Wrap.pod
 lib/Sq/Manual/Examples/CreatingSeqIterator.pod
 lib/Sq/Manual/FromSub.pod
 lib/Sq/Manual/MooseTraitVSSq.pod
+lib/Sq/Manual/Notes/2024-12-24-Realase-0.006.md
+lib/Sq/Manual/Notes/2024-12-26-CPAN-Release.md
 lib/Sq/Manual/OptionExtractArray.pod
 lib/Sq/Manual/Parser/00-intro.pod
 lib/Sq/Manual/Parser/01-Shortcuts.pod
@@ -114,6 +119,7 @@ lib/Sq/Parser.pod
 lib/Sq/Parser/HTML.pm
 lib/Sq/Parser/Markdown.pm
 lib/Sq/Reflection.pm
+lib/Sq/Reflection.pod
 lib/Sq/Sig.pm
 lib/Sq/Sig/Array.pm
 lib/Sq/Sig/Array2D.pm
@@ -139,7 +145,6 @@ LICENSE
 MANIFEST			This list of files
 META.json
 META.yml
-notes/2024-12-24-Realase-0.006.md
 perlcriticrc
 profile_tests.pl
 README

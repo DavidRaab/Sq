@@ -35,29 +35,11 @@
       }
    },
    "provides" : {
-      "Array" : {
-         "file" : "lib/Sq/Collections/Array.pm"
-      },
-      "Hash" : {
-         "file" : "lib/Sq/Collections/Hash.pm"
-      },
-      "Heap" : {
-         "file" : "lib/Sq/Collections/Heap.pm"
-      },
-      "List" : {
-         "file" : "lib/Sq/Collections/List.pm"
-      },
       "Option" : {
          "file" : "lib/Sq/Core/Option.pm"
       },
-      "Queue" : {
-         "file" : "lib/Sq/Collections/Queue.pm"
-      },
       "Result" : {
          "file" : "lib/Sq/Core/Result.pm"
-      },
-      "Seq" : {
-         "file" : "lib/Sq/Collections/Seq.pm"
       },
       "Sq" : {
          "file" : "lib/Sq.pm",
@@ -69,8 +51,26 @@
       "Sq::Cmd" : {
          "file" : "lib/Sq/Cmd.pm"
       },
+      "Sq::Collections::Array" : {
+         "file" : "lib/Sq/Collections/Array.pm"
+      },
+      "Sq::Collections::Hash" : {
+         "file" : "lib/Sq/Collections/Hash.pm"
+      },
+      "Sq::Collections::Heap" : {
+         "file" : "lib/Sq/Collections/Heap.pm"
+      },
+      "Sq::Collections::List" : {
+         "file" : "lib/Sq/Collections/List.pm"
+      },
       "Sq::Collections::Query" : {
          "file" : "lib/Sq/Collections/Query.pm"
+      },
+      "Sq::Collections::Queue" : {
+         "file" : "lib/Sq/Collections/Queue.pm"
+      },
+      "Sq::Collections::Seq" : {
+         "file" : "lib/Sq/Collections/Seq.pm"
       },
       "Sq::Concurrency::Async" : {
          "file" : "lib/Sq/Concurrency/Async.pm"
@@ -84,17 +84,14 @@
       "Sq::Concurrency::Threads" : {
          "file" : "lib/Sq/Concurrency/Threads.pm"
       },
-      "Sq::Control::Event" : {
-         "file" : "lib/Sq/Control/Event.pm"
-      },
-      "Sq::Control::Lazy" : {
-         "file" : "lib/Sq/Control/Lazy.pm"
-      },
       "Sq::Core::DU" : {
          "file" : "lib/Sq/Core/DU.pm"
       },
       "Sq::Core::Date" : {
          "file" : "lib/Sq/Core/Date.pm"
+      },
+      "Sq::Core::Lazy" : {
+         "file" : "lib/Sq/Core/Lazy.pm"
       },
       "Sq::Core::Measure" : {
          "file" : "lib/Sq/Core/Measure.pm"
@@ -116,6 +113,9 @@
       },
       "Sq::Exporter" : {
          "file" : "lib/Sq/Exporter.pm"
+      },
+      "Sq::Fmt" : {
+         "file" : "lib/Sq/Fmt.pm"
       },
       "Sq::Fs" : {
          "file" : "lib/Sq/Fs.pm"
