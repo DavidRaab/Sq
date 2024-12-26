@@ -20,3 +20,14 @@ for ( 1 .. 1_000_000 ) {
     }
 }
 
+printf "Pre-Populate Queue with 100_000 elements\n";
+@queue = (1 .. 100_000);
+
+for ( 1 .. 1_000_000 ) {
+    push @queue, 1, 2;
+    shift @queue;
+    shift @queue;
+    if ( $_ % 100_000 == 0 ) {
+        printf "Queue Size: %d\n", (total_size \@queue);
+    }
+}
