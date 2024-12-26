@@ -255,15 +255,32 @@ sub concat($, @seqs) {
     my $count = @seqs;
 
     # with no values to concat, return an empty iterator
-    return empty('Seq') if $count == 0;
+    return empty('Seq')  if $count == 0;
     # one element can be returned as-is
-    return $seqs[0]     if $count == 1;
-    # at least two items
-    my $concat = append($seqs[0], $seqs[1]);
-    for ( my $idx=2; $idx < @seqs; $idx++ ) {
-        $concat = append($concat,$seqs[$idx]);
-    }
-    return $concat;
+    return $seqs[0]      if $count == 1;
+    # exactly two, just use append
+    return append(@seqs) if $count == 2;
+
+    return bless(sub {
+        my $abort = 0;
+        my $idx   = 0;
+        my $it    = $seqs[0]->();
+        my $x;
+        return sub {
+            return undef if $abort;
+            REDO:
+            $x = $it->();
+            return $x if defined $x;
+
+            undef $it;
+            if ( ++$idx < $count ) {
+                $it = $seqs[$idx]->();
+                goto REDO;
+            }
+            $abort = 1;
+            undef $it;
+        }
+    }, 'Seq');
 }
 
 #----------------------------------------------------------------------------#
