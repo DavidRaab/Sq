@@ -970,34 +970,40 @@ sub foreachi($seq, $f) {
 #
 # do : Seq<'a> -> ('a -> unit) -> Seq<'a>
 sub do($seq, $f) {
-    return from_sub(Seq => sub {
-        my $it = $seq->();
+    return bless(sub {
+        my $abort = 0;
+        my $it    = $seq->();
         my $x;
-
         return sub {
+            return undef if $abort;
             if ( defined($x = $it->()) ) {
                 $f->($x);
                 return $x;
             }
-            return undef;
+            $abort = 1;
+            undef $it;
+            undef $x;
         }
-    });
+    }, 'Seq');
 }
 
 # Same as do() but also provides an index
 sub doi($seq, $f) {
-    return from_sub(Seq => sub {
+    return bless(sub {
+        my $abort     = 0;
         my $it        = $seq->();
         my ($idx, $x) = (0, undef);
-
         return sub {
+            return undef if $abort;
             if ( defined($x = $it->()) ) {
                 $f->($x, $idx++);
                 return $x;
             }
-            return undef;
+            $abort = 1;
+            undef $it;
+            undef $x;
         }
-    });
+    }, 'Seq');
 }
 
 
