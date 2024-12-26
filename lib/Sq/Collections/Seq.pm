@@ -762,8 +762,6 @@ sub regex_sub($seq, $regex, $fn) {
     });
 }
 
-# TODO: Really Seq<Array<'a>> as return value? Seq<Seq<'a>> instead?
-# TODO: Not completely lazy
 # windowed : Seq<'a> -> int -> Seq<Array<'a>>
 sub windowed($seq, $window_size) {
     return empty('Seq') if $window_size <= 0;
