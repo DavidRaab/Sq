@@ -787,14 +787,14 @@ sub windowed($seq, $window_size) {
             return undef if $abort;
             if ( $state == 1 ) {
                 $state = 2;
-                return [@queue];
+                return CORE::bless([@queue], 'Array');
             }
             else {
                 $x = $it->();
                 if ( defined $x ) {
                     shift @queue;
                     push @queue, $x;
-                    return [@queue];
+                    return CORE::bless([@queue], 'Array');
                 }
                 else {
                     $abort = 1;

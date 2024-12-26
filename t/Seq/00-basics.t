@@ -850,11 +850,21 @@ is(
         Seq->range(1,1_000_000_000)->chunked(10)->take(3),
         seq { [1..10], [11..20], [21..30] },
         'chunked on large Seq');
+
+    is(
+        Seq->range(1,1_000_000_000)->chunked(10)->map(sub($a) { $a->sum })->take(3),
+        seq { 55, 155, 255 },
+        'chunked check if array is blessed');
 }
 
 is(
     Seq->range(1,1_000_000_000)->windowed(10)->take(3),
     seq { [1 .. 10], [2 .. 11], [3 .. 12] },
     'windowed on large Seq');
+
+is(
+    Seq->range(1,1_000_000_000)->windowed(10)->map(sub($a) { $a->sum })->take(3),
+    seq { 55, 65, 75 },
+    'windowed - check if array is blessed');
 
 done_testing;
