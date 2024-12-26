@@ -7,7 +7,6 @@ use v5.36;
 
 # Opens a file as UTF-8 text
 sub open_text($class, $file) {
-    require Path::Tiny;
     return Seq->from_sub(sub {
         open my $fh, '<:encoding(UTF-8)', $file or die "Cannot open: $!\n";
 
@@ -29,7 +28,7 @@ sub open_text($class, $file) {
 sub recurse($class, $path) {
     require Path::Tiny;
     Seq->from_sub(sub {
-        my $it = path($path)->iterator({
+        my $it = Path::Tiny::path($path)->iterator({
             recurse         => 1,
             follow_symlinks => 1,
         });
@@ -41,7 +40,7 @@ sub recurse($class, $path) {
 
 sub children($class, $path) {
     require Path::Tiny;
-    return Seq->new(path($path)->children);
+    return Seq->new(Path::Tiny::path($path)->children);
 }
 
 1;

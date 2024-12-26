@@ -15,10 +15,8 @@ my $use = lazy {
     my $folders =
         Sq->io->children('t')
         ->filter(call 'is_dir')
-        ->map(sub ($str) { $str =~ s[\At/][ + ]r })
-        ->regex_sub(qr/\At/, lazy { " + " })
-        ->to_array
-        ->sort_str
+        ->regex_sub(qr{\At/}, lazy { " + " })
+        ->sort(by_str)
         ->join("\n");
 
     return join("\n",

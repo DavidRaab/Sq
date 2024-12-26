@@ -47,9 +47,7 @@ sig('Array::indexed',       t_array,               t_array(t_of t_tuple(t_any, t
 sig('Array::zip',           t_array, t_array,      t_array(t_of t_tuple(t_any, t_any)));
 sig('Array::sort',          t_array, t_sub,        t_array);
 sig('Array::sort_by',       t_array, t_sub, t_sub, t_array);
-sig('Array::sort_num',      $anum,                 t_array);
-sig('Array::sort_str',      $astr,                 t_array);
-sig('Array::sort_hash_str', $aoh,    t_str,        $aoh);
+sig('Array::sort_hash',     t_array, t_sub, t_str, t_array);
 sig('Array::fsts',          $aoa,                  t_array);
 sig('Array::snds',          $aoa,                  t_array);
 sigt('Array::to_array',

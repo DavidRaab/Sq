@@ -4,15 +4,6 @@ use Sq;
 use Sq::Sig;
 use Sq::Test;
 
-# Helpers
-sub new_hash() {
-    return sub() { return Hash->new };
-}
-
-sub by_num() {
-    return sub($x,$y) { $x <=> $y };
-}
-
 # Build Test Data
 sub entry($id, $name, $tag) {
     return { id => $id, name => $name, tag => $tag }
@@ -56,7 +47,7 @@ my @data = (
 {
     my $grouped =
         Seq->from_array(\@data)->group_fold(
-            new_hash(),
+            sub { Hash->new },
             key 'id',
             sub($hash, $entry) {
                 # this will execute multiple times for each entry, but the

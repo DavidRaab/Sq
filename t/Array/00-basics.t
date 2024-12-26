@@ -483,12 +483,12 @@ is($range->last,             Some(10), 'last on non empty');
 is($range->last->or(0),            10, 'last on non empty with option::or');
 
 is(
-    Array->wrap(1,5,-3,10,9,-2)->sort(sub($x,$y) { $x <=> $y }),
+    Array->new(1,5,-3,10,9,-2)->sort(by_num),
     [-3,-2,1,5,9,10],
     'sort 1');
 
 is(
-    Array->wrap(qw/B b c A a C/)->sort(sub($x,$y) { $x cmp $y }),
+    Array->new(qw/B b c A a C/)->sort(by_str),
     [qw/A B C a b c/],
     'sort 2');
 
@@ -823,8 +823,8 @@ is(
 }
 
 # sort
-is(Array->new(qw/1 9 10 5/)->sort_str, [qw/1 10 5 9/], 'sort_str');
-is(Array->new(qw/1 9 10 5/)->sort_num, [1, 5, 9, 10],  'sort_num');
+is(Array->new(qw/1 9 10 5/)->sort(by_str), [qw/1 10 5 9/], 'sort_str');
+is(Array->new(qw/1 9 10 5/)->sort(by_num), [1, 5, 9, 10],  'sort_num');
 
 # keyed_by
 {
@@ -851,49 +851,49 @@ is(Array->new(qw/1 9 10 5/)->sort_num, [1, 5, 9, 10],  'sort_num');
         'keyed_by name only has 3 entries');
 
     is(
-        $data->keyed_by(key 'name')->values->map(key 'name')->sort_str,
-        $data->distinct_by(key 'name')->map(key 'name')->sort_str,
+        $data->keyed_by(key 'name')->values->map(key 'name')->sort(by_str),
+        $data->distinct_by(key 'name')->map(key 'name')->sort(by_str),
         'keyed_by->values is like distinct_by');
 }
 
-# sort_hash_*
+# test sorting with by_num & by_str
 {
-    my $data = Array->new(
+    my $data = sq [
         Hash->new(id => 2,  name => 'B'),
         Hash->new(id => 3,  name => 'A'),
         Hash->new(id => 1,  name => 'C'),
         Hash->new(id => 10, name => 'J'),
-    );
+    ];
 
     is(
-        $data->sort_hash_str('name'),
+        $data->sort_hash(by_str, 'name'),
         [
             {id =>  3, name => 'A'},
             {id =>  2, name => 'B'},
             {id =>  1, name => 'C'},
             {id => 10, name => 'J'}
         ],
-        'sort_hash_str name');
+        'sort_hash by_str name');
 
     is(
-        $data->sort_hash_str('id'),
+        $data->sort_hash(by_str, 'id'),
         [
             {id =>  1, name => 'C'},
             {id => 10, name => 'J'},
             {id =>  2, name => 'B'},
             {id =>  3, name => 'A'},
         ],
-        'sort_hash_str id');
+        'sort_hash by_str id');
 
     is(
-        $data->sort_hash_num('id'),
+        $data->sort_hash(by_num, 'id'),
         [
             {id =>  1, name => 'C'},
             {id =>  2, name => 'B'},
             {id =>  3, name => 'A'},
             {id => 10, name => 'J'},
         ],
-        'sort_hash_num id');
+        'sort_hash by_num id');
 }
 
 is(

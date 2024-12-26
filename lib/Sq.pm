@@ -5,7 +5,11 @@ use Scalar::Util ();
 sub import {
     my ( $pkg ) = caller;
     no strict 'refs';
-    state @funcs = qw(sq call key assign is_num is_str id fst snd seq);
+    state @funcs = (
+        qw(sq call key assign seq),
+        qw(is_num is_str id fst snd),
+        qw(by_num by_str by_stri),
+    );
     for my $func ( @funcs ) {
         *{"${pkg}::$func"} = \&$func;
     }
@@ -14,17 +18,15 @@ sub import {
     *{"${pkg}::None"}  = \&Option::None;
     *{"${pkg}::Ok"}    = \&Result::Ok;
     *{"${pkg}::Err"}   = \&Result::Err;
-    *{"${pkg}::lazy"}  = \&Sq::Control::Lazy::lazy;
+    *{"${pkg}::lazy"}  = \&Sq::Core::Lazy::lazy;
     *{"${pkg}::equal"} = \&Sq::Equality::equal;
 }
 
 # Load Reflection
 use Sq::Reflection;
 
-# Load lazy keyword
-use Sq::Control::Lazy;
-
 # Load Basic Data Types
+use Sq::Core::Lazy;
 use Sq::Core::Option;
 use Sq::Core::Result;
 
@@ -87,6 +89,21 @@ sub is_str :prototype($) {
 
 sub is_num :prototype($) {
     return Scalar::Util::looks_like_number($_[0]);
+}
+
+sub by_num :prototype() {
+    state $fn = sub($x,$y) { $x <=> $y };
+    return $fn;
+}
+
+sub by_str :prototype() {
+    state $fn = sub($x,$y) { $x cmp $y };
+    return $fn;
+}
+
+sub by_stri :prototype() {
+    state $fn = sub($x,$y) { fc $x cmp $y };
+    return $fn;
 }
 
 # recursively traverse a data-structure and add Array/Hash blessings

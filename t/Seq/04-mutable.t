@@ -32,7 +32,7 @@ use Sq::Test;
 
     is($data->length, 3, 'length from hashref is 3');
     is(
-        $data->to_array->sort_str,
+        $data->to_array->sort(by_str),
         ["1Foo", "2Bar", "3Baz"],
         'hash to sequence');
 
@@ -41,7 +41,7 @@ use Sq::Test;
 
     is($data->length, 4, 'length from hashref is 4');
     is(
-        $data->to_array->sort_str,
+        $data->to_array->sort(by_str),
         ["1Foo", "2Bar", "3Baz", "4Maz"],
         'hash to sequence after added key');
 }
@@ -51,7 +51,7 @@ use Sq::Test;
     my @data = (1..10);
 
     # makes a copy at that time
-    my $data1 = Seq->wrap(@data);
+    my $data1 = seq { @data };
     # just refers to the array
     my $data2 = Seq->from_array(\@data);
 

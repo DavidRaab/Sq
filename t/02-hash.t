@@ -538,8 +538,8 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 # check if some functions return blessed Array
 {
     my $h = Hash->new(c => 3, a => 1, d => 4, b => 2);
-    is($h->keys->sort_str,   [qw/a b c d/], 'keys sorted');
-    is($h->values->sort_num, [1..4],        'values sorted');
+    is($h->keys->sort(by_str),   [qw/a b c d/], 'keys sorted');
+    is($h->values->sort(by_num), [1..4],        'values sorted');
 }
 
 # iter

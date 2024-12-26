@@ -310,36 +310,22 @@ sub sort($array, $comparer) {
 sub sort_by($array, $comparer, $f_key) {
     local ($a, $b, $_);
     my @sorted =
-        CORE::map  { $_->[1] }
-        CORE::sort { $comparer->($a->[0], $b->[0]) }
-        CORE::map  { [$f_key->($_), $_] }
+        CORE::map  { $_->[0] }
+        CORE::sort { $comparer->($a->[1], $b->[1]) }
+        CORE::map  { [$_, $f_key->($_)] }
             @$array;
     return CORE::bless(\@sorted, 'Array');
 }
 
-sub sort_num($array) {
-    return CORE::bless([sort { $a <=> $b } @$array], 'Array');
-}
-
-sub sort_str($array) {
-    return CORE::bless([sort { $a cmp $b } @$array], 'Array');
-}
-
 # Array<Hash<'Key,'a>> -> 'Key -> Array<Hash<'Key,'a>>
-sub sort_hash_str($array, $key) {
-    return Array::sort($array, sub($x,$y) {
-        $x->{$key} cmp $y->{$key}
-    });
-}
-
-# Sorts an array of hashes by just providing the key to be used. Keys
-# are number compared.
-#
-# Array<Hash<'Key,'a>> -> 'Key -> Array<Hash<'Key,'a>>
-sub sort_hash_num($array, $key) {
-    return Array::sort($array, sub($x,$y) {
-        $x->{$key} <=> $y->{$key}
-    });
+sub sort_hash($array, $comparer, $key) {
+    local ($a, $b);
+    my @sorted =
+        CORE::map  { $_->[0]                       }
+        CORE::sort { $comparer->($a->[1], $b->[1]) }
+        CORE::map  { [$_, $_->{$key}]              }
+            @$array;
+    return CORE::bless(\@sorted, 'Array');
 }
 
 sub fsts($array) {

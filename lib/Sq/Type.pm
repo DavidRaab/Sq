@@ -432,7 +432,8 @@ sub t_any() {
 
 sub t_sub() {
     state $fn = sub($any) {
-        return $valid if ref $any eq 'CODE';
+        my $type = ref $any;
+        return $valid if $type eq 'CODE' || $type eq 'Sq::Core::Lazy';
         return "sub: Not a CODE reference.";
     };
     return $fn;

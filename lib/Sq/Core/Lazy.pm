@@ -1,4 +1,4 @@
-package Sq::Control::Lazy;
+package Sq::Core::Lazy;
 use 5.036;
 
 sub lazy :prototype(&) {
@@ -9,7 +9,7 @@ sub lazy :prototype(&) {
         $cache = $fn->();
         $fn    = undef;
         return $cache;
-    }, 'Sq::Control::Lazy');
+    }, 'Sq::Core::Lazy');
 }
 
 sub force($self) {

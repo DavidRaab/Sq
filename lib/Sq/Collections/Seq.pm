@@ -659,7 +659,7 @@ sub skip_while($seq, $predicate) {
 sub indexed($seq) {
     my $index = 0;
     return Seq::map($seq, sub($x) {
-        return Array->new($x, $index++);
+        return bless([$x, $index++], 'Array');
     });
 }
 
@@ -686,10 +686,6 @@ sub distinct_by($seq, $f) {
 sub distinct($seq) {
     return distinct_by($seq, \&Sq::id);
 }
-
-# TODO: Instead of fsts and snds provide a function to pick the index of an array.
-#       Maybe even a function to pick and re-order multiple elements
-#         Like: ->pick([3,1,5])
 
 # fsts : Seq<'a * 'b> -> Seq<'a>
 sub fsts($seq) {
