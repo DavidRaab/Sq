@@ -278,29 +278,32 @@ sub copy($seq) {
 
 # append : Seq<'a> -> Seq<'a> -> Seq<'a>
 sub append($seqA, $seqB) {
-    from_sub('Seq', sub {
+    bless(sub {
+        my $abort      = 0;
         my $exhaustedA = 0;
-        my $itA = $seqA->();
+        my $itA        = $seqA->();
         my $itB;
         my $x;
 
         return sub {
+            return undef if $abort;
             REDO:
             if ( $exhaustedA ) {
-                return $itB->();
+                $x = $itB->();
+                return $x if defined $x;
+                $abort = 1;
+                undef $itB;
             }
             else {
-                if ( defined($x = $itA->()) ) {
-                    return $x;
-                }
-
+                $x = $itA->();
+                return $x if defined $x;
                 undef $itA;
                 $exhaustedA = 1;
                 $itB = $seqB->();
                 goto REDO;
             }
         };
-    });
+    }, 'Seq');
 }
 
 # map : Seq<'a> -> ('a -> 'b) -> Seq<'b'>
