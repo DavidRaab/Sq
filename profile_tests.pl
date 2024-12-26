@@ -27,4 +27,4 @@ $files->iter(sub($file) {
 
 system('nytprofmerge', glob('nytprof.out.*'), '-o', 'nytprof.out');
 system('nytprofhtml', '-f', 'nytprof.out', '--open');
-unlink glob('nytprof.out.*');
+unlink 'nytprof.out', glob('nytprof.out.*');
