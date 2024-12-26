@@ -586,13 +586,10 @@ sub take($seq, $amount) {
         return sub {
             return undef if $abort;
             if ( $returnedSoFar++ < $amount ) {
-                if ( defined($x = $it->()) ) {
-                    return $x;
-                }
-                $abort = 1;
-                undef $it;
+                $x = $it->();
+                return $x if defined $x;
             }
-
+            $abort = 1;
             return undef;
         }
     }, 'Seq');
@@ -613,16 +610,27 @@ sub take_while($seq, $predicate) {
 
 # skip : Seq<'a> -> int -> Seq<'a>
 sub skip($seq, $amount) {
-    from_sub('Seq', sub {
-        my $it = $seq->();
+    bless(sub {
+        my $abort = 0;
+        my $it    = $seq->();
         my $count = 0;
-        return sub {
-            while ( $count++ < $amount ) {
-                $it->();
-            }
-            return $it->();
+        my $x;
+
+        while ( $count++ < $amount ) {
+            $x = $it->();
+            next if defined $x;
+            $abort = 1;
+            last;
         }
-    });
+
+        return sub {
+            return undef if $abort;
+            $x = $it->();
+            return $x if defined $x;
+            $abort = 1;
+            undef $it;
+        }
+    }, 'Seq');
 }
 
 # skip_while : Seq<'a> -> ('a -> bool) -> Seq<'a>

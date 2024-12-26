@@ -887,4 +887,9 @@ is(
     seq { 55, 65, 75 },
     'windowed - check if array is blessed');
 
+is(
+    Seq->range(1,100)->skip(1_000_000_000),
+    seq {},
+    'skip with large number');
+
 done_testing;
