@@ -15,9 +15,9 @@ $usage->die if $opt->help;
 
 
 sub queue() {
-    my $queue = Queue->new;
+    my $queue = Queue->new(1..10_000);
     my $x     = 0;
-    for ( 1 .. 10_000 ) {
+    for ( 1 .. 1_000 ) {
         my ($one,$two) = $queue->remove(2);
         # my $two = $queue->remove;
         $queue->add($x .. ($x+4));
@@ -29,9 +29,9 @@ sub queue() {
 }
 
 sub perl_array() {
-    my @queue;
+    my @queue = (1 .. 10_000);
     my $x     = 0;
-    for ( 1 .. 10_000 ) {
+    for ( 1 .. 1_000 ) {
         my $one = shift @queue;
         my $two = shift @queue;
         push @queue, $x .. ($x+4);
