@@ -1,8 +1,20 @@
-package Hash;
+package Sq::Collections::Hash;
 use 5.036;
 use Hash::Util ();
 use Carp ();
 use subs 'bind', 'keys', 'values', 'bless', 'map', 'foreach', 'delete', 'length';
+my $loaded = 0;
+sub import {
+    no strict 'refs'; ## no critic
+    my $target = 'Hash::';
+    if ( $loaded == 0 ) {
+        for my $func ( Sq::Reflection::all_funcs(__PACKAGE__) ) {
+            *{$target . $func} = \&$func;
+        }
+        $loaded = 1;
+    }
+    return;
+}
 
 # TODO: equal, eual_values, is_disjoint
 

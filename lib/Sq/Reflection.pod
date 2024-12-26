@@ -3,10 +3,13 @@
 =head1 Sq::Reflection
 
 Module that contains function to manipulate or query Perl's symbol-table.
+Is automatically loaded when loading C<Sq>.
+
+Nothing is exported at the moment. So all functions must be called with
+`Sq::Reflection::` at the moment. This will change as soon exporting
+is finished.
 
 =head1 Functions
-
-All functions are automatically exported by default.
 
 =head2 get_func($func_name) : $sub | EXCEPTION
 
@@ -26,3 +29,9 @@ Sets a function to a new function by providing the subroutine reference.
         warn "Array::map was called!\n";
         return $orig->($array, $sub);
     });
+
+=head2 all_funcs($package) : @funcs
+
+Returns all function names of a package as an Sq Array.
+
+    my @funcs = all_funcs('Array');

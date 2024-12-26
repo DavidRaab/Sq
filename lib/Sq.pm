@@ -18,6 +18,9 @@ sub import {
     *{"${pkg}::equal"} = \&Sq::Equality::equal;
 }
 
+# Load Reflection
+use Sq::Reflection;
+
 # Load lazy keyword
 use Sq::Control::Lazy;
 
@@ -33,7 +36,7 @@ use Sq::Collections::List;
 use Sq::Collections::Seq;
 use Sq::Collections::Heap;
 
-# Load Extras
+# Load other basic functionality
 use Sq::Dump;
 use Sq::Equality;
 
