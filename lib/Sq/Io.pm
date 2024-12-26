@@ -25,10 +25,10 @@ sub open_text($class, $file) {
     });
 }
 
-sub recurse($class, $path) {
+sub recurse($class, @paths) {
     require Path::Tiny;
     Seq->from_sub(sub {
-        my $it = Path::Tiny::path($path)->iterator({
+        my $it = Path::Tiny::path(@paths)->iterator({
             recurse         => 1,
             follow_symlinks => 1,
         });
@@ -38,9 +38,9 @@ sub recurse($class, $path) {
     });
 }
 
-sub children($class, $path) {
+sub children($class, @paths) {
     require Path::Tiny;
-    return Seq->new(Path::Tiny::path($path)->children);
+    return Seq->new(Path::Tiny::path(@paths)->children);
 }
 
 1;

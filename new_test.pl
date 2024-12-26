@@ -49,7 +49,7 @@ $usage->die if $opt->help;
 
 # get the maximum id from test-files so far
 my $maximum_id =
-    seq  {         path('t', $opt->folder)->children }
+    Sq->io->children('t', $opt->folder)
     ->map(         call 'basename'                   )
     ->regex_match( qr/\A(\d+) .* \.t\z/xms           )
     ->fsts
