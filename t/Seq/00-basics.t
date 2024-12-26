@@ -847,4 +847,13 @@ is(
         'chunked 4');
 }
 
+
+is(
+    Seq
+    ->range(1,1_000_000_000)
+    ->windowed(10)
+    ->take(3),
+    seq { [1 .. 10], [2 .. 11], [3 .. 12] },
+    'windowed on large Seq');
+
 done_testing;

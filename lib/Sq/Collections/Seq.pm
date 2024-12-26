@@ -767,16 +767,46 @@ sub regex_sub($seq, $regex, $fn) {
 # windowed : Seq<'a> -> int -> Seq<Array<'a>>
 sub windowed($seq, $window_size) {
     return empty('Seq') if $window_size <= 0;
-    from_sub(Seq => sub {
-        my $array      = Array::windowed(to_array($seq), $window_size);
-        my $last_index = scalar @$array;
-        my $index      = 0;
+    return bless(sub {
+        my $abort = 0;
+        my $it    = $seq->();
+        my @queue;
 
-        return sub {
-            return undef if $index >= $last_index;
-            return $array->[$index++];
+        my $x;
+        for ( 1 .. $window_size ) {
+            $x = $it->();
+            if ( defined $x ) {
+                push @queue, $x
+            }
+            else {
+                last;
+            }
         }
-    });
+
+        # 1=first call, 2=all others
+        my $state = @queue < $window_size ? 2 : 1;
+        return sub {
+            return undef if $abort;
+            if ( $state == 1 ) {
+                $state = 2;
+                return [@queue];
+            }
+            else {
+                $x = $it->();
+                if ( defined $x ) {
+                    shift @queue;
+                    push @queue, $x;
+                    return [@queue];
+                }
+                else {
+                    $abort = 1;
+                    @queue = ();
+                    undef $it;
+                    return undef;
+                }
+            }
+        }
+    }, 'Seq');
 }
 
 sub chunked($seq, $size) {
