@@ -6,21 +6,19 @@ use Sq::Evaluator;
 use Sq::Sig;
 use Sq::Test;
 
-sub parser($array) {
-    return Sq::Evaluator::parser($array);
-}
-
 # LISP list
-my $list; $list = parser [many => [map =>
-    sub(@xs) { sq [@xs] },
-    [match => qr/\s* \( \s*/x ], # (
-    [or =>
-        [many => [or =>
-            [match => qr/\s* ([^()\s]++) \s*/x  ], # not () and not white-space
-            [delay => sub{ $list }            ]]], # another list
-        [match => qr/\s*/]],
-    [match => qr/\s* \) \s*/x ]  # )
-]];
+my $list;
+$list = Sq::Evaluator::parser
+    [many => [map =>
+        sub(@xs) { sq [@xs] },
+        [match => qr/\s* \( \s*/x ], # (
+        [or =>
+            [many => [or =>
+                [match => qr/\s* ([^()\s]++) \s*/x  ], # not () and not white-space
+                [delay => sub{ $list }            ]]], # another list
+            [match => qr/\s*/]],
+        [match => qr/\s* \) \s*/x ]  # )
+    ]];
 
 # Tests
 is(p_run($list, '()'), Some([[]]), 'list 1');
