@@ -11,50 +11,48 @@ sub parser($array) {
 }
 
 # LISP list
-my $list;
-my $value =
-    parser [or =>
-        [match => qr/\s* \b(\d++)\b           /x ], # int
-        [match => qr/\s* ([a-zA-Z0-9?+]++) \s* /x ], # name
-        [delay => sub{ $list }                  ]]; # another list
+my $list; $list = parser [many => [map =>
+    sub(@xs) { sq [@xs] },
+    [match => qr/\s* \( \s*/x ], # (
+    [or =>
+        [many => [or =>
+            [match => qr/\s* ([^()\s]++) \s*/x  ], # not () and not white-space
+            [delay => sub{ $list }            ]]], # another list
+        [match => qr/\s*/]],
+    [match => qr/\s* \) \s*/x ]  # )
+]];
 
-$list =
-    parser [map =>
-        sub(@xs) { sq [@xs] },
-        [match => qr/\s* \( \s*/x ], # (
-        [or =>
-            [many => $value],
-            $value,
-            [match => qr/\s*/]],
-        [match => qr/\s* \) \s*/x ]  # )
-    ];
+# Tests
+is(p_run($list, '()'), Some([[]]), 'list 1');
 
-sub run($p,@v) {
-    return p_run($p,@v)->map(call 'flatten');
-}
-
-is(run($list, '()'), Some([]), 'list 1');
 is(
-    run($list, '(if (eq 1 1) 1 0)'),
-    Some([ 'if', ['eq', 1, 1], 1, 0 ]),
+    p_run($list, '(if (eq 1 1) 1 0)'),
+    Some([ ['if', ['eq', 1, 1], 1, 0] ]),
     'list 2');
+
 is(
-    run($list, '(list 1 2 3 4 5)'),
-    Some(['list', 1, 2, 3, 4, 5]),
+    p_run($list, '(list 1 2 3 4 5)'),
+    Some([ ['list', 1, 2, 3, 4, 5] ]),
     'list 3');
+
 is(
-    run($list, '
+    p_run($list, '
         (define (sum xs)
           (cond
             (empty? xs null)
             (else (+ (car xs) (sum (cdr xs))))))
     '),
-    Some(
+    Some([
         ["define", ["sum", "xs"],
             ["cond",
                 ["empty?", "xs", "null"],
                 ["else", ["+", ["car", "xs"], ["sum", ["cdr", "xs"]]]]]]
-    ),
+    ]),
     'list 4');
+
+is(
+    p_run($list, '(display "foo") (display "bar")'),
+    Some([ ['display','"foo"'], ['display', '"bar"'] ]),
+    'list 5');
 
 done_testing;
