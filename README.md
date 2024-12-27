@@ -27,7 +27,7 @@ was a nightmare. Coming from Perl with Moose, C# looked horrible outdated. But
 it was faster.
 
 I then learned F# as after HOP i wanted to learn more deeper about functional
-programming. I mostly learned F# from [F# For Fun and Profit][https://fsharpforfunandprofit.com/]
+programming. I mostly learned F# from [F# For Fun and Profit](https://fsharpforfunandprofit.com/)
 
 I really liked F# and will continue using it to make a game in the future.
 
