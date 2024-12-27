@@ -590,8 +590,8 @@ is(
     ],
     'windowed 5');
 
-is($range->windowed(10)->to_array, [ [1,2,3,4,5,6,7,8,9,10] ], 'windowed 10');
-is($range->windowed(11),           Seq->empty,                 'windowed 11');
+is($range->windowed(10), seq { [1 .. 10] }, 'windowed 10');
+is($range->windowed(11), seq { [1 .. 10] }, 'windowed 11');
 
 is(Seq->wrap()     ->intersperse(0)->to_array, [],          'intersperse 1');
 is(Seq->wrap(1)    ->intersperse(0)->to_array, [1],         'intersperse 2');
