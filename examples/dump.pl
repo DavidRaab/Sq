@@ -27,5 +27,5 @@ my $test = sq {
     seq3 => Seq->new(1,2,3,4),
 };
 
-dumpw $test;
+warn dump($test), "\n";
 dumpw Seq->replicate(5, "x");

@@ -446,7 +446,7 @@ It exports the following functions by default:
 | Equality    | equal                   |
 | OBJ         | call                    |
 | Scope       | assign lazy             |
-| Helpers     | id fst snd              |
+| Helpers     | id fst snd dump dumpw   |
 | Comparision | by_num by_str by_stri   |
 | Types       | is_num is_str           |
 
