@@ -2,6 +2,7 @@ package Sq::Evaluator;
 use 5.036;
 use Sq;
 use Sq::Type;
+use Sq::Parser;
 use Carp ();
 
 sub eval_data($table, $array) {
@@ -38,6 +39,20 @@ sub type($array) {
         sub       => \&t_sub,       regex      => \&t_regex,      bool     => \&t_bool,
         seq       => \&t_seq,       void       => \&t_void,       result   => \&t_result,
         ref       => \&t_ref,       isa        => \&t_isa,        can      => \&t_can,
+    };
+    return eval_data($table, $array);
+}
+
+sub parser($array) {
+    state $table = {
+        match  => \&p_match,  matchf => \&p_matchf, matchf_opt => \&p_matchf_opt,
+        map    => \&p_map,    bind   => \&p_bind,   and        => \&p_and,
+        return => \&p_return, or     => \&p_or,     maybe      => \&p_maybe,
+        join   => \&p_join,   str    => \&p_str,    strc       => \&p_strc,
+        many   => \&p_many,   many0  => \&p_many0,  ignore     => \&p_ignore,
+        fail   => \&p_fail,   qty    => \&p_qty,    choose     => \&p_choose,
+        repeat => \&p_repeat, filter => \&p_filter, split      => \&p_split,
+        delay  => \&p_delay,  not    => \&p_not,    empty      => \&p_empty,
     };
     return eval_data($table, $array);
 }
