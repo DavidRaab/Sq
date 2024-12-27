@@ -2,8 +2,6 @@
 
 Sq - A Language hosted in Perl
 
-
-
 # Parser
 
 Here is an example of the Parser to parse a number with suffix.
@@ -531,9 +529,10 @@ things when they seems to make more sense in practice over theory.
 * [Sq::Type](lib/Sq/Manual/Type/00-Intro.pod)
 * [Sq::Signature](lib/Sq/Manual/Type/00-Intro.pod)
 * [Sq::Parser](lib/Sq/Manual/Parser/00-intro.pod)
-* [Sq::Equality](lib/Sq/Equality.pm) (implements `equal` function and adds methods)
-* [Sq::Test](lib/Sq/Test.pm) (minimal Test-Suite that is already used to test Sq itself)
-* [Sq::Dump](lib/Sq/Dump.pm) (used for `->dump` and `->dumpw` methods on types)
+* [Sq::Equality](lib/Sq/Equality.pm) implements `equal` function and add methods
+* [Sq::Evaluator](/lib/Sq/Evaluator) [Type](t/Evaluator/00-type.t) [Parser](t/Evaluator/01-parser.t) implements functions to eval data-structures
+* [Sq::Test](lib/Sq/Test.pm) minimal Test-Suite that is already used to test Sq itself
+* [Sq::Dump](lib/Sq/Dump.pm) implements `dump` and `dumpw` and add methods
 * [Sq::Collections::Seq](lib/Sq/Collections/Seq.pod)
 * [Sq::Collections::Array](lib/Sq/Collections/Array.pod)
 * [Sq::Collections::Hash](lib/Sq/Collections/Hash.pod)

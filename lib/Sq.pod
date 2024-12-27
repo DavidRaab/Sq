@@ -255,4 +255,8 @@ return the second element of an array
 
 =item L<Sq::Parser>
 
+=item L<Sq::Test>
+
+=item L<Sq::Signature>
+
 =back
