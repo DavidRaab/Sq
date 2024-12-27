@@ -289,7 +289,7 @@ whatever("foo", "foo", [1,2,3]); # fails
 whatever(  123, "foo", ["foo"]); # fails
 whatever(  123,    [], [1,2,3]); # fails
 whatever(123.3,   123,      []); # fails
-whatever(  123,   123,      []); # ok - because "123" is also a valid string
+whatever(  123, "123",      []); # ok - because "123" is also a valid string
 whatever(  123, "foo",      []); # ok
 whatever(  123, "foo", [1,2,3]); # ok
 ```
