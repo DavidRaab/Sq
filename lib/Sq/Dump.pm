@@ -152,24 +152,24 @@ sub add_dump($type, $func) {
 
 # Add dumping to other packages
 package Array;
-*dump       = \&dump;
-*dumpw      = \&dumpw;
+*dump  = \&dump;
+*dumpw = \&dumpw;
 
 package Hash;
-*dump        = \&dump;
-*dumpw       = \&dumpw;
+*dump  = \&dump;
+*dumpw = \&dumpw;
 
 package Seq;
-*dump         = \&dump;
-*dumpw        = \&dumpw;
+*dump  = \&dump;
+*dumpw = \&dumpw;
 
 package Option;
-*dump      = \&dump;
-*dumpw     = \&dumpw;
+*dump  = \&dump;
+*dumpw = \&dumpw;
 
 package Result;
-*dump      = \&dump;
-*dumpw     = \&dumpw;
+*dump  = \&dump;
+*dumpw = \&dumpw;
 
 package Sq::Control::Lazy;
 *dump  = \&dump;

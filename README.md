@@ -352,7 +352,7 @@ $fib->take(5)->iter(sub($x) {
 });
 
 # Represents all possible combinations
-# [[clubs => 7], [clubs => 8], [clubs => 9], ...]
+# seq { [clubs => 7], [clubs => 8], [clubs => 9], ... }
 my $cards =
     Seq::cartesian(
         seq { qw/clubs spades hearts diamond/ },
