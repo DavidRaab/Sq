@@ -37,27 +37,27 @@ is(add_point($unit, $unit), {X => 2, Y => 2}, 'still works');
 
 like(
     dies { add_point($unit, {}) },
-    qr/\AType Error/,
+    qr/\Amain::/,
     'throws exception 1');
 
 like(
     dies { add_point({}, $unit) },
-    qr/\AType Error/,
+    qr/\Amain::/,
     'throws exception 2');
 
 like(
     dies { add_point({X => 1}, $unit) },
-    qr/\AType Error/,
+    qr/\Amain::/,
     'throws exception 3');
 
 like(
     dies { add_point($unit, {X => 1}) },
-    qr/\AType Error/,
+    qr/\Amain::/,
     'throws exception 4');
 
 like(
     dies { add_point($unit, $unit, $unit) },
-    qr/Not correct size/,
+    qr/main::/,
     'too many arguments');
 
 # expect a function that should add numbers but returns hash instead
@@ -68,7 +68,7 @@ sig('main::add', t_int, t_int, t_int);
 
 like(
     dies { add(1,3) },
-    qr/\AType Error/,
+    qr/\Amain::/,
     'check return value');
 
 # test void
@@ -87,10 +87,10 @@ sub what($int, $str, $array_of_nums) {
 }
 sig('main::what', t_int, t_str, t_array(t_of t_num), t_hash);
 
-like( dies { what("foo", "foo", [1,2,3]) }, qr/\AType Error:/, 'what fails 1'); # fails
-like( dies { what(  123, "foo", ["foo"]) }, qr/\AType Error:/, 'what fails 2'); # fails
-like( dies { what(  123,    [], [1,2,3]) }, qr/\AType Error:/, 'what fails 3'); # fails
-like( dies { what(123.3, 123.3,      []) }, qr/\AType Error:/, 'what fails 4'); # fails
+like( dies { what("foo", "foo", [1,2,3]) }, qr/\Amain::what/, 'what fails 1'); # fails
+like( dies { what(  123, "foo", ["foo"]) }, qr/\Amain::what/, 'what fails 2'); # fails
+like( dies { what(  123,    [], [1,2,3]) }, qr/\Amain::what/, 'what fails 3'); # fails
+like( dies { what(123.3, 123.3,      []) }, qr/\Amain::what/, 'what fails 4'); # fails
 
 is( what(123,   123,      []), {}, 'what ok 1');
 is( what(123, "foo",      []), {}, 'what ok 2');

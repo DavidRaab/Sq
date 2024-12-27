@@ -21,18 +21,23 @@ sub import {
 sub sig($func_name, @types) {
     Carp::croak "sig needs at least one type" if @types == 0;
     local $Carp::CarpLevel = 1;
-    my $type_ret   = pop @types;
-    my $arg_count  = @types;
     my $orig       = Sq::Reflection::get_func($func_name);
-    my $input_type = t_tuple(@types);
+    my $out_type   = pop @types;
+    my $in_type    = t_tuple(@types);
+    my $arg_count  = @types;
     Sq::Reflection::set_func($func_name, sub {
-        local $Carp::CarpLevel = 1;
         # check input arguments by just consider the arguments as a tuple
-        t_assert($input_type, \@_);
+        my $err = $in_type->(\@_);
+        if ( defined $err ) {
+            Carp::croak "$func_name: $err";
+        }
         # execute original function
         my $ret = $orig->(@_);
         # check return argument
-        t_assert($type_ret, $ret);
+        $err = $out_type->($ret);
+        if ( defined $err ) {
+            Carp::croak "$func_name: Return: $err";
+        }
         return $ret;
     });
     return;
@@ -45,10 +50,15 @@ sub sig($func_name, @types) {
 sub sigt($func_name, $in_type, $out_type) {
     my $orig = Sq::Reflection::get_func($func_name);
     Sq::Reflection::set_func($func_name, sub {
-        local $Carp::CarpLevel = 1;
-        t_assert($in_type, [@_]);
+        my $err = $in_type->(\@_);
+        if ( defined $err ) {
+            Carp::croak "$func_name: $err";
+        }
         my $ret = $orig->(@_);
-        t_assert($out_type, $ret);
+        $err = $out_type->($ret);
+        if ( defined $err ) {
+            Carp::croak "$func_name: Return: $err";
+        }
         return $ret;
     });
 }
