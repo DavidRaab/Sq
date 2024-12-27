@@ -20,8 +20,8 @@ sub import {
     *{"${pkg}::Err"}   = \&Result::Err;
     *{"${pkg}::lazy"}  = \&Sq::Core::Lazy::lazy;
     *{"${pkg}::equal"} = \&Sq::Equality::equal;
-    # *{"${pkg}::dump"}  = \&Sq::Dump::dump;
-    # *{"${pkg}::dumpw"} = \&Sq::Dump::dumpw;
+    *{"${pkg}::dump"}  = \&Sq::Dump::dump;
+    *{"${pkg}::dumpw"} = \&Sq::Dump::dumpw;
 }
 
 # Load Reflection
