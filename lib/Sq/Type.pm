@@ -5,7 +5,7 @@ use Scalar::Util ();
 use Sq;
 use Sq::Parser qw(p_valid);
 sub import {
-    no strict 'refs';
+    no strict 'refs'; ## no critic
     my ( $pkg ) = caller;
     state @funcs = (
         qw(t_run t_valid t_assert t_or t_is),            # Basic

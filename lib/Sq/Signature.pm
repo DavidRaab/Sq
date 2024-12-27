@@ -4,7 +4,7 @@ use Sq;
 use Sq::Type;
 use Carp ();
 sub import {
-    no strict 'refs';
+    no strict 'refs'; ## no critic
     my ( $pkg ) = caller;
     state @funcs = qw(sig sigt);
     for my $func ( @funcs ) {

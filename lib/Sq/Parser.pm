@@ -2,7 +2,7 @@ package Sq::Parser;
 use 5.036;
 use Sq;
 sub import {
-    no strict 'refs';
+    no strict 'refs'; ## no critic
     my ( $pkg ) = caller;
     state @funcs = (
         qw(p_run p_valid p_match p_matchf p_matchf_opt p_map p_bind p_and p_return p_or p_maybe),

@@ -69,7 +69,7 @@ sub key :prototype($) {
 
 # returns a function that calls $method with its arguments on an object
 {
-    no strict 'refs';
+    no strict 'refs'; ## no critic
     sub call($method, @args) {
         return sub($obj) {
             my $type = ref $obj;
