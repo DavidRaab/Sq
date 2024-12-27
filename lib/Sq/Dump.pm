@@ -151,17 +151,28 @@ sub add_dump($type, $func) {
 }
 
 # Add dumping to other packages
-*Array::dump       = \&dump;
-*Array::dumpw      = \&dumpw;
-*Hash::dump        = \&dump;
-*Hash::dumpw       = \&dumpw;
-*Seq::dump         = \&dump;
-*Seq::dumpw        = \&dumpw;
-*Option::dump      = \&dump;
-*Option::dumpw     = \&dumpw;
-*Result::dump      = \&dump;
-*Result::dumpw     = \&dumpw;
-*Sq::Control::Lazy::dump  = \&dump;
-*Sq::Control::Lazy::dumpw = \&dumpw;
+package Array;
+*dump       = \&dump;
+*dumpw      = \&dumpw;
+
+package Hash;
+*dump        = \&dump;
+*dumpw       = \&dumpw;
+
+package Seq;
+*dump         = \&dump;
+*dumpw        = \&dumpw;
+
+package Option;
+*dump      = \&dump;
+*dumpw     = \&dumpw;
+
+package Result;
+*dump      = \&dump;
+*dumpw     = \&dumpw;
+
+package Sq::Control::Lazy;
+*dump  = \&dump;
+*dumpw = \&dumpw;
 
 1;
