@@ -20,6 +20,8 @@ sub import {
     *{"${pkg}::Err"}   = \&Result::Err;
     *{"${pkg}::lazy"}  = \&Sq::Core::Lazy::lazy;
     *{"${pkg}::equal"} = \&Sq::Equality::equal;
+    # *{"${pkg}::dump"}  = \&Sq::Dump::dump;
+    # *{"${pkg}::dumpw"} = \&Sq::Dump::dumpw;
 }
 
 # Load Reflection
@@ -31,11 +33,11 @@ use Sq::Core::Option;
 use Sq::Core::Result;
 
 # Load Collections Modules
-use Sq::Collections::Hash;
 use Sq::Collections::Array;
+use Sq::Collections::Hash;
+use Sq::Collections::Seq;
 use Sq::Collections::Queue;
 use Sq::Collections::List;
-use Sq::Collections::Seq;
 use Sq::Collections::Heap;
 
 # Load other basic functionality

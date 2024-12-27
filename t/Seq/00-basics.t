@@ -323,14 +323,14 @@ is(Seq->wrap(1,2,3,3,4,2,1,5,6,5,4,7,10,8)->distinct, seq {1,2,3,4,5,6,7,10,8}, 
 }
 
 is(
-    Seq->wrap(qw/A B C D E F/)->mapi(sub($x,$i) { [$x,$i] })->to_array,
-    [[A => 0], [B => 1], [C => 2], [D => 3], [E => 4], [F => 5]],
+    Seq->new(qw/A B C D E F/)->mapi(sub($x,$i) { [$x,$i] }),
+    seq { [A => 0], [B => 1], [C => 2], [D => 3], [E => 4], [F => 5] },
     'mapi');
 
-is(Seq->init( 0,  sub($idx) { $idx })->to_array, [], 'init with length 0');
-is(Seq->init(-1,  sub($idx) { $idx })->to_array, [], 'init with length -1');
-is(Seq->init(-10, sub($idx) { $idx })->to_array, [], 'init with length -10');
-is(Seq->range_step(1,1,1)->to_array, [1], 'range_step with 1,1,1');
+is(Seq->init( 0,  sub($idx) { $idx }), Seq->empty, 'init with length 0');
+is(Seq->init(-1,  sub($idx) { $idx }), Seq->empty, 'init with length -1');
+is(Seq->init(-10, sub($idx) { $idx }), Seq->empty, 'init with length -10');
+is(Seq->range_step(1,1,1), seq { 1 }, 'range_step with 1,1,1');
 
 # TODO
 # is(
@@ -355,8 +355,8 @@ is(
     $range->choose(sub($x) {
         my $s = $x * $x;
         $s % 2 == 0 ? Some $s : None
-    })->to_array,
-    [grep { $_ % 2 == 0 } map { $_ * $_ } 1 .. 10],
+    }),
+    seq { grep { $_ % 2 == 0 } map { $_ * $_ } 1 .. 10 },
     'Non Lazy Perl implementation of choose');
 
 
@@ -397,13 +397,13 @@ is($range->last ,        Some(10), 'last on non empty');
 is($range->last->or(0),        10, 'last on non empty with option::or');
 
 is(
-    Seq->wrap(1,5,-3,10,9,-2)->sort(sub($x,$y) { $x <=> $y })->to_array,
-    [-3,-2,1,5,9,10],
+    Seq->new(1,5,-3,10,9,-2)->sort(by_num),
+    seq { -3,-2,1,5,9,10 },
     'sort 1');
 
 is(
-    Seq->wrap(qw/B b c A a C/)->sort(sub($x,$y) { $x cmp $y })->to_array,
-    [qw/A B C a b c/],
+    Seq->new(qw/B b c A a C/)->sort(by_str),
+    seq { qw/A B C a b c/ },
     'sort 2');
 
 # Schwartzian Transformation
@@ -417,26 +417,31 @@ is(
     };
 
     is(
-        $data->sort_by(sub($x,$y) { $x <=> $y }, sub($x) { $x->{id} })->to_array,
-        [
+        $data->sort_by(by_num, key 'id'),
+        seq {
             { id => 1, char => 'W' },
             { id => 2, char => 'O' },
             { id => 3, char => 'R' },
             { id => 4, char => 'L' },
             { id => 5, char => 'D' },
-        ],
+        },
         'sort_by 1');
 
     is(
-        $data->sort_by(sub($x,$y) { $x cmp $y }, sub($x) { $x->{char} })->to_array,
-        [
+        $data->sort_by(by_str, key 'char'),
+        seq {
             { id => 5, char => 'D' },
             { id => 4, char => 'L' },
             { id => 2, char => 'O' },
             { id => 3, char => 'R' },
             { id => 1, char => 'W' },
-        ],
+        },
         'sort_by 2');
+
+    is(
+        $data->sort_by(by_num, key 'id')->map(key 'char')->join(""),
+        'WORLD',
+        'sort_by 3');
 
     is(
         $data
@@ -444,7 +449,7 @@ is(
         ->sort(sub($x,$y) {  $x->[0] <=> $y->[0]  })
         ->map (sub($x)    {  $x->[1]              }),
 
-        $data->sort_by(sub($x,$y) { $x <=> $y }, sub($x) { $x->{id} }),
+        $data->sort_by(by_num, key 'id'),
         'sort_by 3');
 }
 
@@ -551,15 +556,20 @@ is(
         T                                 # T
             (\d\d) : (\d\d) : (\d\d)      # Time
         \z/xms
-    );
+    )
+    ->map(call 'slice', 2,1,0,3,4,5)
+    ->map(sub($a) { sq [
+        $a->slice(0,1,2)->join('.'),
+        $a->slice(3,4,5)->join(':'),
+    ]});
 
     is(
-        $matches->to_array,
-        [
-            [qw/2023 11 25 15 10 00/],
-            [qw/2023 11 20 10 05 29/],
-            [qw/1900 01 01 00 00 01/],
-        ],
+        $matches,
+        seq {
+            ["25.11.2023", "15:10:00"],
+            ["20.11.2023", "10:05:29"],
+            ["01.01.1900", "00:00:01"],
+        },
         'regex_match');
 
     is(
@@ -569,25 +579,23 @@ is(
             (.)(.)(.)(.)
             (.)(.)(.)(.)
             (.)(.)(.)(.)
-        \z/xms)->to_array,
-        [
-            [1 .. 9, 0, 1 .. 9, 0],
-        ],
+        \z/xms),
+        seq { [1 .. 9, 0, 1 .. 9, 0] },
         'check 20 matches');
 }
 
-is( $range->windowed(-1), Seq->empty,   'windowed -1');
-is( $range->windowed(0) , Seq->empty,   'windowed 0');
-is( $range->windowed(1)->to_array, [map { [$_] } 1 .. 10], 'windowed 1');
+is($range->windowed(-1), Seq->empty,                   'windowed -1');
+is($range->windowed(0) , Seq->empty,                   'windowed 0');
+is($range->windowed(1) , seq { map { [$_] } 1 .. 10 }, 'windowed 1');
 is(
-    $range->windowed(2)->to_array,
-    [ [1,2], [2,3], [3,4], [4,5], [5,6], [6,7], [7,8], [8,9], [9,10] ],
+    $range->windowed(2),
+    seq { [1,2], [2,3], [3,4], [4,5], [5,6], [6,7], [7,8], [8,9], [9,10] },
     'windowed 2');
 is(
-    $range->windowed(5)->to_array,
-    [
+    $range->windowed(5),
+    seq {
         [1,2,3,4,5], [2,3,4,5,6], [3,4,5,6,7], [4,5,6,7,8], [5,6,7,8,9], [6,7,8,9,10]
-    ],
+    },
     'windowed 5');
 
 is($range->windowed(10), seq { [1 .. 10] }, 'windowed 10');
@@ -622,60 +630,60 @@ is(Seq->wrap(5)    ->repeat(5) ->to_array, [5,5,5,5,5],   'repeat 4');
 is(Seq->wrap(1,2,3)->repeat(2) ->to_array, [1,2,3,1,2,3], 'repeat 5');
 is(Seq->wrap(1,2,3)->repeat(3) ->to_array, [(1,2,3) x 3], 'repeat 6');
 
-is(Seq->replicate(10, 'A')->to_array, [('A') x 10], 'replicate');
+is(Seq->replicate(10, 'A'), seq { ('A') x 10 }, 'replicate');
 
 is(
     Seq::zip(
         Seq->always(1),
         Seq->wrap(qw/A B C D E F/),
-    )->to_array,
-    [ [1,'A'],[1,'B'],[1,'C'],[1,'D'],[1,'E'],[1,'F'] ],
+    ),
+    seq { [1,'A'],[1,'B'],[1,'C'],[1,'D'],[1,'E'],[1,'F'] },
     'always with zip');
 
 is(
     Seq::zip(
         Seq->wrap(1,2)->repeat(9),
         Seq->wrap(qw/A B C D E F/),
-    )->to_array,
-    [ [1,'A'],[2,'B'],[1,'C'],[2,'D'],[1,'E'],[2,'F'] ],
+    ),
+    seq { [1,'A'],[2,'B'],[1,'C'],[2,'D'],[1,'E'],[2,'F'] },
     'repeat with zip 1');
 
 is(
     Seq::zip(
         Seq->wrap(1,2)->repeat(2),
         Seq->wrap(qw/A B C D E F/),
-    )->to_array,
-    [ [1,'A'],[2,'B'],[1,'C'],[2,'D'] ],
+    ),
+    seq { [1,'A'],[2,'B'],[1,'C'],[2,'D'] },
     'repeat with zip 2');
 
 is(
     Seq::zip(
         Seq->wrap(1,2)->infinity,
         Seq->wrap(qw/A B C D E/)->infinity,
-    )->take(12)->to_array,
-    [
+    )->take(12),
+    seq {
         [1,'A'],[2,'B'],[1,'C'],[2,'D'],[1,'E'],
         [2,'A'],[1,'B'],[2,'C'],[1,'D'],[2,'E'],
         [1,'A'],[2,'B'],
-    ],
+    },
     'zip on infinities');
 
 is(
     Seq::zip(
         $range->infinity,
         $range->rev->infinity,
-    )->take(15)->to_array,
-    [
+    )->take(15),
+    seq {
         [1,10],[2,9],[3,8],[4,7],[5,6],[6,5],[7,4],[8,3],[9,2],[10,1],
         [1,10],[2,9],[3,8],[4,7],[5,6],
-    ],
+    },
     'zip on ifinity with reverse');
 
 is(
     Seq::zip(
         $range->infinity,
         $range->rev->infinity,
-    )->take(15)->map(sub($tuple) { fst($tuple) + snd($tuple) }),
+    )->take(15)->map(call 'sum'),
 
     Seq->always(11)->take(15),
     'zip,infinity,rev,take,map,always');
@@ -741,7 +749,7 @@ is(
 # as_hash
 {
     my $h = Seq->new(qw/Hello World One Two/)->bind(sub($str) {
-        Seq->new($str, length $str)
+        seq { $str, length $str }
     })->as_hash;
 
     is(
@@ -764,25 +772,17 @@ is(
         $sum += $x;
     });
 
-    is($sum, 0, '$sum 0 as no data was queried');
-    is(
-        $seq->to_array(5),
-        [1,2,3,4,5],
-        'first 5 of $seq');
-    is($sum, 15, '$sum is now 15');
-
-    is(
-        $seq->to_array(5),
-        [1,2,3,4,5],
-        'first 5 of $seq');
-    is($sum, 30, '$sum is now 30');
+    is($sum,                          0, '$sum 0 as no data was queried');
+    is($seq->take(5), seq { 1,2,3,4,5 }, 'first 5 of $seq');
+    is($sum,                         15, '$sum is now 15');
+    is($seq->take(5), seq { 1,2,3,4,5 }, 'first 5 of $seq');
+    is($sum,                         30, '$sum is now 30');
 }
 
 # split and join
 {
     my $words =
-        Seq
-        ->new("Foo+Bar+Baz", "maz+faz")
+        seq { "Foo+Bar+Baz", "maz+faz" }
         ->split(qr/\+/);
 
     is(
@@ -798,25 +798,19 @@ is(
 
 # map2
 {
-    my $words = Seq->new(qw(foo bar baz));
+    my $words = seq { qw(foo bar baz) };
     my $one   = Seq->always(1);
 
     # method
-    my $seq1  = $words->map2($one, sub($word,$one) {
-        Array->new($word, $one);
-    });
     is(
-        $seq1->to_array,
-        [["foo",1], ["bar",1], ["baz",1]],
+        $words->map2($one, sub($word,$one) { [$word, $one] }),
+        seq { ["foo",1], ["bar",1], ["baz",1] },
         'map2 - method');
 
     # functional
-    my $seq2  = Seq::map2($words, $one, sub($word,$one) {
-        Array->new($word, $one);
-    });
     is(
-        $seq2->to_array,
-        [["foo",1], ["bar",1], ["baz",1]],
+        Seq::map2($words, $one, sub($word,$one) { [$word, $one] }),
+        seq { ["foo",1], ["bar",1], ["baz",1] },
         'map2 - functional');
 }
 
@@ -881,15 +875,23 @@ is(
     Seq->range(1,1_000_000_000)->windowed(10)->take(3),
     seq { [1 .. 10], [2 .. 11], [3 .. 12] },
     'windowed on large Seq');
-
 is(
     Seq->range(1,1_000_000_000)->windowed(10)->map(sub($a) { $a->sum })->take(3),
     seq { 55, 65, 75 },
     'windowed - check if array is blessed');
-
 is(
     Seq->range(1,100)->skip(1_000_000_000),
     seq {},
     'skip with large number');
+{
+    my $a = seq { 1,2,3 };
+    my $b = seq { 4,5,6 };
+    my $c = seq { 7,8,9 };
+
+    is(
+        Seq::append($a, Seq::append($b,$c)),
+        Seq::append(Seq::append($a,$b), $c),
+        'Seq::append in different order');
+}
 
 done_testing;
