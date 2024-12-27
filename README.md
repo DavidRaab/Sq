@@ -4,88 +4,96 @@ Sq - A Language hosted in Perl
 
 # SYNOPSIS
 
-What is a programming language? The foundation of every programming language
-are the data-structures the language provides you by default. The default
-data-structures and their possibilites shape how you will build a solution.
+Why Sq?
 
-Sq is a module that provides certain data-structures. Those data-structures
-are meant as a replacement for the built-in Perl data-structures. But replacing
-those data-structures will change the way how you code.
+Because I didn't liked the way that Perl and many other languages evolved. This crazy stuff and automatic "crying" that everything not object-oriented must be
+bad is horrible.
 
-Sq currently provides a lazy sequence `Seq`, extension for `Array`, `Hash`,
-a `Queue`, `List` and a `Heap` data-structure.
+So i just wanted another direction.
 
-It uses an `Option` and `Result` type for representing the absence of values
-or representing **Ok/Err** values.
+I just read all beginner books of Perl. Had the Perl Bible. Perl
+Best Practices, Object-Oriented Perl, 2-3 Catalyst Books. Developers Testing,
+Advanced Perl Programming 1st and 2nd Edition. Algorithms with Perl.
+Netzwerk Programmiern mit Perl (Network Programming with Perl. Don't know
+if there was an english book) and some others.
 
-It is planned to implement **Discriminated Unions**.
+The most important one was Higher-Order Perl (HOP) in 2008.
 
-Instead of classes, typing is done with an Structural Typing approach. It is
-available under `Sq::Type` but not fully documented yet. This can be used as
-an argument validator or even as a testing tool.
+I guess it completely shaped how I thought about programming and found a better
+way of writing programs.
 
-Under `Sq::Parser` there is a Combinator based approach to parsing. It
-is already usuable and can be used for certain things but sill lacks some
-features like useful error-messages.
+As i actually wanted todo Game Development I learned C# with Unity. Again C#
+was a nightmare. Coming from Perl with Moose, C# looked horrible outdated. But
+it was faster.
 
-`Sq` don't invent new syntax, it just uses Perl as much as possible. It
-is also implemented in pure Perl so far.
+I then learned F# as after HOP i wanted to learn more deeper about functional
+programming. I mostly learned F# from [F# For Fun and Profit][https://fsharpforfunandprofit.com/]
 
-The idea of `Sq` is to combine procedural and functional programming and
-stick to a design that splits Data from Code. Because it leads to better
-software, is easier to develop and has more reusable code.
+I really liked F# and will continue using it to make a game in the future.
 
-The whole point is that it offers all basic operations you usually do in Perl
-like reading files, directories, parsing in general, parsing arguments, testing
-and a lot of other stuff in it's own System that uses the provided data-structures
-like `Seq`, `Array`, `Option` and `Result` so you can use it as a foundation
-to develop more abstract things without re-implementing the basics again and again.
+Still i am loving and using Perl nearly 20 years. Working on a Linux machine
+with Perl. You can do a lot of stuff, automation. I know that because i
+basically have written a software to exactly do that. But it wasn't for
+me. So i got fired until the software was done.
 
-# HISTORY
+`Sq` is now somewhat my own system to help me solve the typical problems i have.
+I could have picked F# as i really liked the language. But working with F#
+is, the funny part, too slow.
 
-I started `Sq` first by just being a lazy Sequence and named it `Seq`.
-But the `Seq` namespace in Perl was already taken, deleted, and the old
-maintainer doesn't react to eMails anymore.
+My complete test-suite with over 2000 tests runs in under 1 second.
+`prove -lrj 24`. And consider it must first parse and compile it. It starts
+42+ test files in parallel.
 
-So I decided to just name it `Sq` instead. At the same time I already had
-the idea to bring more stuff to Perl, like Records, Pattern Matching
-and Discriminated Unions, also some other approach to type-checking.
+In that time i didn't get a simple "Hello, World!" printed in F#. It takes
+around 3 seconds to start.
 
-So instead of releasing a dozens of seperate modules I thought about
-making one module that just combines all this ideas together that also can
-depend on each other. I wanted a short name, so i just removed the `e`
-from `Seq` and just named it `Sq`. You still can pronounce it `Seq`.
+As i knew Perl the best, i choosed to write it in Perl.
 
-There is no meaning/abreviation behind `Sq`. But when you can think of one
-that makes sense or you like then feel free to contribute.
+Otherwise F# is fast, but I usually didn't liked how complex the community
+tries to solve problems. Even APIs seems over complicated. I guess that
+is what dynamic-typed developers better can. They know better  how an API
+must be, because you must remember it. Usually the IDE doesn't help you.
+
+I know it because i basically worked most of my time just with Geanny and Perl.
+Syntax Highlithing is all you have. But you know. You become faster this way.
+
+Anyway `Sq` is my take on programming in a procedural, LISP-like, dynamic-typed
+ML language.
 
 # Implemented so Far
 
-Most stuff at the moment is just a place-holder, maybe some will never be
-implemented, but some stuff is already usable and tested. So if you really
-want to look around of what is usable you should look at the tests at the
-moment. I anyway think that code is the best way to see and understand code.
+Some interesting things like a Type-System, Equality, Parser, Testing-System
+and a whole feature rich Array, Hash and lazy sequence is already solved to a
+great part. Still not complete. It also offers loadable Signatures.
 
-But the API itself is not fixed, means some stuff is very likely to change.
+The API itself is not fixed, means some stuff is very likely to change.
 
 I wouldn't recommend this module at the moment to build something critical
-unless you are fine that you maybe need sometimes small-fixes to make code
+unless you are fine that you very likely need fixes to make code
 working again.
 
+In the next time i guess I will create more complex tests. So not just tests
+that covers all code paths. More actual useful ones. This way it also
+can be seen how things are solved.
+
+But i already write my own console apps with it and try to improve those.
+So somehow `Sq` is practical. I try to solve problems with it, and change
+things when they seems to make more sense in practice over theory.
+
+* [Sq::Type](lib/Sq/Manual/Type/00-Intro.pod)
+* [Sq::Signature](lib/Sq/Manual/Type/00-Intro.pod)
+* [Sq::Parser](lib/Sq/Manual/Parser/00-intro.pod)
+* [Sq::Equality](lib/Sq/Equality.pm) (implements `equal` function and adds methods)
+* [Sq::Test](lib/Sq/Test.pm) (minimal Test-Suite that is already used to test Sq itself)
+* [Sq::Dump](lib/Sq/Dump.pm) (used for `->dump` and `->dumpw` methods on types)
+* [Sq::Collections::Seq](lib/Sq/Collections/Seq.pod)
+* [Sq::Collections::Array](lib/Sq/Collections/Array.pod)
+* [Sq::Collections::Hash](lib/Sq/Collections/Hash.pod)
 * [Sq::Core::Option](lib/Sq/Core/Option.pod)
 * [Sq::Core::Result](lib/Sq/Core/Result.pod) (Partially implemented)
-* [Sq::Collections::Seq](lib/Sq/Collections/Seq.pod)
-* [Sq::Collections::Hash](lib/Sq/Collections/Hash.pod)
-* [Sq::Collections::Array](lib/Sq/Collections/Array.pod)
 * [Sq::Collections::Queue](lib/Sq/Collections/Queue.pm)
 * [Sq::Collections::List](lib/Sq/Collections/List.pm)
 * [Sq::Collections::Heap](lib/Sq/Collections/Heap.pod)
-* [Sq::Type](lib/Sq/Manual/Type/00-Intro.pod)
-* [Sq::Parser](lib/Sq/Manual/Parser/00-intro.pod)
-* [Sq::Signature](lib/Sq/Manual/Type/00-Intro.pod)
-* [Sq::Dump](lib/Sq/Dump.pm) (used for `->dump` and `->dumpw` methods on types)
-* [Sq::Equality](lib/Sq/Equality.pm) (implements `equal` function and adds methods)
-* [Sq::Test](lib/Sq/Test.pm) (minimal Test-Suite that is already used to test Sq itself)
 
 # Seq Module
 
@@ -141,6 +149,37 @@ my $maximum_id =
     ->map(    sub($x) { $x->basename })
     ->choose( sub($x) { $x =~ m/\A(\d+) .* \.t\z/xms ? $1 : undef })
     ->max->or(0); # or 0 if the sequence is empty
+```
+
+# Seq counting to 1 Billion
+
+Try running: `examples/1bill.pl`
+
+```perl
+use Sq;
+use Sq::Sig;
+use Time::HiRes qw(time);
+
+my $first  =
+    Seq
+    ->range(1,1_000_000_000)
+    ->do(sub($num){ print "$num\n" if $num % 100_000 == 0 });
+
+my $second =
+    Seq->range(1,1_000_000_000);
+
+my $start = time();
+
+print "Are those sequences lazy?\n";
+if ( equal($first,$second) ) {
+    print "Yep!\n";
+}
+else {
+    print "No!\n";
+}
+
+my $stop = time();
+printf "Time took: %f seconds\n", ($stop - $start);
 ```
 
 # Parser
@@ -358,10 +397,16 @@ my $is_album = assign {
 
     return
         t_hash(
+            # This check is not needed. t_keys also does that. But you could
+            # have this line alone. Or just add additional fields that don't
+            # need to be specified with a type. Also the type check
+            # can be faster. All rules are executed one after another. So when
+            # t_with_keys fails, everything fails. and further tests don't need
+            # to be checked. t_keys must recurse into it's checks.
             t_with_keys(qw/artist title tracks/),
             t_keys(
-                artist => t_str(t_min 1),   # string must have at least 1 char
-                title  => t_str(t_min 1),
+                artist => t_str(t_min 1),  # string must have at least 1 char
+                title  => t_str(t_min(1), t_max(255)),
                 tracks => t_array(
                     t_min(1),              # Array must have at least 1 entry
                     t_of(t_hash(           # All entries must be hashes
@@ -425,7 +470,15 @@ whatever(  123, "foo", [1,2,3]); # ok
 
 # EXPORT
 
-It exports the following functions by default: sq, equal, call, key, id, fst, snd, assign, is_str, is_num, Some, None, Ok, Err.
+It exports the following functions by default:
+
+| Creation | sq key Some None Ok Err |
+| Equality | equal |
+| OBJ      | call  |
+| Scope    | assign lazy |
+| Helpers  | id fst snd |
+| Comparision | by_num by_str by_stri |
+| Types | is_num is_str |
 
 # SUPPORT
 
