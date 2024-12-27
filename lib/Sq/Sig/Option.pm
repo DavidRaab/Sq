@@ -64,11 +64,11 @@ sig('Option::to_seq',    $opt,              t_seq);
 
 ### Module Functions
 
-sig('Option::is_opt',          $any, $any,           t_bool);
-sig('Option::all_valid',       $any, $aopt,          $opt);
-sig('Option::all_valid_by',    $any, t_array, t_sub, $opt);
-sig('Option::filter_valid',    $any, $aopt,          t_array);
-sig('Option::filter_valid_by', $any, t_array, t_sub, t_array);
+sig('Option::is_opt',         $any, $any,           t_bool);
+sig('Array::all_valid',       $any, $aopt,          $opt);
+sig('Array::all_valid_by',    $any, t_array, t_sub, $opt);
+sig('Array::filter_valid',    $any, $aopt,          t_array);
+sig('Array::filter_valid_by', $any, t_array, t_sub, t_array);
 # sigt('Option::extract',        t_tuplev($any, ), )  # list context
 
 sigt('Option::dump',
