@@ -2,185 +2,7 @@
 
 Sq - A Language hosted in Perl
 
-# SYNOPSIS
 
-Why Sq?
-
-Because I didn't liked the way that Perl and many other languages evolved. This crazy stuff and automatic "crying" that everything not object-oriented must be
-bad is horrible.
-
-So i just wanted another direction.
-
-I just read all beginner books of Perl. Had the Perl Bible. Perl
-Best Practices, Object-Oriented Perl, 2-3 Catalyst Books. Developers Testing,
-Advanced Perl Programming 1st and 2nd Edition. Algorithms with Perl.
-Netzwerk Programmiern mit Perl (Network Programming with Perl. Don't know
-if there was an english book) and some others.
-
-The most important one was Higher-Order Perl (HOP) in 2008.
-
-I guess it completely shaped how I thought about programming and found a better
-way of writing programs.
-
-As i actually wanted todo Game Development I learned C# with Unity. Again C#
-was a nightmare. Coming from Perl with Moose, C# looked horrible outdated. But
-it was faster.
-
-I then learned F# as after HOP i wanted to learn more deeper about functional
-programming. I mostly learned F# from [F# For Fun and Profit](https://fsharpforfunandprofit.com/)
-
-I really liked F# and will continue using it to make a game in the future.
-
-Still i am loving and using Perl nearly 20 years. Working on a Linux machine
-with Perl. You can do a lot of stuff, automation. I know that because i
-basically have written a software to exactly do that. But it wasn't for
-me. So i got fired until the software was done.
-
-`Sq` is now somewhat my own system to help me solve the typical problems i have.
-I could have picked F# as i really liked the language. But working with F#
-is, the funny part, too slow.
-
-My complete test-suite with over 2000 tests runs in under 1 second.
-`prove -lrj 24`. And consider it must first parse and compile it. It starts
-42+ test files in parallel.
-
-In that time i didn't get a simple "Hello, World!" printed in F#. It takes
-around 3 seconds to start.
-
-As i knew Perl the best, i choosed to write it in Perl.
-
-Otherwise F# is fast, but I usually didn't liked how complex the community
-tries to solve problems. Even APIs seems over complicated. I guess that
-is what dynamic-typed developers better can. They know better  how an API
-must be, because you must remember it. Usually the IDE doesn't help you.
-
-I know it because i basically worked most of my time just with Geanny and Perl.
-Syntax Highlithing is all you have. But you know. You become faster this way.
-
-Anyway `Sq` is my take on programming in a procedural, LISP-like, dynamic-typed
-ML language.
-
-# Implemented so Far
-
-Some interesting things like a Type-System, Equality, Parser, Testing-System
-and a whole feature rich Array, Hash and lazy sequence is already solved to a
-great part. Still not complete. It also offers loadable Signatures.
-
-The API itself is not fixed, means some stuff is very likely to change.
-
-I wouldn't recommend this module at the moment to build something critical
-unless you are fine that you very likely need fixes to make code
-working again.
-
-In the next time i guess I will create more complex tests. So not just tests
-that covers all code paths. More actual useful ones. This way it also
-can be seen how things are solved.
-
-But i already write my own console apps with it and try to improve those.
-So somehow `Sq` is practical. I try to solve problems with it, and change
-things when they seems to make more sense in practice over theory.
-
-* [Sq::Type](lib/Sq/Manual/Type/00-Intro.pod)
-* [Sq::Signature](lib/Sq/Manual/Type/00-Intro.pod)
-* [Sq::Parser](lib/Sq/Manual/Parser/00-intro.pod)
-* [Sq::Equality](lib/Sq/Equality.pm) (implements `equal` function and adds methods)
-* [Sq::Test](lib/Sq/Test.pm) (minimal Test-Suite that is already used to test Sq itself)
-* [Sq::Dump](lib/Sq/Dump.pm) (used for `->dump` and `->dumpw` methods on types)
-* [Sq::Collections::Seq](lib/Sq/Collections/Seq.pod)
-* [Sq::Collections::Array](lib/Sq/Collections/Array.pod)
-* [Sq::Collections::Hash](lib/Sq/Collections/Hash.pod)
-* [Sq::Core::Option](lib/Sq/Core/Option.pod)
-* [Sq::Core::Result](lib/Sq/Core/Result.pod) (Partially implemented)
-* [Sq::Collections::Queue](lib/Sq/Collections/Queue.pm)
-* [Sq::Collections::List](lib/Sq/Collections/List.pm)
-* [Sq::Collections::Heap](lib/Sq/Collections/Heap.pod)
-
-# Seq Module
-
-As I started everything with the `Seq` module, here are some example
-how to use `Seq`. Keep in mind that `Seq` is a lazy data-structure, so nothing
-is computed until you start *querying* for data. And only then only as much
-is computed as needed.
-
-But a sequence is not just an iterator. An iterator usually ends at some
-point, then either a new iterator must be created or the iterator must be
-resetted.
-
-A `Seq` is more like an *immutable-iterator*. So it defines a computation that
-you can execute and iterate as often as you wish. In some sense I think
-that this design is more what someone expects using such a module.
-
-```perl
-use Sq;
-
-# Fibonacci Generator
-my $fib =
-    Seq->concat(
-        Seq->new(1,1),
-        Seq->unfold([1,1], sub($state) {
-            my $next = $state->[0] + $state->[1];
-            return $next, [$state->[1],$next];
-        })
-    );
-
-# prints: 1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987 1597 2584 4181 6765
-$fib->take(20)->iter(sub($x) {
-    say $x;
-});
-
-# you can use the same $fib again, now prints: 1 1 2 3 5
-$fib->take(5)->iter(sub($x) {
-    say $x;
-});
-
-# Represents all possible combinations
-# [[clubs => 7], [clubs => 8], [clubs => 9], ...]
-my $cards =
-    Seq::cartesian(
-        Seq->new(qw/clubs spades hearts diamond/),
-        Seq->new(qw/7 8 9 10 J Q K A/)
-    );
-
-use Path::Tiny qw(path);
-# get the maximum id from test-files so far
-my $maximum_id =
-    Seq
-    ->new(    path('t')->children )
-    ->map(    sub($x) { $x->basename })
-    ->choose( sub($x) { $x =~ m/\A(\d+) .* \.t\z/xms ? $1 : undef })
-    ->max->or(0); # or 0 if the sequence is empty
-```
-
-# Seq counting to 1 Billion
-
-Try running: `examples/1bill.pl`
-
-```perl
-use Sq;
-use Sq::Sig;
-use Time::HiRes qw(time);
-
-my $first  =
-    Seq
-    ->range(1,1_000_000_000)
-    ->do(sub($num){ print "$num\n" if $num % 100_000 == 0 });
-
-my $second =
-    Seq->range(1,1_000_000_000);
-
-my $start = time();
-
-print "Are those sequences lazy?\n";
-if ( equal($first,$second) ) {
-    print "Yep!\n";
-}
-else {
-    print "No!\n";
-}
-
-my $stop = time();
-printf "Time took: %f seconds\n", ($stop - $start);
-```
 
 # Parser
 
@@ -468,17 +290,201 @@ whatever(  123, "foo",      []); # ok
 whatever(  123, "foo", [1,2,3]); # ok
 ```
 
+# Seq Module
+
+`Seq` is a lazy data-structure that only starts computing things when you
+ask it. It only computes as much things it needs. You can think
+of them as *immutable-iterators*.
+
+```perl
+use Sq;
+
+# Does nothing.
+my $big = Seq->range(1, 1_000_000_000);
+
+# Fibonacci Generator - also does no computation.
+# It will generate fibonacci forever when this would be possible. It isn't
+# because it works on 64-bit floats
+my $fib =
+    Seq->concat(
+        Seq->new(1,1),
+        Seq->unfold([1,1], sub($state) {
+            my $next = $state->[0] + $state->[1];
+            return $next, [$state->[1],$next];
+        })
+    );
+
+# Still does nothing. But $smaller will only contain the first 10_000 items
+# when you ask it for data
+my $smaller = $big->take(10_000);
+
+# prints: 1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987 1597 2584 4181 6765
+# never more than one number needs to be in memory.
+$fib->take(20)->iter(sub($x) {
+    say $x;
+});
+
+# you can use the same $fib again, now prints: 1 1 2 3 5
+# this freshly recomputes the first 5 items.
+$fib->take(5)->iter(sub($x) {
+    say $x;
+});
+
+# Represents all possible combinations
+# [[clubs => 7], [clubs => 8], [clubs => 9], ...]
+my $cards =
+    Seq::cartesian(
+        seq { qw/clubs spades hearts diamond/ },
+        seq { qw/7 8 9 10 J Q K A/)           },
+    );
+
+use Path::Tiny qw(path);
+# get the maximum id from test-files so far
+my $maximum_id =
+    Seq->io->children('t')  # this contains Path::Tiny objects
+    ->map(call 'basename')
+    ->regex_match(qr/\A(\d+) .*\.t/xms)
+    ->max    # only the highest - this starts the computation
+    ->or(0); # A default value when sequence is empty
+```
+
+# Seq counting to 1 Billion
+
+Try running: `examples/1bill.pl`
+
+```perl
+use Sq;
+use Sq::Sig;
+use Time::HiRes qw(time);
+
+my $first  =
+    Seq
+    ->range(1,1_000_000_000)
+    ->do(sub($num){ print "$num\n" if $num % 100_000 == 0 });
+
+my $second =
+    Seq->range(1,1_000_000_000);
+
+my $start = time();
+
+print "Are those sequences lazy?\n";
+if ( equal($first,$second) ) {
+    print "Yep!\n";
+}
+else {
+    print "No!\n";
+}
+
+my $stop = time();
+printf "Time took: %f seconds\n", ($stop - $start);
+```
+
 # EXPORT
 
 It exports the following functions by default:
 
-| Creation | sq key Some None Ok Err |
-| Equality | equal |
-| OBJ      | call  |
-| Scope    | assign lazy |
-| Helpers  | id fst snd |
-| Comparision | by_num by_str by_stri |
-| Types | is_num is_str |
+| Category    | Functions               |
+|----         | ---                     |
+| Creation    | sq key Some None Ok Err |
+| Equality    | equal                   |
+| OBJ         | call                    |
+| Scope       | assign lazy             |
+| Helpers     | id fst snd              |
+| Comparision | by_num by_str by_stri   |
+| Types       | is_num is_str           |
+
+# SYNOPSIS
+
+Why Sq?
+
+Because I didn't liked the way that Perl and many other languages evolved. This crazy stuff and automatic "crying" that everything not object-oriented must be
+bad is horrible.
+
+So i just wanted another direction.
+
+I just read all beginner books of Perl. Had the Perl Bible. Perl
+Best Practices, Object-Oriented Perl, 2-3 Catalyst Books. Developers Testing,
+Advanced Perl Programming 1st and 2nd Edition. Algorithms with Perl.
+Netzwerk Programmiern mit Perl (Network Programming with Perl. Don't know
+if there was an english book) and some others.
+
+The most important one was Higher-Order Perl (HOP) in 2008.
+
+I guess it completely shaped how I thought about programming and found a better
+way of writing programs.
+
+As i actually wanted todo Game Development I learned C# with Unity. Again C#
+was a nightmare. Coming from Perl with Moose, C# looked horrible outdated. But
+it was faster.
+
+I then learned F# as after HOP i wanted to learn more deeper about functional
+programming. I mostly learned F# from [F# For Fun and Profit](https://fsharpforfunandprofit.com/)
+
+I really liked F# and will continue using it to make a game in the future.
+
+Still i am loving and using Perl nearly 20 years. Working on a Linux machine
+with Perl. You can do a lot of stuff, automation. I know that because i
+basically have written a software to exactly do that. But it wasn't for
+me. So i got fired until the software was done.
+
+`Sq` is now somewhat my own system to help me solve the typical problems i have.
+I could have picked F# as i really liked the language. But working with F#
+is, the funny part, too slow.
+
+My complete test-suite with over 2000 tests runs in under 1 second.
+`prove -lrj 24`. And consider it must first parse and compile it. It starts
+42+ test files in parallel.
+
+In that time i didn't get a simple "Hello, World!" printed in F#. It takes
+around 3 seconds to start.
+
+As i knew Perl the best, i choosed to write it in Perl.
+
+Otherwise F# is fast, but I usually didn't liked how complex the community
+tries to solve problems. Even APIs seems over complicated. I guess that
+is what dynamic-typed developers better can. They know better  how an API
+must be, because you must remember it. Usually the IDE doesn't help you.
+
+I know it because i basically worked most of my time just with Geanny and Perl.
+Syntax Highlithing is all you have. But you know. You become faster this way.
+
+Anyway `Sq` is my take on programming in a procedural, LISP-like, dynamic-typed
+ML language.
+
+# Implemented so Far
+
+Some interesting things like a Type-System, Equality, Parser, Testing-System
+and a whole feature rich Array, Hash and lazy sequence is already solved to a
+great part. Still not complete. It also offers loadable Signatures.
+
+The API itself is not fixed, means some stuff is very likely to change.
+
+I wouldn't recommend this module at the moment to build something critical
+unless you are fine that you very likely need fixes to make code
+working again.
+
+In the next time i guess I will create more complex tests. So not just tests
+that covers all code paths. More actual useful ones. This way it also
+can be seen how things are solved.
+
+But i already write my own console apps with it and try to improve those.
+So somehow `Sq` is practical. I try to solve problems with it, and change
+things when they seems to make more sense in practice over theory.
+
+* [Sq::Type](lib/Sq/Manual/Type/00-Intro.pod)
+* [Sq::Signature](lib/Sq/Manual/Type/00-Intro.pod)
+* [Sq::Parser](lib/Sq/Manual/Parser/00-intro.pod)
+* [Sq::Equality](lib/Sq/Equality.pm) (implements `equal` function and adds methods)
+* [Sq::Test](lib/Sq/Test.pm) (minimal Test-Suite that is already used to test Sq itself)
+* [Sq::Dump](lib/Sq/Dump.pm) (used for `->dump` and `->dumpw` methods on types)
+* [Sq::Collections::Seq](lib/Sq/Collections/Seq.pod)
+* [Sq::Collections::Array](lib/Sq/Collections/Array.pod)
+* [Sq::Collections::Hash](lib/Sq/Collections/Hash.pod)
+* [Sq::Core::Option](lib/Sq/Core/Option.pod)
+* [Sq::Core::Result](lib/Sq/Core/Result.pod) (Partially implemented)
+* [Sq::Collections::Queue](lib/Sq/Collections/Queue.pm)
+* [Sq::Collections::List](lib/Sq/Collections/List.pm)
+* [Sq::Collections::Heap](lib/Sq/Collections/Heap.pod)
 
 # SUPPORT
 
