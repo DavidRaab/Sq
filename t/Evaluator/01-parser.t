@@ -39,13 +39,13 @@ is(
     p_run($list, '
         (define (sum xs)
           (cond
-            (empty? xs null)
+            (empty? xs 0)
             (else (+ (car xs) (sum (cdr xs))))))
     '),
     Some([
         ["define", ["sum", "xs"],
             ["cond",
-                ["empty?", "xs", "null"],
+                ["empty?", "xs", 0],
                 ["else", ["+", ["car", "xs"], ["sum", ["cdr", "xs"]]]]]]
     ]),
     'list 4');
