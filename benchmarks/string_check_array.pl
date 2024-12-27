@@ -55,6 +55,16 @@ cmpthese(-1, {
             }
         }
     },
+    regex_or2_a => sub {
+        my $count = 0;
+        for ( 1 .. 1_000 ) {
+            for my $data ( @data ) {
+                if ( $data =~ m/\AA(?:rray|RRAY)\z/a ) {
+                    $count++;
+                }
+            }
+        }
+    },
     regex_i => sub {
         my $count = 0;
         for ( 1 .. 1_000 ) {
