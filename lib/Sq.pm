@@ -4,7 +4,7 @@ our $VERSION = '0.007';
 use Scalar::Util ();
 sub import {
     my ( $pkg ) = caller;
-    no strict 'refs';
+    no strict 'refs'; ## no critic
     state @funcs = (
         qw(sq call key assign seq),
         qw(is_num is_str id fst snd),
