@@ -7,16 +7,13 @@ use Sq::Sig;
 use Sq::Test;
 
 my $album = Sq::Evaluator::type
-    [hash =>
-      [with_keys => qw/artist title tracks/],
-      [keys =>
-        artist => ['str'],
-        title  => ['str'],
-        tracks => [array => [of => [hash =>
-          [with_keys => qw/name duration/],
-          [keys =>
-            name     => ['str'],
-            duration => ['int']]]]]]];
+    [hash => [keys =>
+        artist => ['str', [min => 1]],
+        title  => ['str', [min => 1]],
+        tracks =>
+            [array => [of => [hash => [keys =>
+                name     => ['str'],
+                duration => ['int']]]]]]];
 
 nok(t_valid($album, {}), 'album 1');
 
@@ -81,5 +78,26 @@ nok(t_valid($album, {
         {},
     ],
 }), 'album 9');
+
+nok(t_valid($album, {
+    artist => '',
+    title  => 'Greatest Hit',
+    tracks => [
+        {name => 'Woot', duration => 300},
+        {name => 'Huhu', duration => 100},
+        {},
+    ],
+}), 'album 10');
+
+nok(t_valid($album, {
+    artist => 'Yep',
+    title  => '',
+    tracks => [
+        {name => 'Woot', duration => 300},
+        {name => 'Huhu', duration => 100},
+        {},
+    ],
+}), 'album 11');
+
 
 done_testing;
