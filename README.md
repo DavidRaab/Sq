@@ -205,8 +205,12 @@ my $user2 = {
 };
 
 # Tests
-is(t_run($user, $user1), Ok(1),                                '$user1 is a user');
-is(t_run($user, $user2), Err("first does not exists on hash"), '$user2 has a typo');
+is(t_run($address, $users[0]{address}), Ok(1),
+    '$users[0] is addr');
+is(t_run($user, $users[0]), Ok(1),
+    '$users[0] is a user');
+is(t_run($user, $users[1]), Err("hash: keys: 'first' not defined"),
+    '$users[1] has a typo');
 
 # describes an album
 my $is_album = assign {
@@ -288,6 +292,23 @@ whatever(123.3,   123,      []); # fails
 whatever(  123,   123,      []); # ok - because "123" is also a valid string
 whatever(  123, "foo",      []); # ok
 whatever(  123, "foo", [1,2,3]); # ok
+```
+
+This is the signature of `Option::match`.
+
+```perl
+my $matches = t_hash(t_keys(
+    Some => t_sub,
+    None => t_sub,
+));
+sigt('Option::match', t_tuplev($opt, t_as_hash($matches)), $any);
+
+# this is how a match call looks
+my $result =
+    $opt->match(
+        Some => sub($x) { $x * $x },
+        None => sub     { 0       },
+    );
 ```
 
 # Seq Module
