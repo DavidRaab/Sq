@@ -32,6 +32,27 @@ is(
         [ 18,  81 ],
         [ 20, 100 ]
     },
-    'build something small');
+    'build something small 1');
+
+# or functional-style
+# definining Seq->range twice doesn't really matter.
+is(
+    Seq::zip(
+        Seq->range(1,1_000_000_000)->map(sub($x) { $x * 2  }),
+        Seq->range(1,1_000_000_000)->map(sub($x) { $x * $x }),
+    )->take(10),
+    seq {
+        [  2,   1 ],
+        [  4,   4 ],
+        [  6,   9 ],
+        [  8,  16 ],
+        [ 10,  25 ],
+        [ 12,  36 ],
+        [ 14,  49 ],
+        [ 16,  64 ],
+        [ 18,  81 ],
+        [ 20, 100 ]
+    },
+    'build something small 2');
 
 done_testing;
