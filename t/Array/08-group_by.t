@@ -83,7 +83,7 @@ my $data = sq [
         'group_fold');
 
     is(
-        $grouped->values->sort(sub($x,$y) { $x->{id} <=> $y->{id} }),
+        $grouped->values->sort_hash(by_num, 'id'),
         [
             {
                 'id'   => 1,
