@@ -89,19 +89,6 @@ my $dispatch = {
     'Sq::Control::Lazy' => sub { 'lazy { DUMMY }'                   },
 };
 
-sub to_string($any, $inline=60, $depth=0) {
-    my $type =
-        !defined $any    ? '_UNDEF'  :
-        Sq::is_num($any) ? '_NUM'    :
-        Sq::is_str($any) ? '_STRING' :
-        ref $any;
-
-    my $func = $dispatch->{$type};
-    return defined $func
-         ? compact($inline, $func->($any, $inline, $depth))
-         : "NOT_IMPLEMENTED REF: $type";
-}
-
 sub quote($str) {
     $str =~ s/\r/\\r/;
     $str =~ s/\n/\\n/;
@@ -133,6 +120,18 @@ sub compact($max, $str) {
     return $str;
 };
 
+sub to_string($any, $inline=60, $depth=0) {
+    my $type =
+        !defined $any    ? '_UNDEF'  :
+        Sq::is_num($any) ? '_NUM'    :
+        Sq::is_str($any) ? '_STRING' :
+        ref $any;
+
+    my $func = $dispatch->{$type};
+    return defined $func
+         ? compact($inline, $func->($any, $inline, $depth))
+         : "NOT_IMPLEMENTED REF: $type";
+}
 
 sub dump($any, $inline=60, $depth=0) {
     return to_string($any, $inline, $depth);
@@ -151,28 +150,17 @@ sub add_dump($type, $func) {
 }
 
 # Add dumping to other packages
-package Array;
-*dump  = \&dump;
-*dumpw = \&dumpw;
-
-package Hash;
-*dump  = \&dump;
-*dumpw = \&dumpw;
-
-package Seq;
-*dump  = \&dump;
-*dumpw = \&dumpw;
-
-package Option;
-*dump  = \&dump;
-*dumpw = \&dumpw;
-
-package Result;
-*dump  = \&dump;
-*dumpw = \&dumpw;
-
-package Sq::Control::Lazy;
-*dump  = \&dump;
-*dumpw = \&dumpw;
+*{Array::dump }             = \&dump;
+*{Array::dumpw}             = \&dumpw;
+*{Hash::dump }              = \&dump;
+*{Hash::dumpw}              = \&dumpw;
+*{Seq::dump }               = \&dump;
+*{Seq::dumpw}               = \&dumpw;
+*{Option::dump }            = \&dump;
+*{Option::dumpw}            = \&dumpw;
+*{Result::dump }            = \&dump;
+*{Result::dumpw}            = \&dumpw;
+*{Sq::Control::Lazy::dump } = \&dump;
+*{Sq::Control::Lazy::dumpw} = \&dumpw;
 
 1;
