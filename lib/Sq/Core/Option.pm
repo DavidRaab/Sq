@@ -224,6 +224,24 @@ sub is_opt($, $any) {
     return ref $any eq 'Option' ? 1 : 0;
 }
 
+sub extract($, @anys) {
+    my @ret;
+    for my $any ( @anys ) {
+        return 0 if !defined $any;
+        if ( ref $any eq 'Option' ) {
+            return 0 if @$any == 0;
+            push @ret, @$any;
+        }
+        else {
+            push @ret, $any;
+        }
+    }
+    return @ret > 0 ? (1,@ret) : 0;
+}
+
+# Array Functions
+package Array;
+
 sub all_valid($, $array_of_opt) {
     my $new = Array->new;
     for my $opt ( @$array_of_opt ) {
@@ -258,21 +276,6 @@ sub filter_valid_by($, $array, $f) {
         push @$new, @$opt if @$opt;
     }
     return $new;
-}
-
-sub extract($, @anys) {
-    my @ret;
-    for my $any ( @anys ) {
-        return 0 if !defined $any;
-        if ( ref $any eq 'Option' ) {
-            return 0 if @$any == 0;
-            push @ret, @$any;
-        }
-        else {
-            push @ret, $any;
-        }
-    }
-    return @ret > 0 ? (1,@ret) : 0;
 }
 
 1;
