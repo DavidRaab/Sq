@@ -228,17 +228,17 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
         'extract');
 
     is(
-        Option->all_valid($h->extract(qw/foo latz bar/)),
+        Array->all_valid($h->extract(qw/foo latz bar/)),
         None,
         'extract 2');
 
     is(
-        Option->all_valid($h->extract(qw/foo bar/)),
+        Array->all_valid($h->extract(qw/foo bar/)),
         Some([1, 4]),
         'extract 3');
 
     is(
-        Option->filter_valid($h->extract(qw/foo latz bar/)),
+        Array->filter_valid($h->extract(qw/foo latz bar/)),
         [1, 4],
         'extract 4');
 }

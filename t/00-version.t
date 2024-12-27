@@ -39,7 +39,7 @@ is(
 
 # max returns an optional value
 is(
-    Option->filter_valid( $data->map(call 'max') ),
+    Array->filter_valid( $data->map(call 'max') ),
     [3,6,9],
     'calls max on each inner array');
 
