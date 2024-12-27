@@ -812,7 +812,7 @@ sub windowed($seq, $window_size) {
         }
 
         # 1=first call, 2=all others
-        my $state = 1;
+        my $state = @queue > 0 ? 1 : 2;
         return sub {
             return undef if $abort;
             if ( $state == 1 ) {
