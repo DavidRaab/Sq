@@ -1,4 +1,3 @@
-benchmarks/array_check.pl
 benchmarks/array_choose.pl
 benchmarks/array_init.pl
 benchmarks/array_map.pl
@@ -23,6 +22,7 @@ benchmarks/range.pl
 benchmarks/seq_range.pl
 benchmarks/seq_range_step.pl
 benchmarks/signature.pl
+benchmarks/string_check_array.pl
 Build.PL
 Changes
 examples/1bill.pl
@@ -80,7 +80,9 @@ lib/Sq/Data/JSON.pm
 lib/Sq/Data/XML.pm
 lib/Sq/Dump.pm
 lib/Sq/Equality.pm
+lib/Sq/Evaluator.pm
 lib/Sq/Exporter.pm
+lib/Sq/Exporter.pod
 lib/Sq/Fmt.pm
 lib/Sq/Fs.pm
 lib/Sq/Fs/Stat.pm
@@ -90,7 +92,7 @@ lib/Sq/Io/File.pm
 lib/Sq/Io/Socket.pm
 lib/Sq/L.pm
 lib/Sq/Language.pm
-lib/Sq/Manual.pod
+lib/Sq/Manual.md
 lib/Sq/Manual/BindChain.pod
 lib/Sq/Manual/Concepts/Bind.pod
 lib/Sq/Manual/Concepts/FoldMut.pod
@@ -117,6 +119,7 @@ lib/Sq/Manual/Type/02-Tuple.pod
 lib/Sq/Parser.pm
 lib/Sq/Parser.pod
 lib/Sq/Parser/HTML.pm
+lib/Sq/Parser/JSON.pm
 lib/Sq/Parser/Markdown.pm
 lib/Sq/Reflection.pm
 lib/Sq/Reflection.pod
@@ -147,7 +150,6 @@ META.json
 META.yml
 perlcriticrc
 profile_tests.pl
-README
 README.md
 t/00-version.t
 t/01-queue.t
@@ -160,12 +162,15 @@ t/06-sq.t
 t/07-lazy.t
 t/08-equality.t
 t/09-type_option.t
+t/10-exporter.t
 t/Array/00-basics.t
 t/Array/01-bind-flatten.t
 t/Array/03-fibonacci.t
 t/Array/06-min_max.t
 t/Array/08-group_by.t
 t/Array/10-option.t
+t/Evaluator/00-type.t
+t/Evaluator/01-parser.t
 t/List/00-basics.t
 t/Parser/00-basic.t
 t/Parser/01-array.t
@@ -173,6 +178,7 @@ t/Parser/02-nested-array.t
 t/Parser/03-int-list.t
 t/Parser/04-varargs.t
 t/Parser/05-numsuffix.t
+t/Parser/06-json.t
 t/Seq/00-basics.t
 t/Seq/01-bind-flatten.t
 t/Seq/02-join_select.t
@@ -184,9 +190,11 @@ t/Seq/07-from_sub.t
 t/Seq/08-group_by.t
 t/Seq/09-cache.t
 t/Seq/10-option.t
+t/Seq/11-lazy.t
 t/Seq/data/07-from_sub/text.txt
 t/Signature/00-basics.t
 t/Signature/01-Array.t
+t/Signature/02-option.t
 t/Type/00-basics.t
 t/Type/01-user.t
 t/Type/02-option.t

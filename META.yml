@@ -15,10 +15,22 @@ meta-spec:
   version: '1.4'
 name: Sq
 provides:
+  Array:
+    file: lib/Sq/Collections/Array.pm
+  Hash:
+    file: lib/Sq/Collections/Hash.pm
+  Heap:
+    file: lib/Sq/Collections/Heap.pm
+  List:
+    file: lib/Sq/Collections/List.pm
   Option:
     file: lib/Sq/Core/Option.pm
+  Queue:
+    file: lib/Sq/Collections/Queue.pm
   Result:
     file: lib/Sq/Core/Result.pm
+  Seq:
+    file: lib/Sq/Collections/Seq.pm
   Sq:
     file: lib/Sq.pm
     version: '0.007'
@@ -66,6 +78,8 @@ provides:
     file: lib/Sq/Dump.pm
   Sq::Equality:
     file: lib/Sq/Equality.pm
+  Sq::Evaluator:
+    file: lib/Sq/Evaluator.pm
   Sq::Exporter:
     file: lib/Sq/Exporter.pm
   Sq::Fmt:
@@ -82,6 +96,8 @@ provides:
     file: lib/Sq/Parser.pm
   Sq::Parser::HTML:
     file: lib/Sq/Parser/HTML.pm
+  Sq::Parser::JSON:
+    file: lib/Sq/Parser/JSON.pm
   Sq::Parser::Markdown:
     file: lib/Sq/Parser/Markdown.pm
   Sq::Reflection:
