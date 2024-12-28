@@ -1,15 +1,8 @@
 package Sq::Reflection;
 use 5.036;
 use Carp ();
-# sub import {
-#     no strict 'refs';
-#     my ( $pkg ) = caller;
-#     state @funcs = qw(get_func set_func all_funcs);
-#     for my $func ( @funcs ) {
-#         *{"${pkg}::$func"} = \&$func;
-#     }
-#     return;
-# }
+use Sq::Exporter;
+our @EXPORT = qw(get_func set_func all_funcs has_func);
 
 {
     no strict   'refs';     ## no critic
@@ -35,18 +28,15 @@ use Carp ();
     }
 
     # returns all functions of a package
-    my %invalid = map { $_ => 1 }
-            qw(__ANON__ BEGIN END INIT CHECK UNITCHECK a b import);
     sub all_funcs($package) {
         my @funcs;
         # Traverse symbol-table
         for my ($key,$glob) ( %{*{$package . '::'}} ) {
             if ( defined *{$glob}{CODE} ) {
-                next if $invalid{$key};
                 push @funcs, $key;
             }
         }
-        return @funcs;
+        return bless(\@funcs, 'Array');
     }
 
     sub has_func($pkg, $name) {

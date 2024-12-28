@@ -1,29 +1,21 @@
 package Sq::Type;
 use 5.036;
-use Carp ();
-use Scalar::Util ();
 use Sq;
 use Sq::Parser qw(p_valid);
 use Sq::Evaluator;
-sub import {
-    no strict 'refs'; ## no critic
-    my ( $pkg ) = caller;
-    state @funcs = (
-        qw(type),
-        qw(t_run t_valid t_assert t_or t_is),            # Basic
-        qw(t_str t_enum t_match t_matchf t_parser),      # String
-        qw(t_num t_int t_positive t_negative t_range),   # Numbers
-        qw(t_opt),
-        qw(t_hash t_with_keys t_keys t_as_hash),         # Hash
-        qw(t_array t_idx t_tuple t_tuplev t_even_sized), # Array
-        qw(t_of t_min t_max t_length),
-        qw(t_any t_sub t_regex t_bool t_seq t_void t_result),
-        qw(t_ref t_isa t_can)                            # Objects
-    );
-    for my $func ( @funcs ) {
-        *{"${pkg}::$func"} = \&$func;
-    }
-}
+use Sq::Exporter;
+our @EXPORT = (
+    qw(type),
+    qw(t_run t_valid t_assert t_or t_is),            # Basic
+    qw(t_str t_enum t_match t_matchf t_parser),      # String
+    qw(t_num t_int t_positive t_negative t_range),   # Numbers
+    qw(t_opt),
+    qw(t_hash t_with_keys t_keys t_as_hash),         # Hash
+    qw(t_array t_idx t_tuple t_tuplev t_even_sized), # Array
+    qw(t_of t_min t_max t_length),
+    qw(t_any t_sub t_regex t_bool t_seq t_void t_result),
+    qw(t_ref t_isa t_can)                            # Objects
+);
 
 # TODO
 # Add: t_not
@@ -643,7 +635,7 @@ sub type($array) {
         seq       => \&t_seq,       void       => \&t_void,       result   => \&t_result,
         ref       => \&t_ref,       isa        => \&t_isa,        can      => \&t_can,
     };
-    return Sq::Evaluator::eval_data($table, $array);
+    return eval_data($table, $array);
 }
 
 1;

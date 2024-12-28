@@ -1,6 +1,7 @@
 package Sq::Evaluator;
 use 5.036;
-use Carp ();
+use Sq::Exporter;
+our @EXPORT = qw(eval_data);
 
 sub eval_data($table, $array) {
     my ($func, @rest ) = @$array;

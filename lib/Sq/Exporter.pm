@@ -1,6 +1,7 @@
 package Sq::Exporter;
 use 5.036;
-use Sq::Reflection;
+use Carp ();
+
 no strict 'refs'; ## no critic
 sub import {
     my ($pkg) = caller;

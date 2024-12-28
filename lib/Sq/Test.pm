@@ -1,15 +1,9 @@
 package Sq::Test;
 use 5.036;
-use Sq;
 use builtin 'blessed';
-sub import {
-    no strict 'refs';
-    my ( $pkg ) = caller;
-    state @funcs = (qw/is ok nok done_testing dies like check_isa/);
-    for my $func ( @funcs ) {
-        *{"${pkg}::$func"} = \&$func;
-    }
-}
+use Sq;
+use Sq::Exporter;
+our @EXPORT = qw/is ok nok done_testing dies like check_isa/;
 
 BEGIN {
     my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);

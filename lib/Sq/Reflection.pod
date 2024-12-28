@@ -11,6 +11,12 @@ is finished.
 
 =head1 Functions
 
+=head2 has_func($package, $name) : $bool
+
+Returns a truish value if a package has a function defined.
+
+    my $bool = has_func('Array', 'newShiny');
+
 =head2 get_func($func_name) : $sub | EXCEPTION
 
 Write a function with full package name and get back the subroutine
@@ -30,8 +36,8 @@ Sets a function to a new function by providing the subroutine reference.
         return $orig->($array, $sub);
     });
 
-=head2 all_funcs($package) : @funcs
+=head2 all_funcs($package) : $array_of_func_names
 
 Returns all function names of a package as an Sq Array.
 
-    my @funcs = all_funcs('Array');
+    my $funcs = all_funcs('Array');

@@ -2,7 +2,6 @@ package Sq::Collections::Hash;
 package Hash;
 use 5.036;
 use Hash::Util ();
-use Carp ();
 use subs 'bind', 'keys', 'values', 'bless', 'map', 'foreach', 'delete', 'length';
 
 # TODO: equal, eual_values, is_disjoint

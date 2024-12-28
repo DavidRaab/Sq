@@ -2,19 +2,13 @@ package Sq::Parser;
 use 5.036;
 use Sq;
 use Sq::Evaluator;
-sub import {
-    no strict 'refs'; ## no critic
-    my ( $pkg ) = caller;
-    state @funcs = (
-        qw(parser),
-        qw(p_run p_valid p_match p_matchf p_matchf_opt p_map p_bind p_and p_return p_or p_maybe),
-        qw(p_join p_str p_strc p_many p_many0 p_ignore p_fail p_qty p_choose),
-        qw(p_repeat p_filter p_split p_delay p_not p_empty),
-    );
-    for my $func ( @funcs ) {
-        *{"${pkg}::$func"} = \&$func;
-    }
-}
+use Sq::Exporter;
+our @EXPORT = (
+    qw(parser),
+    qw(p_run p_valid p_match p_matchf p_matchf_opt p_map p_bind p_and p_return p_or p_maybe),
+    qw(p_join p_str p_strc p_many p_many0 p_ignore p_fail p_qty p_choose),
+    qw(p_repeat p_filter p_split p_delay p_not p_empty),
+);
 
 ##########
 ###
@@ -478,7 +472,7 @@ sub parser($array) {
         repeat => \&p_repeat, filter => \&p_filter, split      => \&p_split,
         delay  => \&p_delay,  not    => \&p_not,    empty      => \&p_empty,
     };
-    return Sq::Evaluator::eval_data($table, $array);
+    return eval_data($table, $array);
 }
 
 1;

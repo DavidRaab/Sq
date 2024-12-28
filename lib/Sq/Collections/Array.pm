@@ -2,9 +2,6 @@ package Sq::Collections::Array;
 package Array;
 use 5.036;
 use subs 'bind', 'join', 'select', 'last', 'sort', 'map', 'foreach', 'bless', 'length';
-use Scalar::Util ();
-use List::Util ();
-use Carp ();
 
 #-----------------------------------------------------------------------------#
 # CONSTRUCTORS                                                                #

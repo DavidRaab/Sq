@@ -1,16 +1,9 @@
 package Sq::Signature;
 use 5.036;
 use Sq;
-use Sq::Type;
-use Carp ();
-sub import {
-    no strict 'refs'; ## no critic
-    my ( $pkg ) = caller;
-    state @funcs = qw(sig sigt);
-    for my $func ( @funcs ) {
-        *{"${pkg}::$func"} = \&$func;
-    }
-}
+use Sq::Type qw(t_tuple);
+use Sq::Exporter;
+our @EXPORT = qw(sig sigt);
 
 # TODO:
 # + back-reference an unknown type

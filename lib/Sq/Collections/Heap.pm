@@ -1,7 +1,6 @@
 package Sq::Collections::Heap;
 package Heap;
 use 5.036;
-my $loaded = 0;
 
 # cmpf is a typical Perl-like comparison function. That means it must return
 # which element is smaller. It does so by either returning -1, 0 or 1.

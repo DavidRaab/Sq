@@ -1,6 +1,5 @@
 package Option;
 use 5.036;
-use Carp ();
 
 # because this value never changes, or should change, we only need one
 # value of it, and we can share it. But if someone changes the None value

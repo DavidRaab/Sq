@@ -2,8 +2,6 @@ package Sq::Collections::Seq;
 package Seq;
 use 5.036;
 use subs 'bind', 'join', 'select', 'last', 'sort', 'map', 'foreach', 'length';
-use Scalar::Util ();
-use Carp ();
 
 # TODO:
 #       Find another name for 'from_list'
@@ -448,7 +446,7 @@ sub select($seq, $mapA, $mapB) {
     state $gen_input = sub($mapping) {
         my $hash;
         my $keys;
-        if ( not defined Scalar::Util::reftype $mapping) {
+        if ( !defined Scalar::Util::reftype($mapping) ) {
             if ( $mapping =~ m/\Aall\z/i ) {
                 return ['ALL'];
             }
@@ -459,11 +457,11 @@ sub select($seq, $mapA, $mapB) {
                 Carp::croak "When not arrayref or hashref must be either 'ALL' or 'NONE'";
             }
         }
-        elsif ( Scalar::Util::reftype $mapping eq 'HASH' ) {
+        elsif ( Scalar::Util::reftype($mapping) eq 'HASH' ) {
             $hash = $mapping;
             $keys = [ keys $mapping->%* ];
         }
-        elsif ( Scalar::Util::reftype $mapping eq 'ARRAY' ) {
+        elsif ( Scalar::Util::reftype($mapping) eq 'ARRAY' ) {
             $hash = { map { $_ => $_ } @$mapping };
             $keys = $mapping;
         }
