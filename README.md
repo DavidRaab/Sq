@@ -478,9 +478,13 @@ programming. I mostly learned F# from [F# For Fun and Profit](https://fsharpforf
 I really liked F# and will continue using it to make a game in the future.
 
 Still i am loving and using Perl nearly 20 years. Working on a Linux machine
-with Perl. You can do a lot of stuff, automation. I know that because i
-basically have written a software to exactly do that. But it wasn't for
-me. So i got fired until the software was done.
+with Perl. You can do a lot of stuff like automation or other file/text
+processing that are just easier compared to other languages.
+
+I worked as a proffesional Perl developer in the past, did web-development,
+database, linux-administration and wrote and automated a full CMS with all kind of
+auto-deployment, database upgrades, all written in Perl. I did my
+job so good that the software was finished and I basically got fired.
 
 `Sq` is now somewhat my own system to help me solve the typical problems i have.
 I could have picked F# as i really liked the language. But working with F#
