@@ -2,10 +2,9 @@ package Sq::Fs;
 use 5.036;
 
 # Opens a file as UTF-8 text
-sub open_text($class, $file) {
+sub open_text($, $file) {
     return Seq->from_sub(sub {
         open my $fh, '<:encoding(UTF-8)', $file or die "Cannot open: $!\n";
-
         return sub {
             if ( defined $fh ) {
                 if (defined(my $line = <$fh>)) {
@@ -21,7 +20,15 @@ sub open_text($class, $file) {
     });
 }
 
-sub recurse($class, @paths) {
+sub read_bytes($, $file, $count) {
+    open my $fh, '<:raw', $file
+        or return Result::Err("Could not open file '$file'\n");
+    my $content;
+    read $fh, $content, $count;
+    return Result::Ok($content);
+}
+
+sub recurse($, @paths) {
     require Path::Tiny;
     Seq->from_sub(sub {
         my $it = Path::Tiny::path(@paths)->iterator({
@@ -34,7 +41,7 @@ sub recurse($class, @paths) {
     });
 }
 
-sub children($class, @paths) {
+sub children($, @paths) {
     require Path::Tiny;
     return Seq->new(Path::Tiny::path(@paths)->children);
 }

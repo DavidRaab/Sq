@@ -13,7 +13,6 @@ our @EXPORT = qw(sig sigt);
 
 sub sig($func_name, @types) {
     Carp::croak "sig needs at least one type" if @types == 0;
-    local $Carp::CarpLevel = 1;
     my $orig       = Sq::Reflection::get_func($func_name);
     my $out_type   = pop @types;
     my $in_type    = t_tuple(@types);
