@@ -149,7 +149,7 @@ So now look what happens.
 
 Executing this code now prints the following.
 
-    Type Error: tuple: Index 1: int: Not an integer at ./sq_test.pl line 7.
+    Array::range: tuple: Index 1: int: Not an integer at ./code.pl line xxx.
 
 Maybe the Error messages are not the best at the moment and they are a
 work in progress. But here you can see the following.
@@ -333,13 +333,13 @@ a definition your function must stick to it, otherwise you get an error.
 Here are some other kinds of code examples and the error-messages.
 
     my $sum = sq([1,2,3])->as_hash;
-    # Type Error: tuple: Index 0: even_sized: Array not even-sized at ./sq_test.pl line 11.
+    # Array::as_hash: tuple: Index 0: even_sized: Array not even-sized at ./sq_test.pl line 11.
 
-    my $sorted = sq([1,2,3,"foo" ])->sort_num;
-    # Type Error: tuple: Index 0: all: index 3: num: Not a number 'foo' at ./sq_test.pl line 11.
+    my $sorted = sq([1,2,3,"foo" ])->sort(by_num);
+    # Array::sort: tuple: Index 0: all: index 3: num: Not a number 'foo' at ./sq_test.pl line 11.
 
     my $matches = sq(["12-12", "10-10", []])->regex_match(qr/\A(\d\d)-(\d\d)\z/);
-    # Type Error: tuple: Index 0: all: index 2: str: Not a string at ./sq_test.pl line 11.
+    # Array::regex_match: tuple: Index 0: all: index 2: str: Not a string at ./sq_test.pl line 11.
 
 =head1 Optional type-checking
 
