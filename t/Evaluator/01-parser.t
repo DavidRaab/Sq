@@ -1,14 +1,13 @@
 #!perl
 use 5.036;
 use Sq;
-use Sq::Parser qw(p_run);
-use Sq::Evaluator;
+use Sq::Parser qw(parser p_run);
 use Sq::Sig;
 use Sq::Test;
 
 # LISP list
 my $list;
-$list = Sq::Evaluator::parser
+$list = parser
     [many => [map =>
         sub(@xs) { sq [@xs] },
         [match => qr/\s* \( \s*/x ], # (

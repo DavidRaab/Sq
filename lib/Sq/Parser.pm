@@ -1,10 +1,12 @@
 package Sq::Parser;
 use 5.036;
 use Sq;
+use Sq::Evaluator;
 sub import {
     no strict 'refs'; ## no critic
     my ( $pkg ) = caller;
     state @funcs = (
+        qw(parser),
         qw(p_run p_valid p_match p_matchf p_matchf_opt p_map p_bind p_and p_return p_or p_maybe),
         qw(p_join p_str p_strc p_many p_many0 p_ignore p_fail p_qty p_choose),
         qw(p_repeat p_filter p_split p_delay p_not p_empty),
@@ -463,6 +465,20 @@ sub p_not($parser) {
 sub p_empty() {
     state $fn = sub($ctx,$str) { return $ctx };
     return $fn;
+}
+
+sub parser($array) {
+    state $table = {
+        match  => \&p_match,  matchf => \&p_matchf, matchf_opt => \&p_matchf_opt,
+        map    => \&p_map,    bind   => \&p_bind,   and        => \&p_and,
+        return => \&p_return, or     => \&p_or,     maybe      => \&p_maybe,
+        join   => \&p_join,   str    => \&p_str,    strc       => \&p_strc,
+        many   => \&p_many,   many0  => \&p_many0,  ignore     => \&p_ignore,
+        fail   => \&p_fail,   qty    => \&p_qty,    choose     => \&p_choose,
+        repeat => \&p_repeat, filter => \&p_filter, split      => \&p_split,
+        delay  => \&p_delay,  not    => \&p_not,    empty      => \&p_empty,
+    };
+    return Sq::Evaluator::eval_data($table, $array);
 }
 
 1;

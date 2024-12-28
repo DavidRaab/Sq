@@ -4,10 +4,12 @@ use Carp ();
 use Scalar::Util ();
 use Sq;
 use Sq::Parser qw(p_valid);
+use Sq::Evaluator;
 sub import {
     no strict 'refs'; ## no critic
     my ( $pkg ) = caller;
     state @funcs = (
+        qw(type),
         qw(t_run t_valid t_assert t_or t_is),            # Basic
         qw(t_str t_enum t_match t_matchf t_parser),      # String
         qw(t_num t_int t_positive t_negative t_range),   # Numbers
@@ -624,6 +626,24 @@ sub t_as_hash(@checks) {
         }
         return "as_hash: Not an array";
     }
+}
+
+sub type($array) {
+    state $table = {
+        or        => \&t_or,        is         => \&t_is,
+        str       => \&t_str,       enum       => \&t_enum,       match    => \&t_match,
+        matchf    => \&t_matchf,    parser     => \&t_parser,     num      => \&t_num,
+        int       => \&t_int,       positive   => \&t_positive,   negative => \&t_negative,
+        range     => \&t_range,     opt        => \&t_opt,        hash     => \&t_hash,
+        with_keys => \&t_with_keys, keys       => \&t_keys,       as_hash  => \&t_as_hash,
+        array     => \&t_array,     idx        => \&t_idx,        tuple    => \&t_tuple,
+        tuplev    => \&t_tuplev,    even_sized => \&t_even_sized, of       => \&t_of,
+        min       => \&t_min,       max        => \&t_length,     any      => \&t_any,
+        sub       => \&t_sub,       regex      => \&t_regex,      bool     => \&t_bool,
+        seq       => \&t_seq,       void       => \&t_void,       result   => \&t_result,
+        ref       => \&t_ref,       isa        => \&t_isa,        can      => \&t_can,
+    };
+    return Sq::Evaluator::eval_data($table, $array);
 }
 
 1;

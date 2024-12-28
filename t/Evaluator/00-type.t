@@ -2,11 +2,10 @@
 use 5.036;
 use Sq;
 use Sq::Type;
-use Sq::Evaluator;
 use Sq::Sig;
 use Sq::Test;
 
-my $album = Sq::Evaluator::type
+my $album = type
     [hash => [keys =>
         artist => ['str', [min => 1]],
         title  => ['str', [min => 1]],
