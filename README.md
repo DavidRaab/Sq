@@ -463,7 +463,7 @@ Advanced Perl Programming 1st and 2nd Edition. Algorithms with Perl.
 Netzwerk Programmiern mit Perl (Network Programming with Perl. Don't know
 if there was an english book) and some others.
 
-The most important one was Higher-Order Perl (HOP) in 2008.
+The most important one was [Higher-Order Perl](https://hop.perl.plover.com/) (HOP) in 2008.
 
 I guess it completely shaped how I thought about programming and found a better
 way of writing programs.
