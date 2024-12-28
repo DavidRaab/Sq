@@ -1,28 +1,34 @@
-# Sq::Manual
+=encoding UTF-8
+
+=head1 Sq::Manual
 
 This is an overview of already written documentation.
 
-## Sequence or Array
+=head2 Sequence or Array
 
-In [Sequence or Array](lib/Sq/Manual/SeqOrArray.pod) I compare `Array`
+In L<Sequence or Array|file:///lib/Sq/Manual/SeqOrArray.pod> I compare `Array`
 and `Seq` and describe it's advantages and when you should use `Seq`.
 
-## API Documentation
+=head2 API Documentation
 
-## Other
+=head2 Other
 
-### L<Sq::Manual::FromSub>
+=head3 L<Sq::Manual::FromSub>
 
 An in-depth tutorial on how to use Seq->fromSub to create your own
 constructor functions and make other Perl Code / Modules work with
 Seq.
 
-## DESIGN
+=head2 DESIGN
 
-#### L<Sq::Manual::Design::Wrap>
+=over 4
+
+=item * L<Sq::Manual::Design::Wrap>
 
 Describes why certain operations like C<< Seq->wrap >> stops at C<undef>
 
-#### L<Sq::Manual::Design::MinMax>
+=item * L<Sq::Manual::Design::MinMax>
 
 Describes why functions like C<Sq::max> uses a mandatory C<$default> argument.
+
+=back
