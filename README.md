@@ -455,7 +455,7 @@ Why Sq?
 Because I didn't liked the way that Perl and many other languages evolved. This crazy stuff and automatic "crying" that everything not object-oriented must be
 bad is horrible.
 
-So i just wanted another direction.
+So I just wanted another direction.
 
 I just read all beginner books of Perl. Had the Perl Bible. Perl
 Best Practices, Object-Oriented Perl, 2-3 Catalyst Books. Developers Testing,
@@ -468,7 +468,7 @@ The most important one was [Higher-Order Perl](https://hop.perl.plover.com/) (HO
 I guess it completely shaped how I thought about programming and found a better
 way of writing programs.
 
-As i actually wanted todo Game Development I learned C# with Unity. Again C#
+As I actually wanted todo Game Development I learned C# with Unity. Again C#
 was a nightmare. Coming from Perl with Moose, C# looked horrible outdated. But
 it was faster.
 
@@ -477,7 +477,7 @@ programming. I mostly learned F# from [F# For Fun and Profit](https://fsharpforf
 
 I really liked F# and will continue using it to make a game in the future.
 
-Still i am loving and using Perl nearly 20 years. Working on a Linux machine
+Still I am loving and using Perl nearly 20 years. Working on a Linux machine
 with Perl. You can do a lot of stuff like automation or other file/text
 processing that are just easier compared to other languages.
 
@@ -486,26 +486,27 @@ database, linux-administration and wrote and automated a full CMS with all kind 
 auto-deployment, database upgrades, all written in Perl. I did my
 job so good that the software was finished and I basically got fired.
 
-`Sq` is now somewhat my own system to help me solve the typical problems i have.
-I could have picked F# as i really liked the language. But working with F#
+`Sq` is now somewhat my own system to help me solve the typical problems I have.
+I could have picked F# as I really liked the language. But working with F#
 is, the funny part, too slow.
 
-My complete test-suite with over 2000 tests runs in under 1 second.
-`prove -lrj 24`. And consider it must first parse and compile it. It starts
-42+ test files in parallel.
+My complete test-suite with over 2000 tests runs in under one real-time second.
+`prove -lrj 24`. And consider it must first parse and compile every single
+file. It starts 42+ test files in parallel.
 
-In that time i didn't get a simple "Hello, World!" printed in F#. It takes
+In that time I didn't get a simple "Hello, World!" printed in F#. It takes
 around 3 seconds to start.
 
-As i knew Perl the best, i choosed to write it in Perl.
+As I knew Perl the best, I choosed to write it in Perl.
 
 Otherwise F# is fast, but I usually didn't liked how complex the community
 tries to solve problems. Even APIs seems over complicated. I guess that
-is what dynamic-typed developers better can. They know better  how an API
+is what dynamic-typed developers better do. They know better how an API
 must be, because you must remember it. Usually the IDE doesn't help you.
 
-I know it because i basically worked most of my time just with Geanny and Perl.
-Syntax Highlithing is all you have. But you know. You become faster this way.
+I know it because I basically worked most of my time just with Geanny and Perl.
+Syntax Highlithing is all we had back then. But you know. You become faster this
+way.
 
 Anyway `Sq` is my take on programming in a procedural, LISP-like, dynamic-typed
 ML language.
@@ -522,11 +523,11 @@ I wouldn't recommend this module at the moment to build something critical
 unless you are fine that you very likely need fixes to make code
 working again.
 
-In the next time i guess I will create more complex tests. So not just tests
+In the next time I guess I will create more complex tests. So not just tests
 that covers all code paths. More actual useful ones. This way it also
 can be seen how things are solved.
 
-But i already write my own console apps with it and try to improve those.
+But I already write my own console apps with it and try to improve those.
 So somehow `Sq` is practical. I try to solve problems with it, and change
 things when they seems to make more sense in practice over theory.
 
