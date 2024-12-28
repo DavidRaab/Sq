@@ -84,9 +84,9 @@ my $dispatch = {
     'Option'            => \&option,
     'Seq'               => \&seq,
     'Result'            => \&result,
-    'CODE'              => sub { 'sub { DUMMY }'                    },
-    'Path::Tiny'        => sub { '"' . quote($_[0]->stringify) .'"' },
-    'Sq::Control::Lazy' => sub { 'lazy { DUMMY }'                   },
+    'CODE'              => sub { 'sub { DUMMY }'                },
+    'Sq::Control::Lazy' => sub { 'lazy { DUMMY }'               },
+    'Path::Tiny'        => sub { 'path("' . quote($_[0]->stringify) .'")' },
 };
 
 sub quote($str) {

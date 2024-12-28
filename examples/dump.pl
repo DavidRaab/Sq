@@ -3,14 +3,13 @@ use v5.36;
 use open ':std', ':encoding(UTF-8)';
 use Sq;
 use Sq::Sig;
+use Path::Tiny qw(path);
 
 my $test = sq {
     bonus => "with\nnewline",
     opt1  => Some(10),
     opt2  => None,
-    opt3  => Some([]),
-    opt4  => Some({}),
-    opt5  => Some([
+    opt3  => Some([
         [qw/a b c/],
         {
             foo => [
@@ -20,11 +19,11 @@ my $test = sq {
             ]
         }
     ]),
-    opt6 => Some("text"),
-    opt7 => Some(1,2,3),
+    opt4 => Some("text"),
+    opt5 => Some(1,2,3),
     seq1 => Seq->init(10_000, sub($idx) { $idx+1 }),
-    seq2 => Seq->new(1,2,3),
-    seq3 => Seq->new(1,2,3,4),
+    seq2 => seq { 1,2,3 },
+    path => Path::Tiny->cwd,
 };
 
 warn dump($test), "\n";
