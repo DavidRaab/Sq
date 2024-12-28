@@ -28,6 +28,21 @@ sub read_bytes($, $file, $count) {
     return Result::Ok($content);
 }
 
+sub make_link($, $source, $destination) {
+    require Path::Tiny;
+
+    $source      = Path::Tiny::path($source)->absolute;
+    $destination = Path::Tiny::path($destination);
+    my $cwd = Path::Tiny->cwd;
+
+    chdir($destination->parent)
+        or die "Cannot chdir: $!\n";
+    symlink($source->relative, $destination->basename)
+        or die "Cannot create symlink: $!\n";
+
+    chdir($cwd);
+}
+
 sub recurse($, @paths) {
     require Path::Tiny;
     Seq->from_sub(sub {
