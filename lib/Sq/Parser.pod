@@ -15,6 +15,80 @@ is designed to just use Perl Regexes with Parsing.
 
 See L<Sq::Manual::Parser::Intro> at the moment for an Intro.
 
-=head2 FUNCTIONS
+=head1 CONSTRUCTORS
 
-TODO
+
+=head2 parser
+
+
+=head1 RUNNERS
+
+
+=head2 p_run
+
+=head2 p_valid
+
+
+=head1 PARSERS
+
+
+=head2 REGEX
+
+=head3 p_match
+
+=head3 p_matchf
+
+=head3 p_matchf_opt
+
+
+=head2 SPECIAL
+
+=head3 p_map
+
+=head3 p_bind
+
+=head3 p_return
+
+=head3 p_and
+
+=head3 p_fail
+
+=head3 p_empty
+
+=head2 STRING
+
+=head3 p_str
+
+=head3 p_strc
+
+=head3 p_join
+
+=head3 p_split
+
+
+=head2 COMBINATORS
+
+=head3 p_and
+
+=head3 p_or
+
+=head3 p_maybe
+
+=head3 p_many
+
+=head3 p_many0
+
+=head3 p_ignore
+
+=head3 p_qty
+
+=head3 p_choose
+
+=head3 p_repeat
+
+=head3 p_filter
+
+=head3 p_not
+
+=head3 p_delay
+

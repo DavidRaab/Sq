@@ -5,9 +5,12 @@ use Sq::Evaluator;
 use Sq::Exporter;
 our @EXPORT = (
     qw(parser),
-    qw(p_run p_valid p_match p_matchf p_matchf_opt p_map p_bind p_and p_return p_or p_maybe),
-    qw(p_join p_str p_strc p_many p_many0 p_ignore p_fail p_qty p_choose),
-    qw(p_repeat p_filter p_split p_delay p_not p_empty),
+    qw(p_run p_valid),                        # runners
+    qw(p_map p_bind p_return p_fail p_empty), # special?
+    qw(p_match p_matchf p_matchf_opt),        # regex
+    qw(p_str p_strc p_join p_split),          # string
+    qw(p_and p_or p_maybe p_many p_many0 p_ignore),
+    qw(p_qty p_choose p_repeat p_filter p_delay p_not),
 );
 
 ##########

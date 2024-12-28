@@ -1,0 +1,19 @@
+=encoding UTF-8
+
+=head1 Sq::Exporter
+
+At the moment minimal. Use it in a module.
+
+    package MyModule;
+    use 5.036;
+    use Sq::Exporter;
+    our @EXPORT = qw(this that);
+
+    sub this() { ... }
+    sub that() { ... }
+
+Import wherever you need.
+
+    use MyModule ();       # import nothing
+    use MyModule;          # imports all
+    use MyModule qw(this); # only import 'this'.
