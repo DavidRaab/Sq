@@ -532,7 +532,7 @@ So somehow `Sq` is practical. I try to solve problems with it, and change
 things when they seems to make more sense in practice over theory.
 
 * [Sq::Type](lib/Sq/Manual/Type/00-Intro.pod)
-* [Sq::Signature](lib/Sq/Manual/Type/00-Intro.pod)
+* [Sq::Signature](lib/Sq/Manual/Type/01-Signature.pod)
 * [Sq::Parser](lib/Sq/Manual/Parser/00-intro.pod)
 * [Sq::Equality](lib/Sq/Equality.pm) implements `equal` function and add methods
 * [Sq::Evaluator](/lib/Sq/Evaluator) [Type](t/Evaluator/00-type.t) [Parser](t/Evaluator/01-parser.t) implements functions to eval data-structures
