@@ -11,13 +11,6 @@ use Carp ();
 #     return;
 # }
 
-sub oneOf($str, @strs) {
-    for my $x ( @strs ) {
-        return 1 if $str eq $x;
-    }
-    return 0;
-}
-
 {
     no strict   'refs';     ## no critic
     no warnings 'redefine';
@@ -42,13 +35,14 @@ sub oneOf($str, @strs) {
     }
 
     # returns all functions of a package
-    my @skip = qw(__ANON__ BEGIN END INIT CHECK UNITCHECK a b import);
+    my %invalid = map { $_ => 1 }
+            qw(__ANON__ BEGIN END INIT CHECK UNITCHECK a b import);
     sub all_funcs($package) {
         my @funcs;
         # Traverse symbol-table
         for my ($key,$glob) ( %{*{$package . '::'}} ) {
             if ( defined *{$glob}{CODE} ) {
-                next if oneOf($key, @skip);
+                next if $invalid{$key};
                 push @funcs, $key;
             }
         }

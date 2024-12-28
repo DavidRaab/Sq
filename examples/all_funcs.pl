@@ -6,7 +6,7 @@ use Sq::Sig;
 
 print "All defined Array functions:\n\n";
 my $count = 1;
-sq([Sq::Reflection::all_funcs('Array')])->sort_str->chunked(10)->iter(sub($array) {
+sq([Sq::Reflection::all_funcs('Array')])->sort(by_str)->chunked(10)->iter(sub($array) {
     print $array->join(', '), "\n";
 });
 print "\n";
