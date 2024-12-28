@@ -898,4 +898,11 @@ is(
         'Seq::append in different order');
 }
 
+is(
+    Seq
+    ->range(1,10)
+    ->remove(sub($x) { $x % 2 == 0 }), # remove even numbers
+    seq { 1,3,5,7,9 },
+    'remove');
+
 done_testing;

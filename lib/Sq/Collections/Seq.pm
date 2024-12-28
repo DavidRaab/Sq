@@ -563,6 +563,22 @@ sub filter($seq, $predicate) {
     }, 'Seq');
 }
 
+sub remove($seq, $predicate) {
+    return bless(sub {
+        my $abort = 0;
+        my $it    = $seq->();
+        my $x;
+        return sub {
+            return undef if $abort;
+            while ( defined($x = $it->()) ) {
+                return $x if !$predicate->($x);
+            }
+            $abort = 1;
+            undef $it;
+        }
+    }, 'Seq');
+}
+
 # take : Seq<'a> -> int -> Seq<'a>
 sub take($seq, $amount) {
     return bless(sub {
