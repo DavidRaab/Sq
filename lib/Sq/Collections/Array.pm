@@ -1,21 +1,10 @@
 package Sq::Collections::Array;
+package Array;
 use 5.036;
 use subs 'bind', 'join', 'select', 'last', 'sort', 'map', 'foreach', 'bless', 'length';
 use Scalar::Util ();
 use List::Util ();
 use Carp ();
-my $loaded = 0;
-sub import {
-    no strict 'refs'; ## no critic
-    my $target = 'Array::';
-    if ( $loaded == 0 ) {
-        for my $func ( Sq::Reflection::all_funcs(__PACKAGE__) ) {
-            *{$target . $func} = \&$func;
-        }
-        $loaded = 1;
-    }
-    return;
-}
 
 #-----------------------------------------------------------------------------#
 # CONSTRUCTORS                                                                #

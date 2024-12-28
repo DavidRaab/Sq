@@ -1,17 +1,7 @@
 package Sq::Collections::Heap;
+package Heap;
 use 5.036;
 my $loaded = 0;
-sub import {
-    no strict 'refs'; ## no critic
-    my $target = 'Heap::';
-    if ( $loaded == 0 ) {
-        for my $func ( Sq::Reflection::all_funcs(__PACKAGE__) ) {
-            *{$target . $func} = \&$func;
-        }
-        $loaded = 1;
-    }
-    return;
-}
 
 # cmpf is a typical Perl-like comparison function. That means it must return
 # which element is smaller. It does so by either returning -1, 0 or 1.
