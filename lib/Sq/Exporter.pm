@@ -4,47 +4,32 @@ use Sq::Reflection;
 no strict 'refs'; ## no critic
 sub import {
     my ($pkg) = caller;
-    *{$pkg . '::' . 'import'} = \&export_import;
+    *{"$pkg\::import"} = \&export_import;
 }
 
 sub export_import($own, @args) {
-    my %opt;
-    my @requested;
+    my ( $target ) = caller;
 
-    # process input. put key => value where key starts with `-` into
-    # %opt. All other things into @requested
-    my $idx = 0;
-    while ( $idx < @args ) {
-        my $name = $args[$idx];
-        if ( substr($name, 0, 1) eq '-' ) {
-            $opt{$name} = $args[$idx+1];
-            $idx += 2;
-        }
-        else {
-            push @requested, $name;
-            $idx++;
+    # get our @export of current package
+    my $exports = \@{"$own\::EXPORT"};
+
+    # Export default
+    if ( @args == 0 ) {
+        for my $func ( @$exports ) {
+            my $fn = *{"$own\::$func"}{CODE};
+            Carp::croak "function '$func' does not exists. Check \@EXPORT in $own" if !defined $fn;
+            *{"$target\::$func"} = $fn;
         }
     }
-
-    # Export functions into target defined with '-as'
-    if ( defined $opt{-as} ) {
-        my $target = $opt{-as};
-
-        # when no function requested then just export all functions in current
-        # package into target package
-        if ( @requested == 0 ) {
-            for my $func ( Sq::Reflection::all_funcs($own) ) {
-                *{$target . '::' . $func} = \&{$own . '::' . $func};
-            }
-        }
-        # otherwise just export requested
-        else {
-            for my $func ( @requested ) {
-                *{$target . '::' . $func} = \&{$own . '::' . $func};
-            }
+    else {
+        my %ok = map { $_ => 1 } @$exports;
+        for my $func ( @args ) {
+            my $fn = *{"$own\::$func"}{CODE};
+            Carp::croak "function '$func' is not in \@EXPORT" if not $ok{$func};
+            Carp::croak "function '$func' does not exists. Check \@EXPORT in $own" if !defined $fn;
+            *{"$target\::$func"} = $fn;
         }
     }
-    return;
 }
 
 1;

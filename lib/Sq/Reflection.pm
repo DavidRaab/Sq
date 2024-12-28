@@ -48,6 +48,12 @@ use Carp ();
         }
         return @funcs;
     }
+
+    sub has_func($pkg, $name) {
+        return 1 if defined *{"$pkg\::$name"}{CODE};
+        return 0;
+    }
 }
+
 
 1;
