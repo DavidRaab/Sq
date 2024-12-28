@@ -7,8 +7,8 @@ use Sq::Test;
 
 my $album = type
     [hash => [keys =>
-        artist => ['str', [min => 1]],
-        title  => ['str', [min => 1]],
+        artist => [str => [min => 1]],
+        title  => [str => [min => 1]],
         tracks =>
             [array => [of => [hash => [keys =>
                 name     => ['str'],
