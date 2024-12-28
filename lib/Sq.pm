@@ -45,6 +45,8 @@ sub import {
     *{"$pkg\::dumpw"} = \&Sq::Dump::dumpw;
 }
 
+$Carp::Verbose = 1;
+
 # Load Reflection
 use Sq::Reflection;
 
