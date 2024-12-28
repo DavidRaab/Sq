@@ -67,6 +67,11 @@ use Sq::Equality;
 
 # IO
 use Sq::Io;
+use Sq::Fs;
+
+# Access to submodules
+sub io($) { 'Sq::Io' }
+sub fs($) { 'Sq::Fs' }
 
 # Important functions used in FP code. So adding them.
 sub id  :prototype($) { return $_[0]    }
@@ -209,8 +214,5 @@ sub seq :prototype(&) {
         }
     }, 'Seq');
 }
-
-# Access to Sq::Io
-sub io($class) { return 'Sq::Io' }
 
 1;

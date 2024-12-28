@@ -3,6 +3,7 @@ use v5.36;
 use open ':std', ':encoding(UTF-8)';
 use Getopt::Long::Descriptive;
 use Sq;
+use Sq::Sig;
 
 # https://adventofcode.com/2023/day/1
 
@@ -14,16 +15,25 @@ my ($opt, $usage) = describe_options(
 
 $usage->die if $opt->help;
 
+my $first_and_last = sub($array) {
+    [ $array->first->or(0), $array->last->or(0) ]
+};
+
 my $sum =
-    Sq->io->open_text($opt->file)
+    Sq->fs->open_text($opt->file)
+    # removes newline
     ->map(sub($str)    { chomp $str; $str                    })
     ->doi(sub($str,$i) { printf "%4d %s", $i, $str           })
     ->map(sub($line)   { digitize($line)                     })
     ->do( sub($str)    { printf " %s", $str                  })
-    ->map(sub($str)    {[ split //, $str                    ]})
-    ->map(sub($array)  { Array::filter($array, \&is_num)     })
-    ->map(sub($array)  {[ $array->first(0), $array->last(0) ]})
-    ->map(sub($array)  { join "", @$array                    })
+    # split every string into an array. creates seq of array
+    ->split(qr//)
+    # filter only numbers on that array
+    ->map(call 'filter', \&is_num)
+    # pick first and last
+    ->map($first_and_last)
+    # join every array into string
+    ->map(call 'join', "")
     ->do (sub($num)    { printf " %d\n", $num                })
     ->sum;
 
