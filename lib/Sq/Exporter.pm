@@ -22,6 +22,7 @@ sub export_import($own, @args) {
             *{"$target\::$func"} = $fn;
         }
     }
+    # Export requested
     else {
         my %ok = map { $_ => 1 } @$exports;
         for my $func ( @args ) {
