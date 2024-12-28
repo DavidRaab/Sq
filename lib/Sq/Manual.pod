@@ -6,8 +6,8 @@ This is an overview of already written documentation.
 
 =head2 Sequence or Array
 
-In L<Sequence or Array|file:///lib/Sq/Manual/SeqOrArray.pod> I compare `Array`
-and `Seq` and describe it's advantages and when you should use `Seq`.
+In L<Sequence or Array|file:Manual/SeqOrArray.pod> I compare C<Array>
+and C<Seq> and describe it's advantages and when you should use C<Seq>.
 
 =head2 API Documentation
 
