@@ -1204,4 +1204,8 @@ is(
         'chunked 4');
 }
 
+is(sq([10,3,11,4,10])   ->sort(by_num),  [3,4,10,10,11],    'POD sort 1');
+is(sq([qw/foo BAR baa/])->sort(by_str),  [qw/BAR baa foo/], 'POD sort 2');
+is(sq([qw/foo BAR baa/])->sort(by_stri), [qw/baa BAR foo/], 'POD sort 3');
+
 done_testing;

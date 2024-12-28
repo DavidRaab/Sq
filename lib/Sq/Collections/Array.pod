@@ -583,7 +583,14 @@ Sorts an Array. Basically the same as just calling built-in C<sort> but passes
 two values of the array to the C<$comparer> function instead of using global
 variables C<$a,$b>.
 
+C<Sq> be default exports C<by_num>, C<by_str> and C<by_stri> you can use
+for sorting.
+
     my $sorted = sq([10,3,11,4,10])->sort(sub($x,$y) { $x <=> $y });
+
+    my $sorted = sq([10,3,11,4,10])   ->sort(by_num);  # [3,4,10,10,11]
+    my $sorted = sq([qw/foo BAR baa/])->sort(by_str);  # [qw/BAR baa foo/]
+    my $sorted = sq([qw/foo BAR baa/])->sort(by_stri); # [qw/baa BAR foo/]
 
 =head2 sort_by($array, $comparer, $f_key) : $array
 
@@ -612,19 +619,7 @@ of using more memory.
         map  { [ $_, $_->{id} ]    }
             @$data;
 
-=head2 sort_num($array) : $array
-
-Sorts an array by number.
-
-    my $sorted = Array->new(6,4,2,10)->sort_num; # [2,4,6,10]
-
-=head2 sort_str($array) : $array
-
-Sorts an array by strings.
-
-    my $sorted = Array->new(qw/c a b/)->sort_str; # [qw/a b c/]
-
-=head2 sort_hash_str($array, $key) : $array
+=head2 sort_hash($array, $comparer, $key) : $array
 
 Sorts an array of hashes by selecting which key should be used for sorting.
 Values are string compared.
@@ -635,28 +630,10 @@ Values are string compared.
         {id => 2, name => "alf"},
     );
 
-    my $sorted = $data->sort_hash_str('name');
+    my $sorted = $data->sort_hash(by_str, 'name');
     # [
     #     {id => 2, name => "alf"},
     #     {id => 1, name => "bar"},
-    #     {id => 3, name => "foo"},
-    # ];
-
-=head2 sort_hash_num($array, $key) : $array
-
-Sorts an array of hashes by selecting which key should be used for sorting.
-Values are number compared.
-
-    my $data = Array->new(
-        {id => 3, name => "foo"},
-        {id => 1, name => "bar"},
-        {id => 2, name => "alf"},
-    );
-
-    my $sorted = $data->sort_hash_str('id');
-    # [
-    #     {id => 1, name => "bar"},
-    #     {id => 2, name => "alf"},
     #     {id => 3, name => "foo"},
     # ];
 
