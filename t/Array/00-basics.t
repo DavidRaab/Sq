@@ -828,12 +828,12 @@ is(Array->new(qw/1 9 10 5/)->sort(by_num), [1, 5, 9, 10],  'sort_num');
 
 # keyed_by
 {
-    my $data = Array->new(
+    my $data = sq [
         {id => 1, name => "foo"},
         {id => 2, name => "foo"},
         {id => 3, name => "Whatever"},
         {id => 4, name => "But not Lena"},
-    );
+    ];
 
     is(
         $data->keyed_by(key 'id'),
@@ -859,10 +859,10 @@ is(Array->new(qw/1 9 10 5/)->sort(by_num), [1, 5, 9, 10],  'sort_num');
 # test sorting with by_num & by_str
 {
     my $data = sq [
-        Hash->new(id => 2,  name => 'B'),
-        Hash->new(id => 3,  name => 'A'),
-        Hash->new(id => 1,  name => 'C'),
-        Hash->new(id => 10, name => 'J'),
+        { id => 2,  name => 'B' },
+        { id => 3,  name => 'A' },
+        { id => 1,  name => 'C' },
+        { id => 10, name => 'J' },
     ];
 
     is(
@@ -897,7 +897,7 @@ is(Array->new(qw/1 9 10 5/)->sort(by_num), [1, 5, 9, 10],  'sort_num');
 }
 
 is(
-    Array->new(qw/foo bar baz foo bar foo 1 2/)->count,
+    sq([qw/foo bar baz foo bar foo 1 2/])->count,
     {
         foo => 3,
         bar => 2,
@@ -966,7 +966,7 @@ is(
 
 # copy of array-ref
 {
-    my $data = Array->new(1,2,3,4,5);
+    my $data = sq [1,2,3,4,5];
     my $new  = $data->copy;
 
     is($data, $new,         'contains same data');
@@ -984,19 +984,13 @@ is(
         'filter_e');
 }
 
-# cartesian
-{
-    my $nums   = Array->new(7,8,9,10);
-    my $symbol = Array->new("Hearth", "Spades");
-
-    is(
-        $nums->cartesian($symbol),
-        [
-            [7,"Hearth"], [7,"Spades"],  [8,"Hearth"],  [8,"Spades"],
-            [9,"Hearth"], [9,"Spades"], [10,"Hearth"], [10,"Spades"],
-        ],
-        'cartesian');
-}
+is(
+    sq([ 7,8,9,10 ])->cartesian([ "Hearth", "Spades" ]),
+    [
+        [7,"Hearth"], [7,"Spades"],  [8,"Hearth"],  [8,"Spades"],
+        [9,"Hearth"], [9,"Spades"], [10,"Hearth"], [10,"Spades"],
+    ],
+    'cartesian');
 
 # split and join
 {
