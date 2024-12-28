@@ -1,19 +1,40 @@
 package Sq;
 use 5.036;
 our $VERSION = '0.007';
+use Carp ();
 use Scalar::Util ();
+my $export_funcs;
 sub import {
+    my ( $own, @requested ) = @_;
     my ( $pkg ) = caller;
     no strict 'refs'; ## no critic
     state @funcs = (
         qw(sq call key assign seq),
-        qw(is_num is_str id fst snd),
+        qw(is_num is_str is_array is_hash is_seq is_opt is_result is_ref),
+        qw(id fst snd),
         qw(by_num by_str by_stri),
     );
-    for my $func ( @funcs ) {
-        *{"${pkg}::$func"} = \&$func;
+
+    # Otherwise just requested
+    if ( @requested > 0 ) {
+        # Build cache for better checking - but only once and only when needed
+        if ( !defined $export_funcs ) {
+            $export_funcs = { map { $_ => 1 } @funcs };
+        }
+        for my $request ( @requested ) {
+            Carp::croak "Export Func '$request' does not exists"
+                if !exists $export_funcs->{$request};
+            *{"$pkg\::$request"} = \&$request;
+        }
+    }
+    # Export ALL
+    else {
+        for my $func ( @funcs ) {
+            *{"${pkg}::$func"} = \&$func;
+        }
     }
 
+    # TODO: Not always export
     *{"${pkg}::Some"}  = \&Option::Some;
     *{"${pkg}::None"}  = \&Option::None;
     *{"${pkg}::Ok"}    = \&Result::Ok;
@@ -85,6 +106,8 @@ sub assign :prototype(&) {
     return $_[0]->();
 }
 
+### Type-Checking functions
+
 sub is_str :prototype($) {
     return ref $_[0] eq '' ? 1 : 0;
 }
@@ -92,6 +115,36 @@ sub is_str :prototype($) {
 sub is_num :prototype($) {
     return Scalar::Util::looks_like_number($_[0]);
 }
+
+sub is_array :prototype($) {
+    my $type = ref $_[0];
+    return 1 if $type eq 'Array' || $type eq 'ARRAY';
+    return 0;
+}
+
+sub is_hash :prototype($) {
+    my $type = ref $_[0];
+    return 1 if $type eq 'Hash' || $type eq 'HASH';
+    return 0;
+}
+
+sub is_seq :prototype($) {
+    return ref $_[0] eq 'Seq' ? 1 : 0;
+}
+
+sub is_opt :prototype($) {
+    return ref $_[0] eq 'Option' ? 1 : 0;
+}
+
+sub is_result :prototype($) {
+    return ref $_[0] eq 'Result' ? 1 : 0;
+}
+
+sub is_ref :prototype($$) {
+    return ref $_[1] eq $_[0] ? 1 : 0;
+}
+
+### Comparision Functions
 
 sub by_num :prototype() {
     state $fn = sub($x,$y) { $x <=> $y };

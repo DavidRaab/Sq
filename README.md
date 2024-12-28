@@ -446,7 +446,7 @@ It exports the following functions by default:
 | Scope       | assign lazy             |
 | Helpers     | id fst snd dump dumpw   |
 | Comparision | by_num by_str by_stri   |
-| Types       | is_num is_str           |
+| Type-checks | is_num is_str is_array is_hash is_seq is_opt is_result is_ref |
 
 # SYNOPSIS
 
