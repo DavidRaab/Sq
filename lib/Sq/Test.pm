@@ -3,7 +3,7 @@ use 5.036;
 use builtin 'blessed';
 use Sq;
 use Sq::Exporter;
-our @EXPORT = qw/is ok nok done_testing dies like check_isa/;
+our @EXPORT = qw/is ok okr nok done_testing dies like check_isa/;
 
 BEGIN {
     my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
@@ -38,6 +38,22 @@ sub nok($bool, $message) {
         print "ok $count - $message\n";
     }
     return;
+}
+
+# This expects an Result.
+# When Ok() it considers the test as success, otherwise fails and dumps
+# content of Err()
+sub okr($result, $message) {
+    $count++;
+    if ( Result::is_ok($result) ) {
+        print "ok $count - $message\n";
+    }
+    else {
+        print "not ok $count - $message\n";
+        my $msg = dump($result->get);
+        $msg =~ s/^/# /mg;
+        warn $msg, "\n";
+    }
 }
 
 sub is :prototype($$$) {
