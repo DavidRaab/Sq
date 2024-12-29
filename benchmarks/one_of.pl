@@ -44,4 +44,14 @@ cmpthese(-1, {
         }
         die "\$count not 3000: $count\n" if $count != 3000;
     },
+    hash_exists => sub {
+        my $count = 0;
+        my %valid = map { $_ => 1 } qw(yes no maybe);
+        for ( 1 .. 1_000 ) {
+            for my $word ( @words ) {
+                $count++ if exists $valid{$word};
+            }
+        }
+        die "\$count not 3000: $count\n" if $count != 3000;
+    },
 });
