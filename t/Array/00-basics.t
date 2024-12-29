@@ -975,7 +975,7 @@ is(
 # filter_e
 {
     is(
-        $range->filter(sub($x) { $x % 2 == 0 }),
+        $range->filter($is_even),
         $range->filter_e('$_ % 2 == 0'),
         'filter_e');
 }
@@ -990,10 +990,7 @@ is(
 
 # split and join
 {
-    my $words =
-        Array
-        ->new("Foo+Bar+Baz", "maz+faz")
-        ->split(qr/\+/);
+    my $words = sq(["Foo+Bar+Baz", "maz+faz"])->split(qr/\+/);
 
     is(
         $words,
@@ -1105,12 +1102,12 @@ is(
 
 # distinct_by POD example
 {
-    my $data = Array->new(
+    my $data = sq [
         {id => 1, name => "foo"},
         {id => 3, name => "foo"},
         {id => 1, name => "bar"},
         {id => 2, name => "bar"},
-    );
+    ];
 
     is(
         $data->distinct_by(key 'id'),
@@ -1139,7 +1136,7 @@ is(
     ];
 
     is(
-        $data->sort_by(sub($x,$y) { $x <=> $y }, key 'id'),
+        $data->sort_by(by_num, key 'id'),
         [
             { id => 1, name => 'Anne'   },
             { id => 2, name => 'Frank'  },
@@ -1148,7 +1145,7 @@ is(
         'pod example 1. id sorted');
 
     is(
-        $data->sort_by(sub($x,$y) { $x cmp $y }, key 'name'),
+        $data->sort_by(by_str, key 'name'),
         [
             { id => 1, name => 'Anne'   },
             { id => 2, name => 'Frank'  },
