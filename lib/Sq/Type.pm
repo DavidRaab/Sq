@@ -6,7 +6,7 @@ use Sq::Evaluator;
 use Sq::Exporter;
 our @EXPORT = (
     qw(type),
-    qw(t_run t_valid t_assert t_or t_is),             # Basic
+    qw(t_run t_valid t_assert t_or t_is t_not),       # Basic
     qw(t_str t_enum t_match t_matchf t_parser),       # String
     qw(t_num t_int t_positive t_negative t_range),    # Numbers
     qw(t_opt),
@@ -18,7 +18,6 @@ our @EXPORT = (
 );
 
 # TODO
-# Add: t_not
 # Add: t_none, t_any
 # Add: t_tuplen
 # Add: t_repeat(t_int, t_str, t_int)
@@ -642,6 +641,17 @@ sub t_key_is(@checks) {
             return $valid;
         }
         return "key_is: Not Hash. Got: $type";
+    }
+}
+
+sub t_not(@checks) {
+    return sub($any) {
+        my $err;
+        for my $check ( @checks ) {
+            $err = $check->($any);
+            return "not: check valid" if !defined $err;
+        }
+        return $valid;
     }
 }
 
