@@ -592,19 +592,22 @@ sub t_result {
     my ($ok,$err) = @_;
     my $args      = @_;
     return sub($any) {
-        return "result: Not a Result" if ref $any ne 'Result';
-        return $valid if $args == 0;
-        # Ok
-        if ( $any->[0] == 0 ) {
-            my $msg = $err->($any->[1]);
-            return $msg if defined $msg;
+        my $type = ref $any;
+        if ( $type eq 'Result' ) {
+            return $valid if $args == 0;
+            # Err
+            if ( $any->[0] == 0 ) {
+                my $msg = $err->($any->[1]);
+                return "result: $msg" if defined $msg;
+            }
+            # Ok
+            else {
+                my $msg = $ok->($any->[1]);
+                return "result: $msg" if defined $msg;
+            }
+            return $valid;
         }
-        # Err
-        else {
-            my $msg = $ok->($any->[1]);
-            return $msg if defined $msg;
-        }
-        return;
+        return "result: Not Result. Got: $type";
     }
 }
 
