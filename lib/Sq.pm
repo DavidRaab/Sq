@@ -117,9 +117,7 @@ sub is_str :prototype($) {
     return ref $_[0] eq '' ? 1 : 0;
 }
 
-sub is_num :prototype($) {
-    return Scalar::Util::looks_like_number($_[0]);
-}
+*is_num = \&Scalar::Util::looks_like_number;
 
 sub is_array :prototype($) {
     my $type = ref $_[0];
