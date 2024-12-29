@@ -230,7 +230,8 @@ sub t_negative() {
 
 sub t_str(@checks) {
     return sub($any) {
-        if ( ref $any eq '' ) {
+        my $type = ref $any;
+        if ( $type eq '' ) {
             my $err;
             for my $check ( @checks ) {
                 $err = $check->($any);
@@ -238,7 +239,7 @@ sub t_str(@checks) {
             }
             return $valid;
         }
-        return "str: Not a string";
+        return "str: Expected string got '$type'";
     }
 }
 
