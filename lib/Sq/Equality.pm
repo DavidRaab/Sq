@@ -59,7 +59,10 @@ my $dispatch = {
 sub equal($any1, $any2) {
     if ( defined $any1 && defined $any2 ) {
         # when number
-        return $any1 == $any2 if is_num($any1) && is_num($any2);
+        if ( is_num($any1) && is_num($any2) ) {
+            return 1 if $any1 == $any2;
+            return 0;
+        }
         # get type of references
         my $t1 = ref $any1;
         my $t2 = ref $any2;
@@ -71,7 +74,10 @@ sub equal($any1, $any2) {
         # when not the same type, not equal
         return 0 if $t1 ne $t2;
         # when string
-        return $any1 eq $any2 if $t1 eq '' && $t2 eq '';
+        if ( $t1 eq '' && $t2 eq '' ) {
+            return 1 if $any1 eq $any2;
+            return 0;
+        }
         # when references are the same, abort as equal
         return 1 if refaddr($any1) == refaddr($any2);
 
