@@ -138,6 +138,7 @@ my $file =
         $sha->filter(sub($sha, $files) {
             return 0 if $sha eq "0"; # skip the "0" entry completely
             return 1 if @$files > 1; # only entries with more than one file
+            return 0;
         });
     })
     # only keep file sizes that has some entries in it
@@ -279,7 +280,7 @@ sub do_dedup($data) {
                 # Build target
                 my $target =
                     $input->[0] eq 'RANGE'
-                    ? path($dedup, $files->[$input->[1] - 1]->basename)
+                    ? path($dedup, $files->[$input->[1]]->basename)
                     : path($dedup, $input->[1]);
 
                 # when target exists re-ask for another target
