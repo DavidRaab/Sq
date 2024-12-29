@@ -101,4 +101,18 @@ sub gen_sha512() {
     return $str;
 }
 
+### Another structure i use in my find_duplicates example
+my $num_or_str = type
+    [or =>
+        [int => [range => 1, 100]],
+        [str => [not   => ['int']]]];
+
+okr(t_run($num_or_str,          1), 'ns 1');
+okr(t_run($num_or_str,        100), 'ns 2');
+nok(t_valid($num_or_str,      101), 'ns 3');
+nok(t_valid($num_or_str,        0), 'ns 4');
+okr(t_run($num_or_str,   "foo123"), 'ns 5');
+okr(t_run($num_or_str,     "123f"), 'ns 6');
+okr(t_run($num_or_str,     "/asd"), 'ns 7');
+
 done_testing;
