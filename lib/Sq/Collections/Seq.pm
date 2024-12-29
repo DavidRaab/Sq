@@ -1075,6 +1075,26 @@ sub fold_mut($seq, $state, $f_state) {
     return $state;
 }
 
+sub count($seq) {
+    my $hash = Hash->new;
+    my $it = $seq->();
+    my $x;
+    while ( defined($x = $it->()) ) {
+        $hash->{$x}++;
+    }
+    return $hash;
+}
+
+sub count_by($seq, $f_map) {
+    my $hash = Hash->new;
+    my $it = $seq->();
+    my $x;
+    while ( defined($x = $it->()) ) {
+        $hash->{$f_map->($x)}++;
+    }
+    return $hash;
+}
+
 # reduce: Seq<'a> -> ('a -> 'a -> 'a) -> 'a
 sub reduce($seq, $reducer) {
     return first($seq)->map(sub($first) {
