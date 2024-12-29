@@ -896,15 +896,32 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 
 # get doesn't wrap an optional again
 {
-    my $movie = Hash->new(
+    my $movie = sq {
         title  => 'Terminator 2',
         rating => Some(5),
         descr  => None,
-    );
+    };
 
     is($movie->get('title'),  Some('Terminator 2'), 'fetch title');
     is($movie->get('rating'), Some(5),              'fetch rating');
     is($movie->get('descr'),  None,                 'fetch descr');
+}
+
+# iter_sort
+{
+    my @data;
+    sq({foo => 3, bar => 2, zap => 4, aaa => 1})->iter_sort(by_str, sub($k,$v) {
+        push @data, [$k,$v];
+    });
+    is(
+        \@data,
+        [
+            [aaa => 1],
+            [bar => 2],
+            [foo => 3],
+            [zap => 4],
+        ],
+        'iter_sort');
 }
 
 done_testing;
