@@ -791,16 +791,14 @@ is(
 );
 
 is(
-    Array
-    ->wrap(1, 3, 20, -40, 20, 12, 100, 5, 20)
+    sq([1, 3, 20, -40, 20, 12, 100, 5, 20])
     ->skip_while(sub($x) { $x < 100 }),
     [100, 5, 20],
     'skip_while 1'
 );
 
 is(
-    Array
-    ->wrap(1, 3, 20, -40, 20, 12, 100, 5, 20)
+    sq([1, 3, 20, -40, 20, 12, 100, 5, 20])
     ->skip_while(sub($x) { $x > 100 }),
     [1,3,20,-40,20,12,100,5,20],
     'skip_while 2'
@@ -1199,5 +1197,10 @@ is(
 is(sq([10,3,11,4,10])   ->sort(by_num),  [3,4,10,10,11],    'POD sort 1');
 is(sq([qw/foo BAR baa/])->sort(by_str),  [qw/BAR baa foo/], 'POD sort 2');
 is(sq([qw/foo BAR baa/])->sort(by_stri), [qw/baa BAR foo/], 'POD sort 3');
+
+is(
+    Array->range(1,10)->remove($is_even),
+    [1,3,5,7,9],
+    'remove');
 
 done_testing;

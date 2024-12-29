@@ -247,6 +247,11 @@ sub filter_e($array, $expr) {
     return CORE::bless($data, 'Array');
 }
 
+sub remove($array, $predicate) {
+    local $_;
+    return CORE::bless([grep { !$predicate->($_) } @$array], 'Array');
+}
+
 sub skip($array, $amount) {
     return CORE::bless([@$array], 'Array') if $amount <= 0;
     return CORE::bless([$array->@[$amount .. $array->$#*]], 'Array');
