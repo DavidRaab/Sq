@@ -277,11 +277,10 @@ sub iter($hash, $f) {
     return;
 }
 
-sub foreach($hash, $f) {
-    for my ($key,$value) ( %$hash ) {
-        $f->($key, $value);
+sub iter_sort($hash, $compare, $f) {
+    for my $key ( keys($hash)->sort($compare)->@* ) {
+        $f->($key, $hash->{$key});
     }
-    return;
 }
 
 sub lock($hash, @keys) {

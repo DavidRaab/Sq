@@ -700,6 +700,15 @@ the function C<$f> that then can do something with it.
         printf "Key = %s, Value = %s\n", $k, $v;
     });
 
+=head2 iter_sort($hash, $comparision, $f) : void
+
+Iterates through all B<key,values> of the hash, but before doing, all keys are
+sorted by C<$comparision>. It passes the C<$key,$value> to C<$f>.
+
+    $hash->iter_sort(by_num, sub($k,$v) {
+        printf "Key = %s, Value = %s\n", $k, $v;
+    });
+
 =head2 foreach($hash, $f) : void
 
 Same as C<iter>.
