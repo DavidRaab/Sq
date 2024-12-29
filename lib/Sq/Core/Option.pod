@@ -645,9 +645,6 @@ values in a array at once.
 Usually we get an array of optionals when we call an option generating function
 on every element of an array. For example by using C<Array::map>.
 
-    # is_num() is a function automatically imported by Sq. It is just a shortcut
-    # for using Scalar::Util::looks_like_number()
-
     # an option generating function
     my $some_num = sub($str) { is_num($str) ? Some($str) : None };
 

@@ -1,6 +1,9 @@
 package Sq::Equality;
 use 5.036;
-use Scalar::Util qw/looks_like_number refaddr/;
+use Scalar::Util ();
+
+*is_num  = \&Scalar::Util::looks_like_number;
+*refaddr = \&Scalar::Util::refaddr;
 
 # This is inlined in equal() but i still provide this function as an API
 # called by other code
@@ -56,7 +59,7 @@ my $dispatch = {
 sub equal($any1, $any2) {
     if ( defined $any1 && defined $any2 ) {
         # when number
-        return $any1 == $any2 if looks_like_number($any1) && looks_like_number($any2);
+        return $any1 == $any2 if is_num($any1) && is_num($any2);
         # get type of references
         my $t1 = ref $any1;
         my $t2 = ref $any2;

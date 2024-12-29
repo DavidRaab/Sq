@@ -179,7 +179,7 @@ sub t_enum(@expected) {
 
 sub t_num(@checks) {
     return sub($any) {
-        if ( Scalar::Util::looks_like_number($any) ) {
+        if ( is_num($any) ) {
             my $err;
             for my $check ( @checks ) {
                 $err = $check->($any);
@@ -211,7 +211,7 @@ sub t_int(@checks) {
 
 sub t_positive() {
     state $fn = sub($any) {
-        if ( Scalar::Util::looks_like_number($any) ) {
+        if ( is_num($any) ) {
             return $valid if $any >= 0;
             return "positive: '$any' not >= 0";
         }
@@ -222,7 +222,7 @@ sub t_positive() {
 
 sub t_negative() {
     state $fn = sub($any) {
-        if ( Scalar::Util::looks_like_number($any) ) {
+        if ( is_num($any) ) {
             return $valid if $any <= 0;
             return "negative: '$any' not <= 0";
         }
@@ -345,7 +345,7 @@ sub t_min($min) {
     return sub($any) {
         my $type = ref $any;
         if ( $type eq "" ) {
-            if ( Scalar::Util::looks_like_number($any) ) {
+            if ( is_num($any) ) {
                 return $valid if $any >= $min;
                 return "min: $any > $min";
             }
@@ -371,7 +371,7 @@ sub t_max($max) {
     return sub($any) {
         my $type = ref $any;
         if ( $type eq "" ) {
-            if ( Scalar::Util::looks_like_number($any) ) {
+            if ( is_num($any) ) {
                 return $valid if $any <= $max;
                 return "max: $any > $max";
             }
@@ -395,7 +395,7 @@ sub t_max($max) {
 
 sub t_range($min, $max) {
     return sub($num) {
-        if ( Scalar::Util::looks_like_number($num) ) {
+        if ( is_num($num) ) {
             return $valid if $num >= $min && $num <= $max;
             return "range: $num not between ($min,$max)";
         }
@@ -447,7 +447,7 @@ sub t_regex() {
 
 sub t_bool() {
     state $fn = sub($any) {
-        if ( Scalar::Util::looks_like_number($any) && ($any == 0 || $any == 1) ) {
+        if ( is_num($any) && ($any == 0 || $any == 1) ) {
             return $valid;
         }
         return "bool: Not a boolean value";
