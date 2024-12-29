@@ -18,8 +18,7 @@ my $count = 0;
 
 sub ok($bool, $message) {
     $count++;
-    my $type = ref $bool;
-    if ( $type eq "" ) {
+    if ( is_num $bool ) {
         Carp::croak "Error: ok() expects 0 or 1. Got: $bool\n" if ($bool != 0 && $bool != 1);
         if ( $bool ) {
             print "ok $count - $message\n"
@@ -30,6 +29,7 @@ sub ok($bool, $message) {
         }
     }
     else {
+        my $type = ref $bool;
         Carp::croak "Error: ok() got ref: $type\n";
     }
     return;
