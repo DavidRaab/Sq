@@ -135,10 +135,10 @@ sigt('Array::dumpw',
 );
 
 # Functions from Option
-sig('Array::all_valid',       $any, $aopt,        $opt);
-sig('Array::all_valid_by',    $any, $array, $sub, $opt);
-sig('Array::filter_valid',    $any, $aopt,        $array);
-sig('Array::filter_valid_by', $any, $array, $sub, $array);
+sig('Array::all_valid',       $aopt,        $opt);
+sig('Array::all_valid_by',    $array, $sub, $opt);
+sig('Array::filter_valid',    $aopt,        $array);
+sig('Array::filter_valid_by', $array, $sub, $array);
 
 ### MUTATION
 

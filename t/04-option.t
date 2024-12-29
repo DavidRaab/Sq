@@ -269,17 +269,17 @@ use Sq::Test;
     ];
 
     is(
-        Array->all_valid($valids),
+        Array::all_valid($valids),
         Some([10,3,42,"Hello", "World"]),
         'all_valid all Some');
 
     is(
-        Array->filter_valid($valids),
+        Array::filter_valid($valids),
         [10,3,42,"Hello", "World"],
         'filter_valid all Some');
 
     is(
-        Array->all_valid(
+        Array::all_valid(
             $valids->map(sub($opt) {
                 $opt->map(sub($x) {
                     if ( is_num($x) ) { $x * 2  } # double numbers
@@ -293,26 +293,24 @@ use Sq::Test;
 
     ### tests with invalid
 
-    my $invalid = Array->new(
+    my $invalid = sq [
         Some(10),
         None,
         Some(3),
         None,
         Some(42),
-    );
+    ];
+
+    is($invalid->all_valid,        None, 'all_valid with None 1');
+    is(Array::all_valid($invalid), None, 'all_valid with None 2');
 
     is(
-        Array->all_valid($invalid),
-        None,
-        'all_valid with None');
-
-    is(
-        Array->filter_valid($invalid),
+        $invalid->filter_valid,
         [10,3,42],
         'filter_valid with None');
 
     is(
-        Array->filter_valid(
+        Array::filter_valid(
             $invalid->map(sub($opt) {
                 $opt->map(sub($x) { $x * 2 })
             })
@@ -324,30 +322,30 @@ use Sq::Test;
 # all_valid_by
 {
     my $is_num   = sub($x) { is_num($x) ? Some($x) : None };
-    my $str_nums = Array->new("23", "100", "16");
+    my $str_nums = sq ["23", "100", "16"];
 
     # sometimes we want to map a list with an optional function that turns
     # a value into an optional value. this results into a list of optionals,
     # then with `all_valid` we can check if all transformations returned
     # Some value.
     is(
-        Array->all_valid($str_nums->map($is_num)),
+        $str_nums->map($is_num)->all_valid,
         Some([23, 100, 16]),
         'all_valid on array->map');
 
     # with all_valid_by we can do the same in one operation
     is(
-        Array->all_valid_by($str_nums, $is_num),
+        $str_nums->all_valid_by($is_num),
         Some([23, 100, 16]),
         'all_valid_by');
 
     is(
-        Array->all_valid_by([qw/1 2 3/], $is_num),
+        Array::all_valid_by([qw/1 2 3/], $is_num),
         Some([1,2,3]),
         'all_valid_by with array 1');
 
     is(
-        Array->all_valid_by([qw/1 2 3 foo/], $is_num),
+        Array::all_valid_by([qw/1 2 3 foo/], $is_num),
         None,
         'all_valid_by with array 2');
 }
@@ -362,26 +360,26 @@ use Sq::Test;
     # then with `filter_valid` we can only get the Some values and drop
     # the None.
     is(
-        Array->filter_valid($str_nums->map($is_num)),
+        $str_nums->map($is_num)->filter_valid,
         [23, 16],
         'filter_valid on array->map');
 
     # with filter_valid_by we can do the same in one operation
     is(
-        Array->filter_valid_by($str_nums, $is_num),
+        $str_nums->filter_valid_by($is_num),
         [23, 16],
         'filter_valid_by');
 }
 
 {
-    is(Array->filter_valid([Some(1), Some(2), Some(3)]),       [1,2,3], 'filter_valid 1');
-    is(Array->filter_valid([Some(1), Some(2),    None]),         [1,2], 'filter_valid 2');
-    is(Array->filter_valid([None]),                                 [], 'filter_valid 3');
-    is(Array->filter_valid([]),                                     [], 'filter_valid 4');
-    is(Array->all_valid   ([Some(1), Some(2), Some(3)]), Some([1,2,3]), 'all_valid 1');
-    is(Array->all_valid   ([Some(1), Some(2),    None]),          None, 'all_valid 2');
-    is(Array->all_valid   ([None]),                               None, 'all_valid 3');
-    is(Array->all_valid   ([]),                               Some([]), 'all_valid 4');
+    is(Array::filter_valid([Some(1), Some(2), Some(3)]),       [1,2,3], 'filter_valid 1');
+    is(Array::filter_valid([Some(1), Some(2),    None]),         [1,2], 'filter_valid 2');
+    is(Array::filter_valid([None]),                                 [], 'filter_valid 3');
+    is(Array::filter_valid([]),                                     [], 'filter_valid 4');
+    is(Array::all_valid   ([Some(1), Some(2), Some(3)]), Some([1,2,3]), 'all_valid 1');
+    is(Array::all_valid   ([Some(1), Some(2),    None]),          None, 'all_valid 2');
+    is(Array::all_valid   ([None]),                               None, 'all_valid 3');
+    is(Array::all_valid   ([]),                               Some([]), 'all_valid 4');
 }
 
 {
@@ -389,22 +387,22 @@ use Sq::Test;
     my $some_num = sub($str) { is_num($str) ? Some($str) : None };
 
     is(
-        Array->filter_valid([map { $some_num->($_) } 1,2,3]),
+        Array::filter_valid([map { $some_num->($_) } 1,2,3]),
         [1,2,3],
         'filter_valid_by 1');
 
     is(
-        Array->filter_valid(Array->range(1,3)->map($some_num)),
+        Array::filter_valid(Array->range(1,3)->map($some_num)),
         [1,2,3],
         'filter_valid_by 2');
 
     is(
-        Array->filter_valid(Array->new(qw/1 foo 2/)->map($some_num)),
+        Array::filter_valid(Array->new(qw/1 foo 2/)->map($some_num)),
         [1,2],
         'filter_valid_by 3');
 
     is(
-        Array->filter_valid_by([qw/1 foo 2/], $some_num),
+        Array::filter_valid_by([qw/1 foo 2/], $some_num),
         [1,2],
         'filter_valid_by 4');
 }

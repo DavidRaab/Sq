@@ -241,7 +241,7 @@ sub extract($, @anys) {
 # Array Functions
 package Array;
 
-sub all_valid($, $array_of_opt) {
+sub all_valid($array_of_opt) {
     my $new = Array->new;
     for my $opt ( @$array_of_opt ) {
         if ( @$opt ) { push @$new, @$opt }
@@ -250,7 +250,7 @@ sub all_valid($, $array_of_opt) {
     return bless([$new], 'Option');
 }
 
-sub all_valid_by($, $array, $f) {
+sub all_valid_by($array, $f) {
     my $new = Array->new;
     for my $x ( @$array ) {
         my $opt = $f->($x);
@@ -260,7 +260,7 @@ sub all_valid_by($, $array, $f) {
     return bless([$new], 'Option');
 }
 
-sub filter_valid($, $array_of_opt) {
+sub filter_valid($array_of_opt) {
     my $new = Array->new;
     for my $opt ( @$array_of_opt ) {
         push @$new, @$opt if @$opt;
@@ -268,7 +268,7 @@ sub filter_valid($, $array_of_opt) {
     return $new;
 }
 
-sub filter_valid_by($, $array, $f) {
+sub filter_valid_by($array, $f) {
     my $new = Array->new;
     for my $x ( @$array ) {
         my $opt = $f->($x);

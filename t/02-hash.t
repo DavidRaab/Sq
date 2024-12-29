@@ -211,7 +211,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 
 # get, set, extract
 {
-    my $h = Hash->new(foo => 1, bar => 2, baz => 3);
+    my $h = sq {foo => 1, bar => 2, baz => 3};
     is($h->get("foo"), Some(1), 'get 1');
     is($h->get("bar"), Some(2), 'get 2');
     is($h->get("baz"), Some(3), 'get 3');
@@ -228,17 +228,17 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
         'extract');
 
     is(
-        Array->all_valid($h->extract(qw/foo latz bar/)),
+        $h->extract(qw/foo latz bar/)->all_valid,
         None,
         'extract 2');
 
     is(
-        Array->all_valid($h->extract(qw/foo bar/)),
+        $h->extract(qw/foo bar/)->all_valid,
         Some([1, 4]),
         'extract 3');
 
     is(
-        Array->filter_valid($h->extract(qw/foo latz bar/)),
+        $h->extract(qw/foo latz bar/)->filter_valid,
         [1, 4],
         'extract 4');
 }
