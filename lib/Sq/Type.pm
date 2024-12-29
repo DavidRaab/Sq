@@ -6,15 +6,15 @@ use Sq::Evaluator;
 use Sq::Exporter;
 our @EXPORT = (
     qw(type),
-    qw(t_run t_valid t_assert t_or t_is),            # Basic
-    qw(t_str t_enum t_match t_matchf t_parser),      # String
-    qw(t_num t_int t_positive t_negative t_range),   # Numbers
+    qw(t_run t_valid t_assert t_or t_is),             # Basic
+    qw(t_str t_enum t_match t_matchf t_parser),       # String
+    qw(t_num t_int t_positive t_negative t_range),    # Numbers
     qw(t_opt),
-    qw(t_hash t_with_keys t_keys t_as_hash),         # Hash
-    qw(t_array t_idx t_tuple t_tuplev t_even_sized), # Array
+    qw(t_hash t_with_keys t_keys t_as_hash t_key_is), # Hash
+    qw(t_array t_idx t_tuple t_tuplev t_even_sized),  # Array
     qw(t_of t_min t_max t_length),
     qw(t_any t_sub t_regex t_bool t_seq t_void t_result),
-    qw(t_ref t_isa t_can)                            # Objects
+    qw(t_ref t_isa t_can)                             # Objects
 );
 
 # TODO
@@ -620,11 +620,28 @@ sub t_as_hash(@checks) {
             my $err;
             for my $check ( @checks ) {
                 $err = $check->($hash);
-                return $err if defined $err;
+                return "as_hash: $err" if defined $err;
             }
-            return;
+            return $valid;
         }
-        return "as_hash: Not an array";
+        return "as_hash: Not Array. Got: $type";
+    }
+}
+
+sub t_key_is(@checks) {
+    return sub($any) {
+        my $type = ref $any;
+        if ( $type eq 'Hash' || $type eq 'HASH' ) {
+            for my $key ( keys %$any ) {
+                my $err;
+                for my $check ( @checks ) {
+                    $err = $check->($key);
+                    return "key_is: $err" if defined $err;
+                }
+            }
+            return $valid;
+        }
+        return "key_is: Not Hash. Got: $type";
     }
 }
 
@@ -642,6 +659,7 @@ sub type($array) {
         sub       => \&t_sub,       regex      => \&t_regex,      bool     => \&t_bool,
         seq       => \&t_seq,       void       => \&t_void,       result   => \&t_result,
         ref       => \&t_ref,       isa        => \&t_isa,        can      => \&t_can,
+        key_is    => \&t_key_is,
     };
     return eval_data($table, $array);
 }
