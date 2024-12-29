@@ -173,10 +173,9 @@ sub sq($any) {
     my $type = ref $any;
 
     # Add Array/Hash blessing to current ref
-    CORE::bless($any, 'Array') if $type eq 'ARRAY';
-    CORE::bless($any, 'Hash')  if $type eq 'HASH';
+    CORE::bless($any, 'Array'), $type = 'Array' if $type eq 'ARRAY';
+    CORE::bless($any, 'Hash'),  $type = 'Hash'  if $type eq 'HASH';
 
-    $type = ref $any;
     # recursively go through each data-structure
     if ( $type eq 'Hash' ) {
         for ( keys %$any ) {
