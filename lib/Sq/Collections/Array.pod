@@ -1200,11 +1200,3 @@ provided function that does some kind of side-effect.
 
     # prints: 0 => 1, 1 => 2, 2 => 3 ...
     Array->range(1,100)->iter(sub($x,$i) { printf "%d => %d\n", $i, $x });
-
-=head2 foreach($array, $f) : void
-
-Same as C<iter>, just an alias.
-
-=head2 foreachi($array, $f) : void
-
-Same as C<iteri>, just an alias.

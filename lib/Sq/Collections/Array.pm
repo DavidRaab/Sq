@@ -486,14 +486,6 @@ sub iteri($array, $f) {
     return;
 }
 
-sub foreach($array, $f) {
-    iter($array, $f);
-}
-
-sub foreachi($array, $f) {
-    iteri($array, $f);
-}
-
 #-----------------------------------------------------------------------------#
 # CONVERTER                                                                   #
 #         Those are functions converting Array to none Array types            #

@@ -1078,35 +1078,11 @@ using C<fold> or C<fold_mut> instead. Or any other of the B<CONVERTER> methods.
         say $x;
     });
 
-=head2 foreach($seq, $f) : void
-
-Same as C<iter>.
-
-    Seq->range(1,1000)->foreach(sub($x) {
-        say $x;
-    });
-
 =head2 iteri($seq, $f) : void
 
 Same as C<iter> but C<$f> additionally gets an index passed.
 
     Seq->range(10,15)->iteri(sub($x,$idx) {
-        printf "%d: %d\n", $idx, $x;
-    });
-
-    # prints
-    # 0: 10
-    # 1: 11
-    # 2: 12
-    # 3: 13
-    # 4: 14
-    # 5: 15
-
-=head2 foreachi($seq, $f) : void
-
-Same as C<iteri>.
-
-    Seq->range(10,15)->foreachi(sub($x,$idx) {
         printf "%d: %d\n", $idx, $x;
     });
 

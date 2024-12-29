@@ -79,8 +79,6 @@ sig('Seq::repeat',        $seq, t_int,          $seq);
 
 sig('Seq::iter',     $seq, $sub, t_void);
 sig('Seq::iteri',    $seq, $sub, t_void);
-sig('Seq::foreachi', $seq, $sub, t_void);
-sig('Seq::foreachi', $seq, $sub, t_void);
 sig('Seq::do',       $seq, $sub,   $seq);
 sig('Seq::doi',      $seq, $sub,   $seq);
 

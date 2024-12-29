@@ -80,8 +80,6 @@ sig ('Array::extract',           $array, t_int, t_int,     $array);
 
 sig('Array::iter',     $array, $sub, t_void);
 sig('Array::iteri',    $array, $sub, t_void);
-sig('Array::foreachi', $array, $sub, t_void);
-sig('Array::foreachi', $array, $sub, t_void);
 
 
 ### CONVERTER

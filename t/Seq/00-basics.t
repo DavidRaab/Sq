@@ -724,20 +724,16 @@ is(
     'skip_while 2'
 );
 
-{ # iter & foreach
+# iter
+{
     my @iter;    $range->iter(   sub($x) { push @iter,    $x });
-    my @foreach; $range->foreach(sub($x) { push @foreach, $x });
-
     is(\@iter, [1..10],   'iter');
-    is(\@iter, \@foreach, 'iter same as foreach');
 }
 
-{ # iteri & foreachi
+# iteri
+{
     my @iteri;    $range->iteri(   sub($x,$i) { push @iteri,    [$i,$x] });
-    my @foreachi; $range->foreachi(sub($x,$i) { push @foreachi, [$i,$x] });
-
     is(\@iteri, [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,7], [7,8], [8,9], [9,10]], 'iteri');
-    is(\@iteri, \@foreachi, 'iteri same as foreachi');
 }
 
 {

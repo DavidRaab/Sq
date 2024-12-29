@@ -968,25 +968,7 @@ sub iter($seq, $f) {
     return;
 }
 
-# same as iter
-sub foreach($seq, $f) {
-    my $it = $seq->();
-    my $x;
-    $f->($x) while defined($x = $it->());
-    return;
-}
-
 sub iteri($seq, $f) {
-    my $it        = $seq->();
-    my ($idx, $x) = (0, undef);
-    while ( defined($x = $it->()) ) {
-        $f->($x, $idx++);
-    }
-    return;
-}
-
-# same as iteri
-sub foreachi($seq, $f) {
     my $it        = $seq->();
     my ($idx, $x) = (0, undef);
     while ( defined($x = $it->()) ) {

@@ -48,7 +48,6 @@ sig ('Hash::to_array',    t_hash, t_sub,                                   t_arr
 
 sigt('Hash::on',      t_tuplev(t_hash, t_array(t_even_sized)), t_void);
 sig ('Hash::iter',    t_hash, t_sub,                           t_void);
-sig ('Hash::foreach', t_hash, t_sub,                           t_void);
 sigt('Hash::lock',    t_tuplev(t_hash, t_array(t_of t_str)),   t_hash);
 
 ### MUTATION METHODS
