@@ -250,11 +250,12 @@ sub result(@xs) { Some([@xs]) }
     is(p_run($int, '+1234'), Some([ 1234]), 'p_strc many 2');
     is(p_run($int, '-1234'), Some([-1234]), 'p_strc many 3');
 }
+
 {
     my $int  =
         p_and(
             p_maybe(p_str('+', '-')),
-            p_many(p_str(0 .. 9)),
+            p_many (p_str(0 .. 9)),
         ),
     my $word    = p_match(qr/([a-zA-Z]+)/);
     my $intword = p_and($int, $word);
@@ -262,6 +263,24 @@ sub result(@xs) { Some([@xs]) }
     is(p_run($intword,  '1234abc'), Some(["abc"]), 'p_str many 1');
     is(p_run($intword, '+1234foo'), Some(["foo"]), 'p_str many 2');
     is(p_run($intword, '-1234bar'), Some(["bar"]), 'p_str many 3');
+}
+
+{
+    my $num = parser
+        [map =>
+            sub {
+                my ($num,$suffix) = @_;
+                return $num               if !defined $suffix;
+                return $num * 1024        if lc $suffix eq 'k';
+                return $num * 1204 * 1204 if lc $suffix eq 'm';
+            },
+            [and =>
+                [match => qr/\s* (\.\d+ | \d+ | \d+\.\d+) \s*/x],
+                [maybe => [match => qr/([km]) \s* \z/xi]]]];
+
+    is(p_run($num, "123"),         Some([123]), 'num 1');
+    is(p_run($num, "123 k"),    Some([125952]), 'num 2');
+    is(p_run($num, "123 m"), Some([178302768]), 'num 3');
 }
 
 done_testing;
