@@ -117,6 +117,10 @@ sub is_str :prototype($) {
     return ref $_[0] eq '' ? 1 : 0;
 }
 
+# This makes is_num() a direct copy of looks_like_number. So it is called
+# without any overhead. When `is_num` is exported than those are also copies
+# of this one. So calling `is_num` is the same speed as calling
+# looks_like_number().
 *is_num = \&Scalar::Util::looks_like_number;
 
 sub is_array :prototype($) {
