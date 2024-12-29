@@ -1,0 +1,305 @@
+#!/usr/bin/env perl
+use 5.036;
+use Sq;
+use Sq::Type qw(t_assert t_run t_valid type);
+use Sq::Parser qw(parser p_run);
+use Sq::Sig;
+use Path::Tiny;
+use Digest::SHA qw(sha512_hex);
+use Getopt::Long::Descriptive;
+
+## WHAT IT DOES
+#
+# This program recursively scans all files from the current working directory.
+# It gathers filesizes of all files. If there exists more than one file of the
+# same size the SHA512 is computed for its first 4 KiB of content.
+#
+# When this content is the same, file is considered a duplicate. This is not
+# exactly true, but yields into fast possible results. As file-size and first
+# 4 kiB must match.
+#
+# By default it just prints possible duplicated matches, and does nothing besides
+# that. So it is up to you to decide if those files are duplicates or not.
+#
+# If a deduplication folder is given, then the program turns into an interactive
+# application. It first asks if a given set of files should be deduplicated. If
+# user chooses "yes". Then the program ask for the filename it should keep.
+#
+# Then it will copy the first file to the given deduplucation folder and creates
+# symlinks from the old files to the new copied deduplicated file.
+
+## TODO
+# + Extend Deduplication logic to full file, not just first 4 KiB
+# + When one of the duplicated file is already in the deduplication folder
+#   then this needs special care. Then we don't need to ask the user which
+#   file should be keeped.
+# + Add some colors and newlines for interactive prompt
+
+### Argument Parsing
+
+my ($opt, $usage) = describe_options(
+    'Usage: %c %o',
+    ['min|m=s',    'Minimum file-size, like: 1, 1k, 1m, .3m, 1.5m'],
+    ['folder|f=s', 'De-Duplication folder'],
+    ['help|h',     'Print this message', {shortcircuit => 1}],
+);
+
+$usage->die if $opt->help;
+
+# check if folder exists and turn it into a Path::Tiny object
+my $dedup;
+if ( $opt->folder ) {
+    $dedup = path($opt->folder);
+    die "De-Duplication Folder does not exists.\n" if not $dedup->is_dir;
+}
+
+# read minimum
+my $min = assign {
+    if ( $opt->min ) {
+        my $num = parser
+            [map =>
+                sub {
+                    my ($num,$suffix) = @_;
+                    return $num               if !defined $suffix;
+                    return $num * 1024        if lc $suffix eq 'k';
+                    return $num * 1204 * 1204 if lc $suffix eq 'm';
+                },
+                [and =>
+                    [match => qr/\s* (\.\d+ | \d+ | \d+\.\d+) \s*/x],
+                    [maybe => [match => qr/([km]) \s* \z/xi]]]];
+
+        p_run($num, $opt->min)->match(
+            Some => sub($num) { fst $num },
+            None => sub()     {
+                die "Unsupported minimum. Specify integer optionally followed by [km]\n";
+            }
+        );
+    }
+};
+
+### Finding Duplicates
+
+# Type for what we want to built
+my $is_dup = type
+    [hash =>
+        [key_is => ['int']], # File-Size
+        [of     => [hash =>
+            [min    => 1],
+            [key_is => [match => qr/\A[0-9a-f]{128}\z/i]], # SHA512
+            [of     => [array =>
+                [of => [ref => 'Path::Tiny']]]]]]];
+
+# Build the above structure
+my $file =
+    # recursively get all files from current folder as a Seq
+    Sq->fs->recurse('.')
+    # only files
+    ->filter(call 'is_file')
+    # remove symbolic links
+    ->remove(sub($path) { -l $path })
+    # remove empty files or smaller $min (when provided)
+    ->remove(sub($path) { $path->size == 0 || ($min && $path->size < $min) })
+    # build a hash with file-size as key
+    ->group_by(call 'size')
+    # structure now: { FILESIZE => [FILE] }
+    # only keep those hash entries that has more than 1 file per size
+    ->filter(sub($size, $files) { $files->length > 1 })
+    # go through all key,value
+    # and function returns new key,value for every entry
+    ->map(sub($size, $files) {
+        # $files will be turned into: { SHA512 => [FILE] }
+        return
+            $size,                         # key stays the same
+            $files->group_by(sub($file) {  # value becomes a hash grouped by ...
+                # read_bytes returns an Result. Ok() when the content could
+                # be read, or on some failure an Err() containing an Errors
+                # message. So we must think at this place what we want todo
+                # when we get an Error. But before I do that. I map the
+                # content and calculate the SHA512 sum. This only happens
+                # when the content could be loaded. Then the `match`
+                # decides what todo.
+                #
+                # When i get an Err() case i just print a warning and I skip
+                # the file. I Skip it by returning just `0` for the SHA512
+                # sum. Later i just can delete that `0` entry.
+                #
+                # The group_by call groups all files by their SHA512
+                Sq->fs->read_bytes($file, 4096)->map(\&sha512_hex)->match(
+                    Ok  => sub($sha) { return $sha             },
+                    Err => sub($msg) { warn "$msg"; return "0" },
+                );
+            });
+    })
+    # now: { FILESIZE => { SHA512 => [FILE] } }
+    # go through all key,value
+    ->map(sub($size, $sha) {
+        # only keep entries that has more than one file per SHA512
+        $size,
+        $sha->filter(sub($sha, $files) {
+            return 0 if $sha eq "0"; # skip the "0" entry completely
+            return 1 if @$files > 1; # only entries with more than one file
+        });
+    })
+    # only keep file sizes that has some entries in it
+    ->filter(sub($size, $sha) { $sha->length > 0 ? 1 : 0 });
+
+# Abort when '$file' is wrong
+t_assert($is_dup, $file);
+
+# remove comment to see structure
+# dumpw($file);
+
+# EXAMPLE DUMP
+# {
+#   1195685 => {
+#     ed1e6790ff6681259dcff13fc2362ed55e51a173c22078d9c26b59d78a45e4ee0630b588f94af3b8003e1b738bc196aa98f6f7d3598cafc25c0753f87036192d => [
+#       path("P!nk/Greatest Hits... So Far!!!/cover.jpg"),
+#       path("P!nk/Greatest Hits... So Far!!!/Pink - Greatest Hits... So Far.jpg")
+#     ]
+#   },
+#   12251205 => {
+#     d72a0b29ff9dbcc686337dea8d53fe1a2524f9544e792e297b669475039192b311a260dc821be1a33695d8160cd67c423727c9b019dd22f8683692e1e5fffadd => [
+#       path("2020/Big Daddy Wilson - Walk A Mile In My Shoes.mp3"),
+#       path("Blues/Big Daddy Wilson - Walk A Mile In My Shoes.mp3")
+#     ]
+#   },
+#   143862741 => {
+#     7bede93ec60c4c5f130a7a673bd8dd128918cf7aa2a3af8d98ef7c3ff8e95868e32881a7eb09689587c781a85f9268315e38b8110d702fa2f343ef0510161c12 => [
+#       path("Blues/Alben/Instrumental Blues   A two hour long compilation.mp3"),
+#       path("Blues/Long Mix/Instrumental Blues.mp3")
+#     ]
+#   },
+# ......
+
+
+### Action
+
+# when program was started to dedup files
+if ( $dedup ) {
+    do_dedup($file);
+}
+# otherwise just print potential duplicates
+else {
+    print_potential_duplicates($file);
+}
+
+
+### Functions for the interactive program
+
+# prints message to console and expects user to type "yes" otherwise returns 0
+sub ask($message) {
+    $message =~ s/\s*$/ /xmsi;
+    print $message;
+    my $input = <STDIN>;
+    if ( $input =~ m/\A ( y | ye | yes ) $/xmsi ) {
+        return 1;
+    }
+    return 0;
+}
+
+# prints $message to console. It uses $validator to check if what user
+# provides is valid. When not, it prints $error and ask the user again
+# to choose something.
+sub choose($message, $error, $type) {
+    START:
+    print $message;
+    my $input = <STDIN>;
+    chomp $input;
+    return $input if t_valid($type, $input);
+    say $error;
+    goto START;
+}
+
+# ask a user to input a string or number. When number was provided
+# it must be in a certain range.
+sub choose_range_or_string($message, $error, $min, $max) {
+    # HINT: What i really need here is to say. Either be a number, and then
+    #       it MUST check check against range. Or if not number, then it can
+    #       be any string. But currently when int-check fails. Then it will always
+    #       be a valid sring. So without not-match the type before didn't make
+    #       any sense. A better approach would be to deactive back-tracking
+    #       so the `or` check doesn't try alternatives when at least `int` succedded.
+    my $input = choose(
+        $message,
+        $error,
+        type [or =>
+                [int => [range => $min, $max]], # int in range
+                [str => [not   => ['int']]]]    # str, but not int
+    );
+    return [RANGE  => $input-1] if is_num $input;
+    return [STRING => $input  ];
+}
+
+# it expects the $files structure we built.
+# { FILESIZE => { SHA512 => [FILE] } }
+sub print_potential_duplicates($data) {
+    t_assert($is_dup);
+    # we want to go through every key,value of the hash. But the key should
+    # be iterated with a sorting. Here by_num because we want to print
+    # everythhing ascending by the file-size. This is helpful as the output
+    # becomes "stable". Calling the program multiple times always returns
+    # the same output in the same order. Otherwise the duplicates would
+    # be random.
+    $data->iter_sort(by_num, sub($size, $shas) {
+        # $shas is the inner hash: { SHA512 => [FILE] }
+        $shas->iter(sub($sha, $files) {
+            printf "SHA512 %s - %d bytes\n", $sha, $size;
+            $files->iter(sub($file) { say $file });
+            print "\n";
+        });
+    });
+}
+
+# it expects the $files structure we built.
+# { FILESIZE => { SHA512 => [FILE] } }
+sub do_dedup($data) {
+    t_assert($is_dup);
+    $data->iter_sort(by_num, sub($size, $shas) {
+        $shas->iter(sub($sha, $files) {
+            # prints duplicated files to user
+            printf "File-Size: %d bytes\n", $size;
+            $files->iteri(sub($file, $idx) {
+                printf "  %02d. %s\n", $idx+1, $file;
+            });
+
+            if ( ask("De-Duplicate? [yes/no*]") ) {
+                # as all files should be duplicates, i always pick the first.
+                my $keep = $files->[0];
+
+                # we ask the user which file to keep to pick the filename for the target
+                TARGET:
+                my $count = $files->length;
+                my $input = choose_range_or_string(
+                    (sprintf "Keep [1-%d/filename]: ", $count),
+                    (sprintf "Provide an integer in range 1-%d or a filename", $count),
+                    1,
+                    $count
+                );
+
+                # Build target
+                my $target =
+                    $input->[0] eq 'RANGE'
+                    ? path($dedup, $files->[$input->[1] - 1]->basename)
+                    : path($dedup, $input->[1]);
+
+                # when target exists re-ask for another target
+                if ( -e $target ) {
+                    say 'Error: Target already exists';
+                    goto TARGET;
+                }
+
+                # Actual Copy Logic
+                # printf "COPY '%s' -> '%s'\n", $keep, $target;
+                if ( $keep->copy($target) ) {
+                    $files->iter(sub($file) {
+                        $file->remove;
+                        Sq->fs->make_link($target, $file);
+                    });
+                }
+                else {
+                    die "Copy failed: $!\n";
+                }
+            }
+        });
+    });
+}
