@@ -13,7 +13,7 @@ use Sq::Sig;
 # a single time.
 my $use = lazy {
     my $folders =
-        Sq->io->children('t')
+        Sq->fs->children('t')
         ->filter(call 'is_dir')
         ->regex_sub(qr{\At/}, lazy { " + " })
         ->sort(by_str)
@@ -49,9 +49,10 @@ $usage->die if $opt->help;
 
 # get the maximum id from test-files so far
 my $maximum_id =
-    Sq->io->children('t', $opt->folder)
-    ->map(         call 'basename'                   )
-    ->regex_match( qr/\A(\d+) .* \.t\z/xms           )
+    Sq->fs
+    ->children(    't', $opt->folder       )
+    ->map(         call 'basename'         )
+    ->regex_match( qr/\A(\d+) .* \.t\z/xms )
     ->fsts
     ->max
     ->or(-1);
