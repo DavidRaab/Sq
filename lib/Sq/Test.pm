@@ -26,6 +26,7 @@ sub ok($bool, $message) {
         else {
             print "not ok $count - $message\n";
             warn  "# not ok $count - $message\n";
+            warn  "# Expected 1, Some() or Ok()\n";
         }
     }
     else {
@@ -37,7 +38,7 @@ sub ok($bool, $message) {
             else {
                 print "not ok $count - $message\n";
                 warn  "# not ok $count - $message\n";
-                warn  "# Got None()\n";
+                warn  "# Expected 1, Some() or Ok()\n";
             }
             return;
         }
@@ -48,6 +49,7 @@ sub ok($bool, $message) {
             else {
                 print "not ok $count - $message\n";
                 warn  "# not ok $count - $message\n";
+                warn  "# Expected 1, Some() or Ok()\n";
                 my $msg = dump($bool->[1]);
                 $msg =~ s/^/# /mg;
                 warn $msg, "\n";
