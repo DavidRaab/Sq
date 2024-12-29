@@ -655,11 +655,11 @@ sub type($array) {
         with_keys => \&t_with_keys, keys       => \&t_keys,       as_hash  => \&t_as_hash,
         array     => \&t_array,     idx        => \&t_idx,        tuple    => \&t_tuple,
         tuplev    => \&t_tuplev,    even_sized => \&t_even_sized, of       => \&t_of,
-        min       => \&t_min,       max        => \&t_length,     any      => \&t_any,
-        sub       => \&t_sub,       regex      => \&t_regex,      bool     => \&t_bool,
-        seq       => \&t_seq,       void       => \&t_void,       result   => \&t_result,
-        ref       => \&t_ref,       isa        => \&t_isa,        can      => \&t_can,
-        key_is    => \&t_key_is,
+        min       => \&t_min,       max        => \&t_max,        length   => \&t_length,
+        any       => \&t_any,       sub        => \&t_sub,        regex    => \&t_regex,
+        bool      => \&t_bool,      seq        => \&t_seq,        void     => \&t_void,
+        result    => \&t_result,    ref        => \&t_ref,        isa      => \&t_isa,
+        can       => \&t_can,       key_is     => \&t_key_is,
     };
     return eval_data($table, $array);
 }
