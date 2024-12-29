@@ -19,7 +19,7 @@ my $count = 0;
 sub ok($bool, $message) {
     $count++;
     if ( is_num $bool ) {
-        Carp::croak "Error: ok() expects 0 or 1. Got: $bool\n" if ($bool != 0 && $bool != 1);
+        Carp::croak "Error: ok() only expects 0 or 1 as numbers. Got: $bool\n" if ($bool != 0 && $bool != 1);
         if ( $bool ) {
             print "ok $count - $message\n"
         }
@@ -28,6 +28,7 @@ sub ok($bool, $message) {
             warn  "# not ok $count - $message\n";
             warn  "# Expected 1, Some() or Ok()\n";
         }
+        return;
     }
     else {
         my $type = ref $bool;
@@ -54,8 +55,10 @@ sub ok($bool, $message) {
                 $msg =~ s/^/# /mg;
                 warn $msg, "\n";
             }
-            return
+            return;
         }
+
+        Carp::croak "Error: ok() got: $bool\n" if $type eq "";
         Carp::croak "Error: ok() got ref: $type\n";
     }
     return;
@@ -63,12 +66,55 @@ sub ok($bool, $message) {
 
 sub nok($bool, $message) {
     $count++;
-    if ( $bool ) {
-        print "not ok $count - $message\n";
-        warn  "# not ok $count - $message\n";
+    if ( is_num($bool) ) {
+        Carp::croak "Error: ok() only expects 0 or 1 as numbers Got: $bool\n" if ($bool != 0 && $bool != 1);
+        if ( $bool == 0 ) {
+            print "ok $count - $message\n"
+        }
+        else {
+            print "not ok $count - $message\n";
+            warn  "# not ok $count - $message\n";
+            warn  "# Expected 0, None or Err()\n";
+        }
+        return;
     }
     else {
-        print "ok $count - $message\n";
+        my $type = ref $bool;
+        if ( $type eq 'Option' ) {
+            if ( @$bool ) {
+                print "not ok $count - $message\n";
+                warn  "# not ok $count - $message\n";
+                warn  "# Expected 0, None or Err()\n";
+            }
+            else {
+                print "ok $count - $message\n"
+            }
+            return;
+        }
+        elsif ( $type eq 'Result' ) {
+            if ( $bool->[0] == 1 ) {
+                print "not ok $count - $message\n";
+                warn  "# not ok $count - $message\n";
+                warn  "# Expected 0, None or Err()\n";
+            }
+            else {
+                print "ok $count - $message\n"
+            }
+            return;
+        }
+        # only for is_num(). This function is looks_like_number() but when
+        # number is not a number it returns empty string. So empty string
+        # is also considered a failurre or in the case of nok() as valid.
+        # Important, so someone can write:
+        #
+        # nok(is_num($whatever), "not a number");
+        elsif ( $type eq "" && $bool eq "" ) {
+            print "ok $count - $message\n";
+            return;
+        }
+
+        Carp::croak "Error: nok got: $bool\n" if ref eq "";
+        Carp::croak "Error: nok() got ref: $type\n";
     }
     return;
 }

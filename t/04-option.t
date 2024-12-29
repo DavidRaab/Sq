@@ -14,7 +14,8 @@ use Sq::Test;
     check_isa($y, 'Option', '$y is option');
     check_isa($z, 'Option', '$z is option');
 
-    ok($x->is_some, 'some value');
+    ok($x->is_some, 'some value 1');
+    ok($x,          'some value 2'); # ok() understands Some()
     ok($y->is_none, 'none value');
     ok($z->is_none, 'none value');
 }
