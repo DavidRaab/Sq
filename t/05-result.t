@@ -23,10 +23,11 @@ my $is_even = sub($x)    { $x % 2 == 0 };
     check_isa($y, 'Result', '$y is result');
     check_isa($z, 'Result', '$z is result');
 
-    ok($x->is_ok,  'ok value 1');
-    ok($x,         'ok value 2'); # ok understands Ok()
-    ok($y->is_ok,  'err value');  # in a result `undef` can be part of Ok()
-    ok($z->is_err, 'err value');
+     ok($x->is_ok,  'ok value 1');
+     ok($x,         'ok value 2');  # ok understands Ok()
+     ok($y->is_ok,  'err value 1'); # in a result `undef` can be part of Ok()
+     ok($z->is_err, 'err value 2');
+    nok($z,         'err value 3'); # nok understand result
 
     # check functional-style
     my @tests = (

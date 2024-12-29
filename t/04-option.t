@@ -14,10 +14,11 @@ use Sq::Test;
     check_isa($y, 'Option', '$y is option');
     check_isa($z, 'Option', '$z is option');
 
-    ok($x->is_some, 'some value 1');
-    ok($x,          'some value 2'); # ok() understands Some()
-    ok($y->is_none, 'none value');
-    ok($z->is_none, 'none value');
+     ok($x->is_some, 'some value 1');
+     ok($x,          'some value 2'); # ok() understands Some()
+     ok($z->is_none, 'none value 2');
+     ok($y->is_none, 'none value 1');
+    nok($z,          'none value 3'); # nok() understands None
 }
 
 # Pattern Matching
