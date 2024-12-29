@@ -127,8 +127,8 @@ sub is :prototype($$$) {
     }
     else {
         print "not ok $count - $message\n";
-        my $dump_1 = Sq::Dump::dump($got);
-        my $dump_2 = Sq::Dump::dump($expected);
+        my $dump_1 = dump($got);
+        my $dump_2 = dump($expected);
         # add # to beginning of every starting line
         $dump_1 =~ s/^/# /mg;
         $dump_2 =~ s/^/# /mg;

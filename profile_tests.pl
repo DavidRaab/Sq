@@ -4,7 +4,7 @@ use open ':std', ':encoding(UTF-8)';
 use Sq;
 
 my $files =
-    Sq->io->recurse('t')
+    Sq->fs->recurse('t')
     ->filter(call 'is_file')
     ->filter(sub($p) { $p =~ m/\.t\z/ });
 

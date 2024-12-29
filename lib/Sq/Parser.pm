@@ -1,6 +1,6 @@
 package Sq::Parser;
 use 5.036;
-use Sq;
+use Sq ();
 use Sq::Evaluator;
 use Sq::Exporter;
 our @EXPORT = (
@@ -12,6 +12,9 @@ our @EXPORT = (
     qw(p_and p_or p_maybe p_many p_many0 p_ignore),
     qw(p_qty p_choose p_repeat p_filter p_delay p_not),
 );
+
+*Some = \&Option::Some;
+*None = \&Option::None;
 
 ##########
 ###
@@ -35,7 +38,7 @@ sub fail($pos) {
 sub p_run($parser, $str) {
     my $p = $parser->({ valid => 1, pos => 0 }, $str);
     return Some($p->{matches}) if $p->{valid};
-    return None;
+    return None();
 }
 
 # runs a parser against a string, but only return a boolean if parsing

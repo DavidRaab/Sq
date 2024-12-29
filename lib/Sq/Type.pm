@@ -1,6 +1,6 @@
 package Sq::Type;
 use 5.036;
-use Sq;
+use Sq ();
 use Sq::Parser qw(p_valid);
 use Sq::Evaluator;
 use Sq::Exporter;
@@ -17,6 +17,12 @@ our @EXPORT = (
     qw(t_ref t_isa t_can)                             # Objects
 );
 
+# Only import things needed directly. Makes it a little bit faster. Can be
+# changed as soon Exporter is finished and can handle exporting completely.
+*is_num = \&Sq::is_num;
+*Ok     = \&Result::Ok;
+*Err    = \&Result::Err;
+
 # TODO
 # Add: t_none, t_any
 # Add: t_tuplen
@@ -24,11 +30,9 @@ our @EXPORT = (
 #      would be a function that expects the types one or many times in a single array
 #      [1,"foo",2,   1,"foo",2,   1,"foo",2, ...]
 
-# New conept
-#
 # type-checks return undef for valid, or otherwise an error. Currently
 # the error will just be a string. but this reduces the whole checking
-# to a defined checking
+# to a defined checking.
 my $valid = undef;
 
 ### Runners
