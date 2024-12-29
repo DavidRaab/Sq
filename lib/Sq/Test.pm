@@ -18,12 +18,19 @@ my $count = 0;
 
 sub ok($bool, $message) {
     $count++;
-    if ( $bool ) {
-        print "ok $count - $message\n"
+    my $type = ref $bool;
+    if ( $type eq "" ) {
+        Carp::croak "Error: ok() expects 0 or 1. Got: $bool\n" if ($bool != 0 && $bool != 1);
+        if ( $bool ) {
+            print "ok $count - $message\n"
+        }
+        else {
+            print "not ok $count - $message\n";
+            warn  "# not ok $count - $message\n";
+        }
     }
     else {
-        print "not ok $count - $message\n";
-        warn  "# not ok $count - $message\n";
+        Carp::croak "Error: ok() got ref: $type\n";
     }
     return;
 }
