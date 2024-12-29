@@ -78,8 +78,8 @@ sub t_ref($ref, @checks) {
             }
             return $valid;
         }
-        return "ref: Expected '$ref' Got '$type'" if defined $type;
-        return "ref: Expected reference, got not reference.";
+        return "ref: Expected '$ref' Got '$type'" if $type ne "";
+        return "ref: Expected ref. Got: '$any'";
     }
 }
 
@@ -285,7 +285,7 @@ sub t_of($is_type) {
             my $err;
             for my $key ( keys %$any ) {
                 $err = $is_type->($any->{$key});
-                return "of: key $key: $err" if defined $err;
+                return "of: key '$key': $err" if defined $err;
             }
             return $valid;
         }
