@@ -11,11 +11,11 @@ my $hash1 = type [hash => [min => 1]];
 nok(t_valid($hash1, {}), 'hash must have one key');
 
 my $hoh1 = type [hash => [of => $hash1]];
-okr(t_run($hoh1, {}), 'empty hash ok');
+ok(t_run($hoh1, {}), 'empty hash ok');
 nok(t_valid($hoh1, {
     what => {}
 }), 'inner hash fails');
-okr(t_run($hoh1, {
+ok(t_run($hoh1, {
     what => {
         foo => 1
     },
@@ -34,7 +34,7 @@ my $is_dup = type
             [of     => [array =>
                 [of => [ref => 'Path::Tiny']]]]]]];
 
-okr(t_run($is_dup, {}), 'is_dup 1');
+ok(t_run($is_dup, {}), 'is_dup 1');
 
 nok(t_valid($is_dup, {
     123 => {},
@@ -44,7 +44,7 @@ nok(t_valid($is_dup, {
     123 => { foo => 1 },
 }), 'is_dup 3');
 
-okr(t_run($is_dup, {
+ok(t_run($is_dup, {
     "123" => {
         gen_sha512(), [
             path "/",
@@ -53,7 +53,7 @@ okr(t_run($is_dup, {
     }
 }), 'is_dup 4');
 
-okr(t_run($is_dup, {
+ok(t_run($is_dup, {
     "123" => {
         gen_sha512(), [
             path "/",
@@ -79,7 +79,7 @@ nok(t_valid($is_dup, {
     }
 }), 'is_dup 6');
 
-okr(t_run($is_dup, {
+ok(t_run($is_dup, {
     "123" => {
         gen_sha512(), [
             path '/',
@@ -107,12 +107,12 @@ my $num_or_str = type
         [int => [range => 1, 100]],
         [str => [not   => ['int']]]];
 
-okr(t_run($num_or_str,          1), 'ns 1');
-okr(t_run($num_or_str,        100), 'ns 2');
+ok (t_run($num_or_str,          1), 'ns 1');
+ok (t_run($num_or_str,        100), 'ns 2');
 nok(t_valid($num_or_str,      101), 'ns 3');
 nok(t_valid($num_or_str,        0), 'ns 4');
-okr(t_run($num_or_str,   "foo123"), 'ns 5');
-okr(t_run($num_or_str,     "123f"), 'ns 6');
-okr(t_run($num_or_str,     "/asd"), 'ns 7');
+ok (t_run($num_or_str,   "foo123"), 'ns 5');
+ok (t_run($num_or_str,     "123f"), 'ns 6');
+ok (t_run($num_or_str,     "/asd"), 'ns 7');
 
 done_testing;
