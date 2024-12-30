@@ -458,6 +458,7 @@ sub slice($array, @idxs) {
     return CORE::bless([$array->@[grep {$_ < $max && $_ > $min} @idxs]], 'Array');
 }
 
+# TODO: Other name
 sub extract($array, $pos, $length) {
     return CORE::bless([], 'Array') if $length <= 0;
     return CORE::bless([], 'Array') if $pos > @$array;
@@ -469,6 +470,10 @@ sub extract($array, $pos, $length) {
         push @$new, $array->[$idx];
     }
     return $new;
+}
+
+sub diff($arrayA, $arrayB, $comparer) {
+    Hash::difference($arrayA->count, $arrayB->count)->iter_sort($comparer, \&fst);
 }
 
 #-----------------------------------------------------------------------------#
