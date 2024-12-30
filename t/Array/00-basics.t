@@ -1195,9 +1195,91 @@ is(sq([10,3,11,4,10])   ->sort(by_num),  [3,4,10,10,11],    'POD sort 1');
 is(sq([qw/foo BAR baa/])->sort(by_str),  [qw/BAR baa foo/], 'POD sort 2');
 is(sq([qw/foo BAR baa/])->sort(by_stri), [qw/baa BAR foo/], 'POD sort 3');
 
-is(
-    Array->range(1,10)->remove($is_even),
-    [1,3,5,7,9],
-    'remove');
+is(Array->range(1,10)->remove($is_even), [1,3,5,7,9], 'remove');
+
+# diff
+is(Array::diff([1,2,3],  [1,3],     \&id),            [2], 'diff 1');
+is(Array::diff([1..10],  [1,3,7,2], \&id), [4,5,6,8,9,10], 'diff 2');
+
+{
+    my sub entry($id,$name) { {id => $id, name => $name } }
+    is(
+        Array::diff([
+                entry(1, "hello"),
+                entry(2, "world"),
+                entry(3, "test"),
+            ], [
+                entry(2, "abba"),
+                entry(3, "test"),
+                entry(5, "what"),
+            ],
+            key 'id'
+        ),
+        [entry(1, "hello")],
+        'diff 3');
+
+    is(
+        Array::diff([
+                entry(1, "hello"),
+                entry(2, "world"),
+                entry(3, "test"),
+            ], [
+                entry(2, "abba"),
+                entry(3, "test"),
+                entry(5, "what"),
+            ],
+            key 'name'
+        ),
+        [entry(1, "hello"), entry(2, "world")],
+        'diff 4');
+
+    is(
+        Array::diff([
+                entry(2, "world"),
+                entry(1, "hello"),
+                entry(3, "test"),
+                entry(4, "new"),
+            ], [
+                entry(3, "test"),
+                entry(5, "what"),
+                entry(2, "world"),
+            ],
+            key 'id'
+        ),
+        [entry(1, "hello"), entry(4, "new")],
+        'diff 5');
+
+    is(
+        Array::diff([
+                entry(4, "new"),
+                entry(3, "test"),
+                entry(2, "world"),
+                entry(1, "hello"),
+            ], [
+                entry(3, "test"),
+                entry(5, "what"),
+                entry(2, "world"),
+            ],
+            key 'id'
+        ),
+        [entry(4, "new"), entry(1, "hello")],
+        'diff 6');
+
+    is(
+        Array::diff([
+                entry(2, "world"),
+                entry(1, "hello"),
+                entry(3, "test"),
+                entry(4, "new"),
+            ], [
+                entry(3, "test"),
+                entry(5, "what"),
+                entry(2, "foo"),
+            ],
+            key 'name'
+        ),
+        [entry(2, "world"), entry(1, "hello"), entry(4, 'new')],
+        'diff 7');
+}
 
 done_testing;

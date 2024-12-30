@@ -472,8 +472,17 @@ sub extract($array, $pos, $length) {
     return $new;
 }
 
-sub diff($arrayA, $arrayB, $comparer) {
-    Hash::difference($arrayA->count, $arrayB->count)->iter_sort($comparer, \&fst);
+sub diff($arrayA, $arrayB, $f_key) {
+    my @new;
+    my %indexB = map { $f_key->($_) => 1 } @$arrayB;
+    for (my $idx=0; $idx < @$arrayA; $idx++) {
+        my $value = $arrayA->[$idx];
+        my $key   = $f_key->($value);
+        if ( !exists $indexB{$key} ) {
+            push @new, $value;
+        }
+    }
+    return CORE::bless(\@new, 'Array');
 }
 
 #-----------------------------------------------------------------------------#
