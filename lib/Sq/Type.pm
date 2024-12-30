@@ -1,7 +1,6 @@
 package Sq::Type;
 use 5.036;
 use Sq ();
-use Sq::Parser qw(p_valid);
 use Sq::Evaluator;
 use Sq::Exporter;
 our @EXPORT = (
@@ -421,8 +420,9 @@ sub t_or(@checks) {
 
 # Runs a Parser against a string
 sub t_parser($parser) {
+    require Sq::Parser;
     return sub($str) {
-        return $valid if p_valid($parser, $str);
+        return $valid if Sq::Parser::p_valid($parser, $str);
         return "parser: string does not match Parser";
     }
 }
