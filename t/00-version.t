@@ -1,7 +1,7 @@
 #!perl
 use 5.036;
 use Sq;
-use Sq::Gen;
+use Sq::Gen qw(gen gen_run);
 use Sq::Sig;
 use Sq::Test;
 
@@ -185,16 +185,20 @@ is(
      ok(is_type($range, Some(10)), 'type 4');
     nok(is_type($range, Some(11)), 'type 5');
 
+    # this is funny
     my $is_sha = type [str => [match => qr/\A[0-9a-f]{128}\z/i ]];
+    ok(
+        is_type(
+            type([array => [of => $is_sha]]),      # type for array with 20 SHA512 strings
+            gen_run gen [repeat => 20, ['sha512']] # genereates array with 20 SHA512 strings
+        ),
+        'array of SHA512');
 
-    my $array = gen_run(gen_repeat(20, gen_sha512));
-    $array->iteri(sub($sha,$idx) {
-        ok(is_type($is_sha, $sha), "$idx: is_sha");
-    });
-
+    # test genereation of 20 tuples.
     my $is_sha_tuple = type [tuple => $is_sha, $is_sha];
-    my $sha_tuple    = gen_array(gen_sha512, gen_sha512);
+    my $sha_tuple    = gen  [array => ['sha512'], ['sha512']];
     for ( 1 .. 20 ) {
+        # could also be transformed to a single test like above
         ok(is_type($is_sha_tuple, gen_run($sha_tuple)), "$_: sha tuple");
     }
 }
