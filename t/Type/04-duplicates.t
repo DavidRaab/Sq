@@ -4,6 +4,7 @@ use Sq;
 use Sq::Type qw(t_run t_valid type);
 use Sq::Sig;
 use Sq::Test;
+use Sq::Gen;
 use Path::Tiny qw(path);
 
 # check if inner hash with min => 1 works
@@ -90,16 +91,6 @@ ok(t_run($is_dup, {
         ],
     }
 }), 'is_dup 7');
-
-# generates random SHA512 string
-sub gen_sha512() {
-    state @chars = (0 .. 9, 'a' .. 'f');
-    my $str;
-    for ( 1 .. 128 ) {
-        $str .= $chars[ rand(16) ];
-    }
-    return $str;
-}
 
 ### Another structure i use in my find_duplicates example
 my $num_or_str = type
