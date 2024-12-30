@@ -475,9 +475,9 @@ sub extract($array, $pos, $length) {
 sub diff($arrayA, $arrayB, $f_key) {
     my @new;
     my %indexB = map { $f_key->($_) => 1 } @$arrayB;
-    for (my $idx=0; $idx < @$arrayA; $idx++) {
-        my $value = $arrayA->[$idx];
-        my $key   = $f_key->($value);
+    my $key;
+    for my $value ( @$arrayA ) {
+        $key = $f_key->($value);
         if ( !exists $indexB{$key} ) {
             push @new, $value;
         }
