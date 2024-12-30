@@ -105,7 +105,7 @@ sub gen_sha512() {
 my $num_or_str = type
     [or =>
         [int => [range => 1, 100]],
-        [str => [not   => ['int']]]];
+        [str => [not => ['int']]]];
 
 ok (t_run($num_or_str,          1), 'ns 1');
 ok (t_run($num_or_str,        100), 'ns 2');
