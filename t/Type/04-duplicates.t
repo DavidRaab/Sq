@@ -47,7 +47,7 @@ nok(t_valid($is_dup, {
 
 ok(t_run($is_dup, {
     "123" => {
-        gen_sha512(), [
+        gen_sha512->(), [
             path "/",
             path "/whatever",
         ],
@@ -56,11 +56,11 @@ ok(t_run($is_dup, {
 
 ok(t_run($is_dup, {
     "123" => {
-        gen_sha512(), [
+        gen_sha512->(), [
             path "/",
             path "/whatever",
         ],
-        gen_sha512(), [
+        gen_sha512->(), [
             path '/foo/bar',
             path '/etc',
         ],
@@ -73,7 +73,7 @@ nok(t_valid($is_dup, {
             path "/",
             path "/whatever",
         ],
-        gen_sha512(), [
+        gen_sha512->(), [
             path '/foo/bar',
             path '/etc',
         ],
@@ -82,10 +82,10 @@ nok(t_valid($is_dup, {
 
 ok(t_run($is_dup, {
     "123" => {
-        gen_sha512(), [
+        gen_sha512->(), [
             path '/',
         ],
-        gen_sha512(), [
+        gen_sha512->(), [
             path '/foo/bar',
             path '/etc',
         ],

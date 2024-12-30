@@ -1,6 +1,7 @@
 #!perl
 use 5.036;
 use Sq;
+use Sq::Gen;
 use Sq::Sig;
 use Sq::Test;
 
@@ -173,6 +174,29 @@ is(
     nok(is_result([]),      'is_result 3');
      ok(is_ref('Foo', bless([], 'Foo')), 'is_ref 1');
     nok(is_ref('Bar', bless([], 'Foo')), 'is_ref 2');
+}
+
+# type / is_type
+{
+    my $range = type [opt => [range => 0, 10]];
+    nok(is_type($range, Some(-1)), 'type 1');
+     ok(is_type($range,  Some(0)), 'type 2');
+     ok(is_type($range,  Some(5)), 'type 3');
+     ok(is_type($range, Some(10)), 'type 4');
+    nok(is_type($range, Some(11)), 'type 5');
+
+    my $is_sha = type [str => [match => qr/\A[0-9a-f]{128}\z/i ]];
+
+    my $array = gen_run(gen_repeat(20, gen_sha512));
+    $array->iteri(sub($sha,$idx) {
+        ok(is_type($is_sha, $sha), "$idx: is_sha");
+    });
+
+    my $is_sha_tuple = type [tuple => $is_sha, $is_sha];
+    my $sha_tuple    = gen_array(gen_sha512, gen_sha512);
+    for ( 1 .. 20 ) {
+        ok(is_type($is_sha_tuple, gen_run($sha_tuple)), "$_: sha tuple");
+    }
 }
 
 done_testing;
