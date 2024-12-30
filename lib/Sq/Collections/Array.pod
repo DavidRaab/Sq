@@ -108,7 +108,7 @@ the C<Hash> package.
 =head2 Array->new($x,$x,$x,...) : $array
 
 Creates an Array with the specified values to C<new>. There is a special
-behaviour that aborts on an C<undef>. This is to be align with the L<Sq::Collections::Seq>
+behaviour that aborts on C<undef>. This is to be align with the L<Sq::Collections::Seq>
 data-structure that uses C<undef> to abort a sequence.
 
     my $data = Array->new(
@@ -120,11 +120,6 @@ data-structure that uses C<undef> to abort a sequence.
 This creates the same data-structure as the example above using C<sq>.
 Consider that using C<sq> doesn't include the behaviour on C<undef> because
 than the Array is purely created by Perl itself, just the blessing is added.
-
-=head2 Array->wrap($x,$y,$z,...) : $array
-
-Same as C<new>. Used this naming because of the I<Monad Abstraction>. Maybe
-get deleted.
 
 =head2 Array->empty : $array
 

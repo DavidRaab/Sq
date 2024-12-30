@@ -19,7 +19,6 @@ my $sub   = t_sub;
 ### CONSTRUCTORS
 
 sigt('Array::new',        t_tuplev($any, $array),    $array);
-sigt('Array::wrap',       t_tuplev($any, $array),    $array);
 sigt('Array::concat',     t_tuplev($any, $aoa),      $array);
 sig ('Array::empty',      $any,                      $array);
 sig ('Array::replicate',  $any, t_int, $any,         $array);

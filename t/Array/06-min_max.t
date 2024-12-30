@@ -27,7 +27,7 @@ is(Array->range(-100, -50)->max, Some(-50), 'max with negative values');
 is(Array->empty->max,                 None, 'max on empty');
 is(Array->empty->max->or(0),             0, 'max on empty with option::or');
 
-my $words = Array->wrap(qw/Hello World you Are welcome/);
+my $words = Array->new(qw/Hello World you Are welcome/);
 
 # min_str
 is($words->min_str,              Some('Are'), 'min_str');
@@ -45,11 +45,11 @@ is(Array->empty->max_str->or('A'),      'A', 'max_str on empty with option::or')
 # --- ---
 
 
-my $data = Array->wrap(
+my $data = sq [
     { id => 1, name => 'A' },
     { id => 2, name => 'B' },
     { id => 3, name => 'C' },
-);
+];
 
 my $by_id   = key "id";
 my $by_name = key "name";

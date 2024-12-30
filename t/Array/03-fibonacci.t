@@ -8,7 +8,7 @@ use Sq::Test;
 {
     my $fib =
         Array->concat(
-            Array->wrap(1,1),
+            Array->new(1,1),
             Array->unfold([1,1], sub($state) {
                 my $next = fst($state) + snd($state);
                 if ( $next < 100_000 ) {
@@ -43,7 +43,7 @@ use Sq::Test;
 {
     my $fib =
         Array->concat(
-            Array->wrap(1,1),
+            Array->new(1,1),
             Array->unfold([1,1], sub($state) {
                 # uses $state/Array as a Queue, pushes next value onto the end and
                 # removes first entry in array
@@ -64,7 +64,7 @@ use Sq::Test;
 {
     my $fib =
         Array->concat(
-            Array->wrap(1,1),
+            Array->new(1,1),
             Array->unfold({x => 1, y => 1}, sub($state) {
                 my $next = $state->{x} + $state->{y};
                 $state->{x} = $state->{y};

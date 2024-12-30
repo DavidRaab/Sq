@@ -137,11 +137,10 @@ is($range->sum, $range->rev->sum, 'sum 2');
 {
     # Currently on undef it aborts, should it just skip the undef and return
     # the values from 1 to 6?
-    is(Array->wrap(1,2,3,undef,4,5,6), [1..3], 'wrap containing an undef');
-
-    is(Array->wrap(5), [5], 'wrap');
+    is(Array->new(1,2,3,undef,4,5,6), [1..3], 'new containing an undef');
+    is(Array->new(5), [5], 'new');
     is(
-        Array->wrap(5)->append(Array->wrap(10)),
+        Array->new(5)->append(Array->new(10)),
         [5, 10],
         'wrap and append');
     is(
@@ -154,10 +153,10 @@ is($range->sum, $range->rev->sum, 'sum 2');
 
 is(
     Array::zip(
-        Array->wrap(qw/A B C D E F/),
+        Array->new(qw/A B C D E F/),
         Array->range(0, 1_000),
     ),
-    Array->wrap(qw/A B C D E F/)->indexed,
+    Array->new(qw/A B C D E F/)->indexed,
     'zip and indexed');
 
 is(
@@ -187,11 +186,11 @@ is(
     'range->indexed vs. init');
 
 is(
-    (reduce { $a->append($b) } map { Array->wrap($_) } 1 .. 10),
+    (reduce { $a->append($b) } map { Array->new($_) } 1 .. 10),
     $range,
     'append a list of wrapped values');
 is(
-    Array->concat(map { Array->wrap($_) } 1 .. 10),
+    Array->concat(map { Array->new($_) } 1 .. 10),
     $range,
     'concat');
 
@@ -200,18 +199,18 @@ is(
     'concat on zero is empty');
 
 is(
-    Array->wrap(Array->range(1,10)->expand),
+    Array->new(Array->range(1,10)->expand),
     [1 .. 10],
     'expand');
 
 is(
-    Array->wrap(1..5)->append(
-        Array->wrap(6..10)
+    Array->new(1..5)->append(
+        Array->new(6..10)
     ),
     Array->concat(
-        Array->wrap(1..3),
-        Array->wrap(4..6),
-        Array->wrap(7..10),
+        sq [1..3],
+        sq [4..6],
+        sq [7..10],
     ),
     'append vs. concat');
 
@@ -226,14 +225,14 @@ is(
         Array->empty,
         Array->range(10,12),
         Array->empty,
-        Array->wrap("Hello"),
+        Array->new("Hello"),
         Array->empty
     ),
-    Array->wrap(1..5, 10..12, "Hello"),
+    Array->new(1..5, 10..12, "Hello"),
     'concat with empties');
 is(
     Array->from_array([1..10]),
-    Array->wrap(1..10),
+    Array->new(1..10),
     'from_array and wrap');
 is(
     Array->unfold(10, sub($state) {
@@ -248,7 +247,7 @@ is(
     'unfold');
 
 is(
-    Array->wrap, Array->empty,
+    Array->new, Array->empty,
     'wrap without arguments same as empty');
 
 # concat tests
@@ -301,14 +300,14 @@ is(
     ),
     'concat with rev');
 
-is(Array->wrap([A => 1], [B => 2], [C => 3])->sum_by(\&snd), 6, 'sumBy');
+is(Array->new([A => 1], [B => 2], [C => 3])->sum_by(\&snd), 6, 'sumBy');
 is(
-    Array->wrap(qw/H e l l o W o r l d !/)->join('-'),
+    Array->new(qw/H e l l o W o r l d !/)->join('-'),
     "H-e-l-l-o-W-o-r-l-d-!",
     'join');
 
 is(
-    Array->wrap(qw/Hello World you are awesome/)->to_hash(sub($x) { length $x => $x }),
+    Array->new(qw/Hello World you are awesome/)->to_hash(sub($x) { length $x => $x }),
     {
         3 => "are",
         5 => "World",
@@ -317,7 +316,7 @@ is(
     'to_hash 1');
 
 is(
-    Array->wrap(qw/Hello World you are awesome/)->to_hash(sub($x) { $x => length $x }),
+    Array->new(qw/Hello World you are awesome/)->to_hash(sub($x) { $x => length $x }),
     {
         "Hello"   => 5,
         "World"   => 5,
@@ -328,7 +327,7 @@ is(
     'to_hash 2');
 
 is(
-    Array->wrap(qw/Hello World you are awesome/)->to_hash_of_array(sub($x) { length $x => $x }),
+    Array->new(qw/Hello World you are awesome/)->to_hash_of_array(sub($x) { length $x => $x }),
     {
         3 => ["you",   "are"   ],
         5 => ["Hello", "World" ],
@@ -361,18 +360,18 @@ is(
     Array->new(qw/Hello World Awesome World/)->count_by(sub($str) { length $str }),
     'map->count same as count_by');
 
-is(Array->wrap(1,1,2,3,1,4,5,4,3,2,6)->distinct, [1..6],              'distinct 1');
-is(Array->wrap(1,2,3,2,23,123,4,12,2)->distinct, [1,2,3,23,123,4,12], 'distinct 2');
+is(Array->new(1,1,2,3,1,4,5,4,3,2,6)->distinct, [1..6],              'distinct 1');
+is(Array->new(1,2,3,2,23,123,4,12,2)->distinct, [1,2,3,23,123,4,12], 'distinct 2');
 is(Array::distinct([1,2,3,2,23,123,4,12,2]),     [1,2,3,23,123,4,12], 'distinct 3');
 
 # distinct_by tests
 {
-    my $data = Array->wrap(
+    my $data = sq [
         {id => 1, name => "Foo"},
         {id => 2, name => "Bar"},
         {id => 3, name => "Baz"},
         {id => 1, name => "Foo"},
-    );
+    ];
 
     is($data->length, 4, 'distinct_by starts with 4');
     is($data->distinct->length, 4, 'still 4 as HashRefs are always unequal');
@@ -388,12 +387,12 @@ is(Array::distinct([1,2,3,2,23,123,4,12,2]),     [1,2,3,23,123,4,12], 'distinct 
 }
 
 is(
-    Array->wrap(qw/A B C D E F/)->mapi(sub($x,$i) { [$x,$i] }),
+    Array->new(qw/A B C D E F/)->mapi(sub($x,$i) { [$x,$i] }),
     [[A => 0], [B => 1], [C => 2], [D => 3], [E => 4], [F => 5]],
     'mapi');
 
 is(
-    Array->wrap(qw/A B C D E F/)->mapi(sub($x,$i) {
+    Array->new(qw/A B C D E F/)->mapi(sub($x,$i) {
         return undef if $x eq 'D';
         return [$x,$i]
     }),
@@ -401,7 +400,7 @@ is(
     'mapi with early abort');
 
 is(
-    Array->wrap(qw/A B C D E F/)->mapi(sub($x,$i) {
+    Array->new(qw/A B C D E F/)->mapi(sub($x,$i) {
         return undef if $x eq 'D';
         return [$_,$i]
     }),
@@ -450,27 +449,27 @@ is($range->find(sub($x) { $x > 10 }),      None, 'find 2');
 is($range->find(sub($x) { $x > 10 })->or(0),  0, 'find 3');
 
 is(
-    $range->bind(sub($x) { Array->wrap($x) }),
+    $range->bind(sub($x) { Array->new($x) }),
     [1 .. 10],
     'bind - somehow like id');
 
 is(
-    Array->wrap(
-        Array->wrap(1,1),
+    Array->new(
+        Array->new(1,1),
         [2,3],
-        Array->wrap(5,8,13),
+        Array->new(5,8,13),
     )->flatten,
     [1,1,2,3,5,8,13],
     'flatten - flattens an array of array');
 
-is(Array->wrap([1,1], [1,2]), [[1,1],[1,2]], 'wrap with arrays');
-is(Array->wrap([1,1])       , [[1,1]],       'wrap with array');
+is(Array->new([1,1], [1,2]), [[1,1],[1,2]], 'wrap with arrays');
+is(Array->new([1,1])       , [[1,1]],       'wrap with array');
 is(Array->from_array([1,1]) , [1,1],         'from_array vs. wrap');
 
 is($range->reduce($add),         Some(55), 'reduce');
 is(Array->empty->reduce($add),       None, 'reduce on empty 1');
 is(Array->empty->reduce($add)->or(0),   0, 'reduce on empty 2');
-is(Array->wrap(1)->reduce($add),  Some(1), 'reduce on single element');
+is(Array->new(1)->reduce($add),  Some(1), 'reduce on single element');
 
 is(Array->empty->first,          None, 'first on empty');
 is(Array->empty->first->or(0),      0, 'first and optional');
@@ -494,13 +493,13 @@ is(
 
 # Schwartzian Transformation
 {
-    my $data = Array->wrap(
+    my $data = sq [
         { id => 1, char => 'W' },
         { id => 4, char => 'L' },
         { id => 5, char => 'D' },
         { id => 2, char => 'O' },
         { id => 3, char => 'R' },
-    );
+    ];
 
     is(
         $data->sort_by(sub($x,$y) { $x <=> $y }, sub($x) { $x->{id} }),
@@ -534,19 +533,19 @@ is(
         'sort_by 3');
 }
 
-my $fs = Array->wrap([1,"Hi"],[2,"Foo"],[3,"Bar"],[4,"Mug"]);
+my $fs = Array->new([1,"Hi"],[2,"Foo"],[3,"Bar"],[4,"Mug"]);
 is($fs->fsts, [1,2,3,4],            'fsts');
 is($fs->snds, [qw/Hi Foo Bar Mug/], 'snds');
 
 is(
-    Array->wrap([1,2,3], [4,5,6], [7,8,9])->flatten,
+    Array->new([1,2,3], [4,5,6], [7,8,9])->flatten,
     [1..9],
     'flatten');
 
 is(
     Array::zip(
         Array->range(1,6),
-        Array->wrap(qw(A B C D E F))
+        Array->new(qw(A B C D E F))
     ),
     [[qw/1 A/],[qw/2 B/],[qw/3 C/],[qw/4 D/],[qw/5 E/],[qw/6 F/]],
     'zip 1');
@@ -554,7 +553,7 @@ is(
 is(
     Array::zip(
         Array->range(1,3),
-        Array->wrap(qw(A B C D E F))
+        Array->new(qw(A B C D E F))
     ),
     [[qw/1 A/],[qw/2 B/],[qw/3 C/]],
     'zip 2');
@@ -562,7 +561,7 @@ is(
 is(
     Array::zip(
         Array->range(1,6),
-        Array->wrap(qw(A B C D))
+        Array->new(qw(A B C D))
     ),
     [[qw/1 A/],[qw/2 B/],[qw/3 C/],[qw/4 D/]],
     'zip 3');
@@ -570,7 +569,7 @@ is(
 is(
     Array::zip(
         Array->empty,
-        Array->wrap(qw(A B C D E F))
+        Array->new(qw(A B C D E F))
     ),
     [],
     'zip 4');
@@ -584,11 +583,11 @@ is(
     'zip 5');
 
 is(
-    Array->wrap(
-        Array->wrap(1,2,3),
-        Array->wrap(4,5,6),
-        Array->wrap(7,8,9),
-    ),
+    sq([
+        [1,2,3],
+        [4,5,6],
+        [7,8,9],
+    ]),
     [
         [1,2,3],
         [4,5,6],
@@ -597,10 +596,10 @@ is(
     'Is array of array');
 
 is(
-    Array->wrap(
-        Array->wrap(1,2,3),
-        Array->wrap(4,5,6),
-        Array->wrap(7,8,9),
+    Array->new(
+        Array->new(1,2,3),
+        Array->new(4,5,6),
+        Array->new(7,8,9),
     )->to_array_of_array,
     [
         [1,2,3],
@@ -643,7 +642,7 @@ is($range->none(sub($x) { $x > 10  }), 1, 'none value greater 10');
 
 # regex_match
 {
-    my $lines = Array->wrap(
+    my $lines = Array->new(
         '2023-11-25T15:10:00',
         '2023-11-20T10:05:29',
         'xxxx-xx-xxT00:00:00',
@@ -699,53 +698,53 @@ is(
 is($range->windowed(10), [ [1,2,3,4,5,6,7,8,9,10] ], 'windowed 10');
 is($range->windowed(11), [],                         'windowed 11');
 
-is(Array->wrap()     ->intersperse(0), [],              'intersperse 1');
-is(Array->wrap(1)    ->intersperse(0), [1],             'intersperse 2');
-is(Array->wrap(1,2)  ->intersperse(0), [1,0,2],         'intersperse 3');
-is(Array->wrap(1,2,3)->intersperse(0), [1,0,2,0,3],     'intersperse 4');
-is(Array->wrap(1..4) ->intersperse(0), [1,0,2,0,3,0,4], 'intersperse 5');
+is(Array->new()     ->intersperse(0), [],              'intersperse 1');
+is(Array->new(1)    ->intersperse(0), [1],             'intersperse 2');
+is(Array->new(1,2)  ->intersperse(0), [1,0,2],         'intersperse 3');
+is(Array->new(1,2,3)->intersperse(0), [1,0,2,0,3],     'intersperse 4');
+is(Array->new(1..4) ->intersperse(0), [1,0,2,0,3,0,4], 'intersperse 5');
 is(
     Array->range(1,10)->intersperse(0),
     [1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10],
     'intersperse 6');
 
-is(Array->wrap(5)    ->repeat(-1), [],            'repeat 1');
-is(Array->wrap(5)    ->repeat(0) , [],            'repeat 2');
-is(Array->wrap(5)    ->repeat(1) , [5],           'repeat 3');
-is(Array->wrap(5)    ->repeat(5) , [5,5,5,5,5],   'repeat 4');
-is(Array->wrap(1,2,3)->repeat(2) , [1,2,3,1,2,3], 'repeat 5');
-is(Array->wrap(1,2,3)->repeat(3) , [(1,2,3) x 3], 'repeat 6');
+is(Array->new(5)    ->repeat(-1), [],            'repeat 1');
+is(Array->new(5)    ->repeat(0) , [],            'repeat 2');
+is(Array->new(5)    ->repeat(1) , [5],           'repeat 3');
+is(Array->new(5)    ->repeat(5) , [5,5,5,5,5],   'repeat 4');
+is(Array->new(1,2,3)->repeat(2) , [1,2,3,1,2,3], 'repeat 5');
+is(Array->new(1,2,3)->repeat(3) , [(1,2,3) x 3], 'repeat 6');
 
 is(Array->replicate(10, 'A'), [('A') x 10], 'replicate');
 
 is(
     Array::zip(
         Array->replicate(10, 1),
-        Array->wrap(qw/A B C D E F/),
+        Array->new(qw/A B C D E F/),
     ),
     [ [1,'A'],[1,'B'],[1,'C'],[1,'D'],[1,'E'],[1,'F'] ],
     'replicate with zip');
 
 is(
     Array::zip(
-        Array->wrap(1,2)->repeat(9),
-        Array->wrap(qw/A B C D E F/),
+        Array->new(1,2)->repeat(9),
+        Array->new(qw/A B C D E F/),
     ),
     [ [1,'A'],[2,'B'],[1,'C'],[2,'D'],[1,'E'],[2,'F'] ],
     'repeat with zip 1');
 
 is(
     Array::zip(
-        Array->wrap(1,2)->repeat(2),
-        Array->wrap(qw/A B C D E F/),
+        Array->new(1,2)->repeat(2),
+        Array->new(qw/A B C D E F/),
     ),
     [ [1,'A'],[2,'B'],[1,'C'],[2,'D'] ],
     'repeat with zip 2');
 
 is(
     Array::zip(
-        Array->wrap(1,2)->repeat(20),
-        Array->wrap(qw/A B C D E/)->repeat(20),
+        Array->new(1,2)->repeat(20),
+        Array->new(qw/A B C D E/)->repeat(20),
     )->take(12),
     [
         [1,'A'],[2,'B'],[1,'C'],[2,'D'],[1,'E'],
@@ -775,16 +774,14 @@ is(
     'zip,infinity,rev,take,map,always');
 
 is(
-    Array
-    ->wrap(1, 3, 20, -40, 20, 12, 100, 5, 20)
+    sq([1, 3, 20, -40, 20, 12, 100, 5, 20])
     ->take_while(sub($x) { $x < 100 }),
     [1,3,20,-40,20,12],
     'take_while 1'
 );
 
 is(
-    Array
-    ->wrap(1, 3, 20, -40, 20, 12, 100, 5, 20)
+    sq([1, 3, 20, -40, 20, 12, 100, 5, 20])
     ->take_while(sub($x) { $x > 100 }),
     [],
     'take_while 2'

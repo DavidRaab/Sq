@@ -26,11 +26,6 @@ sub new($class, @array) {
     return CORE::bless(\@new, 'Array');
 }
 
-# wraps all function arguments into Array. Stops at first undef
-sub wrap {
-    return new(@_);
-}
-
 sub bless($class, $ref) {
     return CORE::bless($ref, 'Array');
 }
