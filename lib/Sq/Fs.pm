@@ -3,35 +3,32 @@ use 5.036;
 use Sq;
 
 # Opens a file as UTF-8 text
-sub open_text($, $file) {
+sub read_text($, $file) {
     return Seq->from_sub(sub {
         open my $fh, '<:encoding(UTF-8)', $file or die "Cannot open: $!\n";
         my $line;
         return sub {
-            if (defined($line = <$fh>)) {
-                return $line;
-            }
-            else {
-                close $fh;
-                undef $fh;
-            }
-            return undef;
+            $line = <$fh>;
+            return $line if defined $line;
+            close $fh;
+            undef $fh;
         };
     });
 }
 
 sub compare_text($, $file1, $file2) {
     return equal(
-        open_text(undef, $file1),
-        open_text(undef, $file2)
+        read_text(undef, $file1),
+        read_text(undef, $file2)
     );
 }
 
 sub read_bytes($, $file, $count) {
     open my $fh, '<:raw', $file
-        or return Err("Could not open file '$file'\n");
+        or return Err("Could not open file '$file': $!");
     my $content;
-    read $fh, $content, $count;
+    my $read = read $fh, $content, $count;
+    return Err("Error reading from '$file': $!") if !defined $read;
     return Ok($content);
 }
 
