@@ -174,7 +174,9 @@ sub by_stri :prototype() {
 }
 
 # recursively traverse a data-structure and add Array/Hash blessings
-sub sq($any) {
+sub sq :prototype($);
+sub sq :prototype($) {
+    my ( $any ) = @_;
     my $type = ref $any;
 
     # Add Array/Hash blessing to current ref
