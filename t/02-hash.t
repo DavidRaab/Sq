@@ -141,11 +141,7 @@ is($data->length, 3, 'length');
         'intersection 2'
     );
 
-    is(
-        $h->difference($i),
-        { foo => 1 },
-        'difference'
-    );
+    is($h->diff($i), { foo => 1 }, 'diff');
 }
 
 # concat
@@ -199,14 +195,14 @@ is(
 );
 
 my $tuple = sub($x,$y) { [$x,$y] };
-is(Hash::difference({}, { foo => 1 })->is_empty,                 1, 'is_empty 1');
+is(Hash::diff({}, { foo => 1 })->is_empty,                       1, 'is_empty 1');
 is(Hash::intersection({foo => 1}, {bar => 2}, $tuple)->is_empty, 1, 'is_empty 2');
 is(Hash::union({}, {}, $tuple)->is_empty,                        1, 'is_empty 3');
 is(Hash::append({}, {})->is_empty,                               1, 'is_empty 4');
 is(Hash->empty->is_empty,                                        1, 'is_empty 5');
 is(Hash->new->is_empty,                                          1, 'is_empty 6');
 is(Hash->bless({})->is_empty,                                    1, 'is_empty 7');
-is(Hash::difference({foo => 1}, {foo => 1})->is_empty,           1, 'is_empty 8');
+is(Hash::diff({foo => 1}, {foo => 1})->is_empty,                 1, 'is_empty 8');
 is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9');
 
 # get, set, extract

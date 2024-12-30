@@ -168,7 +168,7 @@ sub intersection($hash, $other, $f) {
 }
 
 # Hash<'a,'b> -> Hash<'a,'b> -> Hash<'a,'b>
-sub difference($hash, $other) {
+sub diff($hash, $other) {
     my %new;
     for my ($key,$value) ( %$hash ) {
         if ( !defined $other->{$key} ) {
