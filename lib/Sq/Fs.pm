@@ -6,15 +6,14 @@ use Sq;
 sub open_text($, $file) {
     return Seq->from_sub(sub {
         open my $fh, '<:encoding(UTF-8)', $file or die "Cannot open: $!\n";
+        my $line;
         return sub {
-            if ( defined $fh ) {
-                if (defined(my $line = <$fh>)) {
-                    return $line;
-                }
-                else {
-                    close $fh;
-                    $fh = undef;
-                }
+            if (defined($line = <$fh>)) {
+                return $line;
+            }
+            else {
+                close $fh;
+                undef $fh;
             }
             return undef;
         };
