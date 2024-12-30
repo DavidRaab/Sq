@@ -74,7 +74,7 @@ my $stop = time();
 printf "Timing: %f\n", ($stop - $start);
 
 # print results
-$result->keys->sort_str->iter(sub($date) {
+$result->keys->sort(by_str)->iter(sub($date) {
     printf "%s - {pos => %d, neg => %d}\n",
         $date,
         $result->{$date}{pos} // 0,

@@ -1,5 +1,6 @@
 #!/usr/bin/env perl
 use v5.36;
+use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Sq;
 use Time::HiRes qw(time);
@@ -66,7 +67,7 @@ my $stop = time();
 printf "Timing: %f\n", ($stop - $start);
 
 # print results
-$result->keys->sort_str->iter(sub($date) {
+$result->keys->sort(by_str)->iter(sub($date) {
     printf "%s - {pos => %d, neg => %d}\n",
         $date,
         $result->{$date}{pos} // 0,
