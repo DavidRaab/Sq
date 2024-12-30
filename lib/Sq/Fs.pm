@@ -23,7 +23,7 @@ sub open_text($, $file) {
 sub compare_text($, $file1, $file2) {
     return equal(
         open_text(undef, $file1),
-        pen_text(undef, $file2)
+        open_text(undef, $file2)
     );
 }
 
