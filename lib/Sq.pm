@@ -4,9 +4,18 @@ our $VERSION = '0.007';
 use Carp ();
 use Scalar::Util ();
 my $export_funcs;
+my $first_load = 1;
 sub import {
     my ( $own, @requested ) = @_;
     my ( $pkg ) = caller;
+
+    # Load some modules on import()
+    if ( $first_load ) {
+        require Sq::Fs;
+        require Sq::Io;
+        $first_load = 0;
+    }
+
     no strict 'refs'; ## no critic
     state @funcs = (
         qw(sq call key assign seq),
@@ -64,10 +73,6 @@ use Sq::Collections::Heap;
 # Load other basic functionality
 use Sq::Dump;
 use Sq::Equality;
-
-# IO
-use Sq::Io;
-use Sq::Fs;
 
 # Access to submodules
 sub io($) { 'Sq::Io' }
