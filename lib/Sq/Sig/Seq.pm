@@ -27,6 +27,8 @@ sig ('Seq::range',      $any, t_int, t_int,        $seq);
 sig ('Seq::from_array', $any, t_array,             $seq);
 sig ('Seq::from_hash',  $any, t_hash,  $sub,       $seq);
 sigt('Seq::concat',     t_tuplev($any, $aos),      $seq);
+sig ('Seq::count_up',   $any, t_int,               $seq);
+sig ('Seq::count_down', $any, t_int,               $seq);
 
 ### METHODS
 

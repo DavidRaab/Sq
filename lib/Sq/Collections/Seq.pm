@@ -207,6 +207,20 @@ sub range($, $start, $stop) {
     }
 }
 
+sub count_up($, $start) {
+    return bless(sub {
+        my $current = $start;
+        return sub { $current++ }
+    }, 'Seq');
+}
+
+sub count_down($, $start) {
+    return bless(sub {
+        my $current = $start;
+        return sub { $current-- }
+    }, 'Seq');
+}
+
 # Seq->from_array : Array<'a> -> Seq<'a>
 sub from_array($, $xs) {
     return bless(sub {
