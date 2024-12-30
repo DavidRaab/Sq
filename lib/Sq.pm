@@ -185,18 +185,18 @@ sub sq :prototype($) {
 
     # recursively go through each data-structure
     if ( $type eq 'Hash' ) {
-        for ( keys %$any ) {
-            sq($any->{$_});
+        for my $value ( values %$any ) {
+            sq $value;
         }
     }
     elsif ( $type eq 'Array' ) {
-        for my $x ( @$any ) { sq($x) }
+        for my $x ( @$any ) { sq $x }
     }
     elsif ( $type eq 'Option' ) {
-        for my $x ( @$any ) { sq($x) }
+        for my $x ( @$any ) { sq $x }
     }
     elsif ( $type eq 'Result' ) {
-        sq($any->[1]);
+        sq $any->[1];
     }
     else {
         # Do nothing for unknown type
