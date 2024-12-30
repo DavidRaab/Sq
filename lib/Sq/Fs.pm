@@ -1,6 +1,5 @@
 package Sq::Fs;
 use 5.036;
-use Sq;
 
 # Opens a file as UTF-8 text
 sub open_text($, $file) {
@@ -23,10 +22,10 @@ sub open_text($, $file) {
 
 sub read_bytes($, $file, $count) {
     open my $fh, '<:raw', $file
-        or return Err("Could not open file '$file'\n");
+        or return Result::Err("Could not open file '$file'\n");
     my $content;
     read $fh, $content, $count;
-    return Ok($content);
+    return Result::Ok($content);
 }
 
 sub make_link($, $source, $destination) {
