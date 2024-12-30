@@ -13,6 +13,7 @@ sub import {
     if ( $first_load ) {
         require Sq::Fs;
         require Sq::Io;
+        require Sq::Math;
         $first_load = 0;
     }
 
@@ -75,8 +76,9 @@ use Sq::Dump;
 use Sq::Equality;
 
 # Access to submodules
-sub io($) { 'Sq::Io' }
-sub fs($) { 'Sq::Fs' }
+sub io($)   { 'Sq::Io'   }
+sub fs($)   { 'Sq::Fs'   }
+sub math($) { 'Sq::Math' }
 
 # Important functions used in FP code. So adding them.
 sub id  :prototype($) { return $_[0]    }
