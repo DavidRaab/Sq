@@ -91,15 +91,35 @@ new Arrays. All Constructor functions must be called with an arrow C<< -> >>
 as you expect it from typical OO code. Like C<< Array->new(...) >> or
 C<< Array->init(...) >>.
 
+=head2 sq
+
+Loading C<Sq> loads a function C<sq> by default that recursively adds C<Array>
+and C<Hash> blessing by default. So you can write.
+
+    my $data = sq [
+        { is => 1, name => 'name1' },
+        { is => 2, name => 'name2' },
+        { is => 3, name => 'name3' },
+    ];
+
+and it will be an Array of Hashes. Also the inner Hashes are blessed with
+the C<Hash> package.
+
 =head2 Array->new($x,$x,$x,...) : $array
 
 Creates an Array with the specified values to C<new>. There is a special
 behaviour that aborts on an C<undef>. This is to be align with the L<Sq::Collections::Seq>
-data-structure that uses C<undef> to abort a sequence. But you anyway
-don't want to have C<undef> as values in an array.
+data-structure that uses C<undef> to abort a sequence.
 
-    my $numbers = Array->new(1,2,3,4,5);        # [1..5]
-    my $numbers = Array->new(1,2,3,undef,4,5,6) # [1,2,3]
+    my $data = Array->new(
+        Hash->new( is => 1, name => 'name1' ),
+        Hash->new( is => 2, name => 'name2' ),
+        Hash->new( is => 3, name => 'name3' ),
+    );
+
+This creates the same data-structure as the example above using C<sq>.
+Consider that using C<sq> doesn't include the behaviour on C<undef> because
+than the Array is purely created by Perl itself, just the blessing is added.
 
 =head2 Array->wrap($x,$y,$z,...) : $array
 

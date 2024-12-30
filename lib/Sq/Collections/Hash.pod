@@ -89,14 +89,30 @@ in this package as methods on a hash.
 
 =head1 CONSTRUCTORS
 
+=head2 sq
+
+Loading C<Sq> loads a function C<sq> by default that recursively adds C<Array>
+and C<Hash> blessing by default. So you can write.
+
+    my $data = sq {
+        1 => { name => 'name1' },
+        2 => { name => 'name2' },
+        3 => { name => 'name3' },
+    };
+
+and it will be a Hash of Hashes. Also the inner Hashes are blessed.
+
 =head2 Hash->new(@key_values) : $hash
 
 Creates a new Sq Hash with the defined key and values.
 
-    my $hash = Hash->new(foo => 1, bar => 2);
-    my $hash = { foo => 1, bar => 2 };
+    my $data = Hash->new(
+        1 => Hash->new( name => 'name1' ),
+        2 => Hash->new( name => 'name2' ),
+        3 => Hash->new( name => 'name3' ),
+    );
 
-Both lines are nearly the same. C<< Hash->new >> just adds the C<Hash> blessing.
+This is the same as the example using C<sq>.
 
 =head2 Hash->bless($hash_ref) : $hash
 
