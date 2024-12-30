@@ -1,5 +1,6 @@
 #!/usr/bin/env perl
 use 5.036;
+use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Sq;
 use Sq::Reflection;
@@ -11,17 +12,14 @@ my %array_skip = map { $_ => 1 } qw/always cache do doi infinity/;
 my $array = all_funcs('Array');
 my $seq   = all_funcs('Seq');
 
-print "Array is missing following Array functions.\n";
-Hash::difference($seq->count, $array->count)->keys->remove(sub($func) {
-    $array_skip{$func}
-})->sort(by_str)->iter(sub($func) {
+print "Seq is missing following Array functions.\n";
+$array->diff($seq, \&id)->sort(by_str)->iter(sub($func) {
+    return if $seq_skip{$func};
     printf "  + %s\n", $func;
 });
 
-print "\nSeq is missing following Array functions.\n";
-Hash::difference($array->count, $seq->count)->keys->remove(sub($func) {
-    $seq_skip{$func}
-})->sort(by_str)->iter(sub($func) {
+print "\nArray is missing following Seq functions.\n";
+$seq->diff($array, \&id)->sort(by_str)->iter(sub($func) {
+    return if $array_skip{$func};
     printf "  + %s\n", $func;
 });
-
