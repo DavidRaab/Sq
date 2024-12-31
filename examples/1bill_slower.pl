@@ -12,6 +12,15 @@ my $countup = assign {
 
     Seq::merge(
         # Hmm, i think Seq::zip should built a sequence too instead.
+        # Or not? The reason behind this behavior:
+        # When zip runs, it defenitely must read on element from each list.
+        # (maybe in future from multiple list). So you have all data at once
+        # in an array. It doesn't make sense to save it as a sequence again
+        # and pretend it would be a sequence if it is not. That's why it stays
+        # an array. As a developer you see that. You understand that it isn't
+        # lazy evaluated. Usually that isn't that big of a problem. But it makes
+        # operating on all elements faster. I mean that was the reason you
+        # ziped those elements, right?
         Seq::zip(
             Seq::filter($bill1, $is_even),
             Seq::remove($bill1, $is_even),
