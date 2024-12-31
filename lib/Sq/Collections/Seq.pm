@@ -745,34 +745,12 @@ sub rev($seq) {
 
 # sort : Seq<'a> -> ('a -> 'a -> int) -> Seq<'a>
 sub sort($seq, $comparer) {
-    from_sub('Seq', sub {
-        local ($a, $b);
-        my $array  = to_array($seq);
-        my @sorted = CORE::sort { $comparer->($a, $b) } @$array;
-        my $idx    = 0;
-
-        return sub {
-            return $sorted[$idx++];
-        };
-    });
+    return Array::sort(to_array($seq), $comparer);
 }
 
 # sort_by : Seq<'a> -> ('Key -> 'Key -> int) -> ('a -> 'Key) -> Seq<'a>
 sub sort_by($seq, $comparer, $get_key) {
-    from_sub('Seq', sub {
-        local ($a, $b, $_);
-        my $idx    = 0;
-        my $array  = to_array($seq);
-        my @sorted =
-            CORE::map  { $_->[1] }
-            CORE::sort { $comparer->($a->[0], $b->[0]) }
-            CORE::map  { [$get_key->($_), $_] }
-                @$array;
-
-        return sub {
-            return $sorted[$idx++];
-        }
-    });
+    return Array::sort_by(to_array($seq), $comparer, $get_key);
 }
 
 # cache : Seq<'a> -> Seq<'a>
