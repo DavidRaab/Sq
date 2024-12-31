@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+use 5.036;
+use utf8;
+use open ':std', ':encoding(UTF-8)';
+use Sq;
+use Sq::Sig;
+use Sq::Type;
+use Sq::Test;
+use Benchmark qw(cmpthese);
+use Getopt::Long::Descriptive;
+
+my ($opt, $usage) = describe_options(
+    'Usage: %c %o',
+    ['help|h', 'Print this message', {shortcircuit => 1}],
+);
+
+$usage->die if $opt->help;
