@@ -57,8 +57,6 @@ sig('Seq::fsts',          $seq,                 $seq);
 sig('Seq::snds',          $seq,                 $seq);
 sig('Seq::zip',           $seq, $seq,           $seq);
 sig('Seq::rev',           $seq,                 $seq);
-sig('Seq::sort',          $seq, $sub,           $seq);
-sig('Seq::sort_by',       $seq, $sub, $sub,     $seq);
 sig('Seq::cache',         $seq,                 $seq);
 sig('Seq::regex_match',   $seq, t_regex,        $seq);
 sig('Seq::regex_sub',     $seq, t_regex, t_sub, $seq);
@@ -67,8 +65,6 @@ sig('Seq::windowed',      $seq, t_int,          $seq);
 sig('Seq::intersperse',   $seq, $any,           $seq);
 sig('Seq::infinity',      $seq,                 $seq);
 sig('Seq::repeat',        $seq, t_int,          $seq);
-
-
 
 # sig('Seq::sort_num',      $anum,                 $seq);
 # sig('Seq::sort_str',      $astr,                 $seq);
@@ -85,6 +81,9 @@ sig('Seq::do',       $seq, $sub,   $seq);
 sig('Seq::doi',      $seq, $sub,   $seq);
 
 ### CONVERTER
+
+sig('Seq::sort',          $seq, $sub,           t_array);
+sig('Seq::sort_by',       $seq, $sub, $sub,     t_array);
 sig('Seq::group_fold', $seq, $sub, $sub, $sub, t_hash);
 sig('Seq::group_by',   $seq, $sub,               $hoa);
 sig('Seq::fold',       $seq, $any, $sub,         $any);
