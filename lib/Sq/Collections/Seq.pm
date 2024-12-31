@@ -412,7 +412,7 @@ sub flatten($seq) {
 }
 
 # flatten_array : Seq<Array<'a>> -> Seq<'a>
-sub flatten_array($seq) {
+sub merge($seq) {
     return bind($seq, sub($array) {
         return from_array('Seq', $array);
     });
@@ -422,7 +422,7 @@ sub flatten_array($seq) {
 sub cartesian($seqA, $seqB) {
     bind($seqA, sub($a) {
     bind($seqB, sub($b) {
-        new('Seq', CORE::bless([$a, $b], 'Array'));
+        new ('Seq', CORE::bless([$a, $b], 'Array'));
     })});
 }
 
@@ -432,7 +432,7 @@ sub cartesian($seqA, $seqB) {
 sub left_join($seqA, $seqB, $predicate) {
     bind($seqA, sub($a) {
     bind($seqB, sub($b) {
-        return new(Seq => [$a, $b]) if $predicate->($a, $b);
+        return new (Seq => [$a, $b]) if $predicate->($a, $b);
         return empty('Seq');
     })});
 }
@@ -440,11 +440,11 @@ sub left_join($seqA, $seqB, $predicate) {
 # Expects a sequence of tuples. For example what join returns.
 # Provides a merging function to combine 'a and 'b into something new 'c
 # merge : Seq<'a * 'b> -> ('a -> 'b -> 'c) -> Seq<'c>
-sub merge($seq, $merge) {
-    bind($seq, sub($tuple) {
-        return new(Seq => $merge->($tuple->[0], $tuple->[1]));
-    });
-}
+# sub merge($seq, $merge) {
+#     bind($seq, sub($array) {
+#         return new (Seq => $merge->(@$merge));
+#     });
+# }
 
 # Merges a sequence that contains tuples with hashes. Like: [{...}, {...}]
 # $mapA contains the selection from the first element of the tuple
