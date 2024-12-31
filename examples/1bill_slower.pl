@@ -10,7 +10,8 @@ my $countup = assign {
     my $bill1   = Seq->range(1,1_000_000_000);
     my $is_even = sub($x) { $x & 1 };
 
-    Seq::flatten_array(
+    Seq::merge(
+        # Hmm, i think Seq::zip should built a sequence too instead.
         Seq::zip(
             Seq::filter($bill1, $is_even),
             Seq::remove($bill1, $is_even),
@@ -32,7 +33,7 @@ my $is_even = sub($x) { $x & 1 };
 my $evens   = $bill1->filter($is_even);
 my $unevens = $bill1->remove($is_even);
 my $zip     = $evens->zip($unevens);
-my $flatten = $zip->flatten_array;
+my $flatten = $zip->merge;
 
 run(sub {
     $flatten->iter(sub($x){
