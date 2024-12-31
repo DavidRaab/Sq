@@ -15,5 +15,3 @@ my ($opt, $usage) = describe_options(
 );
 
 $usage->die if $opt->help;
-
-
