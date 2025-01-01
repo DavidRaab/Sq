@@ -191,12 +191,12 @@ sub result(@xs) { Some([@xs]) }
     is(p_run($d3, '1234'), result(1,2,3), 'p_repeat 4');
 }
 
-# p_filter
+# p_keep
 {
     # silly way to only extract 0,1 from a number
     my $binary =
         p_join('',
-            p_filter(
+            p_keep(
                 p_many(p_match(qr/([0-9])/)),
                 sub($x) { $x==0 || $x==1 ? 1 : 0 }));
 
@@ -207,7 +207,7 @@ sub result(@xs) { Some([@xs]) }
     # integers that are allowed to contain -_
     my $int1 =
         p_join('',
-            p_filter(
+            p_keep(
                 p_split('',
                     p_match(qr/([0-9-_]+)/)),
                 sub($x) { $x =~ m/[0-9]/ }));

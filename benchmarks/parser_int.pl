@@ -13,7 +13,7 @@ sub result(@xs) { Some([@xs]) }
 
 my $int1 =
     p_join('',
-        p_filter(
+        p_keep(
             p_split('',
                 p_match(qr/([0-9-_]+)/)),
             sub($x) { $x =~ m/[0-9]/ }));

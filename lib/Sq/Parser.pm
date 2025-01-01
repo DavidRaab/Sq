@@ -10,7 +10,7 @@ our @EXPORT = (
     qw(p_match p_matchf p_matchf_opt),        # regex
     qw(p_str p_strc p_join p_split),          # string
     qw(p_and p_or p_maybe p_many p_many0 p_ignore),
-    qw(p_qty p_choose p_repeat p_filter p_delay p_not),
+    qw(p_qty p_choose p_repeat p_keep p_delay p_not),
 );
 
 *Some = \&Option::Some;
@@ -163,7 +163,7 @@ sub p_choose($parser, $f_opt) {
 }
 
 # executes
-sub p_filter($parser, $predicate) {
+sub p_keep($parser, $predicate) {
     return sub($ctx,$str) {
         my $p = $parser->($ctx,$str);
         if ( $p->{valid} ) {
@@ -469,14 +469,11 @@ sub p_empty() {
 
 sub parser($array) {
     state $table = {
-        match  => \&p_match,  matchf => \&p_matchf, matchf_opt => \&p_matchf_opt,
-        map    => \&p_map,    bind   => \&p_bind,   and        => \&p_and,
-        return => \&p_return, or     => \&p_or,     maybe      => \&p_maybe,
-        join   => \&p_join,   str    => \&p_str,    strc       => \&p_strc,
-        many   => \&p_many,   many0  => \&p_many0,  ignore     => \&p_ignore,
-        fail   => \&p_fail,   qty    => \&p_qty,    choose     => \&p_choose,
-        repeat => \&p_repeat, filter => \&p_filter, split      => \&p_split,
-        delay  => \&p_delay,  not    => \&p_not,    empty      => \&p_empty,
+        map {
+            () if substr($_, 0, 2) ne 'p_';
+            my $name = $_ =~ s/\Ap_//r;
+            $name => \&$_;
+        } @EXPORT
     };
     return eval_data($table, $array);
 }

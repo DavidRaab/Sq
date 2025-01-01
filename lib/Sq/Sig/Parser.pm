@@ -28,7 +28,7 @@ sig ('Sq::Parser::p_fail',                                        $parser);
 sig ('Sq::Parser::p_qty',        t_int, t_int, $parser,           $parser);
 sig ('Sq::Parser::p_choose',     $parser, t_sub,                  $parser);
 sig ('Sq::Parser::p_repeat',     t_int, $parser,                  $parser);
-sig ('Sq::Parser::p_filter',     $parser, t_sub,                  $parser);
+sig ('Sq::Parser::p_keep',       $parser, t_sub,                  $parser);
 sig ('Sq::Parser::p_split',      t_regex, $parser,                $parser);
 sig ('Sq::Parser::p_delay',      t_sub,                           $parser);
 sig ('Sq::Parser::p_not',        $parser,                         $parser);
