@@ -10,9 +10,9 @@ use Path::Tiny qw(path);
 my $info =
     Sq->fs->read_text(path('examples', 'info.txt'))
     ->regex_match(qr/\A(\S+) \s+ (.+) $/x)
-    ->to_hash(sub($kv) { $kv->[0], $kv->[1] });
+    ->merge->as_hash;
 
-# show all examples with info
+# built array of array with info
 my $examples =
     Sq->fs->children('examples')
     ->keep(call 'is_file')
@@ -20,9 +20,12 @@ my $examples =
     ->choose(sub($file) {
         my $name = $file->basename;
         return None if $name eq 'info.txt';
-        return Some(sq [$name, $info->get($name)->or("")]);
+        return Some(sq [$name, $info->{$name} // ""]);
     });
 
+# dumpw($examples);
+
+# print Array of Array as Table
 Sq->fmt->table({
     header => [qw/Script Description/],
     data   => $examples,
