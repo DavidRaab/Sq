@@ -1,12 +1,14 @@
 #!/usr/bin/env perl
-use v5.36;
+use 5.036;
+use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Sq;
+use Sq::Sig;
 
 my $files =
     Sq->fs->recurse('t')
-    ->filter(call 'is_file')
-    ->filter(sub($p) { $p =~ m/\.t\z/ });
+    ->keep(call 'is_file')
+    ->keep(sub($p) { $p =~ m/\.t\z/ });
 
 $ENV{NYTPROF} = "addpid=1";
 $files->iter(sub($file) {
