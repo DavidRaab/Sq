@@ -1,8 +1,9 @@
 #!/usr/bin/env perl
-use v5.36;
+use 5.036;
+use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Sq;
-use Benchmark qw(cmpthese);
+use Sq::Sig;
 
 # It started by bechmarking and looking at different filtering implementation
 # especially looking at the performance of a full mutable version that
@@ -25,7 +26,7 @@ sub by_grep {
     return;
 }
 
-# filtering but c-style
+# same but c-style
 sub by_manual {
     my $numbers = $numbers->copy;
     my @evens;
@@ -56,7 +57,7 @@ sub by_seq {
     my $evens =
         Seq
         ->from_array($numbers)
-        ->filter(sub($x) { $x % 2 == 0 })
+        ->keep(sub($x) { $x % 2 == 0 })
         ->to_array;
     return;
 }
@@ -73,20 +74,20 @@ sub by_seq_nc {
     my $evens =
         Seq
         ->from_array($numbers)
-        ->filter(sub($x) { $x % 2 == 0 })
+        ->keep(sub($x) { $x % 2 == 0 })
         ->to_array;
     return;
 }
 
 # this is like the grep version
-sub array_filter {
-    my $evens = $numbers->filter(sub($x) { $x % 2 == 0 });
+sub array_keep {
+    my $evens = $numbers->keep(sub($x) { $x % 2 == 0 });
     return;
 }
 
-# same as filter but uses string-eval to build up query
-sub array_filter_e {
-    my $evens = $numbers->filter_e('$_ % 2 == 0');
+# same as keep but uses string-eval to build up query
+sub array_keep_e {
+    my $evens = $numbers->keep_e('$_ % 2 == 0');
     return;
 }
 
@@ -126,7 +127,7 @@ sub first_5_seq {
     my $evens =
         Seq
         ->from_array($numbers)
-        ->filter(sub($x) { $x % 2 == 0 })
+        ->keep(sub($x) { $x % 2 == 0 })
         ->take(5)
         ->to_array;
     return;
@@ -149,7 +150,7 @@ sub first_5_seq_nc {
     my $evens =
         Seq
         ->from_array($numbers)
-        ->filter(sub($x) { $x % 2 == 0 })
+        ->keep(sub($x) { $x % 2 == 0 })
         ->to_array(5);
     return;
 }
@@ -164,7 +165,7 @@ sub first_5_list {
 
 sub first_5_array {
     my $evens =
-        Array::filter($numbers, sub($x) { $x % 2 == 0})
+        Array::keep($numbers, sub($x) { $x % 2 == 0})
         ->take(5);
     return;
 }
@@ -178,7 +179,7 @@ sub first_5_grep {
 
 
 printf "Benchmarking versions with array copies.\n";
-cmpthese(-1, {
+Sq->bench->compare(-1, {
     'seq'            => \&by_seq,
     'splice'         => \&by_splice,
     'manual'         => \&by_manual,
@@ -187,18 +188,18 @@ cmpthese(-1, {
     'first_5_manual' => \&first_5_manual,
 });
 
-printf "\nFiltering all with different data-structures. No Array copies.\n";
-cmpthese(-1, {
+printf "\nKeep all with different data-structures. No Array copies.\n";
+Sq->bench->compare(-1, {
     'list'    => \&list_filter,
     'list_nm' => \&list_filter_nm,
     'seq'     => \&by_seq_nc,
-    'array'   => \&array_filter,
-    'array_e' => \&array_filter_e,
+    'array'   => \&array_keep,
+    'array_e' => \&array_keep_e,
     'grep'    => \&by_grep_nc,
 });
 
 printf "\nGetting only first 5 even numbers.\n";
-cmpthese(-1, {
+Sq->bench->compare(-1, {
     'first_5_list'      => \&first_5_list,
     'first_5_array'     => \&first_5_array,
     'first_5_grep'      => \&first_5_grep,
