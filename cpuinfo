@@ -1,0 +1,25 @@
+#!/usr/bin/env perl
+use 5.036;
+use utf8;
+use open ':std', ':encoding(UTF-8)';
+use Sq;
+use Sq::Sig;
+
+# This sequence is lazy up to this point. So nothing is computed
+my $cpu =
+    Sq->fs
+    ->read_text('/', 'proc', 'cpuinfo')
+    ->regex_match(qr/\A ([^:]++) : \s* (.*) $/x)
+    ->map(sub($array) {
+        $array->rxs(qr/\s+$/, sub { "" }) # remove trailing ws in inner array
+    });
+
+while (1) {
+    # the fold_mut call will evaluate the sequence every time new it is called
+    # in the loop. So now it basically pools /proc/cpuinfo every second.
+    my $info = $cpu->fold_mut(Hash->new, sub($kv, $hash) {
+        $hash->push($kv->[0], $kv->[1])
+    });
+    printf "%s MHz\n", $info->{"cpu MHz"}->map(sub($str) { sprintf "%4d", $str })->join(" ");
+    sleep 1;
+}
