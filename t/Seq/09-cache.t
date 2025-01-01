@@ -42,26 +42,40 @@ is($calls, 44, '$calls stay at 44');
 
 #--- Test cache with sort
 
-# sort is an expensive call. But still, in normal operation on a sequence
-# you expect that it always sorts again. Especially when it operates on
-# mutable state. You want the latest updated data. But when this is not
-# needed, you cache the result after a sort().
+# Previously calling sort(), it returned a Sequence again. I tested
+# that when calling multiple times sort() you always get the updated
+# version. This was a test if sort itself keeps the current state of
+# when sort() was called. Now it returns an Array and this becomes obvious.
+# Don't really need to test that. Now it becomes obvious that calling sort()
+# must fetch all elements from a sequence to work. Also calling
+# "->cache" on the result of sort didn't really made a sense. Now this fails
+# because an Array is already a "cache" and this method doesn't make sense to
+# call there.
+# TODO: But i could add it to Array as a noop?
 
 my @data = (3,10,67,123,21,2,6,8578,34);
+# this generates a sequence over mutable state. Because we still can acces
+# @data and change it. And Seq->from_array just keeps a reference, it allows
+# changing @data and a sequence will always get updated values.
+# This is officially supported as an "advanced" feature.
+my $data = Seq->from_array(\@data);
 
 # genereates a sequence from mutable data storage. when @data changes
 # $sorted will see latest values, while the cached variant dont update anymore
-my $sorted       = Seq->from_array(\@data)->sort(sub($x,$y) { $x <=> $y });
-my $sorted_cache = $sorted->cache;
+my $sorted = $data->sort(by_num);
 
-is($sorted,                 $sorted_cache,                'must be the same');
-is($sorted->to_array,       [2,3,6,10,21,34,67,123,8578], 'check sorted');
-is($sorted_cache->to_array, [2,3,6,10,21,34,67,123,8578], 'check sorted cache');
+is($sorted, [2,3,6,10,21,34,67,123,8578], 'check sorted');
 
 # add value to mutable array
 push @data, 42;
 
-is($sorted->to_array,       [2,3,6,10,21,34,42,67,123,8578], 'sorted sees updated value');
-is($sorted_cache->to_array, [2,3,6,10,21,34,67,123,8578],    'but sorted_cache stays the same');
+is(
+    $sorted,
+    [2,3,6,10,21,34,67,123,8578],
+    'sorted stays the same');
+is(
+    $data->sort(by_num),
+    [2,3,6,10,21,34,42,67,123,8578],
+    'but calling sort again sees new value');
 
 done_testing;
