@@ -6,9 +6,9 @@ benchmarks/array_min.pl
 benchmarks/array_reverse.pl
 benchmarks/bool.pl
 benchmarks/even_num.pl
-benchmarks/filtering.pl
 benchmarks/func_key.pl
 benchmarks/hash_append.pl
+benchmarks/keep.pl
 benchmarks/list_foldback.pl
 benchmarks/moose.pl
 benchmarks/one_of.pl
@@ -32,7 +32,6 @@ example
 examples/1bill.pl
 examples/1bill_slower.pl
 examples/album.pl
-examples/all_funcs.pl
 examples/AoC-2022/01.input
 examples/AoC-2022/01.pl
 examples/AoC-2022/02.fsx
@@ -78,11 +77,12 @@ examples/AoC-2023/01p1.txt
 examples/AoC-2023/01p2.pl
 examples/AoC-2023/01p2.txt
 examples/bench_it.pl
-examples/check_funcs.pl
 examples/choose.pl
 examples/dump.pl
 examples/euler.pl
 examples/find_duplicates
+examples/funcs_array.pl
+examples/funcs_seq_array.pl
 examples/job_postings.pl
 examples/job_postings_mixed.pl
 examples/job_postings_pp.pl
