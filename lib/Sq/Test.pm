@@ -69,38 +69,26 @@ sub nok($bool, $message) {
     if ( is_num($bool) ) {
         Carp::croak "Error: ok() only expects 0 or 1 as numbers Got: $bool\n" if ($bool != 0 && $bool != 1);
         if ( $bool == 0 ) {
-            print "ok $count - $message\n"
+            print "ok $count - $message\n";
+            return;
         }
-        else {
-            print "not ok $count - $message\n";
-            warn  "# not ok $count - $message\n";
-            warn  "# Expected 0, None or Err()\n";
-        }
-        return;
+        goto ERROR;
     }
     else {
         my $type = ref $bool;
         if ( $type eq 'Option' ) {
-            if ( @$bool ) {
-                print "not ok $count - $message\n";
-                warn  "# not ok $count - $message\n";
-                warn  "# Expected 0, None or Err()\n";
+            if ( @$bool == 0 ) {
+                print "ok $count - $message\n";
+                return;
             }
-            else {
-                print "ok $count - $message\n"
-            }
-            return;
+            goto ERROR;
         }
         elsif ( $type eq 'Result' ) {
-            if ( $bool->[0] == 1 ) {
-                print "not ok $count - $message\n";
-                warn  "# not ok $count - $message\n";
-                warn  "# Expected 0, None or Err()\n";
+            if ( $bool->[0] == 0 ) {
+                print "ok $count - $message\n";
+                return;
             }
-            else {
-                print "ok $count - $message\n"
-            }
-            return;
+            goto ERROR;
         }
         # only for is_num(). This function is looks_like_number() but when
         # number is not a number it returns empty string. So empty string
@@ -116,6 +104,15 @@ sub nok($bool, $message) {
         Carp::croak "Error: nok got: $bool\n" if ref eq "";
         Carp::croak "Error: nok() got ref: $type\n";
     }
+
+    # C-style error handling without exception crap.
+    # You know that if i would throw an exception and catch that, it would
+    # logical the same as an goto? Just maybe only 100 times slower?
+    ERROR:
+    my ( $pkg, $file, $line ) = caller;
+    my $place = sprintf "at %s: %d\n", $file, $line;
+    warn  "# not ok $count - $message\n";
+    warn  "# Expected 0, None or Err()\n";
     return;
 }
 
@@ -135,7 +132,10 @@ sub is :prototype($$$) {
         # but remove leading "#" on starting string
         $dump_1 =~ s/\A#\s*//;
         $dump_2 =~ s/\A#\s*//;
-        warn "# not ok $count - $message\n",
+        # warning
+        my ( $pkg, $file, $line ) = caller;
+        my $place = sprintf "at %s: %d\n", $file, $line;
+        warn "# not ok $count - $message $place\n",
              "# Got:      ", $dump_1, "\n",
              "# Expected: ", $dump_2, "\n";
     }
@@ -159,7 +159,9 @@ sub like($str, $regex, $message) {
         print "ok $count - $message\n";
     }
     else {
-        print "not ok $count - $message\n";
+        my ( $pkg, $file, $line ) = caller;
+        my $place = sprintf "at %s: %d\n", $file, $line;
+        print "not ok $count - $message $place\n";
         $str =~ s/^/# /mg;
         $str =~ s/\A# //;
         warn "# not ok $count - $message\n",
@@ -184,7 +186,9 @@ sub check_isa($any, $class, $message) {
                  "# Expected: $class\n";
         }
         else {
-            warn "# not ok $count - $message\n",
+            my ( $pkg, $file, $line ) = caller;
+            my $place = sprintf "at %s: %d\n", $file, $line;
+            warn "# not ok $count - $message $place\n",
                  "# Expected an object of $class, got unblessed value\n";
         }
     }
