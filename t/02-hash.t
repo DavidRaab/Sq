@@ -217,25 +217,10 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     is($h->get("bar"), Some(4), 'set');
 
     # extract
-    is(
-        $h->extract(qw/foo latz bar/),
-        [Some(1), None, Some(4)],
-        'extract');
-
-    is(
-        $h->extract(qw/foo latz bar/)->all_valid,
-        None,
-        'extract 2');
-
-    is(
-        $h->extract(qw/foo bar/)->all_valid,
-        Some([1, 4]),
-        'extract 3');
-
-    is(
-        $h->extract(qw/foo latz bar/)->filter_valid,
-        [1, 4],
-        'extract 4');
+    is($h->extract(qw/foo latz bar/),  [Some(1), None, Some(4)], 'extract 1');
+    is($h->extract(qw/foo latz bar/)->all_some,            None, 'extract 2');
+    is($h->extract(qw/foo bar/)     ->all_some,    Some([1, 4]), 'extract 3');
+    is($h->extract(qw/foo latz bar/)->keep_some,         [1, 4], 'extract 4');
 }
 
 # push
