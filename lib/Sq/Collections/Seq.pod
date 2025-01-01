@@ -492,12 +492,12 @@ returns a sequence. Instead of calling C<flatten> on that result use C<bind> ins
     # seq { 1,2,3,4,5,6,7,8,9 }
     my $flatten = $nums->flatten;
 
-=head2 flatten_array($seq_of_array) : $seq
+=head2 merge($seq_of_array) : $seq
 
 returns a new sequence that flattens a sequence of arrays into a single sequence.
 
     # seq { 1 .. 9 }
-    my $nums = Seq->new([1,2,3], [4,5,6], [7,8,9])->flatten;
+    my $nums = Seq->new([1,2,3], [4,5,6], [7,8,9])->merge;
 
 =head2 cartesian($seqA, $seqB) : $seq_of_array
 
