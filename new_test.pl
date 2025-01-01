@@ -14,8 +14,8 @@ use Sq::Sig;
 my $use = lazy {
     my $folders =
         Sq->fs->children('t')
-        ->filter(call 'is_dir')
-        ->regex_sub(qr{\At/}, lazy { " + " })
+        ->keep(call 'is_dir')
+        ->regex_sub(qr{\At/}, sub { " + " })
         ->sort(by_str)
         ->join("\n");
 
