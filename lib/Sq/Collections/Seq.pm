@@ -411,7 +411,7 @@ sub flatten($seq) {
     return bind($seq, \&Sq::id);
 }
 
-# flatten_array : Seq<Array<'a>> -> Seq<'a>
+# merge : Seq<Array<'a>> -> Seq<'a>
 sub merge($seq) {
     return bind($seq, sub($array) {
         return from_array('Seq', $array);
@@ -454,83 +454,89 @@ sub left_join($seqA, $seqB, $predicate) {
 # new hashname { id => 'some_id' }
 #
 # or an array of names that should be picked: [qw/id name/]
-sub select($seq, $mapA, $mapB) {
-    # Transforms the different inputs a user can give into a
-    # hash and an array containing the keys
-    state $gen_input = sub($mapping) {
-        my $hash;
-        my $keys;
-        if ( !defined Scalar::Util::reftype($mapping) ) {
-            if ( $mapping =~ m/\Aall\z/i ) {
-                return ['ALL'];
-            }
-            elsif ( $mapping =~ m/\Anone\z/i ) {
-                return ['NONE'];
-            }
-            else {
-                Carp::croak "When not arrayref or hashref must be either 'ALL' or 'NONE'";
-            }
-        }
-        elsif ( Scalar::Util::reftype($mapping) eq 'HASH' ) {
-            $hash = $mapping;
-            $keys = [ keys $mapping->%* ];
-        }
-        elsif ( Scalar::Util::reftype($mapping) eq 'ARRAY' ) {
-            $hash = { map { $_ => $_ } @$mapping };
-            $keys = $mapping;
-        }
-        else {
-            Carp::croak '$mappings must be tuple and either contain hashref or arrayref';
-        }
+#
+# TODO: Because i changed merge this doesn't work anymore. But I anyway
+#       didn't liked that stuff. API & code is too complex.
+#       Just commented it, to remind me to either do something with it. And
+#       extract some useful ideas from it. Or remove in the future.
+#
+# sub select($seq, $mapA, $mapB) {
+#     # Transforms the different inputs a user can give into a
+#     # hash and an array containing the keys
+#     state $gen_input = sub($mapping) {
+#         my $hash;
+#         my $keys;
+#         if ( !defined Scalar::Util::reftype($mapping) ) {
+#             if ( $mapping =~ m/\Aall\z/i ) {
+#                 return ['ALL'];
+#             }
+#             elsif ( $mapping =~ m/\Anone\z/i ) {
+#                 return ['NONE'];
+#             }
+#             else {
+#                 Carp::croak "When not arrayref or hashref must be either 'ALL' or 'NONE'";
+#             }
+#         }
+#         elsif ( Scalar::Util::reftype($mapping) eq 'HASH' ) {
+#             $hash = $mapping;
+#             $keys = [ keys $mapping->%* ];
+#         }
+#         elsif ( Scalar::Util::reftype($mapping) eq 'ARRAY' ) {
+#             $hash = { map { $_ => $_ } @$mapping };
+#             $keys = $mapping;
+#         }
+#         else {
+#             Carp::croak '$mappings must be tuple and either contain hashref or arrayref';
+#         }
 
-        # Returns a discriminated union with three cases
-        # ['ALL']
-        # ['NONE']
-        # ['SELECTION', $mapping, $keys]
-        return [SELECTION => $hash, $keys];
-    };
+#         # Returns a discriminated union with three cases
+#         # ['ALL']
+#         # ['NONE']
+#         # ['SELECTION', $mapping, $keys]
+#         return [SELECTION => $hash, $keys];
+#     };
 
-    my $caseA = $gen_input->($mapA);
-    my $caseB = $gen_input->($mapB);
+#     my $caseA = $gen_input->($mapA);
+#     my $caseB = $gen_input->($mapB);
 
-    merge($seq, sub($a, $b) {
-        my %new_hash;
+#     merge($seq, sub($a, $b) {
+#         my %new_hash;
 
-        # Merge keys from $seqA
-        if ( $caseA->[0] eq 'ALL' ) {
-            # Copies hash
-            %new_hash = %$a;
-        }
-        elsif ( $caseA->[0] eq 'NONE' ) {
-            # do nothing here ...
-        }
-        else {
-            my ($mapping, $keys) = $caseA->@[1,2];
-            for my $key ( @$keys ) {
-                $new_hash{$mapping->{$key}} = $a->{$key};
-            }
-        }
+#         # Merge keys from $seqA
+#         if ( $caseA->[0] eq 'ALL' ) {
+#             # Copies hash
+#             %new_hash = %$a;
+#         }
+#         elsif ( $caseA->[0] eq 'NONE' ) {
+#             # do nothing here ...
+#         }
+#         else {
+#             my ($mapping, $keys) = $caseA->@[1,2];
+#             for my $key ( @$keys ) {
+#                 $new_hash{$mapping->{$key}} = $a->{$key};
+#             }
+#         }
 
-        # Merge keys from $seqB
-        if ( $caseB->[0] eq 'ALL' ) {
-            # add keys from $b to new hash
-            for my $key ( keys %$b ) {
-                $new_hash{$key} = $b->{$key};
-            }
-        }
-        elsif ( $caseB->[0] eq 'NONE' ) {
-            # do nothing here ...
-        }
-        else {
-            my ($mapping, $keys) = $caseB->@[1,2];
-            for my $key ( @$keys ) {
-                $new_hash{$mapping->{$key}} = $b->{$key};
-            }
-        }
+#         # Merge keys from $seqB
+#         if ( $caseB->[0] eq 'ALL' ) {
+#             # add keys from $b to new hash
+#             for my $key ( keys %$b ) {
+#                 $new_hash{$key} = $b->{$key};
+#             }
+#         }
+#         elsif ( $caseB->[0] eq 'NONE' ) {
+#             # do nothing here ...
+#         }
+#         else {
+#             my ($mapping, $keys) = $caseB->@[1,2];
+#             for my $key ( @$keys ) {
+#                 $new_hash{$mapping->{$key}} = $b->{$key};
+#             }
+#         }
 
-        return \%new_hash;
-    });
-}
+#         return \%new_hash;
+#     });
+# }
 
 # choose : Seq<'a> -> ('a -> option<'b>) -> Seq<'b>
 sub choose($seq, $f_opt) {
