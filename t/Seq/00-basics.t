@@ -396,15 +396,9 @@ is(Seq->empty->last->or(0),     0, 'last on empty with option:or');
 is($range->last ,        Some(10), 'last on non empty');
 is($range->last->or(0),        10, 'last on non empty with option::or');
 
-is(
-    Seq->new(1,5,-3,10,9,-2)->sort(by_num),
-    seq { -3,-2,1,5,9,10 },
-    'sort 1');
-
-is(
-    Seq->new(qw/B b c A a C/)->sort(by_str),
-    seq { qw/A B C a b c/ },
-    'sort 2');
+is(Seq->new(1,5,-3,10,9,-2) ->sort(by_num), [ -3,-2,1,5,9,10 ],  'sort 1');
+is(Seq->new(qw/B b c A a C/)->sort(by_str), [ qw/A B C a b c/ ], 'sort 2');
+check_isa(seq {3,2,1}->sort(by_num), 'Array', 'sort returns Array');
 
 # Schwartzian Transformation
 {
@@ -416,26 +410,28 @@ is(
         { id => 3, char => 'R' },
     };
 
+    check_isa($data->sort_by(by_num, key 'id'), 'Array', 'sort_by return Array');
+
     is(
         $data->sort_by(by_num, key 'id'),
-        seq {
+        [
             { id => 1, char => 'W' },
             { id => 2, char => 'O' },
             { id => 3, char => 'R' },
             { id => 4, char => 'L' },
             { id => 5, char => 'D' },
-        },
+        ],
         'sort_by 1');
 
     is(
         $data->sort_by(by_str, key 'char'),
-        seq {
+        [
             { id => 5, char => 'D' },
             { id => 4, char => 'L' },
             { id => 2, char => 'O' },
             { id => 3, char => 'R' },
             { id => 1, char => 'W' },
-        },
+        ],
         'sort_by 2');
 
     is(
