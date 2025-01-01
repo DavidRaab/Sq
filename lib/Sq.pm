@@ -220,10 +220,11 @@ sub seq :prototype(&) {
     return bless(sub {
         my $abort = 0;
         my $idx   = 0;
+        my $value;
         return sub {
             return undef if $abort;
-            my $v = $data[$idx++];
-            return $v if defined $v;
+            $value = $data[$idx++];
+            return $value if defined $value;
             $abort = 1;
             return undef;
         }
