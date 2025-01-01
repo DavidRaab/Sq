@@ -1,10 +1,14 @@
 Revision history for Sq
 
-0.xxx   xxxxx
-        * Added: sort_by, any, all, none, pick, cache, regex_match, windowed,
-                 intersperse, always, infinity, repeat
-        * Renamed (min|max)_by_str -> (min|max)_str_by
-        * Imported Seq collection into Sq
+0.007   xxxx
+        Changes in 0.007
+
+0.006   2024-12-24 - Traitor Release
+        Now it is more than just a lazy sequence, more like it's own languages.
+        Implemented Seq, Array, Hash, Queue, Heap, List as basic data-structures.
+        Added Option & Result for returning Values/Errors.
+        Implemented a Parser, Type-System and a Test-System used to test
+        the system itself.
 
 0.005   2023-11-22
         Added more Documentation
