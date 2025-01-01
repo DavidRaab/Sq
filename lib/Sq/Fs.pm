@@ -5,14 +5,19 @@ use Sq;
 # Opens a file as UTF-8 text
 sub read_text($, $file) {
     return Seq->from_sub(sub {
-        open my $fh, '<:encoding(UTF-8)', $file or die "Cannot open: $!\n";
-        my $line;
-        return sub {
-            $line = <$fh>;
-            return $line if defined $line;
-            close $fh;
-            undef $fh;
-        };
+        open my $fh, '<:encoding(UTF-8)', $file;
+        if ( !defined $fh ) {
+            return sub { undef }
+        }
+        else {
+            my $line;
+            return sub {
+                $line = <$fh>;
+                return $line if defined $line;
+                close $fh;
+                undef $fh;
+            };
+        }
     });
 }
 
