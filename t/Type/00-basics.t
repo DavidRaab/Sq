@@ -398,7 +398,7 @@ ok(!t_valid($is_album2, $album_wrong2), 'album.tracks not an array');
     ok(!t_valid(t_can('dope'),          []), 't_methods 3');
     ok(!t_valid(t_can('dope'),          {}), 't_methods 4');
 
-    my $is_seq = t_ref('Seq', t_can('map', 'filter'));
+    my $is_seq = t_ref('Seq', t_can('map', 'keep'));
     ok( t_valid($is_seq, Seq->empty), 't_ref & t_methods');
 }
 

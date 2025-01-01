@@ -240,7 +240,7 @@ use Sq::Test;
     is(p_run($int,      "a12"),         None, 'no digit');
 }
 
-# match and filter
+# match and keep
 {
     my $hundred = p_matchf(qr/([+-])? \s* (\d+)/x, sub($sign,$num) {
         my $result = $num;
