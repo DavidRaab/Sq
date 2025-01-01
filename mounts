@@ -17,5 +17,5 @@ my $mounts =
 
 Sq->fmt->table({
     header => [qw/Src Dst Fs Options ? ?/],
-    data   => $mounts->to_array,
+    data   => $mounts,
 });
