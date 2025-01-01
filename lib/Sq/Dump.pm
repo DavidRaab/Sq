@@ -71,11 +71,26 @@ sub result($result, $inline=60, $depth=0) {
     return $str;
 }
 
-# Dumping Logic
+# TODO: Allow specification of key order when dumping
+sub benchmark($bench, $inline=60, $depth=0) {
+    return hash({
+        "Total Parent"        => $bench->cpu_p,
+        "Total Childs"        => $bench->cpu_c,
+        "Total Parent+Childs" => $bench->cpu_a,
+        "Real Seconds"        => $bench->real,
+        "Iterations Run"      => $bench->iters,
+    }, $inline, $depth);
+}
+
+### Dumping Logic
+
+# Dispatch Table for types
 my $dispatch = {
     '_UNDEF'            => sub { 'undef'                        },
     '_NUM'              => sub { sprintf "%s", $_[0]            },
     '_STRING'           => sub { sprintf "\"%s\"", quote($_[0]) },
+    'CODE'              => sub { 'sub { DUMMY }'                },
+    'Sq::Control::Lazy' => sub { 'lazy { DUMMY }'               },
     'ARRAY'             => \&array,
     'Array'             => \&array,
     'Queue'             => \&queue,
@@ -84,8 +99,7 @@ my $dispatch = {
     'Option'            => \&option,
     'Seq'               => \&seq,
     'Result'            => \&result,
-    'CODE'              => sub { 'sub { DUMMY }'                },
-    'Sq::Control::Lazy' => sub { 'lazy { DUMMY }'               },
+    'Benchmark'         => \&benchmark,
     'Path::Tiny'        => sub { 'path("' . quote($_[0]->stringify) .'")' },
 };
 

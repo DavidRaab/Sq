@@ -1,5 +1,6 @@
 package Sq::Bench;
 use 5.036;
+use Sq;
 
 sub it($, $f, $count=1) {
     require Benchmark;
