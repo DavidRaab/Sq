@@ -4,9 +4,7 @@ use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Sq;
 use Sq::Sig;
-use Sq::Type;
-use Sq::Test;
-use Benchmark qw(cmpthese);
+use Path::Tiny qw(path);
 use Getopt::Long::Descriptive;
 
 my ($opt, $usage) = describe_options(
@@ -15,3 +13,27 @@ my ($opt, $usage) = describe_options(
 );
 
 $usage->die if $opt->help;
+
+# read info about examples
+my $info =
+    Sq->fs->read_text(path('examples', 'info.txt'))
+    ->regex_match(qr/\A(\S+) \s+ (.+) $/x)
+    ->to_hash(sub($kv) { $kv->[0], $kv->[1] });
+
+# show all examples with info
+print "EXAMPLES:\n";
+my $examples =
+    Sq->fs->children('examples')
+    ->keep(call 'is_file')
+    ->sort(by_str)
+    ->iter(sub($file) {
+        my $name = $file->basename;
+        return if $name eq 'info.txt';
+        my $info = $info->get($name)->or("");
+        if ( $info ) {
+            printf "  %s - %s\n", $name, $info;
+        }
+        else {
+            printf "  %s\n", $name;
+        }
+    });

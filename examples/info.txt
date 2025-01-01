@@ -1,0 +1,16 @@
+1bill.pl         Counts towards 1 Billion
+1bill_slower.pl  More complicated way to count to 1 Billion
+album.pl         Dumping and Immutable updates of data-structure
+bench_it.pl      Timing a subroutine
+choose.pl        Intro to Sequence. Prints 100 Mio Dots.
+dump.pl          Exhausted Dumping of data-structure
+euler.pl         Computes Euler with Sequence
+find_duplicates  Find file duplicates revcursively in folder
+funcs_array.pl   Reflection: Prints all Array functions
+funcs_seq_array.pl    Reflection: Missing Diff between Array/Seq functions
+job_postings.pl       A Clojure example i converted to Sq
+job_postings_mixed.pl Like the former, but don't use some Sq features for more speed.
+job_postings_pp.pl    Pure Perl version of the same code
+option_divide.pl      Usage of Option to avoid exception when dividing with zero
+permutation.pl        Seq: Prints permutation of 10 keys
+primes.pl             Seq: Print Prime Numbers < 10_000
