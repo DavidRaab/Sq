@@ -2,10 +2,10 @@ package Sq::Bench;
 use 5.036;
 use Sq;
 
-sub it($, $f, $count=1) {
+sub it($, $f) {
     require Benchmark;
-    my $bench = Benchmark::timeit($count, $f);
-    dumpw($bench);
+    my $bench = Benchmark::timeit(1, $f);
+    print Benchmark::timestr($bench), "\n";
     return $bench;
 }
 
