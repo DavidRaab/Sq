@@ -118,11 +118,4 @@ sub get($result) {
     return $result->[1];
 }
 
-### MODULE FUNCTIONS
-
-sub is_result($, $any) {
-    return ref $any eq 'Result' ? 1 : 0;
-}
-
-
 1;

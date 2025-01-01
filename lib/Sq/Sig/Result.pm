@@ -39,8 +39,4 @@ sig('Result::to_array',  $result,                             t_array);
 sig('Result::value',     $result,                                $any);
 sig('Result::get',       $result,                                $any);
 
-### MODULE FUNCTIONS
-
-sig('Result::is_result', $any, $any, t_bool);
-
 1;

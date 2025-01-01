@@ -44,9 +44,9 @@ my $is_even = sub($x)    { $x % 2 == 0 };
     for my $test ( @tests ) {
         my ($value, $is_result, $is_ok, $is_err) = @$test;
 
-        is(Result->is_result($value), $is_result, "$idx functional-style is_result ");
-        is(Result::is_ok($value),     $is_ok,     "$idx functional-style is_ok");
-        is(Result::is_err($value),    $is_err,    "$idx functional-style is_err");
+        is(is_result($value),      $is_result, "$idx functional-style is_result ");
+        is(Result::is_ok($value),      $is_ok, "$idx functional-style is_ok");
+        is(Result::is_err($value),    $is_err, "$idx functional-style is_err");
 
         $idx++;
     }
@@ -104,10 +104,10 @@ my $is_even = sub($x)    { $x % 2 == 0 };
 # is_result / is_ok / is_err
 {
 
-    is(Result->is_result(Ok(1)),  1, 'is_result 1');
-    is(Result->is_result(Err(1)), 1, 'is_result 2');
-    is(Result->is_result(""),     0, 'is_result 3');
-    is(Result->is_result([]),     0, 'is_result 4');
+    is(is_result(Ok(1)),  1, 'is_result 1');
+    is(is_result(Err(1)), 1, 'is_result 2');
+    is(is_result(""),     0, 'is_result 3');
+    is(is_result([]),     0, 'is_result 4');
 
     is(Result::is_ok(Ok(10)),   1, 'is_ok 1');
     is(Result::is_ok(Err(10)),  0, 'is_ok 2');
