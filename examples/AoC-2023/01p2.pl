@@ -4,6 +4,7 @@ use open ':std', ':encoding(UTF-8)';
 use Getopt::Long::Descriptive;
 use Sq;
 use Sq::Sig;
+use Sq::Test;
 
 # https://adventofcode.com/2023/day/1
 
@@ -20,7 +21,7 @@ my $first_and_last = sub($array) {
 };
 
 my $sum =
-    Sq->fs->open_text($opt->file)
+    Sq->fs->read_text($opt->file)
     # removes newline
     ->map(sub($str)    { chomp $str; $str                    })
     ->doi(sub($str,$i) { printf "%4d %s", $i, $str           })
@@ -28,8 +29,8 @@ my $sum =
     ->do( sub($str)    { printf " %s", $str                  })
     # split every string into an array. creates seq of array
     ->split(qr//)
-    # filter only numbers on that array
-    ->map(call 'filter', \&is_num)
+    # keep only numbers on that array
+    ->map(call 'keep', \&is_num)
     # pick first and last
     ->map($first_and_last)
     # join every array into string
@@ -38,6 +39,8 @@ my $sum =
     ->sum;
 
 printf "Sum: %d\n", $sum;
+is($sum, 281, 'sum');
+done_testing;
 
 sub digitize($str) {
     state %mapping = (

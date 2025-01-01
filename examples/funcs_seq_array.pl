@@ -6,7 +6,7 @@ use Sq;
 use Sq::Reflection;
 use Sq::Sig;
 
-my %seq_skip   = map { $_ => 1 } qw/bless blit pop push shift shuffle unshift map_e filter_e/;
+my %seq_skip   = map { $_ => 1 } qw/bless blit pop push shift shuffle unshift map_e keep_e/;
 my %array_skip = map { $_ => 1 } qw/always cache do doi infinity/;
 
 my $array = all_funcs('Array');

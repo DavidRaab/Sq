@@ -1,8 +1,11 @@
 #!/usr/bin/env perl
 use v5.36;
+use utf8;
 use open ':std', ':encoding(UTF-8)';
-use Getopt::Long::Descriptive;
 use Sq;
+use Sq::Sig;
+use Sq::Test;
+use Getopt::Long::Descriptive;
 
 # https://adventofcode.com/2023/day/1
 
@@ -19,11 +22,11 @@ my $first_and_last = sub($array) {
 };
 
 my $sum =
-    Sq->fs->open_text($opt->file)
+    Sq->fs->read_text($opt->file)
     # splits every string and creates a sequence of arrays
     ->split(qr//)
-    # filter only numbers from that array
-    ->map(call 'filter', \&is_num)
+    # keep only numbers from that array
+    ->map(call 'keep', \&is_num)
     # pick first and last item from that array
     ->map($first_and_last)
     # call join on that array to turn to string again
@@ -33,3 +36,5 @@ my $sum =
     ->sum;
 
 printf "Sum: %d\n", $sum;
+is($sum, 142, 'sum');
+done_testing;

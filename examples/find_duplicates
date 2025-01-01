@@ -94,16 +94,16 @@ my $file =
     # recursively get all files from current folder as a Seq
     Sq->fs->recurse('.')
     # only files
-    ->filter(call 'is_file')
+    ->keep(call 'is_file')
     # remove symbolic links
-    ->remove(sub($path) { -l $path })
+    ->remove(sub($file) { -l $file })
     # remove empty files or smaller $min (when provided)
-    ->remove(sub($path) { $path->size == 0 || ($min && $path->size < $min) })
+    ->remove(sub($file) { $file->size == 0 || ($min && $file->size < $min) })
     # build a hash with file-size as key
     ->group_by(call 'size')
     # structure now: { FILESIZE => [FILE] }
     # only keep those hash entries that has more than 1 file per size
-    ->filter(sub($size, $files) { $files->length > 1 })
+    ->keep(sub($size, $files) { $files->length > 1 })
     # go through all key,value
     # and function returns new key,value for every entry
     ->map(sub($size, $files) {
@@ -135,14 +135,14 @@ my $file =
     ->map(sub($size, $sha) {
         # only keep entries that has more than one file per SHA512
         $size,
-        $sha->filter(sub($sha, $files) {
+        $sha->keep(sub($sha, $files) {
             return 0 if $sha eq "0"; # skip the "0" entry completely
             return 1 if @$files > 1; # only entries with more than one file
             return 0;
         });
     })
     # only keep file sizes that has some entries in it
-    ->filter(sub($size, $sha) { $sha->length > 0 ? 1 : 0 });
+    ->keep(sub($size, $sha) { $sha->length > 0 ? 1 : 0 });
 
 # Abort when '$file' is wrong
 t_assert($is_dup, $file);

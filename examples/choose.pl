@@ -1,14 +1,16 @@
 #!/usr/bin/env perl
 use v5.36;
+use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Sq;
+use Sq::Sig;
 
 my $square  = sub($x) { $x * $x     };
 my $is_even = sub($x) { $x % 2 == 0 };
 
 # This defines the Query - but does not compute anything
 my $range = Seq->range(1, 10);
-my $query = $range->map($square)->filter($is_even);
+my $query = $range->map($square)->keep($is_even);
 
 # you could use expand to get a list and iterate over it.
 for my $x ( $query->expand ) {

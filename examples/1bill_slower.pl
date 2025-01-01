@@ -22,7 +22,7 @@ my $countup = assign {
         # operating on all elements faster. I mean that was the reason you
         # ziped those elements, right?
         Seq::zip(
-            Seq::filter($bill1, $is_even),
+            Seq::keep  ($bill1, $is_even),
             Seq::remove($bill1, $is_even),
         )
     );
@@ -39,7 +39,7 @@ run(sub {
 # procedural / oo-style
 my $bill1   = Seq->range(1,1_000_000_000);
 my $is_even = sub($x) { $x & 1 };
-my $evens   = $bill1->filter($is_even);
+my $evens   = $bill1->keep  ($is_even);
 my $unevens = $bill1->remove($is_even);
 my $zip     = $evens->zip($unevens);
 my $flatten = $zip->merge;

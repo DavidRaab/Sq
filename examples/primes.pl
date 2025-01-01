@@ -10,7 +10,7 @@ use Sq;
 my $primes =
     Seq
     ->count_up(2)
-    ->filter(sub($x) { Sq->math->is_prime($x) });
+    ->keep(sub($x) { Sq->math->is_prime($x) });
 
 print "Primes smaller 10_000\n";
 $primes->take_while(sub($x) { $x < 10_000 })->chunked(20)->iter(sub ($array) {
