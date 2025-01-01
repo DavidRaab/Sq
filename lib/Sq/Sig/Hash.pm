@@ -23,7 +23,7 @@ sig ('Hash::values',       t_hash,                t_array);
 sig ('Hash::map',          t_hash, t_sub,         t_hash);
 sig ('Hash::find',         t_hash, t_sub,         t_opt($kv));
 sig ('Hash::pick',         t_hash, t_sub,         t_opt);
-sig ('Hash::filter',       t_hash, t_sub,         t_hash);
+sig ('Hash::keep',         t_hash, t_sub,         t_hash);
 sig ('Hash::fold',         t_hash, t_any, t_sub,  t_any);
 sig ('Hash::length',       t_hash,                t_int);
 sig ('Hash::is_empty',     t_hash,                t_bool);
