@@ -5,14 +5,6 @@ use open ':std', ':encoding(UTF-8)';
 use Sq;
 use Sq::Sig;
 use Path::Tiny qw(path);
-use Getopt::Long::Descriptive;
-
-my ($opt, $usage) = describe_options(
-    'Usage: %c %o',
-    ['help|h', 'Print this message', {shortcircuit => 1}],
-);
-
-$usage->die if $opt->help;
 
 # read info about examples
 my $info =
@@ -21,19 +13,17 @@ my $info =
     ->to_hash(sub($kv) { $kv->[0], $kv->[1] });
 
 # show all examples with info
-print "EXAMPLES:\n";
 my $examples =
     Sq->fs->children('examples')
     ->keep(call 'is_file')
     ->sort(by_str)
-    ->iter(sub($file) {
+    ->choose(sub($file) {
         my $name = $file->basename;
-        return if $name eq 'info.txt';
-        my $info = $info->get($name)->or("");
-        if ( $info ) {
-            printf "  %s - %s\n", $name, $info;
-        }
-        else {
-            printf "  %s\n", $name;
-        }
+        return None if $name eq 'info.txt';
+        return Some(sq [$name, $info->get($name)->or("")]);
     });
+
+Sq->fmt->table({
+    header => [qw/Script Description/],
+    data   => $examples,
+});

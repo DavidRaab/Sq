@@ -10,6 +10,7 @@ use Sq::Sig::Queue;
 use Sq::Sig::Heap;
 use Sq::Sig::Io;
 use Sq::Sig::Fs;
+use Sq::Sig::Fmt;
 
 1;
 
@@ -40,6 +41,8 @@ load.
 =item * Sq::Sig::Io
 
 =item * Sq::Sig::Fs
+
+=item * Sq::Sig::Fmt
 
 =back
 
