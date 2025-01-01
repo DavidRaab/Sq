@@ -228,14 +228,18 @@ sub mapi($array, $f) {
     return CORE::bless(\@new, 'Array');
 }
 
+# TODO: Remove in future
+sub filter   { Carp::croak "Array::filter renamed to Array::keep"     }
+sub filter_e { Carp::croak "Array::filter_e renamed to Array::keep_e" }
+
 # filter : Array<'a> -> ('a -> bool) -> Array<'a>
-sub filter($array, $predicate) {
+sub keep($array, $predicate) {
     local $_;
     return CORE::bless([grep { $predicate->($_) } @$array], 'Array');
 }
 
 # same as filter but expects a string-code
-sub filter_e($array, $expr) {
+sub keep_e($array, $expr) {
     local $_;
     my $data = eval "[grep { $expr } \@\$array]";
     Carp::croak $@ if !defined $data;

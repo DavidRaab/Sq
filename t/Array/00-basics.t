@@ -35,26 +35,15 @@ is(Array->range(1,1), [1],        'range is inclusive');
 is($rangeDesc, [reverse 1 .. 10], 'rangeDesc');
 is($range, $rangeDesc->rev,       'reverse of rangeDesc same as range');
 is($range->map($double),     [2,4,6,8,10,12,14,16,18,20], 'map');
-is($range->filter($is_even), [2,4,6,8,10],                'filter');
+is($range->keep($is_even), [2,4,6,8,10],                 'keep');
 is($range->take(5),    [1..5], 'take 1');
 is($range->take(0),        [], 'take 2');
 is($range->take(-1),       [], 'take 3');
 is($range->length,         10, 'length');
 is($range->take(5)->length, 5, 'take & length');
-
-is(
-    $range->map($square)->filter($is_even),
-    [4,16,36,64,100],
-    'map filter');
-is(
-    $range->map($square)->filter($is_even)->take(3),
-    [4,16,36],
-    'map filter take');
-
-is(
-    $range->map($square)->filter_e('$_ % 2 == 0'),
-    [4,16,36,64,100],
-    'filter_e');
+is($range->map($square)->keep($is_even),        [4,16,36,64,100], 'map keep');
+is($range->map($square)->keep($is_even)->take(3),      [4,16,36], 'map keep take');
+is($range->map($square)->keep_e('$_ % 2 == 0'), [4,16,36,64,100], 'keep_e');
 
 is(
     Array->range(1,3)->map(sub($x) { ($x) x 3 }),
@@ -424,12 +413,12 @@ like(
     'range_step dies with step size of zero');
 
 is(
-    $range->map($square)->filter($is_even),
+    $range->map($square)->keep($is_even),
     $range->choose(sub($x) {
         my $s = $x * $x;
         $s % 2 == 0 ? $s : undef
     }),
-    'choose instead of map filtering');
+    'choose instead of map->keep');
 
 is(
     Array
@@ -440,8 +429,8 @@ is(
         }),
     Array
         ->range(1,5)
-        ->map(   sub($x) { $x * $x     })
-        ->filter(sub($x) { $x % 2 == 0 }),
+        ->map( sub($x) { $x * $x     })
+        ->keep(sub($x) { $x % 2 == 0 }),
     'square and even');
 
 is($range->find(sub($x) { $x > 5  }),   Some(6), 'find 1');
@@ -969,14 +958,7 @@ is(
     is($new2, [1,2,3], 'copy only copies up to first undef');
 }
 
-# filter_e
-{
-    is(
-        $range->filter($is_even),
-        $range->filter_e('$_ % 2 == 0'),
-        'filter_e');
-}
-
+is($range->keep($is_even), $range->keep_e('$_ % 2 == 0'), 'keep_e');
 is(
     sq([ 7,8,9,10 ])->cartesian([ "Hearth", "Spades" ]),
     [
