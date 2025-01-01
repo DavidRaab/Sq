@@ -1,0 +1,21 @@
+#!/usr/bin/env perl
+use 5.036;
+use utf8;
+use open ':std', ':encoding(UTF-8)';
+use Sq;
+use Sq::Sig;
+
+my $mounts =
+    Sq->fs
+    ->read_text('/', 'proc', 'mounts')
+    ->split(qr/\s+/)
+    # sort in Perl is stable
+    ->sort_by(by_str, sub($array) { $array->[1] })
+    ->sort_by(by_str, sub($array) { $array->[2] });
+
+# dumpw($mounts);
+
+Sq->fmt->table({
+    header => [qw/Src Dst Fs Options ? ?/],
+    data   => $mounts->to_array,
+});
