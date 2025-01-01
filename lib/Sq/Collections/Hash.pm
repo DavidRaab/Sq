@@ -86,7 +86,10 @@ sub pick($hash, $f_opt) {
     return Option::None();
 }
 
-sub filter($hash, $predicate) {
+# TODO: Remove in future
+sub filter { Carp::croak "Hash::filter renamed to Hash::keep" }
+
+sub keep($hash, $predicate) {
     my %new;
     for my ($key,$value) ( %$hash ) {
         if ( $predicate->($key, $value) ) {

@@ -315,7 +315,7 @@ hashes are then concatenated into one single hash and returned.
     #     'bin/ps'      => 6,
     # }
 
-=head2 filter($hash, $predicate) : $hash
+=head2 keep($hash, $predicate) : $hash
 
 Iterates through every key,value of a hash and passes it to the C<$predicate>
 function. When this function returns a truish value, then the (key,value) are
@@ -328,9 +328,9 @@ used to build and return a new hash.
         Rudolf => 9,
     );
 
-    my $hash = $player_points->filter(sub($k,$v) { $v > 9 ? 1 : 0   }); # { Anne => 10, Marie => 12 }
-    my $hash = $player_points->filter(sub($k,$v) { $k =~ m/\AR/     }); # { Ralph => 8, Rudolf => 9 }
-    my $hash = $player_points->filter(sub($k,$v) { $v > 100 ? 1 : 0 }); # {}
+    my $hash = $player_points->keep(sub($k,$v) { $v > 9 ? 1 : 0   }); # { Anne => 10, Marie => 12 }
+    my $hash = $player_points->keep(sub($k,$v) { $k =~ m/\AR/     }); # { Ralph => 8, Rudolf => 9 }
+    my $hash = $player_points->keep(sub($k,$v) { $v > 100 ? 1 : 0 }); # {}
 
 =head2 append($hashA, $hashB) : $hash
 

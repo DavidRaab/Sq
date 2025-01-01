@@ -73,13 +73,12 @@ is($data,  {foo  => 1, bar  => 10, baz  =>  5}, '$data stays the same');
 is($data2, {foos => 2, bars => 20, bazs => 10}, 'map');
 check_isa($data2, 'Hash',                       '$data2 isa Hash');
 
-# filter
-my $data3 = $data->filter(sub($k,$v) {
+my $data3 = $data->keep(sub($k,$v) {
     $k =~ m/\A b/xms ? 1 : 0;
 });
 
 is($data,  {foo  => 1, bar  => 10, baz  =>  5}, '$data stays the same');
-is($data3, {bar => 10, baz => 5},               'filter');
+is($data3, {bar => 10, baz => 5},               'keep');
 check_isa($data3, 'Hash',                       '$data3 isa Hash');
 
 {
@@ -91,17 +90,17 @@ check_isa($data3, 'Hash',                       '$data3 isa Hash');
     );
 
     is(
-        $player_points->filter(sub($k,$v) { $v > 9 ? 1 : 0 }),
+        $player_points->keep(sub($k,$v) { $v > 9 ? 1 : 0 }),
         { Anne => 10, Marie => 12 },
         'above 9');
 
     is(
-        $player_points->filter(sub($k,$v) { $k =~ m/\AR/ }),
+        $player_points->keep(sub($k,$v) { $k =~ m/\AR/ }),
         { Ralph => 8, Rudolf => 9 },
         'players starting with R');
 
     is(
-        $player_points->filter(sub($k,$v) { $v > 100 ? 1 : 0 }),
+        $player_points->keep(sub($k,$v) { $v > 100 ? 1 : 0 }),
         { },
         'above 100');
 }
