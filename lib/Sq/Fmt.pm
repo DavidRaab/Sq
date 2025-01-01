@@ -6,10 +6,11 @@ use Sq;
 # For example pass it an array of array and it prints a table.
 
 sub table($, $href) {
-    my $header = $href->{header};
-    my $aoa    = $href->{data};
+    my $header = sq $href->{header};
+    my $aoa    = sq $href->{data};
 
     my $maxY = $aoa->length;
+    return if $maxY == 0;
     my $maxX = $aoa->map(call 'length')->max->or(0);
     return if $maxX == 0;
 
