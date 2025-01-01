@@ -15,11 +15,12 @@ sub table($, $href) {
 
     # just turn AoA into string lengths
     my $sizes = assign {
+        my $sizes = $aoa;
         if ( defined $header ) {
-            $aoa = sq [$header, @$aoa];
+            $sizes = sq [$header, @$aoa];
         }
 
-        $aoa->map(sub($array) {
+        $sizes->map(sub($array) {
             $array->map(sub ($str) { length $str })
         });
     };
