@@ -200,8 +200,8 @@ is(
 
 is(
     Seq
-    ->init(100, sub($idx) { $idx })
-    ->filter(sub($num) { $num % 2 == 0 })
+    ->range(0,99)
+    ->keep(sub($num) { $num % 2 == 0 })
     ->take(10),
     seq { 0,2,4,6,8,10,12,14,16,18 },
     'struct 46');

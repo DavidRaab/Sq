@@ -566,8 +566,13 @@ sub mapi($seq, $f) {
     });
 }
 
-# filter : Seq<'a> -> ('a -> bool) -> Seq<'a>
+# TODO: Remove in future
 sub filter($seq, $predicate) {
+    Carp::croak "Seq->filter was renamed to Seq->keep";
+}
+
+# keep : Seq<'a> -> ('a -> bool) -> Seq<'a>
+sub keep($seq, $predicate) {
     return bless(sub {
         my $abort = 0;
         my $it    = $seq->();

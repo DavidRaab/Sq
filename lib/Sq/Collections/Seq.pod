@@ -318,12 +318,7 @@ could be implemented this way.
 
 =head1 METHODS
 
-Implemented, but not documented yet:
-
-append, map, bind, flatten cartesian, join, merge, select*, choose, mapi,
-filter, take, skip, indexed, distinct, distinct_by, iter, do, rev
-
-* will maybe change
+TODO
 
 =head2 copy($seq) : $seq
 
@@ -381,12 +376,13 @@ index of the item it processes.
         ->range(5,10)
         ->mapi(sub($x,$idx) { [$x,$idx] });
 
-=head2 filter($seq, $predicate) : $seq
+=head2 keep($seq, $predicate) : $seq
 
-returns a new sequence with the elements filtered by C<$predicate>. A predicate
-function is a function that returns a boolish value. When it returns a truish
-value then the element is kept in the sequence. Similar zu perl built-in C<grep>
-for an array.
+returns a new sequence by telling which object should be keeped. Every element
+is passed to C<$predicate> that returns a truish value when this value should
+be keeped in the sequence.
+
+Similar zu perl built-in C<grep> for an array.
 
     # seq { 2,4,6,8,10 }
     my $seq = Seq->range(1,10)->filter(sub($x) { $x % 2 == 0 });

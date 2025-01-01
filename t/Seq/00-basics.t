@@ -32,14 +32,8 @@ is($range->to_array(1),   [1],     'to_array(1)');
 is($range->to_array(5),   [1..5],  'to_array(5)');
 is($range->to_array(100), [1..10], 'to_array(100)');
 
-is(
-    $range->map($double),
-    seq { 2,4,6,8,10,12,14,16,18,20 },
-    'map');
-is(
-    $range->filter($is_even),
-    seq { 2,4,6,8,10 },
-    'filter');
+is($range->map($double),   seq { 2,4,6,8,10,12,14,16,18,20 }, 'map');
+is($range->keep($is_even), seq { 2,4,6,8,10 },               'keep');
 
 is($range->take(5),  seq{1..5}, 'take 1');
 is($range->take(0),  seq {},    'take 2');
@@ -53,13 +47,13 @@ is($range->length, 10, 'length');
 is($range->take(5)->length, 5, 'take & length');
 is($range->map(sub($x) { undef }), Seq->empty, 'map function returns undef');
 is(
-    $range->map($square)->filter($is_even),
+    $range->map($square)->keep($is_even),
     seq { 4,16,36,64,100 },
-    'map filter');
+    'map keep');
 is(
-    $range->map($square)->filter($is_even)->take(3),
+    $range->map($square)->keep($is_even)->take(3),
     seq { 4,16,36 },
-    'map filter take');
+    'map keep take');
 is(
     $range->fold(0, sub($x,$length) { $length + 1 }),
     $range->length,
@@ -344,12 +338,12 @@ like(
     'range_step dies with step size of zero');
 
 is(
-    $range->map($square)->filter($is_even),
+    $range->map($square)->keep($is_even),
     $range->choose(sub($x) {
         my $s = $x * $x;
         $s % 2 == 0 ? Some $s : None
     }),
-    'choose same as map->filter');
+    'choose same as map->keep');
 
 is(
     $range->choose(sub($x) {

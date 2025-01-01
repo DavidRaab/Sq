@@ -83,10 +83,7 @@ is(
 is($file->length, 3, 'line count');
 is($file->length, 3, 'should return 3 again');
 is(
-    $file
-    ->filter(sub($x) { $x =~ m/test/i })
-    ->length,
-
+    $file->keep(sub($x) { $x =~ m/test/i })->length,
     1,
     'one line containing test');
 
@@ -107,9 +104,9 @@ my $temp_name = Path::Tiny->tempfile('PerlSqTmpXXXXXX');
 my $fh        = $temp_name->openrw;
 
 my $temp   = from_file($temp_name);
-my $first  = $temp->filter(sub ($x) { $x =~ m/first/i  });
-my $second = $temp->filter(sub ($x) { $x =~ m/second/i });
-my $third  = $temp->filter(sub ($x) { $x =~ m/third/i  });
+my $first  = $temp->keep(sub ($x) { $x =~ m/first/i  });
+my $second = $temp->keep(sub ($x) { $x =~ m/second/i });
+my $third  = $temp->keep(sub ($x) { $x =~ m/third/i  });
 
 # on empty file
 is($temp->length,     0, '0 - empty file');
