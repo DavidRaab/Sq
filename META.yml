@@ -36,6 +36,8 @@ provides:
     version: '0.007'
   Sq::Args:
     file: lib/Sq/Args.pm
+  Sq::Bench:
+    file: lib/Sq/Bench.pm
   Sq::Cmd:
     file: lib/Sq/Cmd.pm
   Sq::Collections::Array:
@@ -86,12 +88,16 @@ provides:
     file: lib/Sq/Fmt.pm
   Sq::Fs:
     file: lib/Sq/Fs.pm
+  Sq::Gen:
+    file: lib/Sq/Gen.pm
   Sq::Io:
     file: lib/Sq/Io.pm
   Sq::L:
     file: lib/Sq/L.pm
   Sq::Language:
     file: lib/Sq/Language.pm
+  Sq::Math:
+    file: lib/Sq/Math.pm
   Sq::Parser:
     file: lib/Sq/Parser.pm
   Sq::Parser::HTML:
@@ -106,6 +112,8 @@ provides:
     file: lib/Sq/Sig.pm
   Sq::Sig::Array:
     file: lib/Sq/Sig/Array.pm
+  Sq::Sig::Fs:
+    file: lib/Sq/Sig/Fs.pm
   Sq::Sig::Hash:
     file: lib/Sq/Sig/Hash.pm
   Sq::Sig::Heap:
