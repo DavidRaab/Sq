@@ -15,7 +15,6 @@ sub import {
         require Sq::Fs;
         require Sq::Io;
         require Sq::Math;
-        require Sq::Bench;
         $first_load = 0;
     }
 
@@ -83,7 +82,10 @@ use Sq::Equality;
 sub io($)    { 'Sq::Io'    }
 sub fs($)    { 'Sq::Fs'    }
 sub math($)  { 'Sq::Math'  }
-sub bench($) { 'Sq::Bench' }
+sub bench($) {
+    require Sq::Bench;
+    return 'Sq::Bench';
+}
 
 # Important functions used in FP code. So adding them.
 sub id  :prototype($) { return $_[0]    }
