@@ -530,37 +530,28 @@ prints it using C<warn>.
     $opt->dumpw;
     warn $opt->dump, "\n";
 
-=head1 MODULE FUNCTIONS
+=head1 GLOBAL FUNCTION
 
-These functions are concipated to be called from the module level because
-they don't make sense to be called as a method. Usually because the first argument
-is not just an option. Here we have a list of options. But they also wouldn't
-make sense to be added to an array, or maybe it will?
+By loading C<Sq> you automatically get an C<is_opt> function imported.
 
-You could call them in a functional-style, but then you also need to pass a
-dummy value as first argument.
-
-    Option->all_valid($array_of_opt);
-    Option::all_valid(undef, $array_of_opt);
-
-=head2 Option->is_opt($any) : $bool
+=head2 is_opt($any) : $bool
 
 returns a truish value when C<$any> is an optional value.
 
-    my $bool = Option->is_opt(Some({}));    # 1
-    my $bool = Option->is_opt(Some(1));     # 1
-    my $bool = Option->is_opt(None);        # 1
-    my $bool = Option->is_opt(Some(undef)); # 1
-    my $bool = Option->is_opt("");          # 0
-    my $bool = Option->is_opt(0);           # 0
-    my $bool = Option->is_opt([]);          # 0
-    my $bool = Option->is_opt({}):          # 0
+    my $bool = is_opt(Some({}));    # 1
+    my $bool = is_opt(Some(1));     # 1
+    my $bool = is_opt(None);        # 1
+    my $bool = is_opt(Some(undef)); # 1
+    my $bool = is_opt("");          # 0
+    my $bool = is_opt(0);           # 0
+    my $bool = is_opt([]);          # 0
+    my $bool = is_opt({}):          # 0
 
 B<WARNING:> In probably 90% of all cases this is not the function you wanna use.
 Some new people that are introduced to the idea of optional values usually might
 use it like this.
 
-    if ( Option->is_opt($any) && $any->is_some ) {
+    if ( is_opt($any) && $any->is_some ) {
         my $value = $any->get;
     }
 
@@ -570,19 +561,19 @@ B<Don't do that.>
 
 =item First
 
-Instead of C<< Option->is_opt >> you can use C<Option::is_some> or C<Option::is_none>
+Instead of C<is_opt> you can use C<Option::is_some> or C<Option::is_none>
 in a functional-style to also check C<$any> value. Those functions are written in a way
 that they don't expect an optional value. You can directly do
 
     if ( Option::is_some($any) ) {
-        my $value = $any->get
+        my $value = $any->get;
     }
 
 This does the same and is shorter and clearer.
 
 =item Second
 
-Only call C<< Option->is_opt >> when you expect that a function can return many different
+Only call C<is_opt> when you expect that a function can return many different
 values of different types and you need to check if it is an optional value. Obviously
 when you know that something should return an optional then trust it and just
 use it as an optional. That's how dynamic-typing works.
@@ -611,7 +602,7 @@ You could return an optional again.
             None => sub     { None         },
         );
 
-but, this function is exactly what C<map> does! So instead write.
+when you do that, then use C<map>. Because that is what C<map> does.
 
     my $opt_double = $option->map(sub($x) { $x * 2 });
 
@@ -632,86 +623,6 @@ Use C<fold> when you want to extract the value and then transform it to somethin
 else. Use C<iter> when you want to do just some side-effect with the value.
 
 =back
-
-=head2 Option->all_valid($array_of_opt)
-
-Sometimes we have an array of optionals. Like C<[Some(1), Some(2), Some(3)]>.
-But instead of an array of optionals we basically want to turn it inside-out.
-We want an optional array C<Some([1,2,3])> instead. The idea is that we only
-get C<Some> array when all values are C<Some>. As soon one value in the whole
-array is C<None> we immediately just get C<None>. So we can validate all
-values in a array at once.
-
-Usually we get an array of optionals when we call an option generating function
-on every element of an array. For example by using C<Array::map>.
-
-    # an option generating function
-    my $some_num = sub($str) { is_num($str) ? Some($str) : None };
-
-    # Some([12, 100, 13])
-    my $opt_nums =
-        Option->all_valid(
-            Array->new("12", "100", "13")->map($some_num)
-        );
-
-    # None
-    my $opt_nums =
-        Option->all_valid(
-            Array->new("12", "100g", "13")->map($some_num)
-        );
-
-=head2 Option->all_valid_by($array, $f)
-
-When you already have an array of optionals you use C<< Option->all_valid >>. But when
-you want to run an optional generating function on every element of an array
-and then call C<< Option->all_valid >> then you better use C<< Option->all_valid_by >>
-that does both steps in one operation.
-
-    # an option generating function
-    my $some_num = sub($str) { is_num($str) ? Some($str) : None };
-
-    # Some([12, 100, 13])
-    my $opt_nums =
-        Option->all_valid_by(Array->new("12", "100", "13"), $some_num);
-
-    # Some([12, 100, 13])
-    my $opt_nums =
-        Option->all_valid_by(["12", "100", "13"], $some_num);
-
-    # Some([12, 100, 13])
-    my $opt_nums =
-        Option->all_valid(
-            Array->new("12", "100", "13")->map($some_num)
-        );
-
-=head2 Option->filter_valid($array)
-
-Similar to C<< Option->all_valid >> but instead of becoming C<None> as soon one
-value is C<None> in an array it just filters C<None> values out. Additional
-an Sq array instead of an option is returned.
-
-    my $nums = Option->filter_valid([Some(1), Some(2), Some(3)]); # [1,2,3]
-    my $nums = Option->filter_valid([Some(1), Some(2),    None]); # [1,2]
-    my $nums = Option->filter_valid([None]);                      # []
-    my $nums = Option->filter_valid([]);                          # []
-
-    my $opt_nums = Option->all_valid([Some(1), Some(2), Some(3)]); # Some([1,2,3])
-    my $opt_nums = Option->all_valid([Some(1), Some(2),    None]); # None
-    my $opt_nums = Option->all_valid([None])                       # None
-    my $opt_nums = Option->all_valid([])                           # Some([])
-
-=head2 Option->filter_valid_by($array, $f)
-
-Like C<< Option->filter_valid >> but additionaly runs function C<$f> on every
-element of C<$array> to create an option value first.
-
-    # an option generating function
-    my $some_num = sub($str) { is_num($str) ? Some($str) : None };
-
-    my $nums = Option->filter_valid   ([ map { $some_num->($_) } 1,2,3 ]);       # [1,2,3]
-    my $nums = Option->filter_valid   (Array->range(1,3)      ->map($some_num)); # [1,2,3]
-    my $nums = Option->filter_valid   (Array->new(qw/1 foo 2/)->map($some_num)); # [1,2]
-    my $nums = Option->filter_valid_by([qw/1 foo 2/], $some_num);                # [1,2]
 
 =head2 Option->extract($any=undef) : ($bool, $x)
 
@@ -764,3 +675,67 @@ and then work with it like any optional value.
 
 C<< Option->extract >> is a slightly faster version of this because no creation
 of an optional value is involved.
+
+=head1 Array Methods
+
+This module adds function that are accessible on the Array package.
+
+=head2 Array::all_some($array_of_opt) : $opt_array
+
+Sometimes we have an array of optionals. Like C<[Some(1), Some(2), Some(3)]>.
+But instead of an array of optionals we basically want to turn it inside-out.
+We want an optional array C<Some([1,2,3])> instead. The idea is that we only
+get C<Some> array when all values are C<Some>. As soon one value in the whole
+array is C<None> we immediately just get C<None>. So we can validate all
+values in an array at once.
+
+Usually we get an array of optionals when we call an option generating function
+on every element of an array. For example by using C<Array::map>.
+
+    # an option generating function
+    my $some_num = sub($str) { is_num($str) ? Some($str) : None };
+
+    my $opt_nums = Array->new("12", "100",  "13")->map($some_num)->all_some; # Some([12, 100, 13])
+    my $opt_nums = Array->new("12", "100g", "13")->map($some_num)->all_some; # None
+
+
+=head2 Array::all_some_by($array, $f) : $opt_array
+
+C<all_some_by> is a shortcut to C<< ->map($f_opt)->all_some >>. Shortcut
+more in the sense that it does the same thing in one operation instead of
+two.
+
+    # an option generating function
+    my $some_num = sub($str) { is_num($str) ? Some($str) : None };
+
+    my $opt_nums = sq(["12", "100", "13"])->all_some_by($some_num);   # Some([12, 100, 13])
+    my $opt_nums = sq(["12", "100", "13"])->map($some_num)->all_some; # Some([12, 100, 13])
+
+
+=head2 Array::keep_some($array)
+
+Similar to C<< Array::all_valid >> but instead of becoming C<None> as soon one
+value is C<None> in an array it just keeps the C<Some> values.
+
+    my $nums     = Array::keep_some([Some(1), Some(2), Some(3)]); # [1,2,3]
+    my $nums     = Array::keep_some([Some(1), Some(2),    None]); # [1,2]
+    my $nums     = Array::keep_some([None]);                      # []
+    my $nums     = Array::keep_some([]);                          # []
+
+    my $opt_nums = Array::all_some([Some(1), Some(2), Some(3)]); # Some([1,2,3])
+    my $opt_nums = Array::all_some([Some(1), Some(2),    None]); # None
+    my $opt_nums = Array::all_some([None])                       # None
+    my $opt_nums = Array::all_some([])                           # Some([])
+
+=head2 Array::keep_some_by($array, $f)
+
+Like C<< Array::keep_some >> but additionaly runs function C<$f> on every
+element of C<$array> to create an option value first.
+
+    # an option generating function
+    my $some_num = sub($str) { is_num($str) ? Some($str) : None };
+
+    my $nums = Array::keep_some   ([ map { $some_num->($_) } 1,2,3 ]);       # [1,2,3]
+    my $nums = Array::keep_some   (Array->range(1,3)      ->map($some_num)); # [1,2,3]
+    my $nums = Array::keep_some   (Array->new(qw/1 foo 2/)->map($some_num)); # [1,2]
+    my $nums = Array::keep_some_by([qw/1 foo 2/], $some_num);                # [1,2]

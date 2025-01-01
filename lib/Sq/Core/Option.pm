@@ -219,10 +219,6 @@ sub get($opt) {
 
 ### Module Functions
 
-sub is_opt($, $any) {
-    return ref $any eq 'Option' ? 1 : 0;
-}
-
 sub extract($, @anys) {
     my @ret;
     for my $any ( @anys ) {

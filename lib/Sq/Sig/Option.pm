@@ -64,7 +64,6 @@ sig('Option::to_seq',    $opt,              t_seq);
 
 ### Module Functions
 
-sig('Option::is_opt',         $any, $any,           t_bool);
 # sigt('Option::extract',        t_tuplev($any, ), )  # list context
 
 sigt('Option::dump',
