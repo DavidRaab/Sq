@@ -642,32 +642,33 @@ program/computer.
     # seq { 10,9,8,7,6,5,4,3,2,1 }
     my $seq = Seq->range(1,10)->rev;
 
-=head2 sort($seq, $comparer) : $seq
+=head2 sort($seq, $comparer) : $array
 
-Sorts a sequence by using C<$comparer> function. Consider that sorting is only
-possible when all elements of a sequence are known. Thus this method must build
-an array from all elements of a sequence and than sorts it.
+Consumes all elements from a sequence, creates an Array, then calls and
+return C<Array::sort>.
 
-    # seq { 1,2,5,8,10,20,30 }
-    my $sorted_nums =
-        Seq
-        ->new(1,30,5,2,8,10,20)
-        ->sort(sub($x,$y) { $x <=> $y });
+Consider that a sequence cannot be sorted without that all elements are fetched
+from it. So sorting B<MUST> fetch all elements from a sequence. Once it is
+an C<Array> it stays an C<Array> instead that again the result is wrapped in
+a Sequence.
 
-=head2 sort_by($seq, $comparer, $get_key) : $seq
+    # [ 1,2,5,8,10,20,30 ]
+    my $array = seq { 1,30,5,2,8,10,20 }->sort(by_num);
 
-Does a Schwartzian Transformation by first passing every element to the function
-C<$get_key> that returns the key used in sorting. Than uses C<$comparer> to sort
-by the generated keys. Returns the original entries sorted by its keys.
+=head2 sort_by($seq, $comparer, $get_key) : $array
 
-    # seq { "a","as","hello","between" }
-    my $seq =
-        Seq
-        ->new("hello", "a", "between", "as")
-        ->sort_by(
-            sub($x,$y){ $x <=> $y },  # comparer, sort by number
-            sub($x)   { length $x },  # get_key that uses string length
-        );
+Consumes all elements from a sequence, creates an Array, then calls and
+return C<Array::sort_by>.
+
+Consider that a sequence cannot be sorted without that all elements are fetched
+from it. So sorting B<MUST> fetch all elements from a sequence. Once it is
+an C<Array> it stays an C<Array> instead that again the result is wrapped in
+a Sequence.
+
+    # [ "a","as","hello","between" ]
+    my $array =
+        seq { "hello", "a", "between", "as"}
+        ->sort_by(by_num, sub($x) { length $x });
 
 =head2 group_fold
 
