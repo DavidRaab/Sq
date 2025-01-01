@@ -86,7 +86,7 @@ See L<Sq::Manual::Parser::Intro> at the moment for an Intro.
 
 =head3 p_repeat
 
-=head3 p_filter
+=head3 p_keep
 
 =head3 p_not
 

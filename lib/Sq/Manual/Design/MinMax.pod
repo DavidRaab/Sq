@@ -116,7 +116,7 @@ an Array of Array and want to extract only the maximum values of each inner
 Array.
 
 We could achive that easily with C<choose> that combines the idea of C<map>
-and C<filter>.
+and C<keep>.
 
     my $data = sq [
         [10,100],

@@ -253,7 +253,7 @@ This is Sq.
 
     $stuff->{options}->push('whatever', 'foo');
     my $foo    = $stuff->{options}[1];
-    my $fs     = $stuff->{options}->filter(sub($str) { $str =~ m/\Af/ });
+    my $fs     = $stuff->{options}->keep(sub($str) { $str =~ m/\Af/ });
     my $length = $stuff->{options}->length;
 
 So what basically changes is
@@ -274,7 +274,7 @@ only do you have the same advantages, it provides a lot more functions too!
 
 Here are just some functions/methods that are currently written for the
 Array package: B<all, any, append, map, bind, cartesian, blit, copy, count, as_hash,
-choose, distinct, sort, sort_by, min, max, filter, find, first, last, fold,
+choose, distinct, sort, sort_by, min, max, keep, find, first, last, fold,
 iter, intersperse, index, join, mapi, zip, push, pop, pick, repeat, reduce,
 rev, skip, take, slice, split, sum, sum_by, windowed>
 

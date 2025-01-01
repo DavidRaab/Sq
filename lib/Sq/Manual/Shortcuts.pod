@@ -1,15 +1,15 @@
 =head1 Typical replacements
 
-map->filter       vs. choose
+map->keep         vs. choose
 map->find         vs. pick
 map->sort->map    vs. sort_by
 map->sum          vs. sum_by
-#map->min          vs. min_by
-#map->max          vs. max_by
+#map->min         vs. min_by
+#map->max         vs. max_by
 map->flatten      vs. bind
 
 group_by->fold    vs. group_fold
-cartesian->filter vs. left_join
+# cartesian->filter vs. left_join
 indexed->map      vs. mapi
 
 append->append->append...  vs. concat

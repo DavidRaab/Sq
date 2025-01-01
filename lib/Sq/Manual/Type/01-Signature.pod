@@ -355,7 +355,7 @@ array doesn't contain numbers then you have a bug in your code! I guess you
 forget somewhere to check for a number. Did no parsing of a number and so on.
 When you encounter something that isn't a number you usually want to abort.
 
-Correct code would be that you first C<filter/grep> for a number, do some
+Correct code would be that you first C<keep> for a number, do some
 input validation and then sum up. Once your code is written this way, you again
 can remove the type-check.
 

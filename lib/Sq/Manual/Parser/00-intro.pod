@@ -305,10 +305,10 @@ of that function is then used as the parsing result.
 
 All the captures of the regex are passed as function arguments to C<p_matchf>.
 
-=head2 match and filter
+=head2 match and keep
 
 An important feature is that we not only can return different things, basically
-any data-structure, object and so on you can think of. But we also can filter
+any data-structure, object and so on you can think of. But we also can keep
 or return multiple arguments. But when nothing is returned, then parsing is
 considered as a failure.
 

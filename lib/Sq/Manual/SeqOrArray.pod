@@ -81,8 +81,8 @@ But let's see how it will look using Sq.
     my $file_content = Array->bless([read_file('...')]);
     my $accum =
         $file_content
-            ->map(   sub($x) { ... })
-            ->filter(sub($x) { ... })
+            ->map( sub($x) { ... })
+            ->keep(sub($x) { ... })
             ->fold($state, sub($t,$state) {
                 # do something with $t & $state
             });
@@ -92,7 +92,7 @@ But let's see how it will look using Sq.
 =item Execution Order
 
 One thing that changed is the order in which we write our code. Now it becomes
-clear that we first C<map> every entry of an array. Then we C<filter> out
+clear that we first C<map> every entry of an array. Then we C<keep>
 some elements and finally do a C<fold> that transforms a whole array into
 something different.
 
@@ -177,7 +177,7 @@ We started with the following code.
         # do something with $accum
     }
 
-now we want to iterate line by line and do the transformation, filtering
+now we want to iterate line by line and do the transformation, keep
 and creating of $accum as efficent as possible. Now we have code like this.
 
     my $fh = open my $fh, '<', '...';
@@ -208,10 +208,10 @@ memory + C<$accum>. In this solution it is just C<$accum> + 1 line.
 
 =item Execution Order
 
-Execution Order is now in order, we first see that we transform, then we filter.
-But still this code suffers from what i have deescribed above about C<for>
-loops being hard to read. It becomes a lot harder to decipher as a human
-reading code what our C<while> loop actually does.
+Execution Order is now in order, we first see that we transform, then we keep
+only certain elements. But still this code suffers from what i have deescribed
+above about C<for> loops being hard to read. It becomes a lot harder to
+decipher as a human what our C<while> loop actually does.
 
 =item Efficent
 
@@ -253,8 +253,8 @@ Here again is the code we had using C<Array> from C<Sq>.
     my $file_content = Array->bless([read_file('...')]);
     my $accum =
         $file_content
-            ->map(   sub($x) { ... })
-            ->filter(sub($x) { ... })
+            ->map( sub($x) { ... })
+            ->keep(sub($x) { ... })
             ->fold($state, sub($t,$state) {
                 # do something with $t & $state
             });
@@ -267,8 +267,8 @@ into memory all at once.
     my $file_content = Sq->io->open_text('...');
     my $accum =
         $file_content
-            ->map(   sub($x) { ... })
-            ->filter(sub($x) { ... })
+            ->map( sub($x) { ... })
+            ->keep(sub($x) { ... })
             ->fold($state, sub($t,$state) {
                 # do something with $t & $state
             });
