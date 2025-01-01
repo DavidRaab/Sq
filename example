@@ -23,7 +23,7 @@ my $examples =
         return Some(sq [$name, $info->{$name} // ""]);
     });
 
-# dumpw($examples);
+# dumpw($examples, 120);
 
 # print Array of Array as Table
 Sq->fmt->table({
