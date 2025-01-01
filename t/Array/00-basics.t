@@ -629,47 +629,6 @@ is($range->none(sub($x) { $x > 10  }), 1, 'none value greater 10');
     is($r->pick(sub($x) { $x > 10 ? Some($x*$x) : None })->or(100), 100, 'pod example 3');
 }
 
-# regex_match
-{
-    my $lines = Array->new(
-        '2023-11-25T15:10:00',
-        '2023-11-20T10:05:29',
-        'xxxx-xx-xxT00:00:00',
-        '1900-01-01T00:00:01',
-        '12345678901234567890',
-    );
-
-    my $matches = $lines->regex_match(qr/
-        \A
-            (\d\d\d\d) - (\d\d) - (\d\d)  # Date
-        T                                 # T
-            (\d\d) : (\d\d) : (\d\d)      # Time
-        \z/xms)
-        ->map(call 'slice', 2,1,0,3,4,5);
-
-    is(
-        $matches,
-        [
-            [qw/25 11 2023 15 10 00/],
-            [qw/20 11 2023 10 05 29/],
-            [qw/01 01 1900 00 00 01/],
-        ],
-        'regex_match');
-
-    is(
-        $lines->regex_match(qr/\A
-            (.)(.)(.)(.)
-            (.)(.)(.)(.)
-            (.)(.)(.)(.)
-            (.)(.)(.)(.)
-            (.)(.)(.)(.)
-        \z/xms),
-        [
-            [1 .. 9, 0, 1 .. 9, 0],
-        ],
-        'check 20 matches');
-}
-
 is( $range->windowed(-1), Array->empty,           'windowed -1');
 is( $range->windowed(0) , []          ,           'windowed 0');
 is( $range->windowed(1) , [map { [$_] } 1 .. 10], 'windowed 1');

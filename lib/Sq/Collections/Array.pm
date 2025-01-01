@@ -383,12 +383,36 @@ sub distinct_by($array, $f_str) {
     return CORE::bless(\@new, 'Array');
 }
 
-sub regex_match($array, $regex) {
+sub rx($array, $regex) {
+    my @new;
+    for my $str ( @$array ) {
+        push @new, $str if $str =~ $regex;
+    }
+    return CORE::bless(\@new, 'Array');
+}
+
+sub rxm($array, $regex) {
     my @new;
     for my $str ( @$array ) {
         if ( $str =~ $regex ) {
             push @new, CORE::bless([@{^CAPTURE}], 'Array');
         }
+    }
+    return CORE::bless(\@new, 'Array');
+}
+
+sub rxs($array, $regex, $f) {
+    my @new;
+    for my $str ( @$array ) {
+        push @new, $str =~ s/$regex/$f->()/re;
+    }
+    return CORE::bless(\@new, 'Array');
+}
+
+sub rxsg($array, $regex, $f) {
+    my @new;
+    for my $str ( @$array ) {
+        push @new, $str =~ s/$regex/$f->()/gre;
     }
     return CORE::bless(\@new, 'Array');
 }
