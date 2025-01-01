@@ -238,4 +238,107 @@ my $is_even = sub($x)    { $x % 2 == 0 };
     is($opt_x, Ok(13), 'map2 without parens');
 }
 
+
+# all_ok & keep_pl
+{
+    my $oks = sq [
+        Ok(10),
+        Ok( 3),
+        Ok(42),
+        Ok("Hello"),
+        Ok("World"),
+    ];
+
+    is(Array::all_ok($oks), Some([10,3,42,"Hello", "World"]), 'all_ok');
+    is(Array::keep_ok($oks),      [10,3,42,"Hello", "World"], 'keep_ok');
+    is(
+        Array::all_ok(
+            $oks->map(sub($result) {
+                $result->map(sub($x) {
+                    if ( is_num($x) ) { $x * 2  } # double numbers
+                    else              { $x . $x } # double strings
+                })
+            })
+        ),
+        Some([20, 6, 84, "HelloHello", "WorldWorld"]),
+        'all_ok with map'
+    );
+
+    ### tests with invalid
+
+    my $mixed = sq [
+        Ok (10),
+        Err(10),
+        Ok ( 3),
+        Err(10),
+        Ok (42),
+    ];
+
+    is($mixed->all_ok,        None, 'all_ok with Err 1');
+    is(Array::all_ok($mixed), None, 'all_ok with Err 2');
+    is($mixed->keep_ok,  [10,3,42], 'keep_ok with None');
+
+    is(
+        Array::keep_ok(
+            $mixed->map(sub($result) {
+                $result->map(sub($x) { $x * 2 })
+            })
+        ),
+        [20,6,84],
+        'keep_ok containing array::map');
+}
+
+# all_ok_by
+{
+    my $is_num   = sub($x) { is_num($x) ? Ok($x) : Err("Not Number") };
+    my $str_nums = sq ["23", "100", "16"];
+
+    is(
+        $str_nums->map($is_num)->all_ok,
+        Some([23, 100, 16]),
+        'all_ok on array->map');
+
+    # with all_valid_by we can do the same in one operation
+    is(
+        $str_nums->all_ok_by($is_num),
+        Some([23, 100, 16]),
+        'all_ok_by');
+
+    is(
+        Array::all_ok_by([qw/1 2 3/], $is_num),
+        Some([1,2,3]),
+        'all_ok_by with array 1');
+
+    is(
+        Array::all_ok_by([qw/1 2 3 foo/], $is_num),
+        None,
+        'all_ok_by with array 2');
+}
+
+# keep_some_by
+{
+    my $is_num   = sub($x) { is_num($x) ? Ok($x) : Err("Not a number") };
+    my $str_nums = sq [ "23", "foo", "100g", "16"];
+
+    # sometimes we want to map a list with an optional function that turns
+    # a value into an optional value. this results into a list of optionals,
+    # then with `keep_some` we can only get the Some values and drop
+    # the None.
+    is($str_nums->map($is_num)->keep_ok, [23, 16], 'keep_ok on array->map');
+
+    # with keep_some_by we can do the same in one operation
+    is($str_nums->keep_ok_by($is_num), [23, 16], 'keep_ok_by');
+}
+
+{
+    is(Array::keep_ok([Ok(1), Ok(2),   Ok(3)]),      [1,2,3], 'keep_ok 1');
+    is(Array::keep_ok([Ok(1), Ok(2), Err("")]),        [1,2], 'keep_ok 2');
+    is(Array::keep_ok([Err("")]),                         [], 'keep_ok 3');
+    is(Array::keep_ok([]),                                [], 'keep_ok 4');
+    is(Array::all_ok ([Ok(1), Ok(2), Ok(3)]),  Some([1,2,3]), 'all_ok 1');
+    is(Array::all_ok ([Ok(1), Ok(2), Err("")]),         None, 'all_ok 2');
+    is(Array::all_ok ([Err("")]),                       None, 'all_ok 3');
+    is(Array::all_ok ([]),                          Some([]), 'all_ok 4');
+}
+
 done_testing;

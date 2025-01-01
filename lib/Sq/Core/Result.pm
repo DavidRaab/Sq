@@ -118,4 +118,54 @@ sub get($result) {
     return $result->[1];
 }
 
+package Array;
+
+sub all_ok($array_of_results) {
+    my @new;
+    for my $result ( @$array_of_results ) {
+        if ( $result->[0] == 1 ) {
+            push @new, $result->[1];
+            next;
+        }
+        return Option::None();
+    }
+    return bless([\@new], 'Option');
+}
+
+sub all_ok_by($array_of_results, $f_result) {
+    my @new;
+    my $result;
+    for my $x ( @$array_of_results ) {
+        $result = $f_result->($x);
+        if ( $result->[0] == 1 ) {
+            push @new, $result->[1];
+            next;
+        }
+        return Option::None();
+    }
+    return bless([\@new], 'Option');
+}
+
+sub keep_ok($array_of_results) {
+    my @new;
+    for my $result ( @$array_of_results ) {
+        if ( $result->[0] == 1 ) {
+            push @new, $result->[1];
+        }
+    }
+    return bless(\@new, 'Array');
+}
+
+sub keep_ok_by($array_of_results, $f_result) {
+    my @new;
+    my $result;
+    for my $x ( @$array_of_results ) {
+        $result = $f_result->($x);
+        if ( $result->[0] == 1 ) {
+            push @new, $result->[1];
+        }
+    }
+    return bless(\@new, 'Array');
+}
+
 1;
