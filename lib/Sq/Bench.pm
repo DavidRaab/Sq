@@ -8,7 +8,7 @@ sub it($, $f) {
     return $bench;
 }
 
-sub compare($time, $subs) {
+sub compare($, $time, $subs) {
     return cmpthese($time, $subs);
 }
 
