@@ -3,7 +3,9 @@ use 5.036;
 use Sq;
 
 # Opens a file as UTF-8 text
-sub read_text($, $file) {
+sub read_text($, @path) {
+    require Path::Tiny;
+    my $file = Path::Tiny::path(@path);
     return Seq->from_sub(sub {
         open my $fh, '<:encoding(UTF-8)', $file;
         if ( !defined $fh ) {

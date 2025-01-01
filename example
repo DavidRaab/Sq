@@ -4,11 +4,10 @@ use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Sq;
 use Sq::Sig;
-use Path::Tiny qw(path);
 
 # read info about examples
 my $info =
-    Sq->fs->read_text(path('examples', 'info.txt'))
+    Sq->fs->read_text('examples', 'info.txt')
     ->regex_match(qr/\A(\S+) \s+ (.+) $/x)
     ->merge->as_hash;
 
