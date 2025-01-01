@@ -51,6 +51,7 @@ sub table($, $href) {
         print "| ", ('-' x $width), " |", "\n";
     }
 
+    # print data
     for (my $y=0; $y < $maxY; $y++) {
         print "| ";
         for (my $x=0; $x < $maxX; $x++ ) {
