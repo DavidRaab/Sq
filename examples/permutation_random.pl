@@ -21,7 +21,7 @@ sub permute_random($array) {
 }
 
 # random permutation - runs forever - don't know when it finishs
-my $permut = permute_random([qw/A B C D E F G H I J/]); #->take(100_000);
+my $permut = permute_random([qw/A B C D E F G H I J/]); #->take(1_000_000);
 
 # Start printing permutations
 $permut->iter(sub ($array) {
