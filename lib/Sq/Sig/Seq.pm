@@ -56,7 +56,7 @@ sig('Seq::distinct_by',   $seq, $sub,           $seq);
 sig('Seq::distinct',      $seq,                 $seq);
 sig('Seq::fsts',          $seq,                 $seq);
 sig('Seq::snds',          $seq,                 $seq);
-sig('Seq::zip',           $seq, $seq,           $seq);
+sigt('Seq::zip',          t_array(t_of t_seq),  $seq);
 sig('Seq::rev',           $seq,                 $seq);
 sig('Seq::cache',         $seq,                 $seq);
 sig('Seq::regex_match',   $seq, t_regex,        $seq);

@@ -725,23 +725,26 @@ sub snds($seq) {
     return Seq::map($seq, sub ($x) { $x->[1] });
 }
 
-# TODO: zip can handle a list of sequences
-#
 # zip : Seq<'a> -> Seq<'b> -> Seq<'a * 'b>
-sub zip($seqA, $seqB) {
-    from_sub('Seq', sub {
-        my $itA = $seqA->();
-        my $itB = $seqB->();
-        my ($a, $b);
-
+sub zip(@seqs) {
+    return bless(sub {
+        my $abort = 0;
+        my @its   = map { $_->() } @seqs;
         return sub {
-            if (defined ($a = $itA->())) {
-            if (defined ($b = $itB->())) {
-                return Array->new($a,$b);
-            }}
-            return undef;
+            return undef if $abort;
+            my (@new, $x);
+            for my $it ( @its ) {
+                $x = $it->();
+                goto ABORT if !defined $x;
+                push @new, $x;
+            }
+            return bless(\@new, 'Array');
+
+            ABORT:
+            $abort = 1;
+            undef @its;
         }
-    });
+    }, 'Seq');
 }
 
 # rev : Seq<'a> -> Seq<'a>
