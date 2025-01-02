@@ -1220,4 +1220,24 @@ is(Array::diff([1..10],  [1,3,7,2], \&id), [4,5,6,8,9,10], 'diff 2');
         'diff 7');
 }
 
+# testing shuffle
+# I don't see a direct way to test if it shuffled. not even testing if they are
+# not the same wouldn't work. Theoretically it could shuffle and in the end is
+# the same as the input. This is extremely rare, but can happen. But instead
+# i can test other properties like that the elements stay the same. The array
+# that returned is a new one. And calling the same operation after shuffle
+# must yield the same results.
+{
+    my $data    = sq [1,2,3, 1,2,3, 4,5, 6,6,6, 7,8];
+    my $shuffle = $data->shuffle;
+
+    ok(refaddr($data) != refaddr($shuffle), 'different arrays');
+    is($data, [1,2,3, 1,2,3, 4,5, 6,6,6, 7,8],  "original didn't shuffle");
+    is($data->count, {
+        1 => 2, 2 => 2, 3 => 2, 4 => 1, 5 => 1, 6 => 3, 7 => 1, 8 => 1,
+    }, 'direct check');
+    is($data->count, $shuffle->count, 'count must be the same');
+    is($data->sort(by_num), $shuffle->sort(by_num), 'both sorting must be the same');
+}
+
 done_testing;

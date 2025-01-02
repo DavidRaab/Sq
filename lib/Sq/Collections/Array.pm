@@ -525,6 +525,12 @@ sub diff($arrayA, $arrayB, $f_key) {
     return CORE::bless(\@new, 'Array');
 }
 
+sub shuffle($array) {
+    my @copy = @$array;
+    shuffle_mut(\@copy);
+    return CORE::bless(\@copy, 'Array');
+}
+
 #-----------------------------------------------------------------------------#
 # SIDE-EFFECTS                                                                #
 #    functions that have side-effects or produce side-effects. Those are      #
@@ -934,7 +940,7 @@ sub blit($source_array, $source_index, $target_array, $target_index, $amount) {
     return;
 }
 
-sub shuffle($array) {
+sub shuffle_mut($array) {
     my $max = @$array;
     my $new_idx;
     for ( my $idx=0; $idx < ($max-1); $idx++ ) {

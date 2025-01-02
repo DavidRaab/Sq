@@ -77,13 +77,12 @@ sig ('Array::skip_while',        $array, $sub,             $array);
 sigt('Array::slice',             t_tuplev(t_array, $aint), $array);
 sig ('Array::extract',           $array, t_int, t_int,     $array);
 sig ('Array::diff',              $array, $array, t_sub,    $array);
-
+sig ('Array::shuffle',           $array,                   $array);
 
 ### SIDE-EFFECTS
 
 sig('Array::iter',     $array, $sub, t_void);
 sig('Array::iteri',    $array, $sub, t_void);
-
 
 ### CONVERTER
 
@@ -145,11 +144,11 @@ sig('Array::keep_some_by', $array, $sub, $array);
 
 ### MUTATION
 
-sigt('Array::push',     t_tuplev($array, $array),            t_void);
-sig ('Array::pop',      $array,                                $any);
-sig ('Array::shift',    $array,                                $any);
-sigt('Array::unshift',  t_tuplev($array, $array),            t_void);
-sig ('Array::blit',     $array, t_int, $array, t_int, t_int, t_void);
-sig ('Array::shuffle',  $array,                              t_void);
+sigt('Array::push',        t_tuplev($array, $array),            t_void);
+sig ('Array::pop',         $array,                                $any);
+sig ('Array::shift',       $array,                                $any);
+sigt('Array::unshift',     t_tuplev($array, $array),            t_void);
+sig ('Array::blit',        $array, t_int, $array, t_int, t_int, t_void);
+sig ('Array::shuffle_mut', $array,                              t_void);
 
 1;
