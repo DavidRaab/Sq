@@ -186,6 +186,10 @@ is(
     nok(is_type($range, Some(11)), 'type 5');
 
     # this is funny
+    # I define a type, and then auto-generate data for that type that i than
+    # test against that type. But this way it is really a deep complex test
+    # that test a whole of stuff in one go and it tests if the type and the
+    # generation in itself are correct.
     my $is_sha = type [str => [match => qr/\A[0-9a-f]{128}\z/i ]];
     ok(
         is_type(
@@ -194,15 +198,15 @@ is(
         ),
         'array of SHA512');
 
-    # test genereation of 20 tuples.
-    my $is_sha_tuple = type [tuple => $is_sha, $is_sha];
-    my $is_sha_array = type [array => [length => 20, 20], [of => $is_sha_tuple]];
-    my $sha_tuple    = gen  [repeat => 20, [array => ['sha512'], ['sha512']]];
-    # now instead of 20 tests and testin every tuple 20 times, it is done
+    # test generation of 20 tuples.
+    my $is_sha_tuple = type [tuple  => $is_sha, $is_sha];
+    my $is_sha_array = type [array  => [length => 20, 20], [of => $is_sha_tuple]];
+    my $sha_tuples   = gen  [repeat => 20, [array => ['sha512'], ['sha512']]];
+    # now instead of 20 tests and testing every tuple 20 times, it is done
     # in a single test. Still this test is a lot more usefule and actually
     # tests more than the previous 20 tests. It's also about quality of
     # tests, not just the numbers.
-    ok(is_type($is_sha_array, gen_run($sha_tuple)), " array of sha tuple");
+    ok(is_type($is_sha_array, gen_run($sha_tuples)), " array of sha tuple");
 }
 
 done_testing;
