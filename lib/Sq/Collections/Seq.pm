@@ -8,19 +8,15 @@ use subs 'bind', 'join', 'select', 'last', 'sort', 'map', 'foreach', 'length';
 #       chain
 #       extract(predicate, predicate)
 #       foldBack, average, average_by,
-#       pairwise, transpose, chunk_by_size, unzip
-#       transpose, slice
+#       pairwise, transpose, unzip
+#       transpose,
 #       minmax, minmax_by,
 #       scan, mapFold, except/exclude
 #       splitInto
 #     ? contains, firstIndex, mapX, on
 #
-# + ways to do regexes on strings
-# + using this module to scan file-system
-# ? how about a data checker tool
 # + more ways to transform data, especially complex structures
 # ? A data transformation/selection language
-# o Error checking through another module that adds signature type check through AOP
 # o Maybe DU, Record fist-class support when i implement them.
 # o good way to also implement async with it?
 
