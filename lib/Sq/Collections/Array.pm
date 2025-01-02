@@ -196,11 +196,11 @@ sub map_e($array, $expr) {
 
 sub chunked($array, $size) {
     my @new;
-    my $max = @$array;
+    my $max  = @$array;
     my $upto = 0;
     for (my $idx=0; $idx < $max; $idx+=$size) {
-        $upto = ($idx + $size) - 1;
-        $upto = $upto < $max ? $upto : ($max-1);
+        $upto     = ($idx + $size) - 1;
+        $upto     = $upto < $max ? $upto : ($max-1);
         my @slice = $array->@[$idx .. $upto];
         push @new, CORE::bless(\@slice, 'Array');
     }
@@ -305,7 +305,6 @@ sub indexed($array) {
     return CORE::bless(\@new, 'Array');
 }
 
-# zip : Array<'a> -> Array<'b> -> Array<'a * 'b>
 sub zip(@arrays) {
     my @new;
     my $idx = 0;
