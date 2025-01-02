@@ -593,9 +593,9 @@ is(
 
 is(
     Array::zip(
-        [ 1,  2, 3       ],
-        [ 4,  5, 6, 7    ],
-        [ 7,  8, 9       ],
+        [  1, 2, 3       ],
+        [  4, 5, 6, 7    ],
+        [  7, 8, 9       ],
         [ 10,11,12,13,14 ],
     ),
     [ [1,4,7,10], [2,5,8,11], [3,6,9,12] ],
@@ -1269,5 +1269,20 @@ is(Array::diff([1..10],  [1,3,7,2], \&id), [4,5,6,8,9,10], 'diff 2');
     is($data->count, $shuffle->count, 'count must be the same');
     is($data->sort(by_num), $shuffle->sort(by_num), 'both sorting must be the same');
 }
+
+is(
+    Array::fill_blanks([
+        [1,2,3],
+        [4,5,6,7],
+        [1,2],
+        [1],
+    ], sub { 0 }),
+    [
+        [1,2,3,0],
+        [4,5,6,7],
+        [1,2,0,0],
+        [1,0,0,0],
+    ],
+    'fill_blanks');
 
 done_testing;

@@ -322,6 +322,31 @@ sub zip(@arrays) {
     return CORE::bless(\@new, 'Array');
 }
 
+sub fill_blanks($aoa, $f) {
+    my $maxX = 0;
+    for my $array ( @$aoa ) {
+        my $l = @$array;
+        $maxX = $l > $maxX ? $l : $maxX;
+    }
+
+    my @new;
+    for my $array ( @$aoa ) {
+        my @inner;
+        for (my $x=0; $x < $maxX; $x++) {
+            my $value = $array->[$x];
+            if ( defined $value ) {
+                push @inner, $value;
+            }
+            else {
+                push @inner, $f->();
+            }
+        }
+        push @new, CORE::bless(\@inner, 'Array');
+    }
+
+    return CORE::bless(\@new, 'Array');
+}
+
 sub sort($array, $comparer) {
     local ($a, $b);
     my @sorted = CORE::sort { $comparer->($a, $b) } @$array;

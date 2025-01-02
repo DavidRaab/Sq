@@ -61,15 +61,15 @@ sigt('Array::to_array',
     ),
     $array
 );
-sig ('Array::to_array_of_array', $aoa,                     $aoa);
+sig ('Array::to_array_of_array', $aoa,                       $aoa);
 sig ('Array::distinct',          $array,                   $array);
 sig ('Array::distinct_by',       $array, $sub,             $array);
 sig ('Array::rx',                $astr,  t_regex,          t_array(t_of t_str));
 sig ('Array::rxm',               $astr,  t_regex,          t_array(t_of $astr));
 sig ('Array::rxs',               $astr,  t_regex, t_sub,   t_array(t_of t_str));
 sig ('Array::rxsg',              $astr,  t_regex, t_sub,   t_array(t_of t_str));
-sig ('Array::chunked',           $array, t_int,            $aoa);
-sig ('Array::windowed',          $array, t_int,            $aoa);
+sig ('Array::chunked',           $array, t_int,              $aoa);
+sig ('Array::windowed',          $array, t_int,              $aoa);
 sig ('Array::intersperse',       $array, $any,             $array);
 sig ('Array::repeat',            $array, t_int,            $array);
 sig ('Array::take_while',        $array, $sub,             $array);
@@ -78,6 +78,7 @@ sigt('Array::slice',             t_tuplev(t_array, $aint), $array);
 sig ('Array::extract',           $array, t_int, t_int,     $array);
 sig ('Array::diff',              $array, $array, t_sub,    $array);
 sig ('Array::shuffle',           $array,                   $array);
+sig ('Array::fill_blanks',       $aoa,   t_sub,              $aoa);
 
 ### SIDE-EFFECTS
 
