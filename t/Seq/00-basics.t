@@ -560,7 +560,7 @@ is(
     64,
     'pick squared element that is greater 50');
 
-# regex_match
+# rxm
 {
     my $lines = seq {
         '2023-11-25T15:10:00',
@@ -570,7 +570,7 @@ is(
         '12345678901234567890',
     };
 
-    my $matches = $lines->regex_match(qr/
+    my $matches = $lines->rxm(qr/
         \A
             (\d\d\d\d) - (\d\d) - (\d\d)  # Date
         T                                 # T
@@ -590,10 +590,10 @@ is(
             ["20.11.2023", "10:05:29"],
             ["01.01.1900", "00:00:01"],
         },
-        'regex_match');
+        'rxm');
 
     is(
-        $lines->regex_match(qr/\A
+        $lines->rxm(qr/\A
             (.)(.)(.)(.)
             (.)(.)(.)(.)
             (.)(.)(.)(.)
@@ -849,10 +849,10 @@ is(
 
 is(
     seq { qw/foo1bar maz2bar/ }
-    ->regex_sub(qr/([a-z]+) \d+ ([a-z]+)/xi, sub { "$1$2" }),
+    ->rxs(qr/([a-z]+) \d+ ([a-z]+)/xi, sub { "$1$2" }),
 
     seq { qw/foobar mazbar/ },
-    'regex_sub');
+    'rxs');
 
 # chunked
 {

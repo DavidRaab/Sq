@@ -772,8 +772,8 @@ sub cache($seq) {
     return from_array('Seq', to_array($seq));
 }
 
-# regex_match : Seq<string> -> Regex -> Seq<Array<string>>
-sub regex_match($seq, $regex) {
+# rxm : Seq<string> -> Regex -> Seq<Array<string>>
+sub rxm($seq, $regex) {
     from_sub(Seq => sub {
         my $it = $seq->();
         return sub {
@@ -788,7 +788,7 @@ sub regex_match($seq, $regex) {
     });
 }
 
-sub regex_sub($seq, $regex, $fn) {
+sub rxs($seq, $regex, $fn) {
     from_sub(Seq => sub {
         my $it = $seq->();
         return sub {

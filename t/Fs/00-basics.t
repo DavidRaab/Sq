@@ -14,7 +14,7 @@ ok(Sq->fs->compare_text(
 my $file = Sq->fs->read_text(path($Dir, 'data', 'hop-preface.txt'));
 
 is($file->length, 52, 'file lines');
-is($file->regex_match(qr/lisp/i)->length, 15, 'lines mentioned lisp');
+is($file->rxm(qr/lisp/i)->length, 15, 'lines mentioned lisp');
 is(
     $file->keep(sub($line) { $line =~ m/lisp/i })->first->or(""),
     "Around 1993 I started reading books about Lisp, and I discovered something\n",
