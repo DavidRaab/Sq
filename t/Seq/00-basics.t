@@ -103,7 +103,7 @@ is($range->sum, $range->rev->sum, 'sum 2');
 
 is(
     Seq::zip(
-        Seq->wrap(qw/A B C D E F/),
+        seq { qw/A B C D E F/ },
         Seq->range(0, 1_000_000),
     ),
     Seq->wrap(qw/A B C D E F/)->indexed,
@@ -494,11 +494,41 @@ is(
     'zip 5');
 
 is(
-    Seq->wrap(
-        Seq->wrap(1,2,3),
-        Seq->wrap(4,5,6),
-        Seq->wrap(7,8,9),
-    )->to_array_of_array,
+    Seq::zip(
+        seq { 1,2,3    },
+        seq { 4,5,6    },
+        seq { 7,8,9    },
+        seq { 10,11,12 },
+    ),
+    seq { [1,4,7,10], [2,5,8,11], [3,6,9,12] },
+    'zip 6');
+
+is(
+    Seq::zip(
+        seq { 1,2,3    },
+        seq { 4,5,6,7  },
+        seq { 7,8,9    },
+        seq { 10,11,12 },
+    ),
+    seq { [1,4,7,10], [2,5,8,11], [3,6,9,12] },
+    'zip 7');
+
+is(
+    Seq::zip(
+        seq { 1,  2, 3       },
+        seq { 4,  5, 6, 7    },
+        seq { 7,  8, 9       },
+        seq { 10,11,12,13,14 },
+    ),
+    seq { [1,4,7,10], [2,5,8,11], [3,6,9,12] },
+    'zip 8');
+
+is(
+    seq {
+        seq { 1,2,3 },
+        seq { 4,5,6 },
+        seq { 7,8,9 },
+    }->to_array_of_array,
     [
         [1,2,3],
         [4,5,6],
