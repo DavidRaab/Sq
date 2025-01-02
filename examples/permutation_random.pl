@@ -5,9 +5,9 @@ use open ':std', ':encoding(UTF-8)';
 use Sq;
 use Sq::Sig;
 
-# This is definetly not the fastest way to get all possible permutations.
-# The point is, that this code still works. computes/prints all permutation
-# and starts immidiately without waiting or creating memory problems.
+# Generates random permutations in an infinity stream. Because it is random
+# it doesn't know when all possible combinations are tried. But you can limit
+# the amount of tries with for example ->take(100_000)
 
 sub permute_random($array) {
     my $copy = Array::copy($array);
