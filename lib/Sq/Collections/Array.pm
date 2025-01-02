@@ -1,5 +1,6 @@
 package Sq::Collections::Array;
 package Array;
+use List::Util ();
 use 5.036;
 use subs 'bind', 'join', 'select', 'last', 'sort', 'map', 'foreach', 'bless', 'length';
 
@@ -536,9 +537,7 @@ sub diff($arrayA, $arrayB, $f_key) {
 }
 
 sub shuffle($array) {
-    my @copy = @$array;
-    shuffle_mut(\@copy);
-    return CORE::bless(\@copy, 'Array');
+    return CORE::bless([List::Util::shuffle @$array], 'Array');
 }
 
 #-----------------------------------------------------------------------------#
