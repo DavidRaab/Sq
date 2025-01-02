@@ -38,6 +38,7 @@ is(
     [ [0,0], [23,40], [12,12] ],
     'parse time and keep');
 
+
 # another array of data
 my $data2 = sq [
     { X => 3, Y => 7},
