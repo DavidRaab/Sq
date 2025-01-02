@@ -32,29 +32,23 @@ sub table($, $href) {
     # dumpw($sizes);
 
     # determine max column sizes
-    my @cols;
-    for (my $x=0; $x < $maxX; $x++) {
-        my $max = 0;
-        for (my $y=0; $y < $maxY; $y++) {
-            my $cur = $sizes->[$y][$x];
-            $max = $cur > $max ? $cur : $max;
-        }
-        push @cols, $max;
-    }
+    my $cols =
+        Array::zip(Array::fill_blanks($sizes, sub { 0 })->@*)
+        ->map(sub($x) { $x->max->or(0) });
 
-    # dumpw(\@cols)
+    # dumpw($cols);
 
     # Print header when defined
     if ( defined $header ) {
         print "| ";
         for (my $x=0; $x < $maxX; $x++ ) {
-            my $length = $cols[$x];
+            my $length = $cols->[$x];
             printf "%-${length}s", $header->[$x];
             print " | ";
         }
         print "\n";
-        my $l     = @cols - 1;
-        my $width = Array::sum(\@cols) + ($l * 3);
+        my $l     = @$cols - 1;
+        my $width = Array::sum($cols) + ($l * 3);
         print "| ", ('-' x $width), " |", "\n";
     }
 
@@ -62,7 +56,7 @@ sub table($, $href) {
     for (my $y=0; $y < $maxY; $y++) {
         print "| ";
         for (my $x=0; $x < $maxX; $x++ ) {
-            my $length = $cols[$x];
+            my $length = $cols->[$x];
             printf "%-${length}s", $aoa->[$y][$x];
             print " | ";
         }
