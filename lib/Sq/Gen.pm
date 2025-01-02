@@ -10,9 +10,13 @@ our @EXPORT = (
     qw(gen_sha512),           # String
 );
 
+### RUNNSERS
+
 sub gen_run($gen) {
     return sq($gen->());
 }
+
+### STRING
 
 sub gen_sha512() {
     return sub() {
@@ -24,6 +28,8 @@ sub gen_sha512() {
         return $str;
     }
 }
+
+### ARRAY
 
 sub gen_array(@gens) {
     return sub() {
@@ -37,6 +43,8 @@ sub gen_repeat($amount, @gens) {
     }
 }
 
+
+### EVALUATOR
 sub gen($array) {
     state $table = {
         map {
