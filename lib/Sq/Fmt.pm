@@ -6,25 +6,30 @@ use Sq;
 # For example pass it an array of array and it prints a table.
 
 sub table($, $href) {
-    my $header = sq $href->{header};
-    my $aoa    = sq $href->{data};
+    my $header = $href->{header};
+    my $aoa    = $href->{data};
 
-    my $maxY = $aoa->length;
+    # Calling functions in function-style has the benefit that they always
+    # work. You don't need to add a blessing to be sure. This can potential
+    # increase performance. But the impact isn't that big.
+    #
+    # Instead of `sq` you also can use Array->bless, Hash->bless to just bless
+    # the first level, sometimes that can also be enough, as every function
+    # always returns blessed data.
+    my $maxY = Array::length($aoa);
     return if $maxY == 0;
-    my $maxX = $aoa->map(call 'length')->max->or(0);
+    my $maxX = Array::map($aoa, call 'length')->max->or(0);
     return if $maxX == 0;
 
     # just turn AoA into string lengths
     my $sizes = assign {
-        my $sizes = $aoa;
-        if ( defined $header ) {
-            $sizes = sq [$header, @$aoa];
-        }
-
-        $sizes->map(sub($array) {
-            $array->map(sub ($str) { length $str })
+        my $sizes = defined $header ? [$header, @$aoa] : $aoa;
+        Array::map($sizes, sub($array) {
+            Array::map($array, sub ($str) { length $str })
         });
     };
+
+    # dumpw($sizes);
 
     # determine max column sizes
     my @cols;
@@ -36,6 +41,8 @@ sub table($, $href) {
         }
         push @cols, $max;
     }
+
+    # dumpw(\@cols)
 
     # Print header when defined
     if ( defined $header ) {
