@@ -47,6 +47,7 @@ sub import {
     }
 
     # TODO: Not always export
+    no warnings 'once';
     *{"$pkg\::Some"}    = \&Option::Some;
     *{"$pkg\::None"}    = \&Option::None;
     *{"$pkg\::Ok"}      = \&Result::Ok;
@@ -134,7 +135,10 @@ sub is_str :prototype($) {
 # without any overhead. When `is_num` is exported than those are also copies
 # of this one. So calling `is_num` is the same speed as calling
 # looks_like_number().
-*is_num = \&Scalar::Util::looks_like_number;
+{
+    no warnings 'once';
+    *is_num = \&Scalar::Util::looks_like_number;
+}
 
 sub is_array :prototype($) {
     my $type = ref $_[0];

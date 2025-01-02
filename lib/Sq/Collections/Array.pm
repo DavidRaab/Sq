@@ -146,6 +146,12 @@ sub flatten($array_of_array) {
     return bind($array_of_array, \&Sq::id);
 }
 
+# create merge as alias to flatten
+{
+    no warnings 'once';
+    *merge = \&flatten;
+}
+
 sub cartesian($as, $bs) {
     my $new = new('Array');
     for my $a ( @$as ) {

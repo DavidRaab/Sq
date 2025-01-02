@@ -36,6 +36,7 @@ sig ('Array::range',      $any, t_int, t_int,        $array);
 sig ('Array::copy',          $array,               $array);
 sig ('Array::bind',          $array, $sub,         $array);
 sig ('Array::flatten',       $aoa,                 $array);
+sig ('Array::merge',         $aoa,                 $array);
 sig ('Array::cartesian',     $array, $array,       t_array(t_of t_tuple($any, $any)));
 sig ('Array::append',        $array, $array,       $array);
 sig ('Array::rev',           $array,               $array);
