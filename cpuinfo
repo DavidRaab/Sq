@@ -20,6 +20,22 @@ while (1) {
     my $info = $cpu->fold_mut(Hash->new, sub($kv, $hash) {
         $hash->push($kv->[0], $kv->[1])
     });
+
+    # To See what you can select from.
+    # dumpw($info);
+
+    # You can lock the Hash. Why you wanna do that?
+    # Consider that extracting a key from a hash that doesn't exists returns just
+    # undef. So when you for example extra "cpu MHz" you must be exact, typing "cpu mhz"
+    # would be an error. By locking the Hash you get an error if you try to extract
+    # an non-existing key.
+    # But once you finish and you select the correct field, you just can comment this
+    # line out. Once your key is "correct" there is no reason to lock the key
+    # constantly. It's not slower to read from a locked Hash compared to an unlocked,
+    # but the locking itself costs time. But in this example this wouldn't matter.
+    $info->lock;
+
+    # print all Mhz
     printf "%s MHz\n", $info->{"cpu MHz"}->map(sub($str) { sprintf "%4d", $str })->join(" ");
     sleep 1;
 }
