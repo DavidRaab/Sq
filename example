@@ -5,18 +5,20 @@ use open ':std', ':encoding(UTF-8)';
 use Sq;
 use Sq::Sig;
 
-# read info about examples
+# read info about examples - when file doesn't exists $info will be empty hash
 my $info =
-    Sq->fs->read_text('examples', 'info.txt')
+    Sq->fs
+    ->read_text('examples', 'info.txt')
     ->regex_match(qr/\A(\S+) \s+ (.+) $/x)
     ->merge->as_hash;
 
 # built array of array with info
 my $examples =
-    Sq->fs->children('examples')
-    ->keep(call 'is_file')
-    ->sort(by_str)
-    ->choose(sub($file) {
+    Sq->fs
+    ->children('examples')
+    ->keep    (call 'is_file')
+    ->sort    (by_str)
+    ->choose  (sub($file) {
         my $name = $file->basename;
         return None if $name eq 'info.txt';
         return Some(sq [$name, $info->{$name} // ""]);
