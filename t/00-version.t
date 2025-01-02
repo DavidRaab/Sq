@@ -196,11 +196,13 @@ is(
 
     # test genereation of 20 tuples.
     my $is_sha_tuple = type [tuple => $is_sha, $is_sha];
-    my $sha_tuple    = gen  [array => ['sha512'], ['sha512']];
-    for ( 1 .. 20 ) {
-        # could also be transformed to a single test like above
-        ok(is_type($is_sha_tuple, gen_run($sha_tuple)), "$_: sha tuple");
-    }
+    my $is_sha_array = type [array => [length => 20, 20], [of => $is_sha_tuple]];
+    my $sha_tuple    = gen  [repeat => 20, [array => ['sha512'], ['sha512']]];
+    # now instead of 20 tests and testin every tuple 20 times, it is done
+    # in a single test. Still this test is a lot more usefule and actually
+    # tests more than the previous 20 tests. It's also about quality of
+    # tests, not just the numbers.
+    ok(is_type($is_sha_array, gen_run($sha_tuple)), " array of sha tuple");
 }
 
 done_testing;
