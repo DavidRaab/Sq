@@ -255,6 +255,16 @@ sub keep_some_by($array, $f) {
     return CORE::bless(\@new, 'Array');
 }
 
+sub keep_type($array, $type) {
+    my @new;
+    for my $x ( @$array ) {
+        if ( Sq::Type::t_valid($type, $x) ) {
+            push @new, $x;
+        }
+    }
+    return CORE::bless(\@new, 'Array');
+}
+
 # same as keep but expects a string-code
 sub keep_e($array, $expr) {
     local $_;
