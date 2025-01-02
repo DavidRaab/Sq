@@ -238,6 +238,23 @@ sub keep($array, $predicate) {
     return CORE::bless([grep { $predicate->($_) } @$array], 'Array');
 }
 
+sub keep_some($array_of_opt) {
+    my @new;
+    for my $opt ( @$array_of_opt ) {
+        push @new, @$opt if @$opt;
+    }
+    return CORE::bless(\@new, 'Array');
+}
+
+sub keep_some_by($array, $f) {
+    my @new;
+    for my $x ( @$array ) {
+        my $opt = $f->($x);
+        push @new, @$opt if @$opt;
+    }
+    return CORE::bless(\@new, 'Array');
+}
+
 # same as keep but expects a string-code
 sub keep_e($array, $expr) {
     local $_;
@@ -837,6 +854,25 @@ sub pick($array, $f_opt) {
 # to_seq: Array<'a> -> Seq<'a>
 sub to_seq($array) {
     return Seq->from_array($array);
+}
+
+sub all_some($array_of_opt) {
+    my $new = new 'Array';
+    for my $opt ( @$array_of_opt ) {
+        if ( @$opt ) { push @$new, @$opt               }
+        else         { return CORE::bless([],'Option') }
+    }
+    return CORE::bless([$new], 'Option');
+}
+
+sub all_some_by($array, $f) {
+    my $new = new 'Array';
+    for my $x ( @$array ) {
+        my $opt = $f->($x);
+        if ( @$opt ) { push @$new, @$opt               }
+        else         { return CORE::bless([],'Option') }
+    }
+    return CORE::bless([$new], 'Option');
 }
 
 #-----------------------------------------------------------------------------#
