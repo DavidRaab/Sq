@@ -10,10 +10,12 @@ use Sq::Sig;
 # the amount of tries with for example ->take(100_000)
 
 sub permute_random($array) {
-    my $copy = Array::copy($array);
+    my $freeze = Array::copy($array);
     Seq->from_sub(sub {
+        my $new = Array::copy($freeze);
         return sub {
-            return Array::shuffle($copy);
+            $new = Array::shuffle($new);
+            return $new;
         }
     });
 }
