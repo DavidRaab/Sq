@@ -13,4 +13,5 @@ job_postings_mixed.pl Like the former, but don't use some Sq features for more s
 job_postings_pp.pl    Pure Perl version of the same code
 option_divide.pl      Usage of Option to avoid exception when dividing with zero
 permutation.pl        Seq: Prints permutation of 10 keys
+permutation_random.pl Seq: continously generates random permutations
 primes.pl             Seq: Print Prime Numbers < 10_000
