@@ -23,6 +23,13 @@ sub read_text($, @path) {
     });
 }
 
+# TODO: Opens file in binary mode
+sub read_raw() { ... }
+
+# TODO: reads a gziped file transparent as text
+sub read_zip() { ... }
+
+
 sub compare_text($, $file1, $file2) {
     return equal(
         read_text(undef, $file1),
