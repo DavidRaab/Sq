@@ -360,13 +360,13 @@ my $cards =
 use Path::Tiny qw(path);
 # get the maximum id from test-files so far
 my $maximum_id =
-    Sq->io->children('t')               # a sequence of Path::Tiny objects
-    ->map(call 'basename')              # calls ->basename method on objects
-    ->regex_match(qr/\A(\d+) .*\.t/xms) # matches and auto extract () in array
-    ->fsts                              # returns idx0 of inner array
-    ->max                               # pick highest numbers - starts computation
-    ->or(0);                            # max returns optional
-                                        #   or(0) extracts or gives default value
+    Sq->io->children('t')        # a sequence of Path::Tiny objects
+    ->map(call 'basename')       # calls ->basename method on objects
+    ->rxm(qr/\A(\d+) .*\.t/xms)  # matches and auto extract () in array
+    ->fsts                       # returns idx0 of inner array
+    ->max                        # pick highest numbers - starts computation
+    ->or(0);                     # max returns optional
+                                 #   or(0) extracts or gives default value
 ```
 
 # Seq counting to 1 Billion

@@ -787,7 +787,7 @@ The order of elements C<$arrayA> keeps the same.
     #    { id => 2, name => "world" },
     # ]
 
-=head2 regex_match($array, $regex, $picks) : $array
+=head2 rxm($array, $regex) : $array
 
 TODO
 

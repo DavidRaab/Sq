@@ -338,8 +338,8 @@ Here are some other kinds of code examples and the error-messages.
     my $sorted = sq([1,2,3,"foo" ])->sort(by_num);
     # Array::sort: tuple: Index 0: all: index 3: num: Not a number 'foo' at ./sq_test.pl line 11.
 
-    my $matches = sq(["12-12", "10-10", []])->regex_match(qr/\A(\d\d)-(\d\d)\z/);
-    # Array::regex_match: tuple: Index 0: all: index 2: str: Not a string at ./sq_test.pl line 11.
+    my $matches = sq(["12-12", "10-10", []])->rxm(qr/\A(\d\d)-(\d\d)\z/);
+    # Array::rxm: tuple: Index 0: all: index 2: str: Not a string at ./sq_test.pl line 11.
 
 =head1 Optional type-checking
 

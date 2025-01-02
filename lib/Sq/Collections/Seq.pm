@@ -6,7 +6,6 @@ use subs 'bind', 'join', 'select', 'last', 'sort', 'map', 'foreach', 'length';
 # TODO:
 #       Find another name for 'from_list'
 #       chain
-#       regex_replace
 #       extract(predicate, predicate)
 #       foldBack, average, average_by,
 #       pairwise, transpose, chunk_by_size, unzip

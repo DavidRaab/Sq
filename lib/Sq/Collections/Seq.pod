@@ -79,7 +79,7 @@ I have written more documentation. The API is not fully stable at the moment.
         # get basename of each file
         ->map(  sub($x) { $x->basename })
         # extract all numbers from test files. returns matches as array
-        ->regex_match( qr/\A(\d+) .* \.t\z/xms, [1])
+        ->rxm( qr/\A(\d+) .* \.t\z/xms, [1])
         # get the first entry of each array (there is only one)
         ->fsts
         # get the maximum number, or -1 if sequence is empty
@@ -694,21 +694,21 @@ call C<to_array>.
     my $doubled = $evens->map(sub($x) { $x * 2  });
     my $squared = $evens->map(sub($x) { $x * $x });
 
-=head2 regex_match($seq_of_strings, $regex) : $seq_of_array
+=head2 rxm($seq_of_strings, $regex) : $seq_of_array
 
 Matches a C<$regex> against every element of a sequence that is supposed to
 be a string. When a regex matches against the string it extracts all captures
 into an array.
 
-    my $lines = Seq->new(
+    my $lines = seq {
         '2023-11-25T15:10:00',
         '2023-11-20T10:05:29',
         'xxxx-xx-xxT00:00:00',
         '1900-01-01T00:00:01',
         '12345678901234567890',
-    );
+    };
 
-    my $matches = $lines->regex_match(qr/
+    my $matches = $lines->rxm(qr/
         \A
             (\d\d\d\d) - (\d\d) - (\d\d)  # Date
         T                                 # T

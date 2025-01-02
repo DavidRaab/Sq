@@ -15,7 +15,7 @@ my $use = lazy {
     my $folders =
         Sq->fs->children('t')
         ->keep(call 'is_dir')
-        ->regex_sub(qr{\At/}, sub { " + " })
+        ->rxs (qr{\At/}, sub { " + " })
         ->sort(by_str)
         ->join("\n");
 
@@ -50,9 +50,9 @@ $usage->die if $opt->help;
 # get the maximum id from test-files so far
 my $maximum_id =
     Sq->fs
-    ->children(    't', $opt->folder       )
-    ->map(         call 'basename'         )
-    ->regex_match( qr/\A(\d+) .* \.t\z/xms )
+    ->children('t', $opt->folder  )
+    ->map(call 'basename'         )
+    ->rxm(qr/\A(\d+) .* \.t\z/xms )
     ->fsts
     ->max
     ->or(-1);

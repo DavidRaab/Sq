@@ -9,7 +9,7 @@ use Sq::Sig;
 my $cpu =
     Sq->fs
     ->read_text('/', 'proc', 'cpuinfo')
-    ->regex_match(qr/\A ([^:]++) : \s* (.*) $/x)
+    ->rxm(qr/\A ([^:]++) : \s* (.*) $/x)
     ->map(sub($array) {
         $array->rxs(qr/\s+$/, sub { "" }) # remove trailing ws in inner array
     });
