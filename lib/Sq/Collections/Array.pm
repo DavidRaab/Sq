@@ -306,14 +306,18 @@ sub indexed($array) {
 }
 
 # zip : Array<'a> -> Array<'b> -> Array<'a * 'b>
-sub zip($array1, $array2) {
+sub zip(@arrays) {
     my @new;
     my $idx = 0;
+    INNER:
     while (1) {
-        my $x = $array1->[$idx];
-        my $y = $array2->[$idx];
-        last if !defined($x) or !defined($y);
-        push @new, CORE::bless([$x,$y], 'Array');
+        my (@inner, $x);
+        for my $array ( @arrays ) {
+            $x = $array->[$idx];
+            last INNER if !defined $x;
+            push @inner, $x;
+        }
+        push @new, CORE::bless(\@inner, 'Array');
         $idx++;
     }
     return CORE::bless(\@new, 'Array');
