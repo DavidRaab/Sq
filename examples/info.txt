@@ -5,8 +5,8 @@ bench_it.pl      Timing a subroutine
 choose.pl        Intro to Sequence. Prints 100 Mio Dots.
 dump.pl          Exhausted Dumping of data-structure
 euler.pl         Computes Euler with Sequence
-find_duplicates  Find file duplicates revcursively in folder
-funcs_array.pl   Reflection: Prints all Array functions
+find_duplicates       Find file duplicates revcursively in folder
+funcs_array.pl        Reflection: Prints all Array functions
 funcs_seq_array.pl    Reflection: Missing Diff between Array/Seq functions
 job_postings.pl       A Clojure example i converted to Sq
 job_postings_mixed.pl Like the former, but don't use some Sq features for more speed.

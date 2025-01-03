@@ -9,7 +9,8 @@ use Sq::Sig;
 my $info =
     Sq->fs
     ->read_text('examples', 'info.txt')
-    ->rxm(qr/\A(\S+) \s+ (.+) $/x)
+    ->trim
+    ->rxm(qr/\A \s*+ (?= [^#] ) (\S++) \s++ (.++)\z/x)
     ->merge->as_hash;
 
 # built array of array with info
