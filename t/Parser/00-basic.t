@@ -5,6 +5,13 @@ use Sq::Parser -sig => 1;
 use Sq::Test;
 use Sq::Sig;
 
+# check if "-sig => 1" loads Signature
+like(
+    dies { p_match("asd") },
+    qr/\ASq::Parser::p_match/,
+    'type check must fail because of signature'
+);
+
 # Some parsers
 my $word = p_match(qr/([a-zA-Z]+)/);
 my $ws   = p_match(qr/\s++/);
