@@ -340,7 +340,7 @@ sub zip(@arrays) {
     return CORE::bless(\@new, 'Array');
 }
 
-sub fill_blanks($aoa, $f) {
+sub fill2d($aoa, $f) {
     my $maxX = 0;
     for my $array ( @$aoa ) {
         my $l = @$array;

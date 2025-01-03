@@ -82,7 +82,7 @@ sigt('Array::slice',             t_tuplev(t_array, $aint), $array);
 sig ('Array::extract',           $array, t_int, t_int,     $array);
 sig ('Array::diff',              $array, $array, t_sub,    $array);
 sig ('Array::shuffle',           $array,                   $array);
-sig ('Array::fill_blanks',       $aoa,   t_sub,              $aoa);
+sig ('Array::fill2d',            $aoa,   t_sub,              $aoa);
 sig ('Array::trim',              $astr,                     $astr);
 sig ('Array::transpose',         $aoa,                       $aoa);
 
