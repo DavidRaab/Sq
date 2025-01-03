@@ -45,7 +45,7 @@ my $data2 = sq [
     { id => 1, name => "Anny"  },
     { X => 2, Y => 6},
     { id => 2, name => "Sola"  },
-    { id => 3, name => "Lilly" },
+    { id => 3, name => "Lilly", X => 10, Y => 3 },
     { X => 1, Y => 5},
     { id => 4, name => "Candy" },
     { X => 4, Y => 8},
@@ -61,7 +61,7 @@ is(
     [
         { id => 1, name => "Anny"  },
         { id => 2, name => "Sola"  },
-        { id => 3, name => "Lilly" },
+        { id => 3, name => "Lilly", X => 10, Y => 3 },
         { id => 4, name => "Candy" },
     ],
     'only names');
@@ -76,6 +76,7 @@ is(
     [
         { X => 3, Y => 7},
         { X => 2, Y => 6},
+        { id => 3, name => "Lilly", X => 10, Y => 3 },
         { X => 1, Y => 5},
         { X => 4, Y => 8},
     ],
