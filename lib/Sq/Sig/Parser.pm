@@ -6,6 +6,7 @@ use Sq::Signature;
 
 my $parser  = t_sub;
 my $parsers = t_array(t_of $parser);
+my $split   = t_or(t_str, t_regex);
 
 sig ('Sq::Parser::p_run',        $parser, t_str,                    t_opt);
 sig ('Sq::Parser::p_valid',      $parser, t_str,                   t_bool);
@@ -29,7 +30,7 @@ sig ('Sq::Parser::p_qty',        t_int, t_int, $parser,           $parser);
 sig ('Sq::Parser::p_choose',     $parser, t_sub,                  $parser);
 sig ('Sq::Parser::p_repeat',     t_int, $parser,                  $parser);
 sig ('Sq::Parser::p_keep',       $parser, t_sub,                  $parser);
-sig ('Sq::Parser::p_split',      t_regex, $parser,                $parser);
+sig ('Sq::Parser::p_split',      $split, $parser,                 $parser);
 sig ('Sq::Parser::p_delay',      t_sub,                           $parser);
 sig ('Sq::Parser::p_not',        $parser,                         $parser);
 sig ('Sq::Parser::p_empty',                                       $parser);
