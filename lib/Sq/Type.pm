@@ -660,14 +660,7 @@ sub t_not(@checks) {
 }
 
 sub type($array) {
-    state $table = {
-        map {
-            () if substr($_, 0, 2) ne 't_';
-            my $name = $_ =~ s/\At_//r;
-            $name => \&$_;
-        } @EXPORT
-    };
-
+    state $table = { map { s/\At_//r => \&$_ } grep { m/\At_/ } @EXPORT };
     return eval_data($table, $array);
 }
 

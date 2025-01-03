@@ -468,13 +468,7 @@ sub p_empty() {
 }
 
 sub parser($array) {
-    state $table = {
-        map {
-            () if substr($_, 0, 2) ne 'p_';
-            my $name = $_ =~ s/\Ap_//r;
-            $name => \&$_;
-        } @EXPORT
-    };
+    state $table = { map { s/\Ap_//r => \&$_ } grep { m/\Ap_/ } @EXPORT };
     return eval_data($table, $array);
 }
 
