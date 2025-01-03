@@ -1,10 +1,9 @@
 #!perl
 use 5.036;
 use Sq;
-use Sq::Parser;
-use Sq::Sig;
-use Sq::Sig::Parser;
+use Sq::Parser -sig => 1;
 use Sq::Test;
+use Sq::Sig;
 
 # Some parsers
 my $word = p_match(qr/([a-zA-Z]+)/);
