@@ -83,11 +83,13 @@ examples/euler.pl
 examples/find_duplicates
 examples/funcs_array.pl
 examples/funcs_seq_array.pl
+examples/info.txt
 examples/job_postings.pl
 examples/job_postings_mixed.pl
 examples/job_postings_pp.pl
 examples/option_divide.pl
 examples/permutation.pl
+examples/permutation_random.pl
 examples/primes.pl
 lib/Sq.pm
 lib/Sq.pod
@@ -179,10 +181,7 @@ lib/Sq/Reflection.pm
 lib/Sq/Reflection.pod
 lib/Sq/Sig.pm
 lib/Sq/Sig/Array.pm
-lib/Sq/Sig/Array2D.pm
-lib/Sq/Sig/Array3D.pm
-lib/Sq/Sig/Array4D.pm
-lib/Sq/Sig/Async.pm
+lib/Sq/Sig/Fmt.pm
 lib/Sq/Sig/Fork.pm
 lib/Sq/Sig/Fs.pm
 lib/Sq/Sig/Hash.pm
@@ -194,8 +193,6 @@ lib/Sq/Sig/Parser.pm
 lib/Sq/Sig/Queue.pm
 lib/Sq/Sig/Result.pm
 lib/Sq/Sig/Seq.pm
-lib/Sq/Sig/Set.pm
-lib/Sq/Sig/Type.pm
 lib/Sq/Signature.pm
 lib/Sq/Test.pm
 lib/Sq/Type.pm
@@ -226,7 +223,9 @@ sqs/hash_sha
 sqs/help
 sqs/init
 sqs/list
+sqs/list_mount
 sqs/monitor
+sqs/monitor_cpu
 sqs/mv
 sqs/parse_sig
 sqs/publish
@@ -254,6 +253,8 @@ t/Array/03-fibonacci.t
 t/Array/06-min_max.t
 t/Array/08-group_by.t
 t/Array/10-option.t
+t/Array/11-regex.t
+t/Array/12-type.t
 t/Evaluator/00-type.t
 t/Evaluator/01-parser.t
 t/Fs/00-basics.t

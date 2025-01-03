@@ -112,6 +112,10 @@ provides:
     file: lib/Sq/Sig.pm
   Sq::Sig::Array:
     file: lib/Sq/Sig/Array.pm
+  Sq::Sig::Fmt:
+    file: lib/Sq/Sig/Fmt.pm
+  Sq::Sig::Fork:
+    file: lib/Sq/Sig/Fork.pm
   Sq::Sig::Fs:
     file: lib/Sq/Sig/Fs.pm
   Sq::Sig::Hash:
@@ -120,6 +124,8 @@ provides:
     file: lib/Sq/Sig/Heap.pm
   Sq::Sig::Io:
     file: lib/Sq/Sig/Io.pm
+  Sq::Sig::List:
+    file: lib/Sq/Sig/List.pm
   Sq::Sig::Option:
     file: lib/Sq/Sig/Option.pm
   Sq::Sig::Parser:

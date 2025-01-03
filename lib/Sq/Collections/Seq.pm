@@ -762,7 +762,7 @@ sub sort_by($seq, $comparer, $get_key) {
     return Array::sort_by(to_array($seq), $comparer, $get_key);
 }
 
-# cache : Seq<'a> -> Seq<'a>
+# TODO: Better cache
 sub cache($seq) {
     return from_array('Seq', to_array($seq));
 }
