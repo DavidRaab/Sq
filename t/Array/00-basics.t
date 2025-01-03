@@ -1285,4 +1285,31 @@ is(
     ],
     'fill_blanks');
 
+# trim
+{
+    my $data = sq [
+        "   foo",
+        "bar   ",
+        "   f  ",
+        "\nfoo\n",
+        " foo  bar ",
+    ];
+
+    is($data->trim, [
+        "foo",
+        "bar",
+        "f",
+        "foo",
+        "foo  bar",
+    ], 'trim 1');
+
+    is($data, [
+        "   foo",
+        "bar   ",
+        "   f  ",
+        "\nfoo\n",
+        " foo  bar ",
+    ], '$data did not change');
+}
+
 done_testing;

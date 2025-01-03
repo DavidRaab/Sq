@@ -574,6 +574,17 @@ sub shuffle($array) {
     return CORE::bless([List::Util::shuffle @$array], 'Array');
 }
 
+sub trim($array) {
+    my @new;
+    for ( @$array ) {
+        my $str = $_;
+        $str =~ s/\A\s+//;
+        $str =~ s/\s+\z//;
+        push @new, $str;
+    }
+    return CORE::bless(\@new, 'Array');
+}
+
 #-----------------------------------------------------------------------------#
 # SIDE-EFFECTS                                                                #
 #    functions that have side-effects or produce side-effects. Those are      #
