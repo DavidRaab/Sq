@@ -14,8 +14,24 @@ sub export_import($own, @args) {
     # get our @export of current package
     my $exports = \@{"$own\::EXPORT"};
 
+    # Build a list of options and commands that should be exported
+    my %opt;
+    my @cmds;
+    my $idx = 0;
+    while ( $idx < @args ) {
+        my $current = $args[0];
+        if ( substr($current, 0, 1) eq '-' ) {
+            $opt{$current} = $args[$idx+1];
+            $idx += 2;
+        }
+        else {
+            push @cmds, $current;
+            $idx++;
+        }
+    }
+
     # Export default
-    if ( @args == 0 ) {
+    if ( @cmds == 0 ) {
         for my $func ( @$exports ) {
             my $fn = *{"$own\::$func"}{CODE};
             Carp::croak "function '$func' does not exists. Check \@EXPORT in $own" if !defined $fn;
