@@ -1,0 +1,9 @@
+=head1 Exceptions
+
+Explain why and where it is good to use Exceptions.
+
+=head2 Exceptions should not be catched
+
+=head2 C-Style Error Handling
+
+=head2 Alternative Error Handling
