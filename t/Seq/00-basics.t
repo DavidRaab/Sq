@@ -924,4 +924,32 @@ is(
 is(Seq->count_up(10)->take(100),   seq { 10 .. 109 },   'count_up');
 is(Seq->count_down(10)->take(100), Seq->range(10, -89), 'count_down');
 
+# trim
+{
+    my $data = seq {
+        "   foo",
+        "bar   ",
+        "   f  ",
+        "\nfoo\n",
+        " foo  bar ",
+    };
+
+    is($data->trim, seq {
+        "foo",
+        "bar",
+        "f",
+        "foo",
+        "foo  bar",
+    }, 'trim 1');
+
+    is($data, seq {
+        "   foo",
+        "bar   ",
+        "   f  ",
+        "\nfoo\n",
+        " foo  bar ",
+    }, '$data did not change');
+}
+
+
 done_testing;

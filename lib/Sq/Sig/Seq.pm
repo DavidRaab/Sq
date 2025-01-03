@@ -66,6 +66,7 @@ sig('Seq::windowed',      $seq, t_int,          $seq);
 sig('Seq::intersperse',   $seq, $any,           $seq);
 sig('Seq::infinity',      $seq,                 $seq);
 sig('Seq::repeat',        $seq, t_int,          $seq);
+sig('Seq::trim',          $seq,                 $seq);
 
 # sig('Seq::sort_num',      $anum,                 $seq);
 # sig('Seq::sort_str',      $astr,                 $seq);

@@ -790,7 +790,7 @@ sub rxs($seq, $regex, $fn) {
             NEXT_LINE:
             my $str = $it->();
             return undef if not defined $str;
-            $str =~ s/$regex/$fn->()/oe;
+            $str =~ s/$regex/$fn->()/e;
             return $str;
         };
     });
@@ -954,6 +954,23 @@ sub repeat($seq, $count) {
     });
 }
 
+sub trim($seq) {
+    return bless(sub {
+        my $abort = 0;
+        my $it    = $seq->();
+        my $x;
+        return sub {
+            return undef if $abort;
+            if ( defined($x = $it->()) ) {
+                $x =~ s/\A\s+//;
+                $x =~ s/\s+\z//;
+                return $x;
+            }
+            $abort = 1;
+            undef $it;
+        }
+    }, 'Seq');
+}
 
 #-----------------------------------------------------------------------------#
 # SIDE-EFFECTS                                                                #
