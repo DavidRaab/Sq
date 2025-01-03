@@ -53,6 +53,18 @@ sub init($, $count, $f) {
     ], 'Array');
 }
 
+sub init2d($, $width, $height, $f) {
+    my @new;
+    for my $y ( 0 .. $height-1 ) {
+        my @inner;
+        for my $x ( 0 .. $width-1 ) {
+            push @inner, (scalar $f->($x,$y));
+        }
+        push @new, CORE::bless(\@inner, 'Array');
+    }
+    return CORE::bless(\@new, 'Array');
+}
+
 # Array->unfold : 'State -> ('State -> Option<['a, 'State]>) -> Array<'a>
 sub unfold($, $state, $f_opt) {
     my @array;

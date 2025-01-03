@@ -16,6 +16,8 @@ my $opt   = t_opt;
 my $aopt  = t_array(t_of $opt);
 my $sub   = t_sub;
 
+my $pint = t_int(t_positive);
+
 ### CONSTRUCTORS
 
 sigt('Array::new',        t_tuplev($any, $array),    $array);
@@ -25,6 +27,7 @@ sig ('Array::replicate',  $any, t_int, $any,         $array);
 sig ('Array::bless',      $any, $array,              $array);
 sig ('Array::from_array', $any, $array,              $array);
 sig ('Array::init',       $any, t_int, $sub,         $array);
+sig ('Array::init2d',     $any, $pint, $pint, $sub,  $array);
 # Second argument is 'State, would be good to back-reference the type
 sig ('Array::unfold',     $any, $any, $sub,          $array);
 sig ('Array::range_step', $any, t_num, t_num, t_num, $array);
