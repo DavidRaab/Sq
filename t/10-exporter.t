@@ -65,10 +65,15 @@ like(
 nok(has_func('main', 'foo'), 'foo not yet imported');
 nok(has_func('main', 'bar'), 'bar not yet imported');
 
-Test2->import(-sig => 1);
+Test2->import(-sig => 1, 'foo');
+
+ ok(has_func('main', 'foo'), 'foo is imported');
+nok(has_func('main', 'bar'), 'bar not yet imported');
+
+Test2->import(-sig => 1, 'bar');
 
 ok(has_func('main', 'foo'), 'foo is imported');
-ok(has_func('main', 'bar'), 'bar is imported');
+ok(has_func('main', 'bar'), 'bar not yet imported');
 
 # TODO: tests that really checks if signature was loaded???
 
