@@ -89,6 +89,7 @@ sig ('Array::trim',              $astr,                     $astr);
 
 sig('Array::iter',     $array, $sub, t_void);
 sig('Array::iteri',    $array, $sub, t_void);
+sig('Array::iter2d',   $aoa,   $sub, t_void);
 
 ### CONVERTER
 

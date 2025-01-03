@@ -617,6 +617,16 @@ sub iteri($array, $f) {
     return;
 }
 
+sub iter2d($aoa, $f) {
+    for my $y ( 0 .. (@$aoa - 1) ) {
+        my $inner = $aoa->[$y];
+        for my $x ( 0 .. (@$inner - 1) ) {
+            $f->($inner->[$x],$x,$y);
+        }
+    }
+    return;
+}
+
 #-----------------------------------------------------------------------------#
 # CONVERTER                                                                   #
 #         Those are functions converting Array to none Array types            #
