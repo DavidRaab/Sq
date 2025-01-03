@@ -9,16 +9,16 @@ use subs 'bind', 'join', 'select', 'last', 'sort', 'map', 'foreach', 'bless', 'l
 #                    Functions that create sequences                          #
 #-----------------------------------------------------------------------------#
 
-sub empty($class) {
+sub empty($) {
     return CORE::bless([], 'Array');
 }
 
-sub replicate($class, $count, $initial) {
+sub replicate($, $count, $initial) {
     return CORE::bless([($initial) x $count], 'Array');
 }
 
 # creates new array, stops at first undef
-sub new($class, @array) {
+sub new($, @array) {
     my @new;
     for my $x ( @array ) {
         last if not defined $x;
@@ -27,16 +27,16 @@ sub new($class, @array) {
     return CORE::bless(\@new, 'Array');
 }
 
-sub bless($class, $ref) {
+sub bless($, $ref) {
     return CORE::bless($ref, 'Array');
 }
 
 # Array->from_array : Array<'a> -> Array<'a>
-sub from_array($class, $xs) {
+sub from_array($, $xs) {
     return CORE::bless($xs, 'Array');
 }
 
-sub concat($class, @arrays) {
+sub concat($, @arrays) {
     my @new;
     for my $array ( @arrays ) {
         push @new, @$array;
@@ -44,7 +44,7 @@ sub concat($class, @arrays) {
     return CORE::bless(\@new, 'Array');
 }
 
-sub init($class, $count, $f) {
+sub init($, $count, $f) {
     local $_;
     return CORE::bless([
         grep { defined  }
