@@ -1387,5 +1387,12 @@ is(
         'iter2d');
 }
 
+# transpose
+{
+    is(
+        Array->init2d(4,4, sub($x,$y) { [$x,$y] })->transpose,
+        Array->init2d(4,4, sub($x,$y) { [$y,$x] }),
+        'transpose');
+}
 
 done_testing;

@@ -84,6 +84,7 @@ sig ('Array::diff',              $array, $array, t_sub,    $array);
 sig ('Array::shuffle',           $array,                   $array);
 sig ('Array::fill_blanks',       $aoa,   t_sub,              $aoa);
 sig ('Array::trim',              $astr,                     $astr);
+sig ('Array::transpose',         $aoa,                       $aoa);
 
 ### SIDE-EFFECTS
 

@@ -597,6 +597,10 @@ sub trim($array) {
     return CORE::bless(\@new, 'Array');
 }
 
+sub transpose($aoa) {
+    return Array::zip(@$aoa);
+}
+
 #-----------------------------------------------------------------------------#
 # SIDE-EFFECTS                                                                #
 #    functions that have side-effects or produce side-effects. Those are      #
