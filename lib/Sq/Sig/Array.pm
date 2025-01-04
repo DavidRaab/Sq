@@ -166,6 +166,5 @@ sig ('Array::pop',         $array,                                $any);
 sig ('Array::shift',       $array,                                $any);
 sigt('Array::unshift',     t_tuplev($array, $array),            t_void);
 sig ('Array::blit',        $array, t_int, $array, t_int, t_int, t_void);
-sig ('Array::shuffle_mut', $array,                              t_void);
 
 1;

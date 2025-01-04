@@ -1027,16 +1027,4 @@ sub blit($source_array, $source_index, $target_array, $target_index, $amount) {
     return;
 }
 
-sub shuffle_mut($array) {
-    my $max = @$array;
-    my $new_idx;
-    for ( my $idx=0; $idx < ($max-1); $idx++ ) {
-        $new_idx = rand($max);
-        my $tmp = $array->[$idx];
-        $array->[$idx]     = $array->[$new_idx];
-        $array->[$new_idx] = $tmp;
-    }
-    return;
-}
-
 1;
