@@ -713,12 +713,12 @@ sub average($array) {
     return $sum / $count;
 }
 
-sub average_by($array, $f) {
+sub average_by($array, $f_map) {
     return 0 if @$array == 0;
     my $sum   = 0;
     my $count = 0;
     for my $x ( @$array ) {
-        $sum += $f->($x);
+        $sum += $f_map->($x);
         $count++;
     }
     return $sum / $count;
