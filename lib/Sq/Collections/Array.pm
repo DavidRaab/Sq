@@ -702,6 +702,28 @@ sub sum_by($array, $f_map) {
     return $sum;
 }
 
+sub average($array) {
+    return 0 if @$array == 0;
+    my $sum   = 0;
+    my $count = 0;
+    for my $x ( @$array ) {
+        $sum += $x;
+        $count++;
+    }
+    return $sum / $count;
+}
+
+sub average_by($array, $f) {
+    return 0 if @$array == 0;
+    my $sum   = 0;
+    my $count = 0;
+    for my $x ( @$array ) {
+        $sum += $f->($x);
+        $count++;
+    }
+    return $sum / $count;
+}
+
 sub join($array, $sep) {
     return CORE::join($sep, @$array);
 }

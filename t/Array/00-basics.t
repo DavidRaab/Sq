@@ -1403,11 +1403,19 @@ is(
 }
 
 # transpose
-{
-    is(
-        Array->init2d(4,4, sub($x,$y) { [$x,$y] })->transpose,
-        Array->init2d(4,4, sub($x,$y) { [$y,$x] }),
-        'transpose');
-}
+is(
+    Array->init2d(4,4, sub($x,$y) { [$x,$y] })->transpose,
+    Array->init2d(4,4, sub($x,$y) { [$y,$x] }),
+    'transpose');
+
+# average
+is(Array::average([1 .. 10]), 5.5, 'average 1');
+is(
+    Array->init(10, sub($idx) {
+        { id => $idx+1, num => $idx+1 }
+    })->average_by(key 'num'),
+    5.5,
+    'average_by 1');
+
 
 done_testing;
