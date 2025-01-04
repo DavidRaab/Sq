@@ -1455,6 +1455,11 @@ is(
         Array::map2($words, $ones, sub($word,$one) { [$word, $one] })->merge->as_hash,
         { "foo" => 1, "bar" => 1, "baz" => 1 },
         'map2 - merge->as_hash');
+
+    is(
+        Array::map2($words, $ones, sub($word,$one) { $one, $word }),
+        [ "foo", "bar", "baz"],
+        'map2 - lambda returns multiple things');
 }
 
 done_testing;
