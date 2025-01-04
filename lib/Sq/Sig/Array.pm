@@ -15,8 +15,8 @@ my $any   = t_any;
 my $opt   = t_opt;
 my $aopt  = t_array(t_of $opt);
 my $sub   = t_sub;
+my $pint  = t_int(t_positive);
 
-my $pint = t_int(t_positive);
 
 ### CONSTRUCTORS
 
@@ -82,15 +82,21 @@ sigt('Array::slice',             t_tuplev(t_array, $aint), $array);
 sig ('Array::extract',           $array, t_int, t_int,     $array);
 sig ('Array::diff',              $array, $array, t_sub,    $array);
 sig ('Array::shuffle',           $array,                   $array);
-sig ('Array::fill2d',            $aoa,   t_sub,              $aoa);
 sig ('Array::trim',              $astr,                     $astr);
 sig ('Array::transpose',         $aoa,                       $aoa);
+
+
+### ARRAY 2D
+
+sig ('Array::fill2d',            $aoa,   t_sub,              $aoa);
+
 
 ### SIDE-EFFECTS
 
 sig('Array::iter',     $array, $sub, t_void);
 sig('Array::iteri',    $array, $sub, t_void);
 sig('Array::iter2d',   $aoa,   $sub, t_void);
+
 
 ### CONVERTER
 
@@ -144,11 +150,14 @@ sigt('Array::dumpw',
     t_void
 );
 
-# Functions from Option
+
+### OPTION MODULE
+
 sig('Array::all_some',     $aopt,        $opt);
 sig('Array::all_some_by',  $array, $sub, $opt);
 sig('Array::keep_some',    $aopt,        $array);
 sig('Array::keep_some_by', $array, $sub, $array);
+
 
 ### MUTATION
 
