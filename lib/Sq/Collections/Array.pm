@@ -197,6 +197,15 @@ sub map($array, $f) {
     return CORE::bless(\@new, 'Array');
 }
 
+sub map2($arrayA, $arrayB, $f) {
+    my $max = @$arrayA > @$arrayB ? @$arrayA : @$arrayB;
+    my @new;
+    for (my $idx=0; $idx < $max; $idx++) {
+        push @new, (scalar $f->($arrayA->[$idx], $arrayB->[$idx]));
+    }
+    return CORE::bless(\@new, 'Array');
+}
+
 sub map_e($array, $expr) {
     local $_;
     my $new = eval q<

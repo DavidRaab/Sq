@@ -1434,4 +1434,27 @@ is(
     is(refaddr($data), refaddr($cache), 'same references');
 }
 
+# map2
+{
+    my $words = sq [qw(foo bar baz)];
+    my $ones  = sq [1,1,1];
+
+    # method
+    is(
+        $words->map2($ones, sub($word,$one) { [$word, $one] }),
+        [ ["foo",1], ["bar",1], ["baz",1] ],
+        'map2 - method');
+
+    # functional
+    is(
+        Array::map2($words, $ones, sub($word,$one) { [$word, $one] }),
+        [ ["foo",1], ["bar",1], ["baz",1] ],
+        'map2 - functional');
+
+    is(
+        Array::map2($words, $ones, sub($word,$one) { [$word, $one] })->merge->as_hash,
+        { "foo" => 1, "bar" => 1, "baz" => 1 },
+        'map2 - merge->as_hash');
+}
+
 done_testing;
