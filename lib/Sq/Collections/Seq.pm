@@ -1039,6 +1039,24 @@ sub doi($seq, $f) {
     }, 'Seq');
 }
 
+sub do_every($seq, $count, $f) {
+    return bless(sub {
+        my $abort   = 0;
+        my $it      = $seq->();
+        my $idx     = 0;
+        my $x;
+        return sub {
+            return undef if $abort;
+            if ( defined($x = $it->()) ) {
+                $f->($x, $idx) if $idx % $count == 0;
+                $idx++;
+                return $x;
+            }
+            $abort = 1;
+            undef $it;
+        }
+    }, 'Seq');
+}
 
 #----------------------------------------------------------------------#
 # CONVERTER                                                            #

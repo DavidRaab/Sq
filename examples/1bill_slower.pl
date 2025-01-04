@@ -65,5 +65,5 @@ sub run($f) {
     $f->();
 
     my $stop = time();
-    printf "Time: %d seconds\n", ($stop-$start);
+    printf "Time: %d seconds\n", ($stop - $start);
 }

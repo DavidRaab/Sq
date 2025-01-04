@@ -7,10 +7,11 @@ use Time::HiRes qw(time);
 
 my $first  =
     Seq
-    ->range(1,1_000_000_000)
-    ->do(sub($num){ print "$num\n" if $num % 100_000 == 0 });
+    ->range(0,1_000_000_000)
+    ->do_every(100_000, sub($num,$idx){ print "$num\n" });
+
 my $second =
-    Seq->range(1,1_000_000_000);
+    Seq->range(0,1_000_000_000);
 
 my $start = time();
 
