@@ -1416,6 +1416,15 @@ is(
     })->average_by(key 'num'),
     5.5,
     'average_by 1');
+is(
+    Array->init(10, sub($idx) {
+        { id => $idx+1, num => $idx+1 }
+    })->average_by(key 'num'),
 
+    Array->init(10, sub($idx) {
+        { id => $idx+1, num => $idx+1 }
+    })->map(key 'num')->average,
+
+    'average_by 2');
 
 done_testing;
