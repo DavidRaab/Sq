@@ -22,8 +22,18 @@ sub shuffle1($array) {
 }
 
 # from List::Util
-sub shuffle2($array) {
+sub shuffle2_a($array) {
     CORE::bless([List::Util::shuffle @$array], 'Array');
+}
+
+sub shuffle2_b($array) {
+    my $new = [List::Util::shuffle @$array];
+    CORE::bless($new, 'Array');
+}
+
+sub shuffle2_c($array) {
+    my @new = List::Util::shuffle @$array;
+    CORE::bless(\@new, 'Array');
 }
 
 # shuffle like selection sort
@@ -60,17 +70,27 @@ Sq->bench->compare(-1, {
     },
     shuffle1 => sub {
         for ( 1 .. 1_000 ) {
-            my $s = shuffle1($array)
+            my $s = shuffle1($array);
         }
     },
-    shuffle2 => sub {
+    shuffle2_a => sub {
         for ( 1 .. 1_000 ) {
-            my $s = shuffle2($array)
+            my $s = shuffle2_a($array);
+        }
+    },
+    shuffle2_b => sub {
+        for ( 1 .. 1_000 ) {
+            my $s = shuffle2_b($array);
+        }
+    },
+    shuffle2_c => sub {
+        for ( 1 .. 1_000 ) {
+            my $s = shuffle2_c($array);
         }
     },
     shuffle3 => sub {
         for ( 1 .. 1_000 ) {
-            my $s = shuffle3($array)
+            my $s = shuffle3($array);
         }
     },
 });
