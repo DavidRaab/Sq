@@ -1427,4 +1427,11 @@ is(
 
     'average_by 2');
 
+# cache
+{
+    my $data  = Array->init(10, \&id);
+    my $cache = $data->cache;
+    is(refaddr($data), refaddr($cache), 'same references');
+}
+
 done_testing;

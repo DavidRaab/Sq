@@ -576,6 +576,9 @@ sub transpose($aoa) {
     return Array::zip(@$aoa);
 }
 
+# Noop - Only for API compatibility with Seq
+sub cache($array) { $array }
+
 #-----------------------------------------------------------------------------#
 # ARRAY 2D                                                                    #
 #    Here are functions specifally designed for working with 2D Arrays        #
