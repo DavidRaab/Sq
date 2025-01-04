@@ -340,31 +340,6 @@ sub zip(@arrays) {
     return CORE::bless(\@new, 'Array');
 }
 
-sub fill2d($aoa, $f) {
-    my $maxX = 0;
-    for my $array ( @$aoa ) {
-        my $l = @$array;
-        $maxX = $l > $maxX ? $l : $maxX;
-    }
-
-    my @new;
-    for my $array ( @$aoa ) {
-        my @inner;
-        for (my $x=0; $x < $maxX; $x++) {
-            my $value = $array->[$x];
-            if ( defined $value ) {
-                push @inner, $value;
-            }
-            else {
-                push @inner, $f->();
-            }
-        }
-        push @new, CORE::bless(\@inner, 'Array');
-    }
-
-    return CORE::bless(\@new, 'Array');
-}
-
 sub sort($array, $comparer) {
     local ($a, $b);
     my @sorted = CORE::sort { $comparer->($a, $b) } @$array;
@@ -599,6 +574,38 @@ sub trim($array) {
 
 sub transpose($aoa) {
     return Array::zip(@$aoa);
+}
+
+#-----------------------------------------------------------------------------#
+# ARRAY 2D                                                                    #
+#    Here are functions specifally designed for working with 2D Arrays        #
+#-----------------------------------------------------------------------------#
+
+sub fill2d($aoa, $f) {
+    my $maxX = 0;
+    for my $array ( @$aoa ) {
+        my $l = @$array;
+        $maxX = $l > $maxX ? $l : $maxX;
+    }
+
+    my @new;
+    my $y = 0;
+    for my $array ( @$aoa ) {
+        my @inner;
+        for (my $x=0; $x < $maxX; $x++) {
+            my $value = $array->[$x];
+            if ( defined $value ) {
+                push @inner, $value;
+            }
+            else {
+                push @inner, $f->($x,$y);
+            }
+        }
+        $y++;
+        push @new, CORE::bless(\@inner, 'Array');
+    }
+
+    return CORE::bless(\@new, 'Array');
 }
 
 #-----------------------------------------------------------------------------#
