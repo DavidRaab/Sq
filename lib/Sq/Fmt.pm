@@ -32,9 +32,7 @@ sub table($, $href) {
     # dumpw($sizes);
 
     # determine max column sizes
-    my $cols =
-        Array::zip(Array::fill_blanks($sizes, sub { 0 })->@*)
-        ->map(sub($x) { $x->max->or(0) });
+    my $cols = Array::transpose($sizes)->map(call 'max', 0);
 
     # dumpw($cols);
 
