@@ -2,7 +2,7 @@ package Sq::Collections::Array;
 package Array;
 use List::Util ();
 use 5.036;
-use subs 'bind', 'join', 'select', 'last', 'sort', 'map', 'foreach', 'bless', 'length';
+use subs 'bind', 'join', 'last', 'sort', 'map', 'bless', 'length';
 
 #-----------------------------------------------------------------------------#
 # CONSTRUCTORS                                                                #
@@ -666,6 +666,11 @@ sub iter($array, $f) {
     for my $x ( @$array ) {
         $f->($x);
     }
+    return;
+}
+
+sub iter_sort($array, $cmp, $f) {
+    iter(Array::sort($array, $cmp), $f);
     return;
 }
 
