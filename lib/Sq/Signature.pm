@@ -11,8 +11,20 @@ our @EXPORT = qw(sig sigt);
 # + functions with list context?
 # + easier way for default args
 
+# A Hash that stores which function was already added with a signature.
+# Currently just for a check that a function is not set multiple times.
+# Later will likely be used to also unload signature at runtime.
+my %sigs;
+
+sub sigs_added() {
+    return bless([keys %sigs], 'Array');
+}
+
 sub sig($func_name, @types) {
     Carp::croak "sig needs at least one type" if @types == 0;
+    if ( $sigs{$func_name} ) { Carp::croak "$func_name: Signature already added" }
+    else                     { $sigs{$func_name} = 1                             }
+
     my $orig       = Sq::Reflection::get_func($func_name);
     my $out_type   = pop @types;
     my $in_type    = t_tuple(@types);
@@ -40,6 +52,9 @@ sub sig($func_name, @types) {
 # checked against $in_type. Output again is checked against $out_type.
 # So it usually makes sense to use t_tuple for $in_type.
 sub sigt($func_name, $in_type, $out_type) {
+    if ( $sigs{$func_name} ) { Carp::croak "$func_name: Signature already added" }
+    else                     { $sigs{$func_name} = 1                             }
+
     my $orig = Sq::Reflection::get_func($func_name);
     Sq::Reflection::set_func($func_name, sub {
         my $err = $in_type->(\@_);
