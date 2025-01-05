@@ -5,6 +5,22 @@ use Carp ();
 use Scalar::Util ();
 my $export_funcs;
 my $first_load = 1;
+our @EXPORT = (
+    qw(sq call key assign seq),
+    qw(is_num is_str is_array is_hash is_seq is_opt is_result is_ref),
+    qw(id fst snd),
+    qw(by_num by_str by_stri),
+    Some    => sub { \&Option::Some         },
+    None    => sub { \&Option::None         },
+    Ok      => sub { \&Result::Ok           },
+    Err     => sub { \&Result::Err          },
+    lazy    => sub { \&Sq::Core::Lazy::lazy },
+    equal   => sub { \&Sq::Equality::equal  },
+    dump    => sub { \&Sq::Dump::dump       },
+    dumpw   => sub { \&Sq::Dump::dumpw      },
+    type    => sub { \&Sq::Type::type       },
+    is_type => sub { \&Sq::Type::t_valid    },
+);
 sub import {
     my ( $own, @requested ) = @_;
     my ( $pkg ) = caller;
@@ -20,44 +36,51 @@ sub import {
     }
 
     no strict 'refs'; ## no critic
-    state @funcs = (
-        qw(sq call key assign seq),
-        qw(is_num is_str is_array is_hash is_seq is_opt is_result is_ref),
-        qw(id fst snd),
-        qw(by_num by_str by_stri),
-    );
-
     # Otherwise just requested
     if ( @requested > 0 ) {
         # Build cache for better checking - but only once and only when needed
         if ( !defined $export_funcs ) {
-            $export_funcs = { map { $_ => 1 } @funcs };
+            my $idx = 0;
+            while ( $idx < @EXPORT ) {
+                my $func = $EXPORT[$idx];
+                my $next = $EXPORT[$idx+1];
+                if ( ref $next eq 'CODE' ) {
+                    $export_funcs->{$func} = $next;
+                    $idx += 2;
+                }
+                else {
+                    $export_funcs->{$func} = $func;
+                    $idx += 1;
+                }
+            }
         }
+
+        # Export requested
         for my $request ( @requested ) {
+            my $fn = $export_funcs->{$request};
             Carp::croak "Export Func '$request' does not exists"
-                if !exists $export_funcs->{$request};
-            *{"$pkg\::$request"} = \&$request;
+                if !defined $fn;
+
+            if ( ref $fn eq 'CODE' ) { *{"$pkg\::$request"} = $fn->()    }
+            else                     { *{"$pkg\::$request"} = \&$request }
         }
     }
     # Export ALL
     else {
-        for my $func ( @funcs ) {
-            *{"${pkg}::$func"} = \&$func;
+        my $idx = 0;
+        while ( $idx < @EXPORT ) {
+            my $func = $EXPORT[$idx];
+            my $next = $EXPORT[$idx+1];
+            if ( ref $next eq 'CODE' ) {
+                *{"${pkg}::$func"} = $next->();
+                $idx += 2;
+            }
+            else {
+                *{"${pkg}::$func"} = \&$func;
+                $idx += 1;
+            }
         }
     }
-
-    # TODO: Not always export
-    no warnings 'once';
-    *{"$pkg\::Some"}    = \&Option::Some;
-    *{"$pkg\::None"}    = \&Option::None;
-    *{"$pkg\::Ok"}      = \&Result::Ok;
-    *{"$pkg\::Err"}     = \&Result::Err;
-    *{"$pkg\::lazy"}    = \&Sq::Core::Lazy::lazy;
-    *{"$pkg\::equal"}   = \&Sq::Equality::equal;
-    *{"$pkg\::dump"}    = \&Sq::Dump::dump;
-    *{"$pkg\::dumpw"}   = \&Sq::Dump::dumpw;
-    *{"$pkg\::type"}    = \&Sq::Type::type;
-    *{"$pkg\::is_type"} = \&Sq::Type::t_valid;
 }
 
 # Load Reflection
