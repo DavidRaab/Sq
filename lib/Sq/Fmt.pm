@@ -16,9 +16,9 @@ sub table($, $href) {
     # Instead of `sq` you also can use Array->bless, Hash->bless to just bless
     # the first level, sometimes that can also be enough, as every function
     # always returns blessed data.
-    my $maxY = Array::length($aoa);
+    my $maxY = @$aoa;
     return if $maxY == 0;
-    my $maxX = Array::map($aoa, call 'length')->max->or(0);
+    my $maxX = Array::map($aoa, call 'length')->max(0);
     return if $maxX == 0;
 
     # just turn AoA into string lengths and transpose
