@@ -84,4 +84,8 @@ is(Array::max([1,2,3,4,5],  0), 5, 'max with default 1');
 is(Array::max([1,2,3,4,5], 10), 5, 'max with default 2');
 is(Array::max([],           0), 0, 'max with default 3');
 
+is(Array::min([1,2,3,4,5],  0), 1, 'min with default 1');
+is(Array::min([1,2,3,4,5], 10), 1, 'min with default 2');
+is(Array::min([],           0), 0, 'min with default 3');
+
 done_testing;

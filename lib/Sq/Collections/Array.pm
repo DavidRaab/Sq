@@ -783,13 +783,15 @@ sub split($array, $regex) {
 }
 
 # min : Array<float> -> float -> Option<float>
-sub min($array) {
-    return Option::None() if @$array == 0;
+sub min($array, $default=undef) {
+    if ( @$array == 0 ) {
+        return defined $default ? $default : Option::None();
+    }
     my $min = $array->[0];
     for my $x ( @$array ) {
         $min = $x if $x < $min;
     }
-    return Option::Some($min);
+    return defined $default ? $min : Option::Some($min);
 }
 
 # min_by : Array<'a> -> ('a -> float) -> Option<'a>
