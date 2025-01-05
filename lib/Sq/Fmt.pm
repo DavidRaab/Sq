@@ -16,7 +16,7 @@ sub table($, $href) {
     # Instead of `sq` you also can use Array->bless, Hash->bless to just bless
     # the first level, sometimes that can also be enough, as every function
     # always returns blessed data. But why bless and then call a method when
-    # you just directly can call the function?
+    # you just can directly call the function?
     #
     # The intersting part. When everything is called in functional-style
     # no blessing wouldn't be needed anymore. This would interestingly
