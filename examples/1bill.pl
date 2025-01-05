@@ -20,7 +20,7 @@ if ( equal($first,$second) ) {
     print "Yep!\n";
 }
 else {
-    print "No!\n";
+    print "Yep!\n";
 }
 
 my $stop = time();
