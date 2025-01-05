@@ -1,6 +1,6 @@
 package Sq::Gen;
 use 5.036;
-use Sq;
+use Sq qw(sq);
 use Sq::Evaluator;
 use Sq::Exporter;
 our @EXPORT = (
