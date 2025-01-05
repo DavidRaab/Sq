@@ -24,9 +24,7 @@ sub table($, $href) {
     # just turn AoA into string lengths
     my $sizes = assign {
         my $sizes = defined $header ? [$header, @$aoa] : $aoa;
-        Array::map($sizes, sub($array) {
-            Array::map($array, sub ($str) { length $str })
-        });
+        Array::map($sizes, call 'map', sub ($str) { length $str });
     };
 
     # dumpw($sizes);
