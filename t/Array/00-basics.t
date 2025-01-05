@@ -1427,6 +1427,34 @@ is(
     ]),
     'transpose 2');
 
+is(
+    Array::transpose_map([
+        [qw/foo bar/],
+        [qw/length what hoop/],
+        [qw/one/],
+        [qw/a b c/],
+    ], sub ($str,$x,$y) { length $str }),
+    [
+        [3,6,3,1],
+        [3,4,1],
+        [4,1]
+    ],
+    'transpose_map 1');
+
+is(
+    Array::transpose_map([
+        [qw/foo bar/],
+        [qw/length what hoop/],
+        [qw/one/],
+        [qw/a b c/],
+    ], sub ($str,$x,$y) { [$x,$y,$str] }),
+    [
+        [ [0,0,  "foo"], [0,1, "length"], [0,2, "one"], [0,3, "a"] ],
+        [ [1,0,  "bar"], [1,1,   "what"], [1,3,   "b"] ],
+        [ [2,1, "hoop"], [2,3,      "c"] ],
+    ],
+    'transpose_map 2');
+
 # average
 is(Array::average([1 .. 10]), 5.5, 'average 1');
 is(

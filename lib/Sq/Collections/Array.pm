@@ -601,6 +601,26 @@ sub transpose($aoa) {
     return CORE::bless(\@new, 'Array');
 }
 
+sub transpose_map($aoa, $f) {
+    my (@new, $x);
+    my $idx = 0;
+
+    my ($array, $value, $count);
+    for (my $y=0; $y < @$aoa; $y++ ) {
+        $count = 0;
+        $array = $aoa->[$y];
+        for (my $x=0; $x < @$array; $x++) {
+            $value = $array->[$x];
+            if ( defined $value ) {
+                push @{$new[$x]}, (scalar $f->($value,$x,$y));
+                $count++;
+            }
+        }
+        last if $count == 0;
+    }
+    return CORE::bless(Sq::sq(\@new), 'Array');
+}
+
 # Noop - Only for API compatibility with Seq
 sub cache($array) { $array }
 
