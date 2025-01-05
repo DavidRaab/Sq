@@ -21,16 +21,12 @@ sub table($, $href) {
     my $maxX = Array::map($aoa, call 'length')->max->or(0);
     return if $maxX == 0;
 
-    # just turn AoA into string lengths
-    my $sizes = assign {
+    # just turn AoA into string lengths and transpose
+    my $cols = assign {
         my $sizes = defined $header ? [$header, @$aoa] : $aoa;
-        Array::map($sizes, call 'map', sub ($str) { length $str });
+        Array::transpose_map($sizes, sub ($str,$,$) { length $str })
+             ->map(call 'max', 0);
     };
-
-    # dumpw($sizes);
-
-    # determine max column sizes
-    my $cols = Array::transpose($sizes)->map(call 'max', 0);
 
     # dumpw($cols);
 
