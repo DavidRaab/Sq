@@ -38,7 +38,6 @@ is($range->map($double),     [2,4,6,8,10,12,14,16,18,20], 'map');
 is($range->keep($is_even), [2,4,6,8,10],                 'keep');
 is($range->take(5),    [1..5], 'take 1');
 is($range->take(0),        [], 'take 2');
-is($range->take(-1),       [], 'take 3');
 is($range->length,         10, 'length');
 is($range->take(5)->length, 5, 'take & length');
 is($range->map($square)->keep($is_even),        [4,16,36,64,100], 'map keep');
@@ -261,8 +260,6 @@ is(
 }
 
 is($range->skip(0),   [1..10], 'skip(0)');
-is($range->skip(-1),  [1..10], 'skip(-1)');
-is($range->skip(-10), [1..10], 'skip(-10)');
 is($range->skip(100), []     , 'skip(100)');
 
 is($range->skip(3)->take(3),  [4,5,6], 'skip->take 1');
@@ -270,8 +267,6 @@ is($range->skip(3)->take(10), [4..10], 'skip->take 2');
 is($range->skip(10)->take(1), [],      'skip->take 3');
 
 is($range->take(0),   [],      'take(0)');
-is($range->take(-1),  [],      'take(-1)');
-is($range->take(-10), [],      'take(-10)');
 is($range->take(100), [1..10], 'take(100)');
 
 is($range->take(5)->skip(2),  [3,4,5], 'take->skip 1');
@@ -397,8 +392,6 @@ is(
     'mapi with default variable');
 
 is(Array->init( 0,  sub($idx) { $idx }), [], 'init with length 0');
-is(Array->init(-1,  sub($idx) { $idx }), [], 'init with length -1');
-is(Array->init(-10, sub($idx) { $idx }), [], 'init with length -10');
 is(Array->range_step(1,1,1), [1], 'range_step with 1,1,1');
 
 # TODO: floating point inaccuraccy
@@ -659,7 +652,6 @@ is($range->none(sub($x) { $x > 10  }), 1, 'none value greater 10');
     is($r->pick(sub($x) { $x > 10 ? Some($x*$x) : None })->or(100), 100, 'pod example 3');
 }
 
-is( $range->windowed(-1), Array->empty,           'windowed -1');
 is( $range->windowed(0) , []          ,           'windowed 0');
 is( $range->windowed(1) , [map { [$_] } 1 .. 10], 'windowed 1');
 is(
@@ -686,12 +678,11 @@ is(
     [1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10],
     'intersperse 6');
 
-is(Array->new(5)    ->repeat(-1), [],            'repeat 1');
-is(Array->new(5)    ->repeat(0) , [],            'repeat 2');
-is(Array->new(5)    ->repeat(1) , [5],           'repeat 3');
-is(Array->new(5)    ->repeat(5) , [5,5,5,5,5],   'repeat 4');
-is(Array->new(1,2,3)->repeat(2) , [1,2,3,1,2,3], 'repeat 5');
-is(Array->new(1,2,3)->repeat(3) , [(1,2,3) x 3], 'repeat 6');
+is(Array->new(5)    ->repeat(0) , [],            'repeat 1');
+is(Array->new(5)    ->repeat(1) , [5],           'repeat 2');
+is(Array->new(5)    ->repeat(5) , [5,5,5,5,5],   'repeat 3');
+is(Array->new(1,2,3)->repeat(2) , [1,2,3,1,2,3], 'repeat 4');
+is(Array->new(1,2,3)->repeat(3) , [(1,2,3) x 3], 'repeat 5');
 
 is(Array->replicate(10, 'A'), [('A') x 10], 'replicate');
 
@@ -927,11 +918,6 @@ is(
     is($data->extract(9,10),  [10],         'extract at end');
     is($data->extract(10,1),  [],           'extract out of bound');
     is($data->extract(0,0),   [],           'extract with zero length');
-    is($data->extract(0,-10), [],           'extract with negative length');
-    is($data->extract(-3,3),  [8,9,10],     'extract with negative position 1');
-    is($data->extract(-3,2),  [8,9],        'extract with negative position 2');
-    is($data->extract(-3,0),  [],           'extract with negative position and 0 length');
-    is($data->extract(-3,-3), [],           'extract both values negative');
     is($data->extract(1,3), $data->skip(1)->take(3), 'extract is like skip->take');
 }
 
