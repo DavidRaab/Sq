@@ -1384,6 +1384,8 @@ is(
         ],
         'init2d 5');
 
+
+
     my @iter;
     Array
     ->init2d(4, 4, sub($x,$y) { [$y,$x] })
@@ -1406,7 +1408,24 @@ is(
 is(
     Array->init2d(4,4, sub($x,$y) { [$x,$y] })->transpose,
     Array->init2d(4,4, sub($x,$y) { [$y,$x] }),
-    'transpose');
+    'transpose 1');
+
+is(
+    sq([
+        [1,2,3,4],
+        [1,2],
+        [1,2,3,4,5,6],
+        [1,2,3,4],
+    ])->transpose,
+    sq([
+        [1,1,1,1],
+        [2,2,2,2],
+        [3,3,3],
+        [4,4,4],
+        [5],
+        [6],
+    ]),
+    'transpose 2');
 
 # average
 is(Array::average([1 .. 10]), 5.5, 'average 1');

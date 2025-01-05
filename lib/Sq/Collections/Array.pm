@@ -582,7 +582,23 @@ sub trim($array) {
 }
 
 sub transpose($aoa) {
-    return Array::zip(@$aoa);
+    my (@new, $x, $count);
+    my $idx = 0;
+    while (1) {
+        my @inner;
+        $count = 0;
+        for my $array ( @$aoa ) {
+            $x = $array->[$idx];
+            if ( defined $x ) {
+                push @inner, $x;
+                $count++;
+            }
+        }
+        last if $count == 0;
+        push @new, CORE::bless(\@inner, 'Array');
+        $idx++;
+    }
+    return CORE::bless(\@new, 'Array');
 }
 
 # Noop - Only for API compatibility with Seq
