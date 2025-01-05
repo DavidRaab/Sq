@@ -115,7 +115,9 @@ sig('Array::min',        $astr,                        t_opt(t_num));
 sig('Array::min_by',     $array, $sub,                 t_opt);
 sig('Array::min_str',    $astr,                        t_opt(t_str));
 sig('Array::min_str_by', $array, $sub,                 t_opt);
-sig('Array::max',        $anum,                        t_opt(t_num));
+sigt('Array::max',
+    t_or(t_tuple($anum), t_tuple($anum, t_any)),
+    t_or(t_opt(t_num), t_num));
 sig('Array::max_by',     $array, $sub,                 t_opt);
 sig('Array::max_str',    $astr,                        t_opt(t_str));
 sig('Array::max_str_by', $array, $sub,                 t_opt);

@@ -816,13 +816,15 @@ sub min_str_by($array, $f_str) {
 }
 
 # max : Array<float> -> Option<float>
-sub max($array) {
-    return Option::None() if @$array == 0;
+sub max($array, $default=undef) {
+    if ( @$array == 0 ) {
+        return defined $default ? $default : Option::None();
+    }
     my $max = $array->[0];
     for my $x ( @$array ) {
         $max = $x if $x > $max;
     }
-    return Option::Some($max);
+    return defined $default ? $max : Option::Some($max);
 }
 
 # max_by : Array<'a> -> ('a -> float) -> Option<'a>

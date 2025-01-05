@@ -78,4 +78,10 @@ is($data->max_str_by($by_name)->or(0),     { id => 3, name => 'C' } , 'max_by_st
 is(Array->empty->max_str_by($by_name),                          None, 'max_by_str on empty');
 is(Array->empty->max_str_by($by_name)->or(0),                      0, 'max_by_str on empty with option::or');
 
+
+# When max() get's passed a default value. Then no Option is returned anymore.
+is(Array::max([1,2,3,4,5],  0), 5, 'max with default 1');
+is(Array::max([1,2,3,4,5], 10), 5, 'max with default 2');
+is(Array::max([],           0), 0, 'max with default 3');
+
 done_testing;
