@@ -7,6 +7,7 @@ map->sum          vs. sum_by
 #map->min         vs. min_by
 #map->max         vs. max_by
 map->flatten      vs. bind
+map->keep_some    vs. keep_some_by
 
 group_by->fold    vs. group_fold
 # cartesian->filter vs. left_join

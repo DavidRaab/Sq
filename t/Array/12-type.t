@@ -38,6 +38,10 @@ is(
     [ [0,0], [23,40], [12,12] ],
     'parse time and keep');
 
+is(
+    $data->map(sub($str) { p_run $time, $str })->keep_some,
+    $data->keep_some_by(sub($str) { p_run $time, $str }),
+    'keep_some_by same as map->keep_some');
 
 # another array of data
 my $data2 = sq [
