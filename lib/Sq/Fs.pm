@@ -45,7 +45,26 @@ sub read_raw($, $size, @path) {
 }
 
 # TODO: reads a gziped file transparent as text
-sub read_zip() { ... }
+sub read_text_gz($, @path) {
+    require PerlIO::gzip;
+    require Path::Tiny;
+    my $file = Path::Tiny::path(@path);
+    return Seq->from_sub(sub {
+        open my $fh, '<:raw:gzip:encoding(UTF-8)', $file;
+        if ( !defined $fh ) {
+            return sub { undef }
+        }
+        else {
+            my $line;
+            return sub {
+                $line = <$fh>;
+                return $line if defined $line;
+                close $fh;
+                undef $fh;
+            };
+        }
+    });
+}
 
 
 sub compare_text($, $file1, $file2) {

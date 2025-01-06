@@ -36,4 +36,16 @@ is(
     },
     'read_raw');
 
+is(
+    Sq->fs->read_text_gz($Dir, 'data', 'hop-preface.md.gz')->take(1),
+    seq { "# Preface\n" },
+    'read 1 linefrom gz');
+
+ok(
+    equal(
+        Sq->fs->read_text   ($Dir, 'data', 'hop-preface.md'),
+        Sq->fs->read_text_gz($Dir, 'data', 'hop-preface.md.gz'),
+    ),
+    'comparing gziped file with plain text');
+
 done_testing;
