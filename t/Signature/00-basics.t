@@ -87,6 +87,11 @@ sub what($int, $str, $array_of_nums) {
 }
 sig('main::what', t_int, t_str, t_array(t_of t_num), t_hash);
 
+like(
+    dies { sig('main::what', t_int, t_void) },
+    qr/\Amain::what: Signature already added/,
+    'adding signature again fails');
+
 like( dies { what("foo", "foo", [1,2,3]) }, qr/\Amain::what/, 'what fails 1'); # fails
 like( dies { what(  123, "foo", ["foo"]) }, qr/\Amain::what/, 'what fails 2'); # fails
 like( dies { what(  123,    [], [1,2,3]) }, qr/\Amain::what/, 'what fails 3'); # fails
