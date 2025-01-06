@@ -462,7 +462,7 @@ sub rxm($array, $regex) {
 sub rxs($array, $regex, $f) {
     my @new;
     for my $str ( @$array ) {
-        push @new, $str =~ s/$regex/$f->()/re;
+        push @new, $str =~ s/$regex/$f->(@{^CAPTURE})/re;
     }
     return CORE::bless(\@new, 'Array');
 }
@@ -470,7 +470,7 @@ sub rxs($array, $regex, $f) {
 sub rxsg($array, $regex, $f) {
     my @new;
     for my $str ( @$array ) {
-        push @new, $str =~ s/$regex/$f->()/gre;
+        push @new, $str =~ s/$regex/$f->(@{^CAPTURE})/gre;
     }
     return CORE::bless(\@new, 'Array');
 }

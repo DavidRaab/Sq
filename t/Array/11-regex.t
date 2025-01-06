@@ -99,4 +99,28 @@ T                                 # T
         'rxs');
 }
 
+# rxsg
+{
+    my $encoding = sq [
+        'hello%20world',
+        'I%20am%20so%20powerful',
+    ];
+
+    is(
+        $encoding->rxsg(qr/\%(\d\d)/, sub { chr(hex($1)) }),
+        [
+            'hello world',
+            'I am so powerful',
+        ],
+        'URL decoding');
+
+    is(
+        $encoding->rxsg(qr/\%(\d\d)/, sub($hex) { chr(hex($hex)) }),
+        [
+            'hello world',
+            'I am so powerful',
+        ],
+        'URL decoding');
+}
+
 done_testing;

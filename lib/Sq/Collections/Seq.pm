@@ -809,7 +809,7 @@ sub rxs($seq, $regex, $fn) {
             NEXT_LINE:
             my $str = $it->();
             return undef if not defined $str;
-            $str =~ s/$regex/$fn->()/e;
+            $str =~ s/$regex/$fn->(@{^CAPTURE})/e;
             return $str;
         };
     });
@@ -822,7 +822,7 @@ sub rxsg($seq, $regex, $fn) {
             NEXT_LINE:
             my $str = $it->();
             return undef if not defined $str;
-            $str =~ s/$regex/$fn->()/ge;
+            $str =~ s/$regex/$fn->(@{^CAPTURE})/ge;
             return $str;
         };
     });
