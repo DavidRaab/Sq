@@ -1,9 +1,309 @@
 =head1 Exceptions
 
-Explain why and where it is good to use Exceptions.
+In the past I have worked a lot with exceptions and tried out some of the
+I<suggestion>. For example in PBP (Perl Best Practices) there is an suggestion
+that every error should be an Exception. On top every Ecxeption could be
+an object/class instead of just being a string.
+
+I worked with this style for some time in Perl. It is interesting because
+default Perl doesn't throw exceptions. The default Perl commands are more
+in the spirit of C. They usually return error codes or C<undef> in
+the case of an Error.
+
+Later I also learned C# that havily relies on Exceptions. And then F#. My
+conclusion is that Exceptions in all of them are usually a horrible way
+to code.
+
+Most of the time they are just hidden bugs. You just forget that a function
+can throw an exception, you use it, but in some error-case you suddenly
+get an exception you never expected. But usually for errors that you should
+have expected!
+
+In programming there is a difference between an error that basically is
+a programming error. Or i just name it I<domain-error>. Let's go deeper
+into this distinction with an example
+
+=head2 Error vs. Domain Error
+
+Let's consider Scheme for example. Here we have a function named C<car> and
+C<cdr>. In Haskell or some other languages also named C<head> and C<tail>.
+
+Scheme, like Perl, is also dynamic-typed. But like in some other Manual
+I mentioned is dynamic-typing less dynamic as you might think. C<car> for
+example B<only> works on a List! You cannot pass it anything else. Otherwise
+it fails. How does it fail? By throwing an Exception.
+
+    (define first (car list))
+
+This for example extract just the first element of a list. In Perl.
+
+    my $first = $list->[0];
+
+But what happens when C<list> was not a list? For example it suddenly is a
+number?
+
+    (defined first (car 10))
+
+then you get an Exception! See this is a classical error. This is basically
+an error intended for programmers. This is a bug in your software, something
+that a programmer of the software must find, identify and fix. It absolutely
+never ever makes sense to ever put something like a B<try/catch> mechanism
+around that code!
+
+It would be completely stupid to try to catch those errors. It's also important
+to understand why it throws an exception. It's because Scheme, or dynamic-typing
+in general, doesn't try or can know the type of some expression at
+the compilation stage, it only can know when it is running. So check's if something
+was really a list must be done when the program runs. And when it encounters
+something invalid the program aborts with an exception.
+
+But to fix, those kind of errors you would never even want to add B<try/catch>.
+
+Either you have done something completely wrong to C<car>, and need it to
+pass the correct value (a list). Or maybe you need to add a type-check. Basically
+a dispatch. In B<Racket/Scheme> it would look like
+
+    (define (sum xs)
+        (cond
+            [(list?   xs) (apply + xs)]
+            [(number? xs)  xs]
+            [else (error "unknown type")]))
+
+    (sum '(1 2 3 4))  ; 10
+    (sum 12)          ; 12
+
+Not that this function makes a lot of sense. But it shows that you do a
+type-check and based on that check you dispatch to the correct behaviour.
+
+This would be the I<correct> way to handle such an error. If you ever want to
+write a C<sum> function that also can handle numbers instead of just lists.
+
+In Sq/Perl the above code translate to.
+
+    sub sum ($xs) {
+        if ( is_array($xs) ) {
+            return Array::sum($xs);
+        }
+        elsif ( is_num($xs) ) {
+            return $xs;
+        }
+        else {
+            Carp::croak "unknown type";
+        }
+    }
+
+What you see here are B<Errors> that must be fixed through code. In C# for example
+you encounter more of those exceptions. For example reading an Array outside of
+the bound, or accessing a key from a Dictionary already throws an exception.
+
+In Perl they just return C<undef>. Much more convenient. But even in C# the
+good way how to avoid exceptions would not be to put a C<try> mechanism around
+that code and catch a possible exception. What you should do is to explicitly
+ask if an array has enough indexes, or in the case of a Dictionary you first
+need to check if the key already exists.
+
+=head2 Domain Errors
+
+This is completely different to what I name I<domain-errors>. See the word
+B<exception> already contains an interesting idea. It is something that should
+rarely occur, maybe even never.
+
+So let's say you want to open a file. Now you could let it throw an exception
+if that file doesn't exists. But is that really an exception? In my opinion
+it isn't. It is completely B<normal> to me that when i try to open a file
+either cannot be opened, for example because of missing permissions, maybe
+the file-system is corrupted, it's a virtual file-system or that file simply
+doesn't exists. Maybe you had a typo while you opened? Maybe that file was
+deleted?
+
+Whatever it might be. It is not an exception to try to open a file and this
+operation might fail. That it can fail is part of C<open>. And this is also
+for a lot of other operations.
+
+When you might want to parse a json-string to a data-structure. Well it can
+be that the string is not a valid JSON string. So it shouldn't throw an
+exception.
+
+You want to read something from a database? Getting no elements from a Query
+also shouldn't be an exception. It's a classical error that should be represented
+with an C<Option>, C<Result>. Or maybe even when you wish with an C<undef/null>.
 
 =head2 Exceptions should not be catched
 
+That's why I am saying that Exceptions should not be catched. You can use
+exceptions and throw errors. But use them as a way to indicate a failure in
+your program that somehow needs attention by a programmer.
+
+When I write a function that expects a value to be a number, then I just
+throw an exception if it is not a number (actually in Sq i just use Signatures).
+
+But I also don't expect that someone now wraps my function into a try/catch
+to fetch the mistake when he/she doesn't pass a number! How silly would that
+be?
+
+It's very easy. Just think that your language has no way of catching exceptions.
+And only with this kind of idea in mind you start throwing exceptions. But also
+you yourself never catches any exception in your own code.
+
 =head2 C-Style Error Handling
 
+Sometimes Exceptions are used as a poor-mans-goto. Because some programmers
+have a fundemental misunderstanding of C<goto>. When Dijkstra considered
+C<goto> evil it was in a time when people basically implemented any kind
+of loop even functions with just C<goto>.
+
+Today basically every programming language have that feature. Dijkstra considered
+C<goto> evil because you had only this one construct, a C<goto>, that is used
+to implement like a hundred of features. This is extremely powerfull, and at
+the same time makes reading/understanding of any program harder. Because instead
+of seeing hundred of well known names for every pattern, you just see C<goto>
+everywhere.
+
+In a language like B<C> not much changed. Now instead of C<goto>, in over 90%
+of all cases you just see C<if> and C<for>. So now C<goto> is basically replaced
+into two names. Could be better in my opinion.
+
+Back to exceptions. For example let's look at the C<Sq::Test::nok> implementation.
+
+    sub nok($bool, $message) {
+        $count++;
+        if ( is_num($bool) ) {
+            Carp::croak "Error: ok() only expects 0 or 1 as numbers Got: $bool\n" if ($bool != 0 && $bool != 1);
+            if ( $bool == 0 ) {
+                print "ok $count - $message\n";
+                return;
+            }
+            goto ERROR;
+        }
+        else {
+            my $type = ref $bool;
+            if ( $type eq 'Option' ) {
+                if ( @$bool == 0 ) {
+                    print "ok $count - $message\n";
+                    return;
+                }
+                goto ERROR;
+            }
+            elsif ( $type eq 'Result' ) {
+                if ( $bool->[0] == 0 ) {
+                    print "ok $count - $message\n";
+                    return;
+                }
+                goto ERROR;
+            }
+            elsif ( $type eq "" && $bool eq "" ) {
+                print "ok $count - $message\n";
+                return;
+            }
+
+            Carp::croak "Error: nok got: $bool\n" if ref eq "";
+            Carp::croak "Error: nok() got ref: $type\n";
+        }
+
+        ERROR:
+        my ( $pkg, $file, $line ) = caller;
+        my $place = sprintf "at %s: %d\n", $file, $line;
+        warn  "# not ok $count - $message\n";
+        warn  "# Expected 0, None or Err()\n";
+        return;
+    }
+
+Here is the idea a little bit simplified.
+
+    sub function() {
+        ...
+        if ( $error1 ) {
+            goto ERROR;
+        }
+
+        ...
+        if ( $error2 ) {
+            goto ERROR;
+        }
+
+        ERROR:
+        ...
+    }
+
+you know that this would be the same as throwing an exception?
+
+    sub function() {
+        try {
+            ...
+            if ( $error1 ) {
+                throw ERROR;
+            }
+
+            ...
+            if ( $error2 ) {
+                throw ERROR;
+            }
+        }
+        catch {
+            ...
+        }
+    }
+
+But the difference is that this C-style Error handling with C<goto> is maybe
+around 10-100 times faster as doing that Exception bullshit.
+
+Dijkstra was about that we invent new names instead of using C<goto>. But you
+know, it is completely fine to use C<goto> in cases that are not otherwise
+possible to solve differently, or needs you to write 3x more code.
+
+Forget the idea that B<goto is evil>. Yes that's what you teach novice/beginner
+programmers.
+
+The same that you teach new music students how they stick to the chords and
+rules to music. Until you teach them to break the rules.
+
 =head2 Alternative Error Handling
+
+This error-handling with C<goto> like above works fine inside a single
+I<encapsulated> function. But sometimes we need to return errors. And
+in that case we should return some kind of data indicating an Error.
+
+In a dynamic-typed language you could for example just return an Array with
+a special first attribute that tells you what this is.
+
+    my $ok  = ['Ok',  $value];
+    my $err = ['Err', $value];
+
+in a language like ML/F# you use Discriminated Unions to define a type for this.
+
+    type Error<'a,'b> =
+        Ok  of 'a
+        Err of 'b
+
+    let x = Ok(19)
+    let y = Err("foo")
+
+This kind of error-handling works fine, at least in a language with automatic
+memory management. It also makes API and code usually more correct.
+
+It is very easy for example to call a method and just expect it to always
+return a value and you just chain some method calls on it.
+
+    my $x = $obj->foo(...)->bar(...)->baz(...);
+
+but this also has problems when some of those methods throws an exception.
+Then this whole chaining is not possible anymore. Or you again put an try/catch
+around that code. No wonder why your code becomes slow when you program that
+way!
+
+But consider that C<bar> could fail and instead returns an C<Result>. It
+let's you think as a programmer to think about what should be done in that
+case. You also just can C<map> the result first.
+
+    my $x = $obj->foo(...)->bar(...)->map(call 'baz', ...);
+
+Now the code still is a chain. But no slow exception is thrown. The code is
+still a chain like before. But now C<$x> represents not just a Result. It
+maybe might an C<Ok> value, maybe it is C<Err>.
+
+Like try/catch you can create a chain of operations that look likes code
+that has no error-checking in it. And only at the end you check for errors.
+
+Code like this will usually be faster, has the same readability and you
+will create less crashing programs. But when you don't want to have working
+programs, no problem. Just stick to B<Exceptions>.
