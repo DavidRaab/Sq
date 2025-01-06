@@ -78,6 +78,8 @@ else {
 __DATA__
 #!perl
 use 5.036;
+use utf8;
+use open ':std', ':encoding(UTF-8)';
 use Sq;
 use Sq::Parser -sig => 1;
 use Sq::Test;
