@@ -1,5 +1,7 @@
 #!perl
 use 5.036;
+use utf8;
+use open ':std', ':encoding(UTF-8)';
 use Sq;
 use Sq::Sig;
 use Sq::Test;
@@ -17,6 +19,10 @@ is($file->length, 52, 'file lines');
 is($file->rxm(qr/lisp/i)->length, 15, 'lines mentioned lisp');
 is(
     $file->keep(sub($line) { $line =~ m/lisp/i })->first->or(""),
+    "Around 1993 I started reading books about Lisp, and I discovered something\n",
+    'first line containing lisp');
+is(
+    $file->rx(qr/lisp/i)->first->or(""),
     "Around 1993 I started reading books about Lisp, and I discovered something\n",
     'first line containing lisp');
 
@@ -39,13 +45,43 @@ is(
 is(
     Sq->fs->read_text_gz($Dir, 'data', 'hop-preface.md.gz')->take(1),
     seq { "# Preface\n" },
-    'read 1 linefrom gz');
+    'read one line from gz');
 
-ok(
-    equal(
-        Sq->fs->read_text   ($Dir, 'data', 'hop-preface.md'),
-        Sq->fs->read_text_gz($Dir, 'data', 'hop-preface.md.gz'),
-    ),
+is(
+    Sq->fs->read_text   ($Dir, 'data', 'hop-preface.md'),
+    Sq->fs->read_text_gz($Dir, 'data', 'hop-preface.md.gz'),
     'comparing gziped file with plain text');
+
+is(
+    Sq->fs->read_text($Dir, 'data', 'utf8.txt'),
+    seq {
+        "# Höder\n",
+        "\n",
+        "Töxt with söme höder.\n",
+    },
+    'read utf8.txt');
+
+is(
+    Sq->fs->read_text_gz($Dir, 'data', 'utf8.txt.gz'),
+    seq {
+        "# Höder\n",
+        "\n",
+        "Töxt with söme höder.\n",
+    },
+    'read utf8.txt.gz');
+
+is(
+    Sq->fs->read_text($Dir, 'data', 'utf8.txt'),
+    seq {
+        "# Höder\n",
+        "\n",
+        "Töxt with söme höder.\n",
+    },
+    'read utf8.txt');
+
+is(
+    Sq->fs->read_text   ($Dir, 'data', 'utf8.txt'),
+    Sq->fs->read_text_gz($Dir, 'data', 'utf8.txt.gz'),
+    'compare utf8.txt with utf8.txt.gz');
 
 done_testing;

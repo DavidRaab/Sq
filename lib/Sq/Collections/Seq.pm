@@ -767,7 +767,26 @@ sub cache($seq) {
     return from_array('Seq', to_array($seq));
 }
 
-# rxm : Seq<string> -> Regex -> Seq<Array<string>>
+sub rx($seq, $regex) {
+    return bless(sub {
+        my $abort = 0;
+        my $it    = $seq->();
+        my $str;
+        return sub {
+            return undef if $abort;
+
+            NEXT_LINE:
+            if ( defined($str = $it->()) ) {
+                return $str if $str =~ $regex;
+                goto NEXT_LINE;
+            }
+            $abort = 1;
+            undef $it;
+        }
+    }, 'Seq');
+}
+
+
 sub rxm($seq, $regex) {
     from_sub(Seq => sub {
         my $it = $seq->();
@@ -791,6 +810,19 @@ sub rxs($seq, $regex, $fn) {
             my $str = $it->();
             return undef if not defined $str;
             $str =~ s/$regex/$fn->()/e;
+            return $str;
+        };
+    });
+}
+
+sub rxsg($seq, $regex, $fn) {
+    from_sub(Seq => sub {
+        my $it = $seq->();
+        return sub {
+            NEXT_LINE:
+            my $str = $it->();
+            return undef if not defined $str;
+            $str =~ s/$regex/$fn->()/ge;
             return $str;
         };
     });
