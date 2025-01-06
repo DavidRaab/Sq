@@ -23,8 +23,26 @@ sub read_text($, @path) {
     });
 }
 
-# TODO: Opens file in binary mode
-sub read_raw() { ... }
+sub read_raw($, $size, @path) {
+    require Path::Tiny;
+    my $file = Path::Tiny::path(@path);
+    return Seq->from_sub(sub {
+        open my $fh, '<:raw', $file;
+        if ( !defined $fh ) {
+            return sub { undef }
+        }
+        else {
+            return sub {
+                my $byte;
+                if ( read $fh, $byte, $size ) {
+                    return $byte;
+                }
+                close $fh;
+                undef $fh;
+            };
+        }
+    });
+}
 
 # TODO: reads a gziped file transparent as text
 sub read_zip() { ... }

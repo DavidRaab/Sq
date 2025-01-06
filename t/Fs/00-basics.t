@@ -8,7 +8,7 @@ use Path::Tiny;
 
 ok(Sq->fs->compare_text(
     path($Dir, 'data', 'hop-preface.txt'),
-    path($Dir, 'data', 'hop-preface.md')
+    path($Dir, 'data', 'hop-preface.md'),
 ), 'Higher-Order Perl Preface');
 
 my $file = Sq->fs->read_text(path($Dir, 'data', 'hop-preface.txt'));
@@ -24,5 +24,16 @@ ok(Sq->fs->recurse($Dir)->length > 3, 'more than 3 files');
 ok(
     (Sq->fs->recurse($Dir)->length > Sq->fs->children($Dir)->length),
     'recurse must contain more files than children');
+
+is(
+    Sq->fs->read_raw(10, $Dir, 'data', 'hop-preface.txt')->take(5),
+    seq {
+        "# Preface\n",
+        "\nA well-kn",
+        "own saying",
+        " in the pr",
+        "ogramming "
+    },
+    'read_raw');
 
 done_testing;
