@@ -1,0 +1,7 @@
+# Here is a list of modules currently lazy loaded by Sq when you
+# call certain functions.
+
++ Path::Tiny   Sq->fs->*
++ PerlIO::gzip Sq->fs->read_text_gz)
++ Benchmark    Sq->bench->*
+
