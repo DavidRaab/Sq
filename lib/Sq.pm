@@ -83,15 +83,11 @@ sub import {
     }
 }
 
-# Load Reflection
+# Load Core
 use Sq::Reflection;
+use Sq::Core;
 
-# Load Basic Data Types
-use Sq::Core::Lazy;
-use Sq::Core::Option;
-use Sq::Core::Result;
-
-# Load Collections Modules
+# Load Collections
 use Sq::Collections::Array;
 use Sq::Collections::Hash;
 use Sq::Collections::Seq;
