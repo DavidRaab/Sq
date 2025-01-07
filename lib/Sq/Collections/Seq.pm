@@ -1,7 +1,7 @@
 package Sq::Collections::Seq;
 package Seq;
 use 5.036;
-use subs 'bind', 'join', 'select', 'last', 'sort', 'map', 'foreach', 'length';
+use subs 'bind', 'join', 'select', 'last', 'sort', 'map', 'length';
 
 # TODO:
 #       Find another name for 'from_list'
@@ -559,11 +559,6 @@ sub mapi($seq, $f) {
             return $f->($x, $idx++);
         }
     });
-}
-
-# TODO: Remove in future
-sub filter($seq, $predicate) {
-    Carp::croak "Seq->filter was renamed to Seq->keep";
 }
 
 # keep : Seq<'a> -> ('a -> bool) -> Seq<'a>

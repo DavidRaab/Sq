@@ -253,10 +253,6 @@ sub mapi($array, $f) {
     return CORE::bless(\@new, 'Array');
 }
 
-# TODO: Remove in future
-sub filter   { Carp::croak "Array::filter renamed to Array::keep"     }
-sub filter_e { Carp::croak "Array::filter_e renamed to Array::keep_e" }
-
 # keep : Array<'a> -> ('a -> bool) -> Array<'a>
 sub keep($array, $predicate) {
     local $_;
