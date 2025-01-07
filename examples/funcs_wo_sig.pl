@@ -5,7 +5,7 @@ use open ':std', ':encoding(UTF-8)';
 use Sq;
 use Sq::Reflection;
 use Sq::Gen;
-use Sq::Parser;
+use Sq::Parser -sig => 1;
 use Sq::Sig;
 
 # This script prints all functions in Sq, that have no type-check with
