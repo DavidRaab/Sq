@@ -287,6 +287,10 @@ sub seq :prototype(&) {
 #   my $array = new Array => (1,2,3)
 #
 # looks object-oriented!
+#
+# but without Perl syntactic sugar it is just:
+#
+# my $array = new('Array',1,2,3);
 sub new($what, @args) {
     state %new = (
         Array => sub { Array->new(@_) },
