@@ -209,4 +209,14 @@ is(
     ok(is_type($is_sha_array, gen_run($sha_tuples)), " array of sha tuple");
 }
 
+# new
+{
+    is((new Array => (1,2,3)),     [1,2,3], 'new Array');
+    is((new Seq   => (1,2,3)), seq {1,2,3}, 'new Seq');
+    is(
+        (new Hash  => (foo => 1, bar => 2)),
+        {foo => 1, bar => 2},
+        'new Hash');
+}
+
 done_testing;

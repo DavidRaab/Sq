@@ -6,7 +6,7 @@ use Scalar::Util ();
 my $export_funcs;
 my $first_load = 1;
 our @EXPORT = (
-    qw(sq call key assign seq),
+    qw(sq call key assign seq new),
     qw(is_num is_str is_array is_hash is_seq is_opt is_result is_ref),
     qw(id fst snd),
     qw(by_num by_str by_stri),
@@ -253,6 +253,56 @@ sub seq :prototype(&) {
             return undef;
         }
     }, 'Seq');
+}
+
+# try out a new() function
+# the idea is to have a single function that then does a dispatch. This also
+# could be a dispatch of a type. Somehow reminds me on Haskell, but also
+# basically shows what object-orientation is. It's a dispatch on a single
+# type that usually happens at runtime.
+#
+# Why Haskell? For example I could use the same mechanism for fold()
+#
+# fold $array
+# fold $seq
+# fold $hash
+#
+# and it would dispatch to Array::fold, Seq::fold or Hash::fold depending
+# on the type of it's first argument. But i just can write `fold`. This
+# costs more runtime, as the function must be searched in the dispatch-table
+# exactly like in OO. But it gives more flexibility. For example switching
+# to Seq from Array would not break the code. You don't need to manually
+# change from Array::fold to Seq::fold. In that regards it has the same benefits
+# as calling a method $obj->fold(). Here i also don't care for the type,
+# and the dispatch is done for me. Same principle. Only difference is
+# that it is a function-call instead of a method. Theoretically can be extended
+# like in Dump/Equality so someone can add new things to it.
+#
+# I could make this the default for initialization and only use functional-style.
+# An idea i am thinking of. The benefit of just the functional-style would be
+# that all blessings could be deleted from the whole code. Making the whole
+# system a lot faster.
+#
+# And for the fools:
+#   my $array = new Array => (1,2,3)
+#
+# looks object-oriented!
+sub new($what, @args) {
+    state %new = (
+        Array => sub { Array->new(@_) },
+        Hash  => sub { Hash ->new(@_) },
+        Seq   => sub { Seq  ->new(@_) },
+        Queue => sub { Queue->new(@_) },
+        List  => sub { List ->new(@_) },
+        Heap  => sub { Heap ->new(@_) },
+    );
+    my $fn = $new{$what};
+    if ( defined $fn ) {
+        return $fn->(@args);
+    }
+    else {
+        Carp::croak("Don't know type '$what'");
+    }
 }
 
 1;
