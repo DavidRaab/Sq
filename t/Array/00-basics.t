@@ -1495,4 +1495,37 @@ is(
         'map2 - lambda returns multiple things');
 }
 
+# itern
+{
+    my $data = Array->init(10, sub($idx) { $idx => "foo" });
+    my @tuples;
+    $data->itern(2, sub($k,$v) {
+        push @tuples, [$k,$v];
+    });
+    is(\@tuples, [
+        [0 => "foo"],
+        [1 => "foo"],
+        [2 => "foo"],
+        [3 => "foo"],
+        [4 => "foo"],
+        [5 => "foo"],
+        [6 => "foo"],
+        [7 => "foo"],
+        [8 => "foo"],
+        [9 => "foo"],
+    ], 'itern 1');
+
+    my @sum2;
+    $data->itern(4, sub($k1,$v1,$k2,$v2) {
+        push @sum2, [$k1+$k2, $v1.$v2];
+    });
+    is(\@sum2, [
+        [1  => "foofoo"],
+        [5  => "foofoo"],
+        [9  => "foofoo"],
+        [13 => "foofoo"],
+        [17 => "foofoo"],
+    ], 'itern 2');
+}
+
 done_testing;

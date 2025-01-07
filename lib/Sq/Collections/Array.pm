@@ -1,6 +1,7 @@
 package Sq::Collections::Array;
 package Array;
 use List::Util ();
+use List::MoreUtils qw(natatime);
 use 5.036;
 use subs 'bind', 'join', 'last', 'sort', 'map', 'bless', 'length';
 
@@ -223,13 +224,9 @@ sub map_e($array, $expr) {
 
 sub chunked($array, $size) {
     my @new;
-    my $max  = @$array;
-    my $upto = 0;
-    for (my $idx=0; $idx < $max; $idx+=$size) {
-        $upto     = ($idx + $size) - 1;
-        $upto     = $upto < $max ? $upto : ($max-1);
-        my @slice = $array->@[$idx .. $upto];
-        push @new, CORE::bless(\@slice, 'Array');
+    my $it = natatime $size, @$array;
+    while ( my @vals = $it->() ) {
+        push @new, CORE::bless(\@vals, 'Array');
     }
     return CORE::bless(\@new, 'Array');
 }
@@ -667,6 +664,14 @@ sub iter($array, $f) {
         $f->($x);
     }
     return;
+}
+
+sub itern($array, $amount, $f) {
+    my $it = natatime $amount, @$array;
+    while ( my @vals = $it->() ) {
+        $f->(@vals);
+    }
+    return
 }
 
 sub iter_sort($array, $cmp, $f) {

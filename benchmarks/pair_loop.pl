@@ -91,5 +91,10 @@ Sq->bench->compare(-1, {
         for ( 1 .. 1_000 ) {
             windowed(@data);
         }
-    }
+    },
+    current => sub {
+        for ( 1 .. 1_000 ) {
+            Array::itern(\@data, 2, sub {});
+        }
+    },
 });
