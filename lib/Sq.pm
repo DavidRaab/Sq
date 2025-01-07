@@ -286,11 +286,23 @@ sub seq :prototype(&) {
 # And for the fools:
 #   my $array = new Array => (1,2,3)
 #
-# looks object-oriented!
-#
-# but without Perl syntactic sugar it is just:
+# looks object-oriented! but without Perl syntactic sugar it is just:
 #
 # my $array = new('Array',1,2,3);
+#
+# but here is an interesting question. Why do you want to write the left,
+# when you just can write the right?
+#
+# LEFT                       RIGHT
+# new Array => (1,2,3)       [1,2,3]
+# new Seq   => (1,2,3)       seq { 1,2,3 }
+# new Hash  => (foo => 1)    { foo => 1 }
+#
+# Even Lisp-style would be better IMHO
+#
+# (list 1 2 3)
+# (seq  1 2 3)
+# (hash foo 1)
 sub new($what, @args) {
     state %new = (
         Array => sub { Array->new(@_) },
