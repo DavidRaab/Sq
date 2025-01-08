@@ -84,8 +84,8 @@ sig('Seq::doi',      $seq, $sub,   $seq);
 
 ### CONVERTER
 
-sig('Seq::sort',          $seq, $sub,           t_array);
-sig('Seq::sort_by',       $seq, $sub, $sub,     t_array);
+sig('Seq::sort',       $seq, $sub,            t_array);
+sig('Seq::sort_by',    $seq, $sub, $sub,      t_array);
 sig('Seq::group_fold', $seq, $sub, $sub, $sub, t_hash);
 sig('Seq::group_by',   $seq, $sub,               $hoa);
 sig('Seq::fold',       $seq, $any, $sub,         $any);
