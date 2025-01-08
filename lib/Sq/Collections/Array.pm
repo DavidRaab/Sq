@@ -715,7 +715,7 @@ sub itern($array, $amount, $f) {
     while ( my @vals = $it->() ) {
         $f->(@vals);
     }
-    return
+    return;
 }
 
 sub iter_sort($array, $cmp, $f) {

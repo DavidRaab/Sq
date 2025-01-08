@@ -3,8 +3,8 @@ use 5.036;
 use Sq;
 use Sq::Type;
 use Sq::Signature;
-use Sq::Sig;
 use Sq::Test;
+use Sq::Sig;
 
 my $is_point = t_hash(t_keys(
     X => t_num,
