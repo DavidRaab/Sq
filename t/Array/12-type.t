@@ -1,7 +1,7 @@
 #!perl
 use 5.036;
 use Sq;
-use Sq::Parser;
+use Sq::Parser -sig => 1;
 use Sq::Test;
 use Sq::Sig;
 

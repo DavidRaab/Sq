@@ -1,10 +1,9 @@
 #!perl
 use 5.036;
 use Sq;
-use Sq::Parser;
-use Sq::Sig;
-use Sq::Sig::Parser;
+use Sq::Parser -sig => 1;
 use Sq::Test;
+use Sq::Sig;
 
 # Some functions now take multiple parsers and p_and or p_or them
 

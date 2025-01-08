@@ -2,9 +2,9 @@
 use 5.036;
 use Sq;
 use Sq::Type;
-use Sq::Parser;
-use Sq::Sig;
+use Sq::Parser -sig => 1;
 use Sq::Test;
+use Sq::Sig;
 
 # data used for checking
 my $album = sq {
