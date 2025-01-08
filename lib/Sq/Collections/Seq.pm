@@ -757,9 +757,39 @@ sub sort_by($seq, $comparer, $get_key) {
     return Array::sort_by(to_array($seq), $comparer, $get_key);
 }
 
-# TODO: Better cache
 sub cache($seq) {
-    return from_array('Seq', to_array($seq));
+    my $it       = $seq->();
+    my $finished = 0;        # if $it finished once
+    my @cache;
+    return bless(sub {
+        my $abort = 0;
+        my $idx   = 0;
+        my $x;
+        return sub {
+            return undef if $abort;
+            # when $it finished we only need to serve from @cache
+            if ( $finished ) {
+                return $cache[$idx++] if $idx < @cache;
+                $abort = 1;
+                return undef;
+            }
+            # otherwise we serve from @cache or read/cache from $it
+            else {
+                # serve from cache when cache has item
+                return $cache[$idx++] if $idx < @cache;
+                # otherwise read from iterator to get next element,
+                # save in cache and return.
+                if ( defined($x = $it->()) ) {
+                    push @cache, $x;
+                    $idx++;
+                    return $x;
+                }
+                $abort    = 1;
+                $finished = 1;
+                undef $it;
+            }
+        }
+    }, 'Seq');
 }
 
 sub rx($seq, $regex) {
