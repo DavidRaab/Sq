@@ -71,7 +71,16 @@ cmpthese(-1, {
             );
         }
     },
-    sq_new => sub {
+    sq => sub {
+        for ( 1 .. 1_000 ) {
+            my $m = sq {
+                title  => 'Terminator 2',
+                rating => 5,
+                desc   => 'Awesome',
+            };
+        }
+    },
+    "Hash->new" => sub {
         for ( 1 .. 1_000 ) {
             my $m = Hash->new(
                 title  => 'Terminator 2',
@@ -80,7 +89,7 @@ cmpthese(-1, {
             );
         }
     },
-    sq_bless => sub {
+    "Hash->bless" => sub {
         for ( 1 .. 1_000 ) {
             my $m = Hash->bless({
                 title  => 'Terminator 2',
@@ -134,6 +143,7 @@ cmpthese(-1, {
             );
         }
     },
+    # Fastest
     perl_hash => sub {
         for ( 1 .. 1_000 ) {
             my $m = {
@@ -142,7 +152,16 @@ cmpthese(-1, {
                 desc   => 'Awesome',
             };
         }
-    }
+    },
+    perl_hash_bless => sub {
+        for ( 1 .. 1_000 ) {
+            my $m = bless({
+                title  => 'Terminator 2',
+                rating => 5,
+                desc   => 'Awesome',
+            }, 'Hash');
+        }
+    },
 });
 
 # examples for benchmarks
