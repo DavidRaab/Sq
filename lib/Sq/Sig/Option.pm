@@ -16,10 +16,10 @@ sigt('Option::Some', t_tuplev(t_array), $opt);
 sig('Option::is_some', $any, t_bool);
 sig('Option::is_none', $any, t_bool);
 
-my $matches = t_hash(t_keys(
+my $matches = t_keys(
     Some => t_sub,
     None => t_sub,
-));
+);
 sigt('Option::match', t_tuplev($opt, t_as_hash($matches)), $any);
 
 # Still need a solution for signature with list context
