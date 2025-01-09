@@ -82,10 +82,18 @@ sub seq($seq, $depth=0) {
 }
 
 sub result($result, $depth=0) {
-    my $str = $result->[0] == 1
-        ? 'Ok('  . to_string($result->[1], $depth+2) . ')'
-        : 'Err(' . to_string($result->[1], $depth+2) . ')';
-    return $str;
+    if ( $COLOR ) {
+        my $str = $result->[0] == 1
+            ? "${COLOR_SPECIAL}Ok$COLOR_RESET("  . to_string($result->[1], $depth+2) . ')'
+            : "${COLOR_SPECIAL}Err$COLOR_RESET(" . to_string($result->[1], $depth+2) . ')';
+        return $str;
+    }
+    else {
+        my $str = $result->[0] == 1
+            ? 'Ok('  . to_string($result->[1], $depth+2) . ')'
+            : 'Err(' . to_string($result->[1], $depth+2) . ')';
+        return $str;
+    }
 }
 
 # TODO: Allow specification of key order when dumping
