@@ -1,7 +1,7 @@
 package Sq::Dump;
 use 5.036;
 
-our $INLINE = 60;
+our $INLINE = 90;
 
 # Dumping functions for types
 sub array($array, $depth=0) {
