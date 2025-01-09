@@ -114,4 +114,17 @@ sub children($, @paths) {
     return Seq->new(Path::Tiny::path(@paths)->children);
 }
 
+sub sha512($, @path) {
+    require Path::Tiny;
+    my $file = Path::Tiny::path(@path);
+    my $err = open my $fh, '<:raw', $file;
+    return Err("Could not open '$file': $!") if !defined $err;
+
+    require Digest::SHA;
+    my $sha  = Digest::SHA->new('sha512');
+    $sha->addfile($fh);
+
+    return Ok($sha->hexdigest);
+}
+
 1;
