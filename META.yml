@@ -3,8 +3,13 @@ abstract: 'The Sq Language'
 author:
   - 'David Raab <davidraab83@gmail.com>'
 build_requires:
+  Carp: '0'
+  Digest::SHA: '0'
+  List::MoreUtils: '0'
   List::Util: '0'
   Path::Tiny: '0'
+  PerlIO::gzip: '0'
+  Scalar::Util: '0'
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
@@ -24,11 +29,11 @@ provides:
   List:
     file: lib/Sq/Collections/List.pm
   Option:
-    file: lib/Sq/Core/Option.pm
+    file: lib/Sq/Core.pm
   Queue:
     file: lib/Sq/Collections/Queue.pm
   Result:
-    file: lib/Sq/Core/Result.pm
+    file: lib/Sq/Core.pm
   Seq:
     file: lib/Sq/Collections/Seq.pm
   Sq:
@@ -62,12 +67,14 @@ provides:
     file: lib/Sq/Concurrency/Mailbox.pm
   Sq::Concurrency::Threads:
     file: lib/Sq/Concurrency/Threads.pm
+  Sq::Core:
+    file: lib/Sq/Core.pm
   Sq::Core::DU:
     file: lib/Sq/Core/DU.pm
   Sq::Core::Date:
     file: lib/Sq/Core/Date.pm
   Sq::Core::Lazy:
-    file: lib/Sq/Core/Lazy.pm
+    file: lib/Sq/Core.pm
   Sq::Core::Measure:
     file: lib/Sq/Core/Measure.pm
   Sq::Data::CSV:
@@ -144,8 +151,8 @@ provides:
     file: lib/Sq/Type.pm
 requires:
   Carp: '0'
+  List::MoreUtils: '0'
   List::Util: '0'
-  Path::Tiny: '0'
   Scalar::Util: '0'
 resources:
   license: http://www.opensource.org/licenses/mit-license.php

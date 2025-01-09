@@ -4,6 +4,7 @@ benchmarks/array_init.pl
 benchmarks/array_map.pl
 benchmarks/array_min.pl
 benchmarks/array_reverse.pl
+benchmarks/array_shuffle.pl
 benchmarks/bool.pl
 benchmarks/even_num.pl
 benchmarks/func_key.pl
@@ -15,6 +16,7 @@ benchmarks/one_of.pl
 benchmarks/option.pl
 benchmarks/option_mapv.pl
 benchmarks/option_match.pl
+benchmarks/pair_loop.pl
 benchmarks/parser_int.pl
 benchmarks/parser_intstr.pl
 benchmarks/parser_str.pl
@@ -78,11 +80,13 @@ examples/AoC-2023/01p2.pl
 examples/AoC-2023/01p2.txt
 examples/bench_it.pl
 examples/choose.pl
+examples/colors.pl
 examples/dump.pl
 examples/euler.pl
 examples/find_duplicates
 examples/funcs_array.pl
 examples/funcs_seq_array.pl
+examples/funcs_wo_sig.pl
 examples/info.txt
 examples/job_postings.pl
 examples/job_postings_mixed.pl
@@ -116,15 +120,14 @@ lib/Sq/Concurrency/Async.pm
 lib/Sq/Concurrency/Fork.pm
 lib/Sq/Concurrency/Mailbox.pm
 lib/Sq/Concurrency/Threads.pm
+lib/Sq/Core.pm
 lib/Sq/Core.pod
 lib/Sq/Core/Date.pm
 lib/Sq/Core/DU.pm
-lib/Sq/Core/Lazy.pm
+lib/Sq/Core/Lazy.pod
 lib/Sq/Core/Measure.pm
-lib/Sq/Core/Option.pm
 lib/Sq/Core/Option.pod
 lib/Sq/Core/Record.pm
-lib/Sq/Core/Result.pm
 lib/Sq/Core/Result.pod
 lib/Sq/Data/CSV.pm
 lib/Sq/Data/JSON.pm
@@ -200,6 +203,7 @@ LICENSE
 MANIFEST			This list of files
 META.json
 META.yml
+MODULES
 perlcriticrc
 profile_tests.pl
 README.md
@@ -255,11 +259,15 @@ t/Array/08-group_by.t
 t/Array/10-option.t
 t/Array/11-regex.t
 t/Array/12-type.t
+t/Array/13-no_sig.t
 t/Evaluator/00-type.t
 t/Evaluator/01-parser.t
 t/Fs/00-basics.t
 t/Fs/data/hop-preface.md
+t/Fs/data/hop-preface.md.gz
 t/Fs/data/hop-preface.txt
+t/Fs/data/utf8.txt
+t/Fs/data/utf8.txt.gz
 t/List/00-basics.t
 t/Parser/00-basic.t
 t/Parser/01-array.t
@@ -280,6 +288,7 @@ t/Seq/08-group_by.t
 t/Seq/09-cache.t
 t/Seq/10-option.t
 t/Seq/11-lazy.t
+t/Seq/11-regex.t
 t/Seq/data/07-from_sub/text.txt
 t/Signature/00-basics.t
 t/Signature/01-Array.t

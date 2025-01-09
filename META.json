@@ -22,15 +22,20 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "List::MoreUtils" : "0",
             "List::Util" : "0",
-            "Path::Tiny" : "0",
             "Scalar::Util" : "0"
          }
       },
       "test" : {
          "requires" : {
+            "Carp" : "0",
+            "Digest::SHA" : "0",
+            "List::MoreUtils" : "0",
             "List::Util" : "0",
-            "Path::Tiny" : "0"
+            "Path::Tiny" : "0",
+            "PerlIO::gzip" : "0",
+            "Scalar::Util" : "0"
          }
       }
    },
@@ -48,13 +53,13 @@
          "file" : "lib/Sq/Collections/List.pm"
       },
       "Option" : {
-         "file" : "lib/Sq/Core/Option.pm"
+         "file" : "lib/Sq/Core.pm"
       },
       "Queue" : {
          "file" : "lib/Sq/Collections/Queue.pm"
       },
       "Result" : {
-         "file" : "lib/Sq/Core/Result.pm"
+         "file" : "lib/Sq/Core.pm"
       },
       "Seq" : {
          "file" : "lib/Sq/Collections/Seq.pm"
@@ -105,6 +110,9 @@
       "Sq::Concurrency::Threads" : {
          "file" : "lib/Sq/Concurrency/Threads.pm"
       },
+      "Sq::Core" : {
+         "file" : "lib/Sq/Core.pm"
+      },
       "Sq::Core::DU" : {
          "file" : "lib/Sq/Core/DU.pm"
       },
@@ -112,7 +120,7 @@
          "file" : "lib/Sq/Core/Date.pm"
       },
       "Sq::Core::Lazy" : {
-         "file" : "lib/Sq/Core/Lazy.pm"
+         "file" : "lib/Sq/Core.pm"
       },
       "Sq::Core::Measure" : {
          "file" : "lib/Sq/Core/Measure.pm"
