@@ -1,7 +1,13 @@
 package Sq::Dump;
 use 5.036;
 
-our $INLINE = 90;
+our $INLINE         = 200;
+our $COLOR          = 1;
+my  $COLOR_RESET    = "\e[m";
+our $COLOR_STRING   = "\e[38;5;2m"; # green
+our $COLOR_NUM      = "\e[38;5;1m"; # red
+our $COLOR_HASH_KEY = "\e[38;5;4m"; # blue
+our $COLOR_SPECIAL  = "\e[38;5;3m"; # yellow
 
 # Dumping functions for types
 sub array($array, $depth=0) {
@@ -31,7 +37,12 @@ sub hash($hash, $depth=0) {
     my $indent = " " x ($depth + 2);
     for my $key ( sort { $a cmp $b } CORE::keys %$hash ) {
         my $value  = $hash->{$key};
-        $str .= $indent . sprintf("%s => %s,\n", $key, to_string($value,$depth+2));
+        if ( $COLOR ) {
+            $str .= $indent . sprintf("$COLOR_HASH_KEY\%s$COLOR_RESET => %s,\n", $key, to_string($value,$depth+2));
+        }
+        else {
+            $str .= $indent . sprintf("%s => %s,\n", $key, to_string($value,$depth+2));
+        }
     }
     $str =~ s/,\n\z/\n/;
     $str .= (" " x $depth) . "}";
@@ -41,13 +52,17 @@ sub hash($hash, $depth=0) {
 sub option($opt, $depth=0) {
     if ( @$opt ) {
         my $inner = join(',', map { to_string($_, $depth+2) } @$opt);
-        return 'Some(' . $inner . ')';
+        return $COLOR
+               ? "${COLOR_SPECIAL}Some$COLOR_RESET(" . $inner . ')'
+               : "Some(" . $inner . ')';
     }
-    return 'None';
+    return $COLOR
+         ? $COLOR_SPECIAL . 'None' . $COLOR_RESET
+         : 'None';
 }
 
 sub seq($seq, $depth=0) {
-    my $str    = "seq {\n";
+    my $str    = $COLOR ? "${COLOR_SPECIAL}seq${COLOR_RESET} {\n" : "seq {\n";
     my $indent = " " x ($depth + 2);
     my $array  = $seq->to_array(21);
     my $max    = @$array == 21 ? 21 : @$array;
@@ -86,11 +101,23 @@ sub benchmark($bench, $depth=0) {
 
 ### Dumping Logic
 
+sub num {
+    return $COLOR
+         ? sprintf "$COLOR_NUM%s$COLOR_RESET", $_[0]
+         : sprintf "%s", $_[0];
+}
+
+sub string {
+    return $COLOR
+         ? sprintf "$COLOR_STRING\"%s\"$COLOR_RESET", quote($_[0])
+         : sprintf "\"%s\"", quote($_[0]);
+}
+
 # Dispatch Table for types
 my $dispatch = {
     '_UNDEF'            => sub { 'undef'                        },
-    '_NUM'              => sub { sprintf "%s", $_[0]            },
-    '_STRING'           => sub { sprintf "\"%s\"", quote($_[0]) },
+    '_NUM'              => \&num,
+    '_STRING'           => \&string,
     'CODE'              => sub { 'sub { DUMMY }'                },
     'Sq::Control::Lazy' => sub { 'lazy { DUMMY }'               },
     'ARRAY'             => \&array,
@@ -102,7 +129,7 @@ my $dispatch = {
     'Seq'               => \&seq,
     'Result'            => \&result,
     'Benchmark'         => \&benchmark,
-    'Path::Tiny'        => sub { 'path("' . quote($_[0]->stringify) .'")' },
+    'Path::Tiny'        => sub { 'path(' . string(quote($_[0]->stringify)) .')' },
 };
 
 sub quote($str) {

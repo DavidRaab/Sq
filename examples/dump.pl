@@ -5,6 +5,13 @@ use Sq;
 use Sq::Sig;
 use Path::Tiny qw(path);
 
+# Control if Dump should show color or not.
+$Sq::Dump::COLOR  = 1;
+# When color is active this should be higher. At the moment i don't differentiate
+# between printable characters and not. Color printing emits additional characters
+# so this must be higher to be more compact.
+$Sq::Dump::INLINE = 300;
+
 my $test = sq {
     bonus => "with\nnewline",
     opt1  => Some(10),
