@@ -61,7 +61,6 @@ sigt('Hash::dump',
     t_or(
         t_tuple(t_hash),
         t_tuple(t_hash, t_int),
-        t_tuple(t_hash, t_int, t_int),
     ),
     t_str
 );
@@ -70,7 +69,6 @@ sigt('Hash::dumpw',
     t_or(
         t_tuple(t_hash),
         t_tuple(t_hash, t_int),
-        t_tuple(t_hash, t_int, t_int),
     ),
     t_void
 );

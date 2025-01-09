@@ -70,7 +70,6 @@ sigt('Option::dump',
     t_or(
         t_tuple($opt),
         t_tuple($opt, t_int),
-        t_tuple($opt, t_int, t_int),
     ),
     t_str
 );
@@ -78,7 +77,6 @@ sigt('Option::dumpw',
     t_or(
         t_tuple($opt),
         t_tuple($opt, t_int),
-        t_tuple($opt, t_int, t_int),
     ),
     t_void
 );

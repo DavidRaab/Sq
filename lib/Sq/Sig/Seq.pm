@@ -128,7 +128,6 @@ sigt('Seq::dump',
     t_or(
         t_tuple($seq),
         t_tuple($seq, t_int),
-        t_tuple($seq, t_int, t_int),
     ),
     t_str
 );
@@ -136,7 +135,6 @@ sigt('Seq::dumpw',
     t_or(
         t_tuple($seq),
         t_tuple($seq, t_int),
-        t_tuple($seq, t_int, t_int),
     ),
     t_void
 );

@@ -24,10 +24,10 @@ sig('Result::or_else_with', $result, t_sub,                            $result);
 sig('Result::iter',      $result, t_sub, t_void);
 
 ### CONVERTERS
-my $matches = t_hash(t_keys(
+my $matches = t_keys(
     Ok  => t_sub,
     Err => t_sub,
-));
+);
 sigt('Result::match',    t_tuplev($result, t_as_hash($matches)), $any);
 sig('Result::fold',      $result, $any, t_sub,                   $any);
 sig('Result::is_ok',     $any,                                 t_bool);

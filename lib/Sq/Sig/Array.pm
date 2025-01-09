@@ -153,7 +153,6 @@ sigt('Array::dump',
     t_or(
         t_tuple($array),
         t_tuple($array, t_int),
-        t_tuple($array, t_int, t_int),
     ),
     t_str
 );
@@ -161,7 +160,6 @@ sigt('Array::dumpw',
     t_or(
         t_tuple($array),
         t_tuple($array, t_int),
-        t_tuple($array, t_int, t_int),
     ),
     t_void
 );

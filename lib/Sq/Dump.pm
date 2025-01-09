@@ -1,57 +1,59 @@
 package Sq::Dump;
 use 5.036;
 
+our $INLINE = 60;
+
 # Dumping functions for types
-sub array($array, $inline=60, $depth=0) {
+sub array($array, $depth=0) {
     my $str    = "[\n";
     my $indent = " " x ($depth + 2);
     for my $x ( @$array ) {
-        $str .= $indent . to_string($x, $inline, $depth+2) . ",\n";
+        $str .= $indent . to_string($x, $depth+2) . ",\n";
     }
     $str =~ s/,\n\z/\n/;
     $str .= (" " x $depth) . "]";
     return $str;
 }
 
-sub queue($queue, $inline=60, $depth=0) {
+sub queue($queue, $depth=0) {
     my $str    = "Queue [\n";
     my $indent = " " x ($depth + 2);
     for my $x ( @$queue ) {
-        $str .= $indent . to_string($x, $inline, $depth+2) . ",\n";
+        $str .= $indent . to_string($x, $depth+2) . ",\n";
     }
     $str =~ s/,\n\z/\n/;
     $str .= (" " x $depth) . "]";
     return $str;
 }
 
-sub hash($hash, $inline=60, $depth=0) {
+sub hash($hash, $depth=0) {
     my $str    = "{\n";
     my $indent = " " x ($depth + 2);
     for my $key ( sort { $a cmp $b } CORE::keys %$hash ) {
         my $value  = $hash->{$key};
-        $str .= $indent . sprintf("%s => %s,\n", $key, to_string($value,$inline,$depth+2));
+        $str .= $indent . sprintf("%s => %s,\n", $key, to_string($value,$depth+2));
     }
     $str =~ s/,\n\z/\n/;
     $str .= (" " x $depth) . "}";
     return $str;
 }
 
-sub option($opt, $inline=60, $depth=0) {
+sub option($opt, $depth=0) {
     if ( @$opt ) {
-        my $inner = join(',', map { to_string($_, $inline, $depth+2) } @$opt);
+        my $inner = join(',', map { to_string($_, $depth+2) } @$opt);
         return 'Some(' . $inner . ')';
     }
     return 'None';
 }
 
-sub seq($seq, $inline=60, $depth=0) {
+sub seq($seq, $depth=0) {
     my $str    = "seq {\n";
     my $indent = " " x ($depth + 2);
     my $array  = $seq->to_array(21);
     my $max    = @$array == 21 ? 21 : @$array;
     # only put 20 elements into seq {} string
     for (my $idx=0; $idx < $max; $idx++ ) {
-        $str .= $indent . to_string($array->[$idx] , $inline, $depth+2) . ",\n";
+        $str .= $indent . to_string($array->[$idx], $depth+2) . ",\n";
     }
     # when they are more than 20 elements
     if ( @$array == 21 ) {
@@ -64,22 +66,22 @@ sub seq($seq, $inline=60, $depth=0) {
     return $str;
 }
 
-sub result($result, $inline=60, $depth=0) {
+sub result($result, $depth=0) {
     my $str = $result->[0] == 1
-        ? 'Ok('  . to_string($result->[1], $inline, $depth+2) . ')'
-        : 'Err(' . to_string($result->[1], $inline, $depth+2) . ')';
+        ? 'Ok('  . to_string($result->[1], $depth+2) . ')'
+        : 'Err(' . to_string($result->[1], $depth+2) . ')';
     return $str;
 }
 
 # TODO: Allow specification of key order when dumping
-sub benchmark($bench, $inline=60, $depth=0) {
+sub benchmark($bench, $depth=0) {
     return hash({
         "Total Parent"        => $bench->cpu_p,
         "Total Childs"        => $bench->cpu_c,
         "Total Parent+Childs" => $bench->cpu_a,
         "Real Seconds"        => $bench->real,
         "Iterations Run"      => $bench->iters,
-    }, $inline, $depth);
+    }, $depth);
 }
 
 ### Dumping Logic
@@ -110,7 +112,7 @@ sub quote($str) {
     return $str;
 };
 
-sub compact($max, $str) {
+sub compact($str) {
     # replace empty string/array
     return '[]' if $str =~ m/\A\s*\[\s*\]\z/;
     return '{}' if $str =~ m/\A\s*\{\s*\}\z/;
@@ -127,14 +129,14 @@ sub compact($max, $str) {
 
     # when $no_ws is smaller than $max we keep that string but we
     # need to add $indent again
-    if ( CORE::length $no_ws <= $max ) {
+    if ( CORE::length $no_ws <= $INLINE ) {
         $str = (" " x $indent) . $no_ws;
     }
 
     return $str;
 };
 
-sub to_string($any, $inline=60, $depth=0) {
+sub to_string($any, $depth=0) {
     my $type =
         !defined $any    ? '_UNDEF'  :
         Sq::is_num($any) ? '_NUM'    :
@@ -143,16 +145,16 @@ sub to_string($any, $inline=60, $depth=0) {
 
     my $func = $dispatch->{$type};
     return defined $func
-         ? compact($inline, $func->($any, $inline, $depth))
+         ? compact($func->($any, $depth))
          : "NOT_IMPLEMENTED REF: $type";
 }
 
-sub dump($any, $inline=60, $depth=0) {
-    return to_string($any, $inline, $depth);
+sub dump($any, $depth=0) {
+    return to_string($any, $depth);
 }
 
-sub dumpw($any, $inline=60, $depth=0) {
-    warn to_string($any, $inline, $depth), "\n";
+sub dumpw($any, $depth=0) {
+    warn to_string($any, $depth), "\n";
     return;
 }
 
@@ -164,6 +166,7 @@ sub add_dump($type, $func) {
 }
 
 # Add dumping to other packages
+no warnings 'once';
 *{Array::dump }             = \&dump;
 *{Array::dumpw}             = \&dumpw;
 *{Hash::dump }              = \&dump;

@@ -25,7 +25,8 @@ my $examples =
         return Some(sq [$name, $info->{$name} // ""]);
     });
 
-# dumpw($examples, 120);
+# $Sq::Dump::Inline = 120;
+# dumpw($examples);
 
 # print Array of Array as Table
 Sq->fmt->table({
