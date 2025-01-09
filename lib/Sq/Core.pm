@@ -24,6 +24,7 @@ sub force($self) {
 
 package Option;
 use 5.036;
+use overload q{""} => sub { Sq::Dump::option($_[0]) };
 
 # because this value never changes, or should change, we only need one
 # value of it, and we can share it. But if someone changes the None value
@@ -260,6 +261,7 @@ sub extract($, @anys) {
 
 package Result;
 use 5.036;
+use overload q{""} => sub { Sq::Dump::result($_[0]) };
 
 # enum values representing Ok/Err
 my $err = 0;
