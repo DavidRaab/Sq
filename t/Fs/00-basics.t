@@ -84,4 +84,13 @@ is(
     Sq->fs->read_text_gz($Dir, 'data', 'utf8.txt.gz'),
     'compare utf8.txt with utf8.txt.gz');
 
+is(
+    Sq->fs->sha512($Dir, 'data', 'hop-preface.md'),
+    Ok("3518cc17afa576ef870ab0e869eb0ebf49fe137a97c6aec50ba05d72ce89331057403eaffbec8bd7dee38694bef67ebcd70a15ee41ee6e13e74ea731db3633cc"),
+    'sha512 1');
+
+ok(
+    Result::is_err(Sq->fs->sha512($Dir, 'data', 'NotExisting')),
+    'sha512 2');
+
 done_testing;
