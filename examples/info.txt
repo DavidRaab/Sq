@@ -15,3 +15,5 @@ option_divide.pl      Usage of Option to avoid exception when dividing with zero
 permutation.pl        Seq: Prints permutation of 10 keys
 permutation_random.pl Seq: continously generates random permutations
 primes.pl             Seq: Print Prime Numbers < 10_000
+colors.pl             Shows ANSI Colors to choose from
+funcs_wo_sig.pl       Shows functions in Sq that don't have a Signature
