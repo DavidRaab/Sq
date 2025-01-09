@@ -2,6 +2,6 @@
 # call certain functions.
 
 + Path::Tiny   Sq->fs->*
-+ PerlIO::gzip Sq->fs->read_text_gz)
++ PerlIO::gzip Sq->fs->read_text_gz
 + Benchmark    Sq->bench->*
-
++ Digest::SHA  Sq->fs->sha512
