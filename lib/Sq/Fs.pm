@@ -23,28 +23,6 @@ sub read_text($, @path) {
     });
 }
 
-sub read_raw($, $size, @path) {
-    require Path::Tiny;
-    my $file = Path::Tiny::path(@path);
-    return Seq->from_sub(sub {
-        open my $fh, '<:raw', $file;
-        if ( !defined $fh ) {
-            return sub { undef }
-        }
-        else {
-            return sub {
-                my $byte;
-                if ( read $fh, $byte, $size ) {
-                    return $byte;
-                }
-                close $fh;
-                undef $fh;
-            };
-        }
-    });
-}
-
-# TODO: reads a gziped file transparent as text
 sub read_text_gz($, @path) {
     require PerlIO::gzip;
     require Path::Tiny;
@@ -66,6 +44,26 @@ sub read_text_gz($, @path) {
     });
 }
 
+sub read_raw($, $size, @path) {
+    require Path::Tiny;
+    my $file = Path::Tiny::path(@path);
+    return Seq->from_sub(sub {
+        open my $fh, '<:raw', $file;
+        if ( !defined $fh ) {
+            return sub { undef }
+        }
+        else {
+            return sub {
+                my $byte;
+                if ( read $fh, $byte, $size ) {
+                    return $byte;
+                }
+                close $fh;
+                undef $fh;
+            };
+        }
+    });
+}
 
 sub compare_text($, $file1, $file2) {
     return equal(
