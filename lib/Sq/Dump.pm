@@ -172,11 +172,13 @@ sub compact($str) {
 };
 
 sub to_string($any, $depth=0) {
-    my $type =
-        !defined $any    ? '_UNDEF'  :
-        Sq::is_num($any) ? '_NUM'    :
-        Sq::is_str($any) ? '_STRING' :
-        ref $any;
+    my $type = '_UNDEF';
+    if ( defined $any ) {
+        $type = ref $any;
+        if ( $type eq "" ) {
+            $type = Sq::is_num($any) ? '_NUM' : '_STRING'
+        }
+    }
 
     my $func = $dispatch->{$type};
     return defined $func
