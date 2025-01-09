@@ -1,10 +1,10 @@
-1bill.pl         Counts towards 1 Billion
-1bill_slower.pl  More complicated way to count to 1 Billion
+1bill.pl         Seq: Counts towards 1 Billion
+1bill_slower.pl  Seq: More complicated way to count to 1 Billion
 album.pl         Dumping and Immutable updates of data-structure
 bench_it.pl      Timing a subroutine
-choose.pl        Intro to Sequence. Prints 100 Mio Dots.
-dump.pl          Exhausted Dumping of data-structure
-euler.pl         Computes Euler with Sequence
+choose.pl        Seq: Intro to Sequence. Prints 100 Mio Dots.
+dump.pl          Dumping of data-structure
+euler.pl         Seq: Computes Euler
 find_duplicates       Find file duplicates revcursively in folder
 funcs_array.pl        Reflection: Prints all Array functions
 funcs_seq_array.pl    Reflection: Missing Diff between Array/Seq functions
@@ -16,4 +16,4 @@ permutation.pl        Seq: Prints permutation of 10 keys
 permutation_random.pl Seq: continously generates random permutations
 primes.pl             Seq: Print Prime Numbers < 10_000
 colors.pl             Shows ANSI Colors to choose from
-funcs_wo_sig.pl       Shows functions in Sq that don't have a Signature
+funcs_wo_sig.pl       Reflection: Shows functions in Sq that don't have a Signature
