@@ -753,6 +753,7 @@ sub fold($array, $state, $folder) {
     return $state;
 }
 
+# TODO: Maybe find a better name?
 sub scan($array, $state, $f_state) {
     my @new = ($state);
     for my $x ( @$array ) {
@@ -762,7 +763,6 @@ sub scan($array, $state, $f_state) {
     return CORE::bless(\@new, 'Array');
 }
 
-# fold : Array<'a> -> 'State -> ('State -> 'a -> 'State) -> 'State
 sub fold_mut($array, $state, $folder) {
     for my $x ( @$array ) {
         $folder->($x,$state);
