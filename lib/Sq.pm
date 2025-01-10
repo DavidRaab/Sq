@@ -6,7 +6,7 @@ use Scalar::Util ();
 my $export_funcs;
 my $first_load = 1;
 our @EXPORT = (
-    qw(sq call key assign seq new),
+    qw(sq call key assign seq new multi),
     qw(is_num is_str is_array is_hash is_seq is_opt is_result is_ref),
     qw(id fst snd),
     qw(by_num by_str by_stri),
@@ -319,6 +319,22 @@ sub new($what, @args) {
     else {
         Carp::croak("Don't know type '$what'");
     }
+}
+
+# creates functions with multi-dispatch based on input type
+sub multi($name, @tf) {
+    my $pkg  = caller;
+    my $full = $pkg . '::' . $name;
+    Sq::Reflection::set_func($full, sub {
+        my ($type, $f);
+        for (my $idx=0; $idx < @tf; $idx+=2 ) {
+            ($type, $f) = @tf[$idx, $idx+1];
+            if ( Sq::Type::t_valid($type, \@_) ) {
+                return $f->(@_);
+            }
+        }
+        Carp::croak "$full: No Type chedck was successful";
+    });
 }
 
 1;

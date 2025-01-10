@@ -219,4 +219,61 @@ is(
         'new Hash');
 }
 
+# multi
+{
+    my $is_account = type [keys =>
+        name  => ['str'],
+        saldo => ['num'],
+    ];
+    my $in  = type [keys =>  in => ['num']];
+    my $out = type [keys => out => ['num']];
+
+    # this creates a multi-dispatch function based on the type
+    multi(apply_change =>
+        type [tuple => $is_account, $in] => sub($account,$entry) {
+            my $in  = $entry->{in};
+            my $new = Hash::withf($account, saldo => sub($saldo) { $saldo + $in });
+            $new->{change} = "+$in";
+            return $new;
+        },
+        type [tuple => $is_account, $out] => sub($account,$entry) {
+            my $out = $entry->{out};
+            my $new = Hash::withf($account, saldo => sub($saldo) { $saldo - $out });
+            $new->{change} = "-$out";
+            return $new;
+        }
+    );
+}
+{
+    my $account = { name  => "Lilly", saldo => 10_000 };
+
+    my sub in ($amount) { {in  => $amount } }
+    my sub out($amount) { {out => $amount } }
+
+    my $bookings = sq [
+        in(2_000), out(3_000), in(500), out(6_000),  in(1_800), out(600),
+          in(400), out(1_200), in(666),   out(999), in(10_000)
+    ];
+
+    is(
+        Array::scan($bookings, $account, sub($entry,$account) {
+            apply_change($account, $entry)
+        }),
+        [
+            { name => "Lilly", saldo => 10000 },
+            { change =>  "+2000", name => "Lilly", saldo => 12000 },
+            { change =>  "-3000", name => "Lilly", saldo =>  9000 },
+            { change =>   "+500", name => "Lilly", saldo =>  9500 },
+            { change =>  "-6000", name => "Lilly", saldo =>  3500 },
+            { change =>  "+1800", name => "Lilly", saldo =>  5300 },
+            { change =>   "-600", name => "Lilly", saldo =>  4700 },
+            { change =>   "+400", name => "Lilly", saldo =>  5100 },
+            { change =>  "-1200", name => "Lilly", saldo =>  3900 },
+            { change =>   "+666", name => "Lilly", saldo =>  4566 },
+            { change =>   "-999", name => "Lilly", saldo =>  3567 },
+            { change => "+10000", name => "Lilly", saldo => 13567 }
+        ],
+        'in/out history');
+}
+
 done_testing;

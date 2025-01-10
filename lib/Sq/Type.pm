@@ -659,7 +659,8 @@ sub t_not(@checks) {
     }
 }
 
-sub type($array) {
+sub type :prototype($) {
+    my ( $array ) = @_;
     state $table = { map { s/\At_//r => \&$_ } grep { m/\At_/ } @EXPORT };
     return eval_data($table, $array);
 }
