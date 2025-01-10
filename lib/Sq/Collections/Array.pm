@@ -748,9 +748,18 @@ sub iter2d($aoa, $f) {
 # fold : Array<'a> -> 'State -> (a -> 'State -> 'State) -> 'State
 sub fold($array, $state, $folder) {
     for my $x ( @$array ) {
-        $state = $folder->($x,$state);
+        $state = scalar $folder->($x,$state);
     }
     return $state;
+}
+
+sub scan($array, $state, $f_state) {
+    my @new = ($state);
+    for my $x ( @$array ) {
+        $state = (scalar $f_state->($x,$state));
+        push @new, $state;
+    }
+    return CORE::bless(\@new, 'Array');
 }
 
 # fold : Array<'a> -> 'State -> ('State -> 'a -> 'State) -> 'State
