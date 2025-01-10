@@ -1543,14 +1543,14 @@ is(
             my $new = Hash::withf($account,
                 saldo => sub($saldo) { $saldo + $entry->{in} }
             );
-            $new->set(change => +$entry->{in});
+            $new->{change} = '+' . $entry->{in};
             return $new;
         }
         elsif ( defined $entry->{out} ) {
             my $new = Hash::withf($account,
                 saldo => sub($saldo) { $saldo - $entry->{out} }
             );
-            $new->set(change => -$entry->{out});
+            $new->{change} = '-' . $entry->{out};
             return $new;
         }
         Carp::croak (sprintf "Not In/Out: %s", dump($entry));
@@ -1566,18 +1566,18 @@ is(
             apply_change($account, $entry)
         }),
         [
-            { name => "Lilly", saldo => 10000 }, # initial state
-            { change =>  2000, name => "Lilly", saldo => 12000 },
-            { change => -3000, name => "Lilly", saldo =>  9000 },
-            { change =>   500, name => "Lilly", saldo =>  9500 },
-            { change => -6000, name => "Lilly", saldo =>  3500 },
-            { change =>  1800, name => "Lilly", saldo =>  5300 },
-            { change =>  -600, name => "Lilly", saldo =>  4700 },
-            { change =>   400, name => "Lilly", saldo =>  5100 },
-            { change => -1200, name => "Lilly", saldo =>  3900 },
-            { change =>   666, name => "Lilly", saldo =>  4566 },
-            { change =>  -999, name => "Lilly", saldo =>  3567 },
-            { change => 10000, name => "Lilly", saldo => 13567 }
+            { name => "Lilly", saldo => 10000 },
+            { change =>  "+2000", name => "Lilly", saldo => 12000 },
+            { change =>  "-3000", name => "Lilly", saldo =>  9000 },
+            { change =>   "+500", name => "Lilly", saldo =>  9500 },
+            { change =>  "-6000", name => "Lilly", saldo =>  3500 },
+            { change =>  "+1800", name => "Lilly", saldo =>  5300 },
+            { change =>   "-600", name => "Lilly", saldo =>  4700 },
+            { change =>   "+400", name => "Lilly", saldo =>  5100 },
+            { change =>  "-1200", name => "Lilly", saldo =>  3900 },
+            { change =>   "+666", name => "Lilly", saldo =>  4566 },
+            { change =>   "-999", name => "Lilly", saldo =>  3567 },
+            { change => "+10000", name => "Lilly", saldo => 13567 }
         ],
         'in/out history');
 }
