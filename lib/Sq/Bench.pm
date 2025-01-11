@@ -1,15 +1,16 @@
 package Sq::Bench;
 use 5.036;
+use Sq qw(static);
 use Benchmark qw(timestr timeit cmpthese);
 
-sub it($, $f) {
+static 'it', sub ($f) {
     my $bench = timeit(1, $f);
     print timestr($bench), "\n";
     return $bench;
-}
+};
 
-sub compare($, $time, $subs) {
+static 'compare', sub($time, $subs) {
     return cmpthese($time, $subs);
-}
+};
 
 1;

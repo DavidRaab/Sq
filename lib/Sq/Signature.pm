@@ -16,6 +16,7 @@ our @EXPORT = qw(sig sigt);
 # Later will likely be used to also unload signature at runtime.
 my %sigs;
 
+# returns an array of functions added with a signature
 sub sigs_added() {
     return bless([keys %sigs], 'Array');
 }

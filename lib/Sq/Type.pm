@@ -1,6 +1,6 @@
 package Sq::Type;
 use 5.036;
-use Sq ();
+use Sq qw(is_num Ok Err);
 use Sq::Evaluator;
 use Sq::Exporter;
 our @EXPORT = (
@@ -15,12 +15,6 @@ our @EXPORT = (
     qw(t_any t_sub t_regex t_bool t_seq t_void t_result),
     qw(t_ref t_isa t_can)                             # Objects
 );
-
-# Only import things needed directly. Makes it a little bit faster. Can be
-# changed as soon Exporter is finished and can handle exporting completely.
-*is_num = \&Sq::is_num;
-*Ok     = \&Result::Ok;
-*Err    = \&Result::Err;
 
 # TODO
 # Add: t_none, t_any

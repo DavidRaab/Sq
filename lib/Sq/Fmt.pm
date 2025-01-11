@@ -5,7 +5,7 @@ use Sq;
 # This will be a module that help in formating/printing things.
 # For example pass it an array of array and it prints a table.
 
-sub table($, $href) {
+static 'table', sub($href) {
     my $header = $href->{header};
     my $aoa    = $href->{data};
 
@@ -64,6 +64,6 @@ sub table($, $href) {
     }
 
     return;
-}
+};
 
 1;

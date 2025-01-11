@@ -1,6 +1,5 @@
 package Sq::Reflection;
 use 5.036;
-use Carp ();
 use Sq::Exporter;
 our @EXPORT = qw(get_func set_func all_funcs has_func);
 
