@@ -9,7 +9,7 @@ my @primes;
 Sq->bench->it(sub {
     Seq
     ->count_up(2)
-    ->keep(sub($x) { Sq->math->is_prime($x) } )
+    ->keep(Sq->math->is_prime)
     ->take(100)
     ->iter(sub($x) {
         push @primes, $x;
