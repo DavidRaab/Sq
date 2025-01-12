@@ -44,6 +44,12 @@ is(
     [3,6,9],
     'calls max on each inner array');
 
+# but you also can specify a default, then no optional is returned anymore
+is(
+    $data->map(call 'max', 0),
+    [3,6,9],
+    'calls max on each inner array');
+
 is(
     $data->map(call 'map', sub($x) { $x+1 }),
     [
@@ -146,6 +152,10 @@ is(
     nok(equal($data2, $data3), 'comparision of data-structures 2');
 }
 
+# this also shows that a sequence is lazy, and only compares as much
+# needed to decide if they are equal. If not, comparing two sequences
+# with each of 1 billion elements would take some time. In examples/1bill.pl
+# it takes multiple minutes todo so.
 {
     my $first  = Seq->range(1,1_000_000_000);
     my $second = Seq->range(2,1_000_000_000);
