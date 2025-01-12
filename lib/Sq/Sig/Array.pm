@@ -87,6 +87,7 @@ sig ('Array::skip_while',        $array, $sub,             $array);
 sigt('Array::slice',             t_tuplev(t_array, $aint), $array);
 sig ('Array::extract',           $array, $pint, $pint,     $array);
 sig ('Array::diff',              $array, $array, $sub,     $array);
+sig ('Array::intersect',         $array, $array, $sub,     $array);
 sig ('Array::shuffle',           $array,                   $array);
 sig ('Array::trim',              $astr,                     $astr);
 sig ('Array::cache',             $array,                   $array);
