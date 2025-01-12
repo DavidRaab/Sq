@@ -1173,23 +1173,21 @@ sub fold_mut($seq, $state, $f_state) {
 }
 
 sub count($seq) {
-    my $hash = Hash->new;
+    my (%new, $x);
     my $it = $seq->();
-    my $x;
     while ( defined($x = $it->()) ) {
-        $hash->{$x}++;
+        $new{$x}++;
     }
-    return $hash;
+    return bless(\%new, 'Hash');
 }
 
 sub count_by($seq, $f_map) {
-    my $hash = Hash->new;
+    my (%new, $x);
     my $it = $seq->();
-    my $x;
     while ( defined($x = $it->()) ) {
-        $hash->{$f_map->($x)}++;
+        $new{$f_map->($x)}++;
     }
-    return $hash;
+    return bless(\%new, 'Hash');
 }
 
 # reduce: Seq<'a> -> ('a -> 'a -> 'a) -> 'a
@@ -1218,23 +1216,20 @@ sub last($seq) {
 
 # to_array : Seq<'a> -> Array<'a>
 sub to_array($seq, $count=undef) {
-    my $new = Array->new;
-    my $it  = $seq->();
-    my $x;
+    my (@new, $x);
+    my $it = $seq->();
     if ( defined $count ) {
         my $current = 0;
-        while ( $current++ < $count ) {
-            if ( defined($x = $it->()) ) {
-                push @$new, $x;
-            }
+        while ( $current++ < $count && defined($x = $it->()) ) {
+            push @new, $x;
         }
     }
     else {
         while ( defined($x = $it->()) ) {
-            push @$new, $x;
+            push @new, $x;
         }
     }
-    return $new;
+    return bless(\@new, 'Array');
 }
 
 # to_seq: Seq<'a> -> Seq<'a>
