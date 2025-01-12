@@ -106,6 +106,13 @@ sub fold($hash, $state, $f) {
     return $state;
 }
 
+sub fold_back($hash, $state, $f) {
+    for my ($key,$value) ( %$hash ) {
+        $state = $f->($state, $key, $value);
+    }
+    return $state;
+}
+
 sub length($hash) {
     return scalar (CORE::keys %$hash);
 }

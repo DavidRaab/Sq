@@ -3,7 +3,6 @@ use 5.036;
 use Sq;
 use Sq::Sig;
 use Sq::Test;
-use Scalar::Util ();
 
 # Helper functions
 my $by_str = sub($x, $y) { $x cmp $y };
@@ -108,6 +107,9 @@ check_isa($data3, 'Hash',                       '$data3 isa Hash');
 # fold
 is($data->fold(0, sub($k,$v,$state) { $state + $v }), 16, 'fold 1');
 is($data->fold(1, sub($k,$v,$state) { $state + $v }), 17, 'fold 2');
+
+is($data->fold_back(0, sub($state,$k,$v) { $state + $v }), 16, 'fold_back 1');
+is($data->fold_back(1, sub($state,$k,$v) { $state + $v }), 17, 'fold_back 2');
 
 is($data->length, 3, 'length');
 
