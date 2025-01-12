@@ -127,11 +127,11 @@ my $is_even = sub($x)    { $x % 2 == 0 };
 # match
 {
     my $fetch = sub($path) {
-        state $content = Hash->new(
+        state $content = sq {
             '/'             => Ok  'root',
             '/etc/passwd'   => Err 'invalid access',
             '/var/log/text' => Ok  'some text',
-        );
+        };
         return $content->get($path)->or(Err '404');
     };
 
