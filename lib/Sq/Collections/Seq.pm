@@ -933,7 +933,7 @@ sub chunked($seq, $size) {
         return sub {
             return undef if $abort;
             my $count = 0;
-            my $new   = Array->new;
+            my $new   = bless([],'Array');
             ITEM:
 
             my $x;
