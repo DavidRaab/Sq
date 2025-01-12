@@ -68,8 +68,6 @@ sig('Seq::infinity',      $seq,                 $seq);
 sig('Seq::repeat',        $seq, t_int,          $seq);
 sig('Seq::trim',          $seq,                 $seq);
 
-# sig('Seq::sort_num',      $anum,                 $seq);
-# sig('Seq::sort_str',      $astr,                 $seq);
 # sig('Seq::sort_hash_str', $aoh,    t_str,        $aoh);
 # sigt('Seq::slice',             t_tuplev($seq, $aint), $seq);
 # sig ('Seq::extract',           $seq, t_int, t_int,    $seq);
@@ -114,7 +112,7 @@ sig('Seq::max_by',     $seq, $sub,                 $opt);
 sig('Seq::max_str',    $seq,                       t_opt(t_str));
 sig('Seq::max_str_by', $seq, $sub,                 $opt);
 sig('Seq::join',       $seq, t_str,                t_str);
-sig('Seq::split',      $seq, t_or(t_regex, t_str), $seq);
+sig('Seq::split',      $seq, t_regex,              $seq);
 sig('Seq::as_hash',    $seq,                       t_hash);
 sig('Seq::to_hash',    $seq, $sub,                 t_hash);
 sig('Seq::to_hash_of_array',  $seq, $sub,          $hoa);
