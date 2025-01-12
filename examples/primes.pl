@@ -13,7 +13,7 @@ print "Sequence of primes runs twice to show cache().\n\n";
 # We could use Math::BigInt for bigger numbers (but its slower)
 my $primes =
     Seq
-    ->count_up(2)
+    ->up(2)
     ->keep(sub($x) {
         sleep 0.001; # simulate sloweness for cache
         Sq->math->is_prime($x)
