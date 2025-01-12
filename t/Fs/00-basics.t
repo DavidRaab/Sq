@@ -3,8 +3,8 @@ use 5.036;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Sq;
-use Sq::Sig;
 use Sq::Test;
+use Sq::Sig;
 use FindBin qw($Dir);
 use Path::Tiny;
 
@@ -13,7 +13,7 @@ ok(Sq->fs->compare_text(
     path($Dir, 'data', 'hop-preface.md'),
 ), 'Higher-Order Perl Preface');
 
-my $file = Sq->fs->read_text(path($Dir, 'data', 'hop-preface.txt'));
+my $file = Sq->fs->read_text(path($Dir, 'data', 'hop-preface.txt'))->cache;
 
 is($file->length, 52, 'file lines');
 is($file->rxm(qr/lisp/i)->length, 15, 'lines mentioned lisp');
