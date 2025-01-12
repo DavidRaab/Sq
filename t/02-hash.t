@@ -131,15 +131,15 @@ is($data->length, 3, 'length');
     );
 
     is(
-        $h->intersection($i, sub($k,$x,$y) { [$x,$y] }),
+        $h->intersect($i, sub($k,$x,$y) { [$x,$y] }),
         { bar => [2,3] },
-        'intersection 1'
+        'intersect 1'
     );
 
     is(
-        $h->intersection($i, sub($k,$x,$y) { $x > $y ? $x : $y }),
+        $h->intersect($i, sub($k,$x,$y) { $x > $y ? $x : $y }),
         { bar => 3 },
-        'intersection 2'
+        'intersect 2'
     );
 
     is($h->diff($i), { foo => 1 }, 'diff');
@@ -197,7 +197,7 @@ is(
 
 my $tuple = sub($x,$y) { [$x,$y] };
 is(Hash::diff({}, { foo => 1 })->is_empty,                       1, 'is_empty 1');
-is(Hash::intersection({foo => 1}, {bar => 2}, $tuple)->is_empty, 1, 'is_empty 2');
+is(Hash::intersect({foo => 1}, {bar => 2}, $tuple)->is_empty,    1, 'is_empty 2');
 is(Hash::union({}, {}, $tuple)->is_empty,                        1, 'is_empty 3');
 is(Hash::append({}, {})->is_empty,                               1, 'is_empty 4');
 is(Hash->empty->is_empty,                                        1, 'is_empty 5');

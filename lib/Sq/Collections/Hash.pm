@@ -154,7 +154,7 @@ sub union($hash, $other, $f) {
     return CORE::bless(\%new, 'Hash');
 }
 
-sub intersection($hash, $other, $f) {
+sub intersect($hash, $other, $f) {
     # $hash is the hash that is iterated, for performance reasons
     # it is useful to iterate the hash that has fewer keys. So we check
     # if $other has less keys and swap the hashes if that is true.

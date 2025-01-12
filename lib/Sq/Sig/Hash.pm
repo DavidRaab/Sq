@@ -35,7 +35,7 @@ sig ('Hash::is_empty',     $hash,                t_bool);
 sig ('Hash::bind',         $hash, $sub,          $hash);
 sig ('Hash::append',       $hash, $hash,         $hash);
 sig ('Hash::union',        $hash, $hash, $sub,   $hash);
-sig ('Hash::intersection', $hash, $hash, $sub,   $hash);
+sig ('Hash::intersect',    $hash, $hash, $sub,   $hash);
 sig ('Hash::diff',         $hash, $hash,         $hash);
 sigt('Hash::concat',       t_tuplev($hash, t_array(t_of $hash)), $hash);
 sig ('Hash::is_subset_of', $hash, $hash,         $int);
