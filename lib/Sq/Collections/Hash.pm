@@ -72,7 +72,7 @@ sub find($hash, $predicate) {
     # reset the internal iterator. So calling `find` multiple times on the
     # same hash leads to buggy behaviour.
     for my ($k,$v) ( %$hash ) {
-        return Option::Some(Array->new($k,$v)) if $predicate->($k,$v);
+        return Option::Some(CORE::bless([$k,$v], 'Array')) if $predicate->($k,$v);
     }
     return Option::None();
 }
