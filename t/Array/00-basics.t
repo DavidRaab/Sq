@@ -161,13 +161,12 @@ is(
 is(Array->init(10, \&id)->map($add1), $range, 'init->map');
 is(
     Array->init(5, sub($idx) { ($idx) x $idx }),
-    [1,2,2,3,3,3,4,4,4,4],
-    'init allows multiple return values from lambda');
+    ["", "1", "22" , "333", "4444"],
+    'lambda in init is evaluated in scalar context');
 is(
-    Array->init(3, sub($idx) { $idx, undef }),
-    [0,1,2],
-    'init also skips undef');
-
+    Array->init(5, sub($idx) { $idx == 2 ? undef : $idx }),
+    [0,1],
+    'init aborts on undef');
 is(
     Array->range(1,10)->indexed,
     Array->init(10, sub($idx) { [$idx+1, $idx] }),
@@ -1497,7 +1496,7 @@ is(
 
 # itern
 {
-    my $data = Array->init(10, sub($idx) { $idx => "foo" });
+    my $data = Array->bless([map { $_ => "foo" } 0 .. 9]);
     my @tuples;
     $data->itern(2, sub($k,$v) {
         push @tuples, [$k,$v];

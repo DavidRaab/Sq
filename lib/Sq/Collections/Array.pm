@@ -46,12 +46,17 @@ sub concat($, @arrays) {
 }
 
 sub init($, $count, $f) {
-    local $_;
-    return CORE::bless([
-        grep { defined  }
-        map  { $f->($_) }
-            0 .. ($count-1)
-    ], 'Array');
+    my @new;
+    my $x;
+    for my $idx ( 0 .. ($count-1) ) {
+        if ( defined($x = $f->($idx)) ) {
+            push @new, $x;
+        }
+        else {
+            last;
+        }
+    }
+    return CORE::bless(\@new, 'Array');
 }
 
 sub init2d($, $width, $height, $f) {

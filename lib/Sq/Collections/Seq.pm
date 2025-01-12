@@ -94,9 +94,13 @@ sub init($, $count, $f) {
     bless(sub {
         my $abort   = 0;
         my $current = 0;
+        my $x;
         return sub {
             return undef if $abort;
-            return $f->($current++) if $current < $count;
+            if ( $current < $count ) {
+                $x = $f->($current++);
+                return $x if defined $x;
+            }
             $abort = 1;
             return undef;
         }
