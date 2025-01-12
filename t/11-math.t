@@ -4,11 +4,14 @@ use Sq;
 use Sq::Sig;
 use Sq::Test;
 
+# Here I also check the 'static' ability
+# first, i use a normal function call. Then in the second example omiting
+# the value, and a direct function call
 {
     my $primes =
         Seq
         ->up(2)
-        ->keep(sub($x) { Sq->math->is_prime($x) })
+        ->keep(sub($x) { Sq->math->is_prime($x) }) # wraped in lambda
         ->take(100);
 
     is(
@@ -33,7 +36,7 @@ use Sq::Test;
     my $primes =
         Seq
         ->up(2)
-        ->keep(Sq->math->is_prime)
+        ->keep(Sq->math->is_prime) # check without lambda
         ->take(100);
 
     is(
@@ -56,7 +59,7 @@ use Sq::Test;
     my $primes =
         Seq
         ->up(2)
-        ->keep(Sq::Math::is_prime)
+        ->keep(Sq::Math::is_prime) # Direct function-call
         ->take(100);
 
     is(
