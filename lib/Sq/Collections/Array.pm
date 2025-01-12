@@ -612,6 +612,19 @@ sub diff($arrayA, $arrayB, $f_key) {
     return CORE::bless(\@new, 'Array');
 }
 
+sub intersect($arrayA, $arrayB, $f_key) {
+    my @new;
+    my %indexB = map { $f_key->($_) => 1 } @$arrayB;
+    my $key;
+    for my $value ( @$arrayA ) {
+        $key = $f_key->($value);
+        if ( exists $indexB{$key} ) {
+            push @new, $value;
+        }
+    }
+    return CORE::bless(\@new, 'Array');
+}
+
 sub shuffle($array) {
     return CORE::bless([List::Util::shuffle @$array], 'Array');
 }

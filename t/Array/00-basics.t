@@ -1581,4 +1581,20 @@ is(
         'in/out history');
 }
 
+# intersect
+{
+    my $data1 = sq [[qw/foo .mp4/], [qw/bar .mp4/], [qw/baz .mp4/]];
+    my $data2 = sq [[qw/foo .m4v/],                 [qw/baz .m4v/]];
+
+    is(
+        Array::intersect($data1, $data2, \&fst),
+        [[qw/foo .mp4/], [qw/baz .mp4/]],
+        'intersect 1');
+
+    is(
+        Array::intersect($data2, $data1, \&fst),
+        [[qw/foo .m4v/], [qw/baz .m4v/]],
+        'intersect 2');
+}
+
 done_testing;
