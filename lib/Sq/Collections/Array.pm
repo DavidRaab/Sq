@@ -970,7 +970,7 @@ sub max_str_by($array, $f_str) {
 # -> ('State -> 'a -> 'State)
 # -> Hash<'key, 'State>
 sub group_fold($array, $f_init, $f_str, $f_state) {
-    my $new = Hash->new;
+    my $new = CORE::bless({}, 'Hash');
     for my $x ( @$array ) {
         my $str = $f_str->($x);
         if ( exists $new->{$str} ) {
@@ -995,10 +995,10 @@ sub to_hash($array, $f_map) {
 
 # Array<'a> -> ('a -> ('Key,'Value)) -> Hash<'Key, Array<'Value>>
 sub to_hash_of_array($array, $f_map) {
-    my $hash = Hash->new;
+    my $hash = CORE::bless({}, 'Hash');
     for my $x ( @$array ) {
         my ($key, $value) = $f_map->($x);
-        $hash->push($key, $value);
+        Hash::push($hash, $key, $value);
     }
     return $hash;
 }
@@ -1022,17 +1022,17 @@ sub keyed_by($array, $f_str) {
 #
 # Array<'a> -> ('a -> 'Key) -> Hash<'Key, Array<'a>>
 sub group_by($array, $f_str) {
-    my $hash = Hash->new;
+    my $hash = CORE::bless({}, 'Hash');
     for my $x ( @$array ) {
         my $str = $f_str->($x);
-        $hash->push($str, $x);
+        Hash::push($hash, $str, $x);
     }
     return $hash;
 }
 
 # Array<'a> -> Hash<'a,int>
 sub count($array) {
-    my $new = Hash->new;
+    my $new = CORE::bless({}, 'Hash');
     for my $key ( @$array ) {
         $new->{$key}++;
     }
@@ -1040,7 +1040,7 @@ sub count($array) {
 }
 
 sub count_by($array, $f_str) {
-    my $new = Hash->new;
+    my $new = CORE::bless({}, 'Hash');
     for my $x ( @$array ) {
         $new->{$f_str->($x)}++;
     }
