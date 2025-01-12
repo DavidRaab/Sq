@@ -86,9 +86,6 @@ sub pick($hash, $f_opt) {
     return Option::None();
 }
 
-# TODO: Remove in future
-sub filter { Carp::croak "Hash::filter renamed to Hash::keep" }
-
 sub keep($hash, $predicate) {
     my %new;
     for my ($key,$value) ( %$hash ) {
@@ -126,7 +123,7 @@ sub bind($hash, $f) {
     my %new;
     for my ($key,$value) ( %$hash ) {
         my $tmp_hash = $f->($key, $value);
-        while ( my ($key, $value) = each %$tmp_hash ) {
+        for my ($key,$value) ( %$tmp_hash ) {
             $new{$key} = $value;
         }
     }
