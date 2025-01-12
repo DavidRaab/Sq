@@ -18,18 +18,17 @@ my $file = Sq->fs->read_text(path($Dir, 'data', 'hop-preface.txt'))->cache;
 is($file->length, 52, 'file lines');
 is($file->rxm(qr/lisp/i)->length, 15, 'lines mentioned lisp');
 is(
-    $file->keep(sub($line) { $line =~ m/lisp/i })->first->or(""),
-    "Around 1993 I started reading books about Lisp, and I discovered something\n",
+    $file->rx(qr/lisp/i)->first,
+    Some("Around 1993 I started reading books about Lisp, and I discovered something\n"),
     'first line containing lisp');
 is(
-    $file->rx(qr/lisp/i)->first->or(""),
-    "Around 1993 I started reading books about Lisp, and I discovered something\n",
+    $file->rx(qr/lisp/i)->first,
+    Some("Around 1993 I started reading books about Lisp, and I discovered something\n"),
     'first line containing lisp');
 
 ok(Sq->fs->recurse($Dir)->length > 3, 'more than 3 files');
-ok(
-    (Sq->fs->recurse($Dir)->length > Sq->fs->children($Dir)->length),
-    'recurse must contain more files than children');
+ok((Sq->fs->recurse($Dir)->length > Sq->fs->children($Dir)->length),
+   'recurse must contain more files than children');
 
 is(
     Sq->fs->read_raw(10, $Dir, 'data', 'hop-preface.txt')->take(5),
@@ -89,8 +88,6 @@ is(
     Ok("3518cc17afa576ef870ab0e869eb0ebf49fe137a97c6aec50ba05d72ce89331057403eaffbec8bd7dee38694bef67ebcd70a15ee41ee6e13e74ea731db3633cc"),
     'sha512 1');
 
-ok(
-    Result::is_err(Sq->fs->sha512($Dir, 'data', 'NotExisting')),
-    'sha512 2');
+nok(Sq->fs->sha512($Dir, 'data', 'NotExisting'), 'sha512 2');
 
 done_testing;
