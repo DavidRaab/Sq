@@ -862,7 +862,7 @@ sub min_by($array, $f_num) {
     return Option::None() if @$array == 0;
     my $min     = $array->[0];
     my $min_num = $f_num->($min);
-    my ($x, $num);
+    my $num;
     for my $x ( @$array ) {
         $num = $f_num->($x);
         if ( $num < $min_num ) {
@@ -890,7 +890,7 @@ sub min_str_by($array, $f_str) {
     return Option::None() if @$array == 0;
     my $min     = $array->[0];
     my $min_str = $f_str->($min);
-    my ($x, $str);
+    my $str;
     for my $x ( @$array ) {
         $str = $f_str->($x);
         if ( $str lt $min_str ) {
@@ -918,7 +918,7 @@ sub max_by($array, $f_num) {
     return Option::None() if @$array == 0;
     my $max     = $array->[0];
     my $max_num = $f_num->($max);
-    my ($x, $num);
+    my $num;
     for my $x ( @$array ) {
         $num = $f_num->($x);
         if ( $num > $max_num ) {
@@ -935,7 +935,6 @@ sub max_str($array, $default=undef) {
         return defined $default ? $default : Option::None();
     }
     my $max = $array->[0];
-    my $x;
     for my $x ( @$array ) {
         $max = $x if $x gt $max;
     }
@@ -947,7 +946,7 @@ sub max_str_by($array, $f_str) {
     return Option::None() if @$array == 0;
     my $max     = $array->[0];
     my $max_str = $f_str->($max);
-    my ($x, $str);
+    my $str;
     for my $x ( @$array ) {
         $str = $f_str->($x);
         if ( $str gt $max_str ) {
