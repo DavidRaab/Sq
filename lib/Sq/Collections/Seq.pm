@@ -202,14 +202,14 @@ sub range($, $start, $stop) {
     }
 }
 
-sub count_up($, $start) {
+sub up($, $start) {
     return bless(sub {
         my $current = $start;
         return sub { $current++ }
     }, 'Seq');
 }
 
-sub count_down($, $start) {
+sub down($, $start) {
     return bless(sub {
         my $current = $start;
         return sub { $current-- }

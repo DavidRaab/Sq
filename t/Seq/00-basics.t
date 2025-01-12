@@ -921,8 +921,8 @@ is(
     seq { 1,3,5,7,9 },
     'remove');
 
-is(Seq->count_up(10)->take(100),   seq { 10 .. 109 },   'count_up');
-is(Seq->count_down(10)->take(100), Seq->range(10, -89), 'count_down');
+is(Seq->up(10)  ->take(100),   seq { 10 .. 109 }, 'up');
+is(Seq->down(10)->take(100), Seq->range(10, -89), 'down');
 
 # trim
 {

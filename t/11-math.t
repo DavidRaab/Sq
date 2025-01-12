@@ -7,7 +7,7 @@ use Sq::Test;
 {
     my $primes =
         Seq
-        ->count_up(2)
+        ->up(2)
         ->keep(sub($x) { Sq->math->is_prime($x) })
         ->take(100);
 
@@ -32,7 +32,7 @@ use Sq::Test;
 {
     my $primes =
         Seq
-        ->count_up(2)
+        ->up(2)
         ->keep(Sq->math->is_prime)
         ->take(100);
 
@@ -55,7 +55,7 @@ use Sq::Test;
 {
     my $primes =
         Seq
-        ->count_up(2)
+        ->up(2)
         ->keep(Sq::Math::is_prime)
         ->take(100);
 
