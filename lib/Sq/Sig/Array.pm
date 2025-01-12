@@ -122,7 +122,7 @@ sig('Array::last',       $array,                       $opt);
 sig('Array::sum',        $anum,                        t_num);
 sig('Array::sum_by',     $array, $sub,                 t_num);
 sig('Array::join',       $astr, t_str,                 t_str);
-sig('Array::split',      $array, t_or(t_regex, t_str), t_array(t_of $astr));
+sig('Array::split',      $astr, t_regex,              t_array(t_of $astr));
 sigt('Array::min',
     t_or(t_tuple($anum), t_tuple($anum, t_any)),
     t_or(t_opt(t_num), t_num));
