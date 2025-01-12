@@ -1,6 +1,7 @@
 package Sq::Dump;
 use 5.036;
 
+our $SEQ_AMOUNT     = 50;
 our $INLINE         = 200;
 our $COLOR          = 1;
 my  $COLOR_RESET    = "\e[m";
@@ -64,14 +65,14 @@ sub option($opt, $depth=0) {
 sub seq($seq, $depth=0) {
     my $str    = $COLOR ? "${COLOR_SPECIAL}seq${COLOR_RESET} {\n" : "seq {\n";
     my $indent = " " x ($depth + 2);
-    my $array  = $seq->to_array(21);
-    my $max    = @$array == 21 ? 21 : @$array;
-    # only put 20 elements into seq {} string
+    my $array  = $seq->to_array($SEQ_AMOUNT+1);
+    my $max    = @$array == ($SEQ_AMOUNT+1) ? $SEQ_AMOUNT : @$array;
+    # only put $SEQ_AMOUNT elements into seq {} string
     for (my $idx=0; $idx < $max; $idx++ ) {
         $str .= $indent . to_string($array->[$idx], $depth+2) . ",\n";
     }
     # when they are more than 20 elements
-    if ( @$array == 21 ) {
+    if ( @$array == ($SEQ_AMOUNT+1) ) {
         $str .= $indent . '...' . "\n" . $indent . "}";
     }
     else {
