@@ -761,6 +761,29 @@ sub sort_by($seq, $comparer, $get_key) {
     return Array::sort_by(to_array($seq), $comparer, $get_key);
 }
 
+sub intersect($seqA, $seqB, $f_key) {
+    my @new;
+
+    # build seen elements from $seqB
+    my (%indexB, $x);
+    my $it = $seqB->();
+    while ( defined($x = $it->()) ) {
+        $indexB{ $f_key->($x) } = 1;
+    }
+
+    # traverse $seqA and save every seen element in @new
+    my $key;
+    $it = $seqA->();
+    while ( defined($x = $it->()) ) {
+        $key = $f_key->($x);
+        if ( exists $indexB{$key} ) {
+            push @new, $x;
+        }
+    }
+
+    return CORE::bless(\@new, 'Array');
+}
+
 sub cache($seq) {
     my $it       = $seq->();
     my $finished = 0;        # if $it finished once
