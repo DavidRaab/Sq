@@ -874,14 +874,15 @@ sub min_by($array, $f_num) {
 }
 
 # min_str : Seq<string> -> string -> Option<string>
-sub min_str($array) {
-    return Option::None() if @$array == 0;
+sub min_str($array, $default=undef) {
+    if ( @$array == 0 ) {
+        return defined $default ? $default : Option::None();
+    }
     my $min = $array->[0];
-    my $x;
     for my $x ( @$array ) {
         $min = $x if $x lt $min;
     }
-    return Option::Some($min);
+    return defined $default ? $min : Option::Some($min);
 }
 
 # min_str_by : Seq<'a> -> ('a -> string) -> Option<'a>
@@ -929,14 +930,16 @@ sub max_by($array, $f_num) {
 }
 
 # max_str : Array<string> -> string
-sub max_str($array) {
-    return Option::None() if @$array == 0;
+sub max_str($array, $default=undef) {
+    if ( @$array == 0 ) {
+        return defined $default ? $default : Option::None();
+    }
     my $max = $array->[0];
     my $x;
     for my $x ( @$array ) {
         $max = $x if $x gt $max;
     }
-    return Option::Some($max);
+    return defined $default ? $max : Option::Some($max);
 }
 
 # max_str_by : Array<'a> -> ('a -> string) -> Option<'a>

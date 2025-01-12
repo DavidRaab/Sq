@@ -27,7 +27,7 @@ is(Array->range(-100, -50)->max, Some(-50), 'max with negative values');
 is(Array->empty->max,                 None, 'max on empty');
 is(Array->empty->max->or(0),             0, 'max on empty with option::or');
 
-my $words = Array->new(qw/Hello World you Are welcome/);
+my $words = sq [qw/Hello World you Are welcome/];
 
 # min_str
 is($words->min_str,              Some('Are'), 'min_str');
@@ -79,7 +79,7 @@ is(Array->empty->max_str_by($by_name),                          None, 'max_by_st
 is(Array->empty->max_str_by($by_name)->or(0),                      0, 'max_by_str on empty with option::or');
 
 
-# When max() get's passed a default value. Then no Option is returned anymore.
+# When min/max get's passed a default value. Then no Option is returned anymore.
 is(Array::max([1,2,3,4,5],  0), 5, 'max with default 1');
 is(Array::max([1,2,3,4,5], 10), 5, 'max with default 2');
 is(Array::max([],           0), 0, 'max with default 3');
@@ -87,5 +87,15 @@ is(Array::max([],           0), 0, 'max with default 3');
 is(Array::min([1,2,3,4,5],  0), 1, 'min with default 1');
 is(Array::min([1,2,3,4,5], 10), 1, 'min with default 2');
 is(Array::min([],           0), 0, 'min with default 3');
+
+# same for min_str / max_str
+is(Array::max_str([qw/foo bar zap/], "asd"), "zap", 'max with default 1');
+is(Array::max_str([qw/foo bar zap/], "zzz"), "zap", 'max with default 2');
+is(Array::max_str([],                "zap"), "zap", 'max with default 3');
+
+is(Array::min_str([qw/foo bar zap/], "aaa"), "bar", 'min with default 1');
+is(Array::min_str([qw/foo bar zap/], "zzz"), "bar", 'min with default 2');
+is(Array::min_str([],                "zzz"), "zzz", 'min with default 3');
+
 
 done_testing;

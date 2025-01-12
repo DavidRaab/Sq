@@ -126,14 +126,18 @@ sig('Array::split',      $astr, t_regex,              t_array(t_of $astr));
 sigt('Array::min',
     t_or(t_tuple($anum), t_tuple($anum, t_any)),
     t_or(t_opt(t_num), t_num));
+sigt('Array::min_str',
+    t_or(t_tuple($astr), t_tuple($astr, t_any)),
+    t_or(t_opt(t_str), t_str));
 sig('Array::min_by',     $array, $sub,                 $opt);
-sig('Array::min_str',    $astr,                        t_opt(t_str));
 sig('Array::min_str_by', $array, $sub,                 $opt);
 sigt('Array::max',
     t_or(t_tuple($anum), t_tuple($anum, t_any)),
     t_or(t_opt(t_num), t_num));
+sigt('Array::max_str',
+    t_or(t_tuple($astr), t_tuple($astr, t_any)),
+    t_or(t_opt(t_str), t_str));
 sig('Array::max_by',     $array, $sub,                 $opt);
-sig('Array::max_str',    $astr,                        t_opt(t_str));
 sig('Array::max_str_by', $array, $sub,                 $opt);
 sig('Array::group_fold', $array, $sub, $sub, $sub,     $hash);
 sig('Array::to_hash',    $array, $sub,                 $hash);
