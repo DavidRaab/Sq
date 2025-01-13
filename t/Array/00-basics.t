@@ -1597,6 +1597,7 @@ is(
         'intersect 2');
 }
 
+# TODO: Add a map_any?
 # map2d
 {
     my $aoa = sq [
