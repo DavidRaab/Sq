@@ -212,6 +212,21 @@ sub map2($arrayA, $arrayB, $f) {
     return CORE::bless(\@new, 'Array');
 }
 
+sub map2d($aoa, $f) {
+    my @new;
+    my ($y, $value) = (0);
+    for my $inner ( @$aoa ) {
+        my @inner;
+        for (my $x=0; $x < @$inner; $x++) {
+            $value = $inner->[$x];
+            push @inner, (scalar $f->($value,$x,$y));
+        }
+        push @new, CORE::bless(\@inner, 'Array');
+        $y++;
+    }
+    return CORE::bless(\@new, 'Array');
+}
+
 sub map_e($array, $expr) {
     local $_;
     my $new = eval q<

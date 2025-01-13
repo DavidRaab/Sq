@@ -37,30 +37,27 @@ static 'table', sub($href) {
     };
 
     # dump($cols);
+    # local $Sq::Dump::INLINE = 0;
 
-    # Print header when defined
+    # First all strings in data AoA are expanded to its full column size
+    $aoa = Array::map2d($aoa, sub($str,$x,$y) {
+        my $length = $cols->[$x];
+        sprintf "%-${length}s", $str;
+    });
+
+    # print header
     if ( defined $header ) {
-        print "| ";
-        for (my $x=0; $x < $maxX; $x++ ) {
+        # Expand header when some is defined
+        my $header = Array::mapi($header, sub($str,$x) {
             my $length = $cols->[$x];
-            printf "%-${length}s", $header->[$x];
-            print " | ";
-        }
-        print "\n";
-        my $l     = @$cols - 1;
-        my $width = Array::sum($cols) + ($l * 3);
-        print "| ", ('-' x $width), " |", "\n";
+            sprintf "%-${length}s", $str;
+        })->join(' | ');
+        printf "| %s |\n", $header;
     }
 
     # print data
-    for (my $y=0; $y < $maxY; $y++) {
-        print "| ";
-        for (my $x=0; $x < $maxX; $x++ ) {
-            my $length = $cols->[$x];
-            printf "%-${length}s", $aoa->[$y][$x];
-            print " | ";
-        }
-        print "\n";
+    for my $inner ( @$aoa ) {
+        printf "| %s |\n", $inner->join(' | ');
     }
 
     return;
