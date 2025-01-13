@@ -62,7 +62,7 @@ sigt('Hash::change',  t_tuplev($hash, t_array(t_even_sized)),         t_void);
 sigt('Hash::push',    t_tuplev($hash, t_str, t_array(t_min 1)),       t_void);
 sigt('Hash::delete',  t_tuplev($hash, t_array(t_min(1), t_of t_str)), t_void);
 
-sigt('Hash::dump',
+sigt('Hash::dumps',
     t_or(
         t_tuple($hash),
         t_tuple($hash, $int),
@@ -70,7 +70,7 @@ sigt('Hash::dump',
     t_str
 );
 
-sigt('Hash::dumpw',
+sigt('Hash::dump',
     t_or(
         t_tuple($hash),
         t_tuple($hash, $int),

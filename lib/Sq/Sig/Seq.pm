@@ -122,14 +122,14 @@ sig('Seq::any',        $seq, $sub,                 t_bool);
 sig('Seq::all',        $seq, $sub,                 t_bool);
 sig('Seq::none',       $seq, $sub,                 t_bool);
 sig('Seq::pick',       $seq, $sub,                 $opt);
-sigt('Seq::dump',
+sigt('Seq::dumps',
     t_or(
         t_tuple($seq),
         t_tuple($seq, t_int),
     ),
     t_str
 );
-sigt('Seq::dumpw',
+sigt('Seq::dump',
     t_or(
         t_tuple($seq),
         t_tuple($seq, t_int),

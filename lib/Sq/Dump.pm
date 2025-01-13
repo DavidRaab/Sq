@@ -187,11 +187,11 @@ sub to_string($any, $depth=0) {
          : "NOT_IMPLEMENTED REF: $type";
 }
 
-sub dump($any, $depth=0) {
+sub dumps($any, $depth=0) {
     return to_string($any, $depth);
 }
 
-sub dumpw($any, $depth=0) {
+sub dump($any, $depth=0) {
     warn to_string($any, $depth), "\n";
     return;
 }
@@ -205,17 +205,17 @@ sub add_dump($type, $func) {
 
 # Add dumping to other packages
 no warnings 'once';
-*{Array::dump }             = \&dump;
-*{Array::dumpw}             = \&dumpw;
-*{Hash::dump }              = \&dump;
-*{Hash::dumpw}              = \&dumpw;
-*{Seq::dump }               = \&dump;
-*{Seq::dumpw}               = \&dumpw;
-*{Option::dump }            = \&dump;
-*{Option::dumpw}            = \&dumpw;
-*{Result::dump }            = \&dump;
-*{Result::dumpw}            = \&dumpw;
-*{Sq::Control::Lazy::dump } = \&dump;
-*{Sq::Control::Lazy::dumpw} = \&dumpw;
+*{Array::dumps}             = \&dumps;
+*{Array::dump}              = \&dump;
+*{Hash::dumps}              = \&dumps;
+*{Hash::dump}               = \&dump;
+*{Seq::dumps}               = \&dumps;
+*{Seq::dump}                = \&dump;
+*{Option::dumps}            = \&dumps;
+*{Option::dump}             = \&dump;
+*{Result::dumps}            = \&dumps;
+*{Result::dump}             = \&dump;
+*{Sq::Control::Lazy::dumps} = \&dumps;
+*{Sq::Control::Lazy::dump}  = \&dump;
 
 1;

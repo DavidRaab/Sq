@@ -154,14 +154,14 @@ sig('Array::all',        $array, $sub,                 t_bool);
 sig('Array::none',       $array, $sub,                 t_bool);
 sig('Array::pick',       $array, $sub,                 $opt);
 sig('Array::to_seq',     $array,                       t_seq);
-sigt('Array::dump',
+sigt('Array::dumps',
     t_or(
         t_tuple($array),
         t_tuple($array, t_int),
     ),
     t_str
 );
-sigt('Array::dumpw',
+sigt('Array::dump',
     t_or(
         t_tuple($array),
         t_tuple($array, t_int),
