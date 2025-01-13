@@ -124,7 +124,7 @@ my $file =
                 # sum. Later i just can delete that `0` entry.
                 #
                 # The group_by call groups all files by their SHA512
-                Sq->fs->read_bytes($file, 4096)->map(\&sha512_hex)->match(
+                Sq->fs->read_bytes(4096, $file)->map(\&sha512_hex)->match(
                     Ok  => sub($sha) { return $sha             },
                     Err => sub($msg) { warn "$msg"; return "0" },
                 );
