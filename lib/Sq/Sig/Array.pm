@@ -47,6 +47,7 @@ sig ('Array::rev',           $array,                 $array);
 sig ('Array::map',           $array, $sub,           $array);
 sig ('Array::map2',          $array, $array, $sub,   $array);
 sig ('Array::map_e',         $array, t_str,          $array);
+sig ('Array::map2d',         $aoa,   $sub,             $aoa);
 sig ('Array::choose',        $array, $sub,           $array);
 sig ('Array::mapi',          $array, $sub,           $array);
 sig ('Array::keep',          $array, $sub,           $array);

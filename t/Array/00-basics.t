@@ -1597,4 +1597,34 @@ is(
         'intersect 2');
 }
 
+# map2d
+{
+    my $aoa = sq [
+        [qw/foo bar hazelnut/],
+        [qw/Lilly Anny/],
+        [qw/Batman Spider-Man/],
+        [qw/Ricewind Two-Flowers/],
+    ];
+
+    is(
+        Array::map2d($aoa, sub($str,$x,$y) { length $str }),
+        [
+            [3,3,8],
+            [5,4],
+            [6,10],
+            [8,11],
+        ],
+        'map2d 1');
+
+    is(
+        Array::map2d($aoa, sub($str,$x,$y) { [$x,$y] }),
+        [
+            [ [0,0], [1,0], [2,0] ],
+            [ [0,1], [1,1]        ],
+            [ [0,2], [1,2]        ],
+            [ [0,3], [1,3]        ],
+        ],
+        'map2d 2');
+}
+
 done_testing;
