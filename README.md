@@ -536,7 +536,8 @@ things when they seems to make more sense in practice over theory.
 * [Sq::Signature](lib/Sq/Manual/Type/01-Signature.pod)
 * [Sq::Parser](lib/Sq/Manual/Parser/00-intro.pod)
 * [Sq::Equality](lib/Sq/Equality.pm) implements `equal` function and add methods
-* [Sq::Evaluator](/lib/Sq/Evaluator) [Type](t/Evaluator/00-type.t) [Parser](t/Evaluator/01-parser.t) implements functions to eval data-structures
+* [Sq::Fs](lib/Sq/Fs.pod) file-system operations
+* [Sq::Evaluator](lib/Sq/Evaluator) Implements functions to eval data-structures. See [Type](t/Evaluator/00-type.t) and [Parser](t/Evaluator/01-parser.t)
 * [Sq::Test](lib/Sq/Test.pm) minimal Test-Suite that is already used to test Sq itself
 * [Sq::Dump](lib/Sq/Dump.pm) implements `dump` and `dumps` and add methods
 * [Sq::Collections::Seq](lib/Sq/Collections/Seq.pod)
