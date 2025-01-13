@@ -95,6 +95,7 @@ examples/option_divide.pl
 examples/permutation.pl
 examples/permutation_random.pl
 examples/primes.pl
+examples/same_basename.pl
 lib/Sq.pm
 lib/Sq.pod
 lib/Sq/Args.pm
@@ -139,6 +140,7 @@ lib/Sq/Exporter.pm
 lib/Sq/Exporter.pod
 lib/Sq/Fmt.pm
 lib/Sq/Fs.pm
+lib/Sq/Fs.pod
 lib/Sq/Fs/Stat.pm
 lib/Sq/Gen.pm
 lib/Sq/Io.pm
