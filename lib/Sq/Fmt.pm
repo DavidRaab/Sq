@@ -49,10 +49,12 @@ static 'table', sub($href) {
         sprintf "%-${length}s", $str;
     });
     # Same for header when it is defined
-    $header = Array::mapi($header, sub($str,$x) {
-        my $length = $cols->[$x];
-        sprintf "%-${length}s", $str;
-    });
+    if ( $header ) {
+        $header = Array::mapi($header, sub($str,$x) {
+            my $length = $cols->[$x];
+            sprintf "%-${length}s", $str;
+        });
+    }
 
     # print header
     if ( $header ) {
