@@ -23,6 +23,7 @@ static read_text => sub(@path) {
     });
 };
 
+# reads a text file that is compressed as .gz
 static read_text_gz => sub(@path) {
     require PerlIO::gzip;
     require Path::Tiny;
@@ -65,18 +66,30 @@ static read_raw => sub($size, @path) {
     });
 };
 
-static compare_text => sub($file1, $file2) {
-    return equal(
-        read_text(undef, $file1),
-        read_text(undef, $file2)
-    );
-};
+# TODO: Make it work that it also works with a `state` variable. `static`
+#       has one problem. When signature are loaded, you must specifiy
+#       all needed arguments. So just calling the function without any
+#       argument makes it return an type-error. So `static` and `signature`
+#       must be extended that his works better. Otherwise `static` is useless
+#       with signatures.
+{
+    my $read_text = read_text();
+    static compare_text => sub($file1, $file2) {
+        return equal(
+            $read_text->($file1),
+            $read_text->($file2)
+        );
+    };
+}
 
-static read_bytes => sub($file, $count) {
+static read_bytes => sub($size, @path) {
+    require Path::Tiny;
+    my $file = Path::Tiny::path(@path);
+
     open my $fh, '<:raw', $file
         or return Err("Could not open file '$file': $!");
     my $content;
-    my $read = read $fh, $content, $count;
+    my $read = read $fh, $content, $size;
     return Err("Error reading from '$file': $!") if !defined $read;
     return Ok($content);
 };
@@ -94,6 +107,7 @@ static make_link => sub($source, $destination) {
         or die "Cannot create symlink: $!\n";
 
     chdir($cwd);
+    return;
 };
 
 static recurse => sub(@paths) {

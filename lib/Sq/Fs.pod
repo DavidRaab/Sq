@@ -1,0 +1,136 @@
+=encoding UTF-8
+
+=head1 Sq::Fs
+
+The functions in this module are accessed through C<< Sq->fs >>. At the moment
+it is automatically loaded by loading C<Sq>. Maybe at a later point it is lazy
+loaded. When you use C<< Sq->fs >> then future code should still work when
+this change is done. Calling functions as C<< Sq::Fs->func >> will not have
+that benefit.
+
+=head2 read_text(@path) : $seq
+
+C<@path> are the components to build the path to a file. This function returns
+a sequence representing that file, opened and decoded as an UTF-8 text-file.
+
+    my $file = Sq->fs->read_text('data', 'file.txt');
+
+C<read_text> returns a sequence. Consider that the file is not opened nor is it
+otherwise processed as long you don't query data from a sequence. This means
+you also can pass in a folder/file that doesn't exists yet.
+
+When a file doesn't exists then you just get an empty sequence. No error, warning
+or exception is thrown.
+
+Whenever you query data from a sequence, the file is then re-opened and processed
+again and again.
+
+    my $lines = $file->length;
+
+The above will open the file. Calculates the length, and closes the file.
+When the file is changed, for example by another process. Then calling
+
+    my $lines = $file->length;
+
+will again re-read the whole file and calculates the line length. When you
+want that a file is only read into memory a single time, and only as much
+is needed. Then you either should C<cache> the sequence.
+
+    my $file = Sq->fs->read_text('data', 'file.txt')->cache;
+
+or directly read the whole file into memory by turning it into an Array.
+
+    my $contet = Sq->fs->read_text('data', 'file.txt')->to_array;
+
+Calling C<cache> is preferred, as the sequence is still lazy and caching happens
+along while reading. C<to_array> reads the whole file before anything is done.
+But also consider to make the C<cache> call as useful/late as possible. For
+example you could do.
+
+    my $file =
+        Sq->fs
+        ->read_text('data', 'file.txt')
+        ->rx(qr/\A \s* [^#]/x)          # keep lines not starting with #
+        ->cache;
+
+This also would built a cache of the whole file, and the whole file read once.
+But the cache doesn't contain lines that started with C<#>. You also can do
+all other kind of sequence transforming data you are used to build/process
+the data before you call C<cache> or C<to_array>.
+
+=head2 read_text_gz(@path) : $seq
+
+Same as C<read_text> but assumes file is compressed with C<gzip>. So you directly
+can open a C<gz> file and just iterate it the same as a I<normal> file. Reading
+gziped files is usually faster than opening/reading pure text files!
+
+For example an uncrompressed text-file with 1 GiB of size usually can be compressed
+to 100 MiB or less. Reading 100 MiB from disk is by far faster than reading 1 GiB
+even with todays SSD, NVME. It costs a little bit more of CPU usage but it's better
+than an idling process waiting for data to arrive.
+
+    # Are those files equal?
+    my $same_file = equal(
+        Sq->fs->read_text   ('data', 'one.txt'),
+        Sq->fs->read_text_gz('data', 'one.txt.gz'),
+    );
+
+=head2 read_raw($size, @path) : $seq
+
+Reads a file as a binary file. With C<$size> you specify how much bytes are
+read at once.
+
+    my $content = Sq->fs->read_raw(4096, 'data', 'file.bin');
+
+=head2 compare_text($file1, $file2) : $bool
+
+Returns if both files are the same text files. The implementation
+of this function is nearly stupid because the whole work of processing
+a file is in a sequence and a sequence can be compared with C<equal>. Here is
+the whole implementation of this function.
+
+    static compare_text => sub($file1, $file2) {
+        return equal(
+            read_text(undef, $file1),
+            read_text(undef, $file2)
+        );
+    };
+
+=head2 read_bytes($size, @path) : $result_content
+
+Reads C<$size> bytes from a file that is considered a binary file. Returns
+the content in a C<Result>.
+
+When content could be read you get a C<Ok($content)> otherwise an C<Err($error_message)>.
+
+    my $result = Sq->fs->read_bytes(4096, 'data', 'whatever.bin');
+
+=head2 make_link($source, $destination) : void
+
+Creates a symbolin link from C<$destination> to C<$source>. The symbolic link
+is a relative symbolic link.
+
+TODO: Add example
+
+=head2 recurse(@path) : $seq_of_path_tiny
+
+Recursively traverses a folder by returning you a sequence of C<Path::Tiny>
+objects.
+
+    # sequence of a list of files that end with ".jpg" or ".jpeg" recursively
+    # from the current folder.
+    my $files =
+        Sq->fs
+        ->recurse('.')
+        ->map(call 'is_file')->rx(qr/\.jpe?g\z/);
+
+=head2 children(@path) : $seq_of_path_tiny
+
+Same as C<recurse> but without any recursion. So you basically just get the
+content of the folder you specify without that any sub-folder is traversed.
+
+=head2 sha512(@path) : $result_sha512
+
+Computes the B<SHA512> sum of a file and returns it as a Hexdigit.
+
+    my $result_hex = Sq->fs->sha512('folder', 'file.bin');

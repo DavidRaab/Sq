@@ -90,4 +90,9 @@ is(
 
 nok(Sq->fs->sha512($Dir, 'data', 'NotExisting'), 'sha512 2');
 
+is(
+      Sq->fs->read_raw  (100, $Dir, 'data', 'hop-preface.md')->to_array(1),
+    [ Sq->fs->read_bytes(100, $Dir, 'data', 'hop-preface.md')->get ],
+    'read_bytes');
+
 done_testing;
