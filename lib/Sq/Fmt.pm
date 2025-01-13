@@ -5,8 +5,12 @@ use Sq;
 # This will be a module that help in formating/printing things.
 # For example pass it an array of array and it prints a table.
 
+# TODO: Add something to type-check that allows optional field in a hash
+#       When a field is defined it must type-check. Otherwise when not provided
+#       the type-check is just skipped.
 static 'table', sub($href) {
-    my $header = $href->{header};
+    my $header = $href->{header} // 0;
+    my $border = $href->{border} // 0;
     my $aoa    = $href->{data};
 
     # Calling functions in function-style has the benefit that they always
@@ -36,28 +40,29 @@ static 'table', sub($href) {
              ->map(call 'max', 0);
     };
 
-    # dump($cols);
     # local $Sq::Dump::INLINE = 0;
+    # dump($cols);
 
     # First all strings in data AoA are expanded to its full column size
     $aoa = Array::map2d($aoa, sub($str,$x,$y) {
         my $length = $cols->[$x];
         sprintf "%-${length}s", $str;
     });
+    # Same for header when it is defined
+    $header = Array::mapi($header, sub($str,$x) {
+        my $length = $cols->[$x];
+        sprintf "%-${length}s", $str;
+    });
 
     # print header
-    if ( defined $header ) {
-        # Expand header when some is defined
-        my $header = Array::mapi($header, sub($str,$x) {
-            my $length = $cols->[$x];
-            sprintf "%-${length}s", $str;
-        })->join(' | ');
-        printf "| %s |\n", $header;
+    if ( $header ) {
+        if ( $border ) { printf "| %s |\n", $header->join(' | ') }
+        else           { print $header->join(" "), "\n"          }
     }
-
     # print data
     for my $inner ( @$aoa ) {
-        printf "| %s |\n", $inner->join(' | ');
+        if ( $border ) { printf "| %s |\n", $inner->join(' | ') }
+        else           { print $inner->join(" "), "\n"          }
     }
 
     return;

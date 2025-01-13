@@ -32,4 +32,5 @@ my $examples =
 Sq->fmt->table({
     header => [qw/Script Description/],
     data   => $examples,
+    border => 0,
 });
