@@ -51,7 +51,7 @@ sub ok($bool, $message) {
                 print "not ok $count - $message\n";
                 warn  "# not ok $count - $message\n";
                 warn  "# Expected 1, Some() or Ok()\n";
-                my $msg = dump($bool->[1]);
+                my $msg = dumps($bool->[1]);
                 $msg =~ s/^/# /mg;
                 warn $msg, "\n";
             }
@@ -124,8 +124,8 @@ sub is :prototype($$$) {
     }
     else {
         print "not ok $count - $message\n";
-        my $dump_1 = dump($got);
-        my $dump_2 = dump($expected);
+        my $dump_1 = dumps($got);
+        my $dump_2 = dumps($expected);
         # add # to beginning of every starting line
         $dump_1 =~ s/^/# /mg;
         $dump_2 =~ s/^/# /mg;
