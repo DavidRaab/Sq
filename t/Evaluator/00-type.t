@@ -2,8 +2,8 @@
 use 5.036;
 use Sq;
 use Sq::Type;
-use Sq::Sig;
 use Sq::Test;
+use Sq::Sig;
 
 my $album = type
     [hash => [keys =>
@@ -14,27 +14,27 @@ my $album = type
                 name     => ['str'],
                 duration => ['int']]]]]]];
 
-nok(t_valid($album, {}), 'album 1');
+nok(t_run($album, {}), 'album 1');
 
-ok(t_valid($album, {
+ok(t_run($album, {
     artist => 'Yep',
     title  => 'Greatest Hit',
     tracks => [],
 }), 'album 2');
 
-nok(t_valid($album, {
+nok(t_run($album, {
     artist => [],
     title  => 'Greatest Hit',
     tracks => [],
 }), 'album 3');
 
-nok(t_valid($album, {
+nok(t_run($album, {
     artist => 'Yep',
     title  => [],
     tracks => [],
 }), 'album 4');
 
-ok(t_valid($album, {
+ok(t_run($album, {
     artist => 'Yep',
     title  => 'Greatest Hit',
     tracks => [
@@ -42,7 +42,7 @@ ok(t_valid($album, {
     ],
 }), 'album 5');
 
-nok(t_valid($album, {
+nok(t_run($album, {
     artist => 'Yep',
     title  => 'Greatest Hit',
     tracks => [
@@ -50,7 +50,7 @@ nok(t_valid($album, {
     ],
 }), 'album 6');
 
-ok(t_valid($album, {
+ok(t_run($album, {
     artist => 'Yep',
     title  => 'Greatest Hit',
     tracks => [
@@ -59,7 +59,7 @@ ok(t_valid($album, {
     ],
 }), 'album 7');
 
-nok(t_valid($album, {
+nok(t_run($album, {
     artist => 'Yep',
     title  => 'Greatest Hit',
     tracks => [
@@ -68,7 +68,7 @@ nok(t_valid($album, {
     ],
 }), 'album 8');
 
-nok(t_valid($album, {
+nok(t_run($album, {
     artist => 'Yep',
     title  => 'Greatest Hit',
     tracks => [
@@ -78,7 +78,7 @@ nok(t_valid($album, {
     ],
 }), 'album 9');
 
-nok(t_valid($album, {
+nok(t_run($album, {
     artist => '',
     title  => 'Greatest Hit',
     tracks => [
@@ -88,7 +88,7 @@ nok(t_valid($album, {
     ],
 }), 'album 10');
 
-nok(t_valid($album, {
+nok(t_run($album, {
     artist => 'Yep',
     title  => '',
     tracks => [
