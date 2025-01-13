@@ -1552,7 +1552,7 @@ is(
             $new->{change} = '-' . $entry->{out};
             return $new;
         }
-        Carp::croak (sprintf "Not In/Out: %s", dump($entry));
+        Carp::croak (sprintf "Not In/Out: %s", dumps($entry));
     }
 
     my $bookings = sq [

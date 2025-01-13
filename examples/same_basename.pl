@@ -26,8 +26,8 @@ my $mv4files =
     ->keep(call 'is_file')->rx(qr/\.m4v\z/)
     ->split(qr/\./);
 
-# dumpw($mp4files);
-# dumpw($mv4files);
+# dump($mp4files);
+# dump($mv4files);
 
 print "Possible converted files that can be deleted.\n";
 $mp4files->intersect($mv4files, \&fst)->iter(sub($tuple) {

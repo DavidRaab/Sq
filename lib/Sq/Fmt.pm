@@ -36,7 +36,7 @@ static 'table', sub($href) {
              ->map(call 'max', 0);
     };
 
-    # dumpw($cols);
+    # dump($cols);
 
     # Print header when defined
     if ( defined $header ) {

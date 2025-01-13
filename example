@@ -26,7 +26,7 @@ my $examples =
     });
 
 # $Sq::Dump::Inline = 120;
-# dumpw($examples);
+# dump($examples);
 
 # print Array of Array as Table
 Sq->fmt->table({

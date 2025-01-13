@@ -52,9 +52,9 @@ sub shuffle3($array) {
 
 # my $data = [1..10];
 # for ( 1 .. 1_000 ) {
-#     dumpw(shuffle3($data));
+#     dump(shuffle3($data));
 #     if ( Array::sum($data) != 55 ) {
-#         warn "Error: %s\n", dump($data);
+#         warn "Error: %s\n", dumps($data);
 #     }
 # }
 

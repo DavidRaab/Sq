@@ -22,7 +22,7 @@ while (1) {
     });
 
     # To See what you can select from.
-    # dumpw($info);
+    # dump($info);
 
     # You can lock the Hash. Why you wanna do that?
     # Consider that extracting a key from a hash that doesn't exists returns just

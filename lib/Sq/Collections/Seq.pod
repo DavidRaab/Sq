@@ -1032,19 +1032,14 @@ I highly encourage to better use C<fold> or C<fold_mut> instead of C<reduce>.
     my $sum = Seq->range(1,1000)->reduce(0, sub($x,$y)     { $x + $y     });
     my $sum = Seq->range(1,1000)->fold(  0, sub($state,$x) { $state + $x });
 
-=head2 dump($seq, $inline=60, $depth=0) : $str
+=head2 dumps($seq, $depth=0) : $str
 
 Recursivly traverses data-structures and creates a human readable dump from it.
-Only the first 20 entries are shown.
-
-C<$inline> controls the amount of characters a data-structure is completely
-inlined into a single string without newlines. The higher the number the more
-compact your dump will be.
+Only the first 50 entries are shown.
 
 It currently has a bug as it also collaps whitespace in a string and it shouldn't
-do that. This could be avoided by setting C<$inline> to C<0>. But consider that
-dumping in its current form is considered for debugging purposes, not for
-serializing data.
+do that. But consider that dumping in its current form is considered for
+debugging purposes, not for serializing data.
 
 Currently it is not perfect. It only works with Perl Array/Hash and Sq Array/Hash
 and the Option type. Sq Array/Hash are just dumped as normal Perl Array/Hash. No
@@ -1052,15 +1047,17 @@ other object is being dumped. It also does not dump any other object and has no
 configuration. Also doesn't detect cyclic data-structures. But for most I<practical>
 data-structures it works good enough at the moment. Get's improved in the future.
 
-    printf "%s\n", $opt->dump;
+    printf "%s\n", $opt->dumps;
+    printf "%s\n", dumps($opt);
 
-=head2 dumpw($seq, $inline=60, $depth=0) : void
+=head2 dump($seq, $depth=0) : void
 
 Same as C<dump> but instead of returning the dump as a string, automatically
 prints it using C<warn>.
 
-    $opt->dumpw;
-    warn $opt->dump, "\n";
+    $opt->dump;
+    dump($opt);
+    warn $opt->dumps, "\n";
 
 =head1 SIDE-EFFECTS
 

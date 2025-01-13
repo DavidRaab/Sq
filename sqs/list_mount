@@ -13,7 +13,7 @@ my $mounts =
     ->sort_by(by_str, sub($array) { $array->[1] })
     ->sort_by(by_str, sub($array) { $array->[2] });
 
-# dumpw($mounts);
+# dump($mounts);
 
 Sq->fmt->table({
     header => [qw/Src Dst Fs Options ? ?/],

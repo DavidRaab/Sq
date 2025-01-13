@@ -148,7 +148,7 @@ my $file =
 t_assert($is_dup, $file);
 
 # remove comment to see structure
-# dumpw($file);
+# dump($file);
 
 # EXAMPLE DUMP
 # {

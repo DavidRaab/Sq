@@ -28,11 +28,11 @@ my $funcs = Array->concat(
     fqdn('Result'), fqdn('Sq::Parser'), fqdn('Sq::Gen'),
 );
 
-# dumpw($funcs);
+# dump($funcs);
 
 my $sigs = Sq::Signature::sigs_added();
 
-# dumpw($sigs);
+# dump($sigs);
 
 say "Following functions is missing a signature:";
 Array::diff($funcs, $sigs, \&id)->iter_sort(by_str, sub($func) {

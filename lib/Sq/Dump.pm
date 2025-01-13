@@ -4,6 +4,8 @@ use 5.036;
 our $SEQ_AMOUNT     = 50;
 our $INLINE         = 200;
 our $COLOR          = 1;
+
+# Color Values for dumping
 my  $COLOR_RESET    = "\e[m";
 our $COLOR_STRING   = "\e[38;5;2m"; # green
 our $COLOR_NUM      = "\e[38;5;1m"; # red

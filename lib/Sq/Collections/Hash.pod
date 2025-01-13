@@ -618,7 +618,9 @@ The newly created Array is an Sq Array.
 
     my $array = $points->to_array(sub($k,$v) { $k }); # ["Frank", "Marie", "Alice"]
 
-=head2 dump($hash, $inline=60, $depth=0) : $str
+=head2 dumps($hash, $depth=0) : $str
+
+This function is also imported as a global functio C<dumps>.
 
 Recursivly traverses data-structures and creates a human readable dump from it.
 
@@ -627,9 +629,8 @@ inlined into a single string without newlines. The higher the number the more
 compact your dump will be.
 
 It currently has a bug as it also collaps whitespace in a string and it shouldn't
-do that. This could be avoided by setting C<$inline> to C<0>. But consider that
-dumping in its current form is considered for debugging purposes, not for
-serializing data.
+do that. But consider that dumping in its current form is considered for
+debugging purposes, not for serializing data.
 
 Currently it is not perfect. It only works with Perl Array/Hash and Sq Array/Hash
 and the Option type. Sq Array/Hash are just dumped as normal Perl Array/Hash. No
@@ -637,15 +638,17 @@ other object is being dumped. It also does not dump any other object and has no
 configuration. Also doesn't detect cyclic data-structures. But for most I<practical>
 data-structures it works good enough at the moment. Get's improved in the future.
 
-    printf "%s\n", $hash->dump;
+    printf "%s\n", $hash->dumps;
+    printf "%s\n", dumps($hash);
 
-=head2 dumpw($hash, $inline=60, $depth=0) : void
+=head2 dump($hash, $depth=0) : void
 
 Same as C<dump> but instead of returning the dump as a string, automatically
-prints it using C<warn>.
+prints it using C<warn>. C<dump> is also imported by loading C<Sq>.
 
-    $hash->dumpw;
-    warn $hash->dump, "\n";
+    $hash->dump;
+    dump($hash);
+    warn $hash->dumps, "\n";
 
 =head1 SIDE-EFFECTS
 

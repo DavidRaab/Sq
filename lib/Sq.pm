@@ -17,7 +17,7 @@ our @EXPORT = (
     lazy    => sub { \&Sq::Core::Lazy::lazy },
     equal   => sub { \&Sq::Equality::equal  },
     dump    => sub { \&Sq::Dump::dump       },
-    dumpw   => sub { \&Sq::Dump::dumpw      },
+    dumps   => sub { \&Sq::Dump::dumps      },
     type    => sub { \&Sq::Type::type       },
     is_type => sub { \&Sq::Type::t_valid    },
 );

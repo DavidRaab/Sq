@@ -7,10 +7,14 @@ use Path::Tiny qw(path);
 
 # Control if Dump should show color or not.
 $Sq::Dump::COLOR  = 1;
+
 # When color is active this should be higher. At the moment i don't differentiate
 # between printable characters and not. Color printing emits additional characters
 # so this must be higher to be more compact.
 $Sq::Dump::INLINE = 300;
+
+# Defines how many elements of a sequence should be shown.
+$Sq::Dump::SEQ_AMOUNT = 20;
 
 my $test = sq {
     bonus => "with\nnewline",
@@ -33,5 +37,5 @@ my $test = sq {
     path => Path::Tiny->cwd,
 };
 
-warn dump($test), "\n";
-dumpw Seq->replicate(5, "x");
+warn dumps($test), "\n";
+dump Seq->replicate(5, "x");

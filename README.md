@@ -438,14 +438,15 @@ is(
 
 It exports the following functions by default:
 
-| Category    | Functions               |
-|----         | ---                     |
-| Creation    | sq key Some None Ok Err |
-| Equality    | equal                   |
-| OBJ         | call                    |
-| Scope       | assign lazy             |
-| Helpers     | id fst snd dump dumpw   |
-| Comparision | by_num by_str by_stri   |
+| Category    | Functions                        |
+|----         | ---                              |
+| Creation    | sq key Some None Ok Err new type |
+| Functions   | multi static                     |
+| Equality    | equal                            |
+| OBJ         | call                             |
+| Scope       | assign lazy                      |
+| Helpers     | id fst snd dump dumps            |
+| Comparision | by_num by_str by_stri            |
 | Type-checks | is_num is_str is_array is_hash is_seq is_opt is_result is_ref |
 
 # SYNOPSIS
@@ -537,7 +538,7 @@ things when they seems to make more sense in practice over theory.
 * [Sq::Equality](lib/Sq/Equality.pm) implements `equal` function and add methods
 * [Sq::Evaluator](/lib/Sq/Evaluator) [Type](t/Evaluator/00-type.t) [Parser](t/Evaluator/01-parser.t) implements functions to eval data-structures
 * [Sq::Test](lib/Sq/Test.pm) minimal Test-Suite that is already used to test Sq itself
-* [Sq::Dump](lib/Sq/Dump.pm) implements `dump` and `dumpw` and add methods
+* [Sq::Dump](lib/Sq/Dump.pm) implements `dump` and `dumps` and add methods
 * [Sq::Collections::Seq](lib/Sq/Collections/Seq.pod)
 * [Sq::Collections::Array](lib/Sq/Collections/Array.pod)
 * [Sq::Collections::Hash](lib/Sq/Collections/Hash.pod)
