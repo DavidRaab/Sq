@@ -3,7 +3,7 @@ use 5.036;
 use Sq;
 
 # Opens a file as UTF-8 text
-sub read_text($, @path) {
+static read_text => sub(@path) {
     require Path::Tiny;
     my $file = Path::Tiny::path(@path);
     return Seq->from_sub(sub {
@@ -21,9 +21,9 @@ sub read_text($, @path) {
             };
         }
     });
-}
+};
 
-sub read_text_gz($, @path) {
+static read_text_gz => sub(@path) {
     require PerlIO::gzip;
     require Path::Tiny;
     my $file = Path::Tiny::path(@path);
@@ -42,9 +42,9 @@ sub read_text_gz($, @path) {
             };
         }
     });
-}
+};
 
-sub read_raw($, $size, @path) {
+static read_raw => sub($size, @path) {
     require Path::Tiny;
     my $file = Path::Tiny::path(@path);
     return Seq->from_sub(sub {
@@ -63,25 +63,25 @@ sub read_raw($, $size, @path) {
             };
         }
     });
-}
+};
 
-sub compare_text($, $file1, $file2) {
+static compare_text => sub($file1, $file2) {
     return equal(
         read_text(undef, $file1),
         read_text(undef, $file2)
     );
-}
+};
 
-sub read_bytes($, $file, $count) {
+static read_bytes => sub($file, $count) {
     open my $fh, '<:raw', $file
         or return Err("Could not open file '$file': $!");
     my $content;
     my $read = read $fh, $content, $count;
     return Err("Error reading from '$file': $!") if !defined $read;
     return Ok($content);
-}
+};
 
-sub make_link($, $source, $destination) {
+static make_link => sub($source, $destination) {
     require Path::Tiny;
 
     $source      = Path::Tiny::path($source)->absolute;
@@ -94,9 +94,9 @@ sub make_link($, $source, $destination) {
         or die "Cannot create symlink: $!\n";
 
     chdir($cwd);
-}
+};
 
-sub recurse($, @paths) {
+static recurse => sub(@paths) {
     require Path::Tiny;
     Seq->from_sub(sub {
         my $it = Path::Tiny::path(@paths)->iterator({
@@ -107,14 +107,14 @@ sub recurse($, @paths) {
         my $path;
         return sub { $it->() }
     });
-}
+};
 
-sub children($, @paths) {
+static children => sub(@paths) {
     require Path::Tiny;
     return Seq->new(Path::Tiny::path(@paths)->children);
-}
+};
 
-sub sha512($, @path) {
+static sha512 => sub(@path) {
     require Path::Tiny;
     my $file = Path::Tiny::path(@path);
     my $err = open my $fh, '<:raw', $file;
@@ -125,6 +125,6 @@ sub sha512($, @path) {
     $sha->addfile($fh);
 
     return Ok($sha->hexdigest);
-}
+};
 
 1;
