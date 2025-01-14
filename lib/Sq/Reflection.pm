@@ -1,7 +1,7 @@
 package Sq::Reflection;
 use 5.036;
 use Sq::Exporter;
-our @EXPORT = qw(get_func set_func all_funcs has_func);
+our @EXPORT = qw(get_func set_func funcs_of has_func signatures);
 
 {
     no strict   'refs';     ## no critic
@@ -27,7 +27,7 @@ our @EXPORT = qw(get_func set_func all_funcs has_func);
     }
 
     # returns all functions of a package
-    sub all_funcs($package) {
+    sub funcs_of($package) {
         my @funcs;
         # Traverse symbol-table
         for my ($key,$glob) ( %{*{$package . '::'}} ) {
@@ -44,5 +44,8 @@ our @EXPORT = qw(get_func set_func all_funcs has_func);
     }
 }
 
+sub signatures() {
+    return Sq::Signature::sigs_added();
+}
 
 1;
