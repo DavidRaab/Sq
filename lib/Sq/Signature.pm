@@ -71,12 +71,4 @@ sub sigt($func_name, $in_type, $out_type) {
     });
 }
 
-# a function with multiple different signatures
-sub sigm($func_name, @multi) {
-
-}
-
-# when a function has variable args
-sub sigv { ... }
-
 1;
