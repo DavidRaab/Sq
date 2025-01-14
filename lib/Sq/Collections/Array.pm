@@ -251,6 +251,24 @@ sub chunked($array, $size) {
     return CORE::bless(\@new, 'Array');
 }
 
+sub columns($array, $amount) {
+    my @new;
+    my $max = @$array / $amount;
+    my ($x,$y) = (0,0);
+    for my $value ( @$array ) {
+        $new[$y][$x] = $value;
+        if ( ++$y >= $max ) {
+            $x++;
+            $y = 0;
+        }
+    }
+    # Add blessings
+    for my $array ( @new ) {
+        CORE::bless($array, 'Array');
+    }
+    return CORE::bless(\@new, 'Array');
+}
+
 sub choose($array, $f_opt) {
     my $new = new('Array');
     my ($is_some, $v);

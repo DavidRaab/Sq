@@ -1628,4 +1628,97 @@ is(
         'map2d 2');
 }
 
+# columns
+{
+    is(
+        Array->range(1,10)->columns(1),
+        [
+            [1],
+            [2],
+            [3],
+            [4],
+            [5],
+            [6],
+            [7],
+            [8],
+            [9],
+            [10],
+        ],
+        'columns 1');
+
+    is(
+        Array->range(1,10)->columns(2),
+        [
+            [1,6],
+            [2,7],
+            [3,8],
+            [4,9],
+            [5,10],
+        ],
+        'columns 2');
+
+    is(
+        Array->range(1,10)->columns(3),
+        [
+            [1,5, 9],
+            [2,6,10],
+            [3,7   ],
+            [4,8   ],
+        ],
+        'columns 3');
+
+    is(
+        Array->range(1,10)->columns(4),
+        [
+            [1,4,7,10],
+            [2,5,8   ],
+            [3,6,9   ],
+        ],
+        'columns 4');
+
+    is(Array::columns([1], 1), [[1]], 'columns 5');
+    is(Array::columns([], 1),     [], 'columns 6');
+
+    is(
+        Array->range(1,4)->columns(4),
+        [
+            [1,2,3,4],
+        ],
+        'columns 7');
+
+    is(
+        Array->range(1,10)->columns(10),
+        [
+            [1,2,3,4,5,6,7,8,9,10],
+        ],
+        'columns 8');
+
+    is(
+        Array->range(1,5)->columns(10),
+        [
+            [1,2,3,4,5],
+        ],
+        'columns 9');
+
+    # TODO: Correct or not?
+    is(
+        Array->range(1,11)->columns(10),
+        [
+            [ 1, 3, 5, 7,  9, 11 ],
+            [ 2, 4, 6, 8, 10     ]
+        ],
+        'columns 10');
+
+    is(
+        Array->range(1,50)->columns(10),
+        [
+            [ 1,  6, 11, 16, 21, 26, 31, 36, 41, 46 ],
+            [ 2,  7, 12, 17, 22, 27, 32, 37, 42, 47 ],
+            [ 3,  8, 13, 18, 23, 28, 33, 38, 43, 48 ],
+            [ 4,  9, 14, 19, 24, 29, 34, 39, 44, 49 ],
+            [ 5, 10, 15, 20, 25, 30, 35, 40, 45, 50 ]
+        ],
+        'columns 11');
+}
+
 done_testing;
