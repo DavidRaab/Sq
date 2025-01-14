@@ -35,7 +35,7 @@ static 'table', sub($href) {
 
     # just turn AoA into string lengths and transpose
     my $cols = assign {
-        my $sizes = defined $header ? [$header, @$aoa] : $aoa;
+        my $sizes = $header ? [$header, @$aoa] : $aoa;
         Array::transpose_map($sizes, sub ($str,$,$) { length $str })
              ->map(call 'max', 0);
     };
