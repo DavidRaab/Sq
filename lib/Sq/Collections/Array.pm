@@ -831,6 +831,22 @@ sub reduce($array, $f) {
     return Option::Some($init);
 }
 
+# TODO: Should equal() be extended that it also can equal with a Regexp?
+sub contains($array, $any) {
+    my $type = ref $any;
+    if ( $type eq 'Regexp' ) {
+        for my $x ( @$array ) {
+            return 1 if $x =~ $any;
+        }
+    }
+    else {
+        for my $x ( @$array ) {
+            return 1 if Sq::Equality::equal($x, $any);
+        }
+    }
+    return 0;
+}
+
 # length : Array<'a> -> int
 sub length($array) {
     return scalar @{ $array };

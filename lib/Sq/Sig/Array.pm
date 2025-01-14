@@ -155,6 +155,8 @@ sig('Array::all',        $array, $sub,                 t_bool);
 sig('Array::none',       $array, $sub,                 t_bool);
 sig('Array::pick',       $array, $sub,                 $opt);
 sig('Array::to_seq',     $array,                       t_seq);
+sig('Array::contains',   $array, $any,                 t_bool);
+
 sigt('Array::dumps',
     t_or(
         t_tuple($array),

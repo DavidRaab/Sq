@@ -1721,4 +1721,29 @@ is(
         'columns 11');
 }
 
+# contains
+{
+    my $data = sq [
+        { name => 'Lilly' },
+        { X => 1, Y => 2  },
+        'Some Text',
+        "Foo: x",
+        123,
+        [1,2,3],
+    ];
+
+     ok($data->contains({name => 'Lilly'}),          'contains Lilly');
+    nok($data->contains({name => 'Anny' }),          'no Anny');
+     ok($data->contains({X => 1, Y => 2 }),          'contains Point');
+    nok($data->contains({X => 1, Y => 3 }),          'Y other value');
+     ok($data->contains('Some Text'),                'string 1');
+    nok($data->contains('Not Found'),                'string 2');
+     ok($data->contains(123),                        'num 1');
+    nok($data->contains(124),                        'num 2');
+     ok($data->contains([1,2,3]),                    'array 1');
+    nok($data->contains([1,2,3,4]),                  'array 2');
+     ok($data->contains(qr/\A\w+ \s* : \s* \w+\z/x), 'regexp 1');
+    nok($data->contains(qr/\A\z/),                   'regexp 2');
+}
+
 done_testing;
