@@ -1143,8 +1143,9 @@ sub none($array, $predicate) {
 }
 
 sub pick($array, $f_opt) {
+    my $opt;
     for my $x ( @$array ) {
-        my $opt = Option::Some($f_opt->($x));
+        $opt = Option::Some($f_opt->($x));
         return $opt if @$opt;
     }
     return Option::None();
