@@ -19,5 +19,5 @@ if ( @$missing ) {
     say $missing->sort(by_str)->join(', ');
 }
 else {
-    print "All statics have a siganture.\n";
+    print "All statics have a signature.\n";
 }
