@@ -25,8 +25,8 @@ sub ok($bool, $message) {
         }
         else {
             print "not ok $count - $message\n";
-            warn  "# not ok $count - $message\n";
             warn  "# Expected 1, Some() or Ok()\n";
+            warn  "# not ok $count - $message\n";
         }
         return;
     }
@@ -38,8 +38,8 @@ sub ok($bool, $message) {
             }
             else {
                 print "not ok $count - $message\n";
-                warn  "# not ok $count - $message\n";
                 warn  "# Expected 1, Some() or Ok()\n";
+                warn  "# not ok $count - $message\n";
             }
             return;
         }
@@ -49,8 +49,8 @@ sub ok($bool, $message) {
             }
             else {
                 print "not ok $count - $message\n";
-                warn  "# not ok $count - $message\n";
                 warn  "# Expected 1, Some() or Ok()\n";
+                warn  "# not ok $count - $message\n";
                 my $msg = dumps($bool->[1]);
                 $msg =~ s/^/# /mg;
                 warn $msg, "\n";
@@ -134,10 +134,11 @@ sub is :prototype($$$) {
         $dump_2 =~ s/\A#\s*//;
         # warning
         my ( $pkg, $file, $line ) = caller;
-        my $place = sprintf "at %s: %d\n", $file, $line;
-        warn "# not ok $count - $message $place\n",
+        my $place = sprintf "at %s: %d", $file, $line;
+        warn "\n",
              "# Got:      ", $dump_1, "\n",
-             "# Expected: ", $dump_2, "\n";
+             "# Expected: ", $dump_2, "\n",
+             "# not ok $count - $message $place\n";
     }
     return;
 }
@@ -160,13 +161,14 @@ sub like($str, $regex, $message) {
     }
     else {
         my ( $pkg, $file, $line ) = caller;
-        my $place = sprintf "at %s: %d\n", $file, $line;
+        my $place = sprintf "at %s: %d", $file, $line;
         print "not ok $count - $message $place\n";
         $str =~ s/^/# /mg;
         $str =~ s/\A# //;
-        warn "# not ok $count - $message\n",
+        warn "\n",
              "# Got:      $str\n",
-             "# Expected: $regex\n";
+             "# Expected: $regex\n",
+             "# not ok $count - $message $place\n";
     }
     return;
 }
@@ -181,15 +183,15 @@ sub check_isa($any, $class, $message) {
         print "not ok $count - $message\n";
         my $type = blessed $any;
         if ( defined $type ) {
-            warn "# not ok $count - $message\n",
-                 "# Got:      $type\n",
-                 "# Expected: $class\n";
+            warn "# Got:      $type\n",
+                 "# Expected: $class\n",
+                 "# not ok $count - $message\n";
         }
         else {
             my ( $pkg, $file, $line ) = caller;
-            my $place = sprintf "at %s: %d\n", $file, $line;
-            warn "# not ok $count - $message $place\n",
-                 "# Expected an object of $class, got unblessed value\n";
+            my $place = sprintf "at %s: %d", $file, $line;
+            warn "# Expected an object of $class, got unblessed value\n";
+                 "# not ok $count - $message $place\n",
         }
     }
 }
