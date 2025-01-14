@@ -34,6 +34,15 @@ my $None = bless([], 'Option');
 # Constructor functions that are importet by Sq
 sub Some(@values) {
     return $None if @values == 0;
+
+    if ( @values == 1 ) {
+        my $value = $values[0];
+        my $type  = ref $value;
+        return $value                    if $type eq 'Option';
+        return bless([$value], 'Option') if defined $value;
+        return $None;
+    }
+
     my @new;
     for my $value ( @values ) {
         return $None if !defined $value;
