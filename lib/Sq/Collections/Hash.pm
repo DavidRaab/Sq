@@ -2,7 +2,7 @@ package Sq::Collections::Hash;
 package Hash;
 use 5.036;
 use Hash::Util ();
-use subs 'bind', 'keys', 'values', 'bless', 'map', 'foreach', 'delete', 'length';
+use subs 'bind', 'keys', 'values', 'bless', 'map', 'delete', 'length';
 
 # TODO: equal, eual_values, is_disjoint
 
@@ -285,9 +285,11 @@ sub iter($hash, $f) {
 }
 
 sub iter_sort($hash, $compare, $f) {
-    for my $key ( keys($hash)->sort($compare)->@* ) {
+    local ($a,$b);
+    for my $key ( sort { $compare->($a,$b) } CORE::keys %$hash ) {
         $f->($key, $hash->{$key});
     }
+    return;
 }
 
 sub lock($hash, @keys) {
