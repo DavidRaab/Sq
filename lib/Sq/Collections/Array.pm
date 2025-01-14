@@ -850,7 +850,6 @@ sub contains($array, $any) {
     return 0;
 }
 
-# length : Array<'a> -> int
 sub length($array) {
     return scalar @{ $array };
 }
@@ -1079,10 +1078,10 @@ sub as_hash($array) {
 }
 
 # Array<'a> -> ('a -> 'Key) -> Hash<'Key, 'a>
-sub keyed_by($array, $f_str) {
+sub keyed_by($array, $f_key) {
     my %hash;
     for my $x ( @$array ) {
-        $hash{$f_str->($x)} = $x;
+        $hash{$f_key->($x)} = $x;
     }
     return CORE::bless(\%hash, 'Hash');
 }
@@ -1091,11 +1090,12 @@ sub keyed_by($array, $f_str) {
 # with the same 'Key.
 #
 # Array<'a> -> ('a -> 'Key) -> Hash<'Key, Array<'a>>
-sub group_by($array, $f_str) {
+sub group_by($array, $f_key) {
     my $hash = CORE::bless({}, 'Hash');
+    my $key;
     for my $x ( @$array ) {
-        my $str = $f_str->($x);
-        Hash::push($hash, $str, $x);
+        $key = $f_key->($x);
+        Hash::push($hash, $key, $x);
     }
     return $hash;
 }
@@ -1109,10 +1109,10 @@ sub count($array) {
     return $new;
 }
 
-sub count_by($array, $f_str) {
+sub count_by($array, $f_key) {
     my $new = CORE::bless({}, 'Hash');
     for my $x ( @$array ) {
-        $new->{$f_str->($x)}++;
+        $new->{$f_key->($x)}++;
     }
     return $new;
 }
