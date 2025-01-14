@@ -673,6 +673,41 @@ sub trim($array) {
     return CORE::bless(\@new, 'Array');
 }
 
+# Noop - Only for API compatibility with Seq
+sub cache($array) { $array }
+
+#-----------------------------------------------------------------------------#
+# ARRAY 2D                                                                    #
+#          Here are functions designed for working with 2D Arrays             #
+#-----------------------------------------------------------------------------#
+
+sub fill2d($aoa, $f) {
+    my $maxX = 0;
+    for my $array ( @$aoa ) {
+        my $l = @$array;
+        $maxX = $l > $maxX ? $l : $maxX;
+    }
+
+    my @new;
+    my $y = 0;
+    for my $array ( @$aoa ) {
+        my @inner;
+        for (my $x=0; $x < $maxX; $x++) {
+            my $value = $array->[$x];
+            if ( defined $value ) {
+                push @inner, $value;
+            }
+            else {
+                push @inner, $f->($x,$y);
+            }
+        }
+        $y++;
+        push @new, CORE::bless(\@inner, 'Array');
+    }
+
+    return CORE::bless(\@new, 'Array');
+}
+
 sub transpose($aoa) {
     my (@new, $x, $count);
     my $idx = 0;
@@ -711,41 +746,6 @@ sub transpose_map($aoa, $f) {
         last if $count == 0;
     }
     return CORE::bless(Sq::sq(\@new), 'Array');
-}
-
-# Noop - Only for API compatibility with Seq
-sub cache($array) { $array }
-
-#-----------------------------------------------------------------------------#
-# ARRAY 2D                                                                    #
-#    Here are functions specifally designed for working with 2D Arrays        #
-#-----------------------------------------------------------------------------#
-
-sub fill2d($aoa, $f) {
-    my $maxX = 0;
-    for my $array ( @$aoa ) {
-        my $l = @$array;
-        $maxX = $l > $maxX ? $l : $maxX;
-    }
-
-    my @new;
-    my $y = 0;
-    for my $array ( @$aoa ) {
-        my @inner;
-        for (my $x=0; $x < $maxX; $x++) {
-            my $value = $array->[$x];
-            if ( defined $value ) {
-                push @inner, $value;
-            }
-            else {
-                push @inner, $f->($x,$y);
-            }
-        }
-        $y++;
-        push @new, CORE::bless(\@inner, 'Array');
-    }
-
-    return CORE::bless(\@new, 'Array');
 }
 
 #-----------------------------------------------------------------------------#
