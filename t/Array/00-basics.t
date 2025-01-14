@@ -769,7 +769,7 @@ is(
     'skip_while 2'
 );
 
- # iter
+# iter
 {
     my @iter;
     $range->iter(sub($x) { push @iter, $x });
@@ -781,6 +781,19 @@ is(
     my @iteri;
     $range->iteri(sub($x,$i) { push @iteri, [$i,$x] });
     is(\@iteri, [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,7], [7,8], [8,9], [9,10]], 'iteri');
+}
+
+# iter_sort
+{
+    my $data = sq [10,5,3,6,2,8,4,3,23];
+    my @sorted;
+    $data->iter_sort(by_num, sub($x) {
+        push @sorted,$x;
+    });
+    is(
+        \@sorted,
+        [2, 3, 3, 4, 5, 6, 8, 10, 23],
+        'iter_sort');
 }
 
 # sort

@@ -770,7 +770,10 @@ sub itern($array, $amount, $f) {
 }
 
 sub iter_sort($array, $cmp, $f) {
-    iter(Array::sort($array, $cmp), $f);
+    local ($a,$b);
+    for my $x ( sort { $cmp->($a,$b) } @$array ) {
+        $f->($x);
+    }
     return;
 }
 
