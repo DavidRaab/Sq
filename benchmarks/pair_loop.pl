@@ -14,21 +14,23 @@ sub splice_mojo(@pairs) {
 }
 
 sub index_based1(@pairs) {
-    my @cookies;
+    my (@cookies, $name, $value);
     my $idx = 0;
-    while ( $idx < @pairs ) {
-        my ($name, $value) = @pairs[$idx, $idx+1];
+    my $max = @pairs;
+    while ( $idx < $max ) {
+        ($name, $value) = @pairs[$idx, $idx+1];
         push @cookies, {name => $name, value => $value};
         $idx += 2;
     }
 }
 
 sub index_based2(@pairs) {
-    my @cookies;
+    my (@cookies, $name, $value);
     my $idx = 0;
-    while ( $idx < @pairs ) {
-        my $name  = $pairs[$idx];
-        my $value = $pairs[$idx+1];
+    my $max = @pairs;
+    while ( $idx < $max ) {
+        $name  = $pairs[$idx];
+        $value = $pairs[$idx+1];
         push @cookies, {name => $name, value => $value};
         $idx += 2;
     }
@@ -36,11 +38,9 @@ sub index_based2(@pairs) {
 
 sub builtin(@pairs) {
     my @cookies;
-    my $idx = 0;
+    # Added with 5.036; not experimental anymore with 5.040
     for my ($name,$value) ( @pairs ) {
-        my ($name, $value) = @pairs[$idx, $idx+1];
         push @cookies, {name => $name, value => $value};
-        $idx += 2;
     }
 }
 
