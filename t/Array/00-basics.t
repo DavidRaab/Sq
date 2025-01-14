@@ -1505,6 +1505,15 @@ is(
         Array::map2($words, $ones, sub($word,$one) { $one, $word }),
         [ "foo", "bar", "baz"],
         'map2 - lambda returns multiple things');
+
+    is(
+        Array::map2([qw/foo bar baz maz hatz/], [1,2,3], sub($w,$n) { [$w,$n] }),
+        [
+            ["foo", 1],
+            ["bar", 2],
+            ["baz", 3],
+        ],
+        'map2 - array with different lengths');
 }
 
 # itern
