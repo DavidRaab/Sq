@@ -204,10 +204,19 @@ sub map($array, $f) {
 }
 
 sub map2($arrayA, $arrayB, $f) {
-    my $max = @$arrayA > @$arrayB ? @$arrayA : @$arrayB;
+    my $min = @$arrayA > @$arrayB ? @$arrayB : @$arrayA;
     my @new;
-    for (my $idx=0; $idx < $max; $idx++) {
+    for (my $idx=0; $idx < $min; $idx++) {
         push @new, (scalar $f->($arrayA->[$idx], $arrayB->[$idx]));
+    }
+    return CORE::bless(\@new, 'Array');
+}
+
+sub map3($arrayA, $arrayB, $arrayC, $f) {
+    my $min = min([scalar @$arrayA, scalar @$arrayB, scalar @$arrayC], 0);
+    my @new;
+    for (my $idx=0; $idx < $min; $idx++) {
+        push @new, (scalar $f->($arrayA->[$idx], $arrayB->[$idx], $arrayC->[$idx]));
     }
     return CORE::bless(\@new, 'Array');
 }
