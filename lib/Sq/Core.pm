@@ -36,9 +36,8 @@ sub Some(@values) {
     return $None if @values == 0;
 
     if ( @values == 1 ) {
-        my $value = $values[0];
-        my $type  = ref $value;
-        return $value                    if $type eq 'Option';
+        my $value = shift @values;
+        return $value                    if ref $value eq 'Option';
         return bless([$value], 'Option') if defined $value;
         return $None;
     }
