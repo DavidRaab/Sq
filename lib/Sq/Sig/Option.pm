@@ -66,19 +66,4 @@ sig('Option::to_seq',    $opt,              t_seq);
 
 # sigt('Option::extract',        t_tuplev($any, ), )  # list context
 
-sigt('Option::dumps',
-    t_or(
-        t_tuple($opt),
-        t_tuple($opt, t_int),
-    ),
-    t_str
-);
-sigt('Option::dump',
-    t_or(
-        t_tuple($opt),
-        t_tuple($opt, t_int),
-    ),
-    t_void
-);
-
 1;

@@ -51,9 +51,10 @@ sig ('Hash::to_array',     $hash, $sub,                                    t_arr
 
 ### SIDE-EFFECTS
 
-sigt('Hash::on',      t_tuplev($hash, t_array(t_even_sized)), t_void);
-sig ('Hash::iter',    $hash, $sub,                            t_void);
-sigt('Hash::lock',    t_tuplev($hash, t_array(t_of t_str)),   $hash);
+sigt('Hash::on',        t_tuplev($hash, t_array(t_even_sized)), t_void);
+sig ('Hash::iter',      $hash, $sub,                            t_void);
+sig ('Hash::iter_sort', $hash, $sub, $sub,                      t_void);
+sigt('Hash::lock',      t_tuplev($hash, t_array(t_of t_str)),   $hash);
 
 ### MUTATION METHODS
 
@@ -61,21 +62,5 @@ sigt('Hash::set',     t_tuplev($hash, t_array(t_even_sized)),         t_void);
 sigt('Hash::change',  t_tuplev($hash, t_array(t_even_sized)),         t_void);
 sigt('Hash::push',    t_tuplev($hash, t_str, t_array(t_min 1)),       t_void);
 sigt('Hash::delete',  t_tuplev($hash, t_array(t_min(1), t_of t_str)), t_void);
-
-sigt('Hash::dumps',
-    t_or(
-        t_tuple($hash),
-        t_tuple($hash, $int),
-    ),
-    t_str
-);
-
-sigt('Hash::dump',
-    t_or(
-        t_tuple($hash),
-        t_tuple($hash, $int),
-    ),
-    t_void
-);
 
 1;

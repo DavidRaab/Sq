@@ -122,24 +122,10 @@ sig('Seq::any',        $seq, $sub,                 t_bool);
 sig('Seq::all',        $seq, $sub,                 t_bool);
 sig('Seq::none',       $seq, $sub,                 t_bool);
 sig('Seq::pick',       $seq, $sub,                 $opt);
-sigt('Seq::dumps',
-    t_or(
-        t_tuple($seq),
-        t_tuple($seq, t_int),
-    ),
-    t_str
-);
-sigt('Seq::dump',
-    t_or(
-        t_tuple($seq),
-        t_tuple($seq, t_int),
-    ),
-    t_void
-);
-sig('Seq::equal', $seq, $any, $any);
+sig('Seq::equal',      $seq, $any,                 $any);
 
 # sig('Seq::keyed_by',   $seq, $sub,                t_hash);
-# sig('Seq::count',      $seq,                       t_hash(t_of t_int));
+# sig('Seq::count',      $seq,                      t_hash(t_of t_int));
 # sig('Seq::count_by',   $seq, $sub,                t_hash(t_of t_int));
 
 1;
