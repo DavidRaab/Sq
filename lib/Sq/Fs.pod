@@ -3,10 +3,11 @@
 =head1 Sq::Fs
 
 The functions in this module are accessed through C<< Sq->fs >>. At the moment
-it is automatically loaded by loading C<Sq>. Maybe at a later point it is lazy
-loaded. When you use C<< Sq->fs >> then future code should still work when
+it is automatically loaded by loading C<Sq>. Maybe at a later point in time it
+is lazy loaded. When you use C<< Sq->fs >> then future code should still work when
 this change is done. Calling functions as C<< Sq::Fs->func >> will not have
-that benefit.
+that benefit. Ensure to add C<use Sq::Fs> when you want to call function
+this way.
 
 =head2 read_text(@path) : $seq
 
@@ -19,8 +20,8 @@ C<read_text> returns a sequence. Consider that the file is not opened nor is it
 otherwise processed as long you don't query data from a sequence. This means
 you also can pass in a folder/file that doesn't exists yet.
 
-When a file doesn't exists then you just get an empty sequence. No error, warning
-or exception is thrown.
+When a file doesn't exists and you try quering data from a sequence, you just get
+an empty sequence. No error, warning or exception is thrown.
 
 Whenever you query data from a sequence, the file is then re-opened and processed
 again and again.
@@ -33,8 +34,8 @@ When the file is changed, for example by another process. Then calling
     my $lines = $file->length;
 
 will again re-read the whole file and calculates the line length. When you
-want that a file is only read into memory a single time, and only as much
-is needed. Then you either should C<cache> the sequence.
+want to read a file only once into memory, and only as much needed. Then you
+either should C<cache> the sequence.
 
     my $file = Sq->fs->read_text('data', 'file.txt')->cache;
 
@@ -58,6 +59,8 @@ But the cache doesn't contain lines that started with C<#>. You also can do
 all other kind of sequence transforming data you are used to build/process
 the data before you call C<cache> or C<to_array>.
 
+Adding C<cache> only has a benefit when you evaluate a sequence multiple times.
+
 =head2 read_text_gz(@path) : $seq
 
 Same as C<read_text> but assumes file is compressed with C<gzip>. So you directly
@@ -77,10 +80,13 @@ than an idling process waiting for data to arrive.
 
 =head2 read_raw($size, @path) : $seq
 
-Reads a file as a binary file. With C<$size> you specify how much bytes are
-read at once.
+Reads a file as a binary file. With C<$size> you specify the chunk-size how much
+bytes are read at once.
 
     my $content = Sq->fs->read_raw(4096, 'data', 'file.bin');
+
+The above returns a sequence containing chunks of strings/bytes of 4 KiB each.
+Except the last element that can be smaller.
 
 =head2 compare_text($file1, $file2) : $bool
 

@@ -3,7 +3,6 @@ use 5.036;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Sq;
-use Sq::Reflection;
 use Sq::Gen;
 use Sq::Parser -sig => 1;
 use Sq::Sig;
@@ -11,26 +10,50 @@ use Sq::Sig;
 # This script prints all functions in Sq, that have no type-check with
 # signature added.
 
-sub fqdn($package) {
-    my %skip;
-    for my $name ( @Sq::EXPORT ) {
-        $skip{$name} = 1 if is_str($name);
-    }
-    $skip{import} = 1;
+# Fully-Qualified-Name
+sub fqn($package) {
+    # Built a hash of functions to be skipped
+    #
+    # state only computes the value a single time. and `assign` allows us to
+    # basically provide a subroutine to compute the value that then is only
+    # computed once.
+    state $skip = assign {
+        my %skip;
+        # Skip imported/exported functions by Sq
+        for my $name ( @Sq::EXPORT ) {
+            $skip{$name} = 1 if is_str($name);
+        }
+        # also skip import() function
+        $skip{import} = 1;
+        # skip string overload in packages
+        $skip{'(""'} = 1;
+        $skip{'(('}  = 1;
+        return \%skip;
+    };
 
-    all_funcs($package)
-    ->remove(sub($name) { $skip{$name}    })
+    # get functions of package
+    Sq::Reflection::funcs_of($package)
+    # remove those defined in %skip
+    ->remove(sub($name) { $skip->{$name}  })
+    # add full package name
     ->rxs(qr/\A/, sub   { $package . '::' });
 }
 
-my $funcs = Array->concat(
-    fqdn('Array'),  fqdn('Seq'),        fqdn('Option'),
-    fqdn('Result'), fqdn('Sq::Parser'), fqdn('Sq::Gen'),
-);
+# Three examples that are all the same
+#
+# Array::concat(fqn($strA), fqn($strB));
+# Array::map ($strs, \&fqn)->flatten;
+# Array::bind($strs, \&fqn);
+my $funcs = Array::bind(
+    [
+        qw/Array Hash Seq Option Result Sq::Parser Sq::Gen Sq::Fmt Sq::Fs/,
+        qw/Sq::Math Sq::Bench Sq::Io/
+    ],
+    \&fqn);
 
 # dump($funcs);
 
-my $sigs = Sq::Signature::sigs_added();
+my $sigs = Sq::Reflection::signatures;
 
 # dump($sigs);
 

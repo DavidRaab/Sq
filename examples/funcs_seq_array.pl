@@ -3,14 +3,13 @@ use 5.036;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Sq;
-use Sq::Reflection;
 use Sq::Sig;
 
 my %seq_skip   = map { $_ => 1 } qw/bless blit pop push shift shuffle unshift map_e keep_e/;
 my %array_skip = map { $_ => 1 } qw/always cache do doi infinity/;
 
-my $array = all_funcs('Array');
-my $seq   = all_funcs('Seq');
+my $array = Sq::Reflection::funcs_of('Array');
+my $seq   = Sq::Reflection::funcs_of('Seq');
 
 print "Seq is missing following Array functions.\n";
 $array->diff($seq, \&id)->sort(by_str)->iter(sub($func) {

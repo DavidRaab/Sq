@@ -36,8 +36,15 @@ Sets a function to a new function by providing the subroutine reference.
         return $orig->($array, $sub);
     });
 
-=head2 all_funcs($package) : $array_of_func_names
+=head2 funcs_of($package) : $array_of_func_names
 
 Returns all function names of a package as an Sq Array.
 
-    my $funcs = all_funcs('Array');
+    my $funcs = funcs_of('Array');
+
+=head2 signatures() : $array_of_funcs
+
+Returns all functions for which a signature with C<sig> and C<sigt> from
+C<Sq::Signature> was added.
+
+
