@@ -1693,19 +1693,19 @@ is(
         ],
         'columns 8');
 
-    is(
-        Array->range(1,5)->columns(10),
-        [
-            [1,2,3,4,5],
-        ],
-        'columns 9');
-
     # TODO: Correct or not?
     is(
         Array->range(1,11)->columns(10),
         [
             [ 1, 3, 5, 7,  9, 11 ],
             [ 2, 4, 6, 8, 10     ]
+        ],
+        'columns 9');
+
+    is(
+        Array->range(1,5)->columns(10),
+        [
+            [1,2,3,4,5],
         ],
         'columns 10');
 
