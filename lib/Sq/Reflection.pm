@@ -48,4 +48,18 @@ sub signatures() {
     return Sq::Signature::sigs_added();
 }
 
+sub static($name, $func) {
+    my $full = caller . '::' . $name;
+    Sq::Reflection::set_func($full, sub {
+        if ( @_ <= 1 ) {
+            return $func;
+        }
+        else {
+            shift @_;
+            return $func->(@_);
+        }
+    });
+    return;
+}
+
 1;

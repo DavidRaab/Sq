@@ -6,20 +6,21 @@ use Scalar::Util ();
 my $export_funcs;
 my $first_load = 1;
 our @EXPORT = (
-    qw(sq call key assign seq new multi static),
+    qw(sq call key assign seq new multi),
     qw(is_num is_str is_array is_hash is_seq is_opt is_result is_ref),
     qw(id fst snd),
     qw(by_num by_str by_stri),
-    Some    => sub { \&Option::Some         },
-    None    => sub { \&Option::None         },
-    Ok      => sub { \&Result::Ok           },
-    Err     => sub { \&Result::Err          },
-    lazy    => sub { \&Sq::Core::Lazy::lazy },
-    equal   => sub { \&Sq::Equality::equal  },
-    dump    => sub { \&Sq::Dump::dump       },
-    dumps   => sub { \&Sq::Dump::dumps      },
-    type    => sub { \&Sq::Type::type       },
-    is_type => sub { \&Sq::Type::t_valid    },
+    Some    => sub { \&Option::Some           },
+    None    => sub { \&Option::None           },
+    Ok      => sub { \&Result::Ok             },
+    Err     => sub { \&Result::Err            },
+    lazy    => sub { \&Sq::Core::Lazy::lazy   },
+    equal   => sub { \&Sq::Equality::equal    },
+    dump    => sub { \&Sq::Dump::dump         },
+    dumps   => sub { \&Sq::Dump::dumps        },
+    type    => sub { \&Sq::Type::type         },
+    is_type => sub { \&Sq::Type::t_valid      },
+    static  => sub { \&Sq::Reflection::static },
 );
 sub import {
     my ( $own, @requested ) = @_;
@@ -333,20 +334,6 @@ sub multi($name, @tf) {
             }
         }
         Carp::croak "$full: No Type check was successful";
-    });
-    return;
-}
-
-sub static($name, $func) {
-    my $full = caller . '::' . $name;
-    Sq::Reflection::set_func($full, sub {
-        if ( @_ <= 1 ) {
-            return $func;
-        }
-        else {
-            shift @_;
-            return $func->(@_);
-        }
     });
     return;
 }
