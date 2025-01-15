@@ -18,3 +18,4 @@ primes.pl             Seq: Print Prime Numbers < 10_000
 colors.pl             Shows ANSI Colors to choose from
 funcs_wo_sig.pl       Reflection: Shows functions in Sq that don't have a Signature
 same_basename.pl      Fs: Show files with same basename
+funcs_statics.pl      Reflection: Shows all static functions
