@@ -157,7 +157,6 @@ is(
     [[1,0], [2,1], [3,2]],
     'take->indexed');
 
-
 is(Array->init(10, \&id)->map($add1), $range, 'init->map');
 is(
     Array->init(5, sub($idx) { ($idx) x $idx }),
@@ -171,7 +170,6 @@ is(
     Array->range(1,10)->indexed,
     Array->init(10, sub($idx) { [$idx+1, $idx] }),
     'range->indexed vs. init');
-
 is(
     (reduce { $a->append($b) } map { Array->new($_) } 1 .. 10),
     $range,
@@ -180,16 +178,13 @@ is(
     Array->concat(map { Array->new($_) } 1 .. 10),
     $range,
     'concat');
-
 is(
     Array->concat, Array->empty,
     'concat on zero is empty');
-
 is(
     Array->new(Array->range(1,10)->expand),
     [1 .. 10],
     'expand');
-
 is(
     Array->new(1..5)->append(
         Array->new(6..10)
@@ -200,7 +195,6 @@ is(
         sq [7..10],
     ),
     'append vs. concat');
-
 is(
     Array->empty->append(Array->range(1,5))->append(Array->range(6,10)),
     $range,
@@ -684,6 +678,10 @@ is(Array->new(1,2,3)->repeat(2) , [1,2,3,1,2,3], 'repeat 4');
 is(Array->new(1,2,3)->repeat(3) , [(1,2,3) x 3], 'repeat 5');
 
 is(Array->replicate(10, 'A'), [('A') x 10], 'replicate');
+is(
+    Some(10, 'A')->map(Array->replicate),
+    Some([ "A", "A", "A", "A", "A", "A", "A", "A", "A", "A" ]),
+    'replicate is static');
 
 is(
     Array::zip(
@@ -1866,5 +1864,46 @@ is(
         [[1,3,5,7,9,11,13,15,17,19], [2,4,6,8,10,12,14,16,18,20]],
     ],
     'columns 1..15');
+
+# static checks
+{
+    my $idx = sub ($idx) { $idx };
+    is(
+        Array::map2([1,5,8],[$idx,$idx,$idx],Array->init),
+        [
+            [ 0 ],
+            [ 0, 1, 2, 3, 4 ],
+            [ 0, 1, 2, 3, 4, 5, 6, 7 ]
+        ],
+        'check static init');
+
+    my $idx2 = sub($x,$y) { [$x,$y] };
+    is(
+        Array::map3([1,5,8],[1,3,6],[$idx2,$idx2,$idx2],Array->init2d),
+        [
+            # 1,1
+            [
+                [[0,0]]
+            ],
+
+            # 5,3
+            [
+                [[0,0],[1,0],[2,0],[3,0],[4,0]],
+                [[0,1],[1,1],[2,1],[3,1],[4,1]],
+                [[0,2],[1,2],[2,2],[3,2],[4,2]]
+            ],
+
+            # 8,6
+            [
+                [[0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0]],
+                [[0,1],[1,1],[2,1],[3,1],[4,1],[5,1],[6,1],[7,1]],
+                [[0,2],[1,2],[2,2],[3,2],[4,2],[5,2],[6,2],[7,2]],
+                [[0,3],[1,3],[2,3],[3,3],[4,3],[5,3],[6,3],[7,3]],
+                [[0,4],[1,4],[2,4],[3,4],[4,4],[5,4],[6,4],[7,4]],
+                [[0,5],[1,5],[2,5],[3,5],[4,5],[5,5],[6,5],[7,5]],
+            ],
+        ],
+        'check static init2d');
+}
 
 done_testing;

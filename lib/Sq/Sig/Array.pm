@@ -24,11 +24,11 @@ my $pint  = t_int(t_positive);
 sigt('Array::new',        t_tuplev($any, $array),    $array);
 sigt('Array::concat',     t_tuplev($any, $aoa),      $array);
 sig ('Array::empty',      $any,                      $array);
-sig ('Array::replicate',  $any, $pint, $any,         $array);
+sig ('Array::replicate',  $pint, $any,               $array);
 sig ('Array::bless',      $any, $array,              $array);
 sig ('Array::from_array', $any, $array,              $array);
-sig ('Array::init',       $any, $pint, $sub,         $array);
-sig ('Array::init2d',     $any, $pint, $pint, $sub,  $array);
+sig ('Array::init',       $pint, $sub,               $array);
+sig ('Array::init2d',     $pint, $pint, $sub,        $array);
 # Second argument is 'State, would be good to back-reference the type
 sig ('Array::unfold',     $any, $any, $sub,          $array);
 sig ('Array::range_step', $any, t_num, t_num, t_num, $array);

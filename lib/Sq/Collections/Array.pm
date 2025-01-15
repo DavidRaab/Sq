@@ -5,6 +5,10 @@ use List::MoreUtils ();
 use 5.036;
 use subs 'bind', 'join', 'last', 'sort', 'map', 'bless', 'length';
 
+# Manual import of static
+sub static;
+*static = \&Sq::Reflection::static;
+
 #-----------------------------------------------------------------------------#
 # CONSTRUCTORS                                                                #
 #                    Functions that create sequences                          #
@@ -14,9 +18,9 @@ sub empty($) {
     return CORE::bless([], 'Array');
 }
 
-sub replicate($, $count, $initial) {
+static replicate => sub($count, $initial) {
     return CORE::bless([($initial) x $count], 'Array');
-}
+};
 
 # creates new array, stops at first undef
 sub new($, @array) {
@@ -45,7 +49,7 @@ sub concat($, @arrays) {
     return CORE::bless(\@new, 'Array');
 }
 
-sub init($, $count, $f) {
+static init => sub($count, $f) {
     my @new;
     my $x;
     for my $idx ( 0 .. ($count-1) ) {
@@ -57,9 +61,9 @@ sub init($, $count, $f) {
         }
     }
     return CORE::bless(\@new, 'Array');
-}
+};
 
-sub init2d($, $width, $height, $f) {
+static init2d => sub($width, $height, $f) {
     my @new;
     for my $y ( 0 .. $height-1 ) {
         my @inner;
@@ -69,7 +73,7 @@ sub init2d($, $width, $height, $f) {
         push @new, CORE::bless(\@inner, 'Array');
     }
     return CORE::bless(\@new, 'Array');
-}
+};
 
 # Array->unfold : 'State -> ('State -> Option<['a, 'State]>) -> Array<'a>
 sub unfold($, $state, $f_opt) {
