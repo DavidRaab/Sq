@@ -16,6 +16,7 @@ benchmarks/one_of.pl
 benchmarks/option.pl
 benchmarks/option_mapv.pl
 benchmarks/option_match.pl
+benchmarks/option_some.pl
 benchmarks/pair_loop.pl
 benchmarks/parser_int.pl
 benchmarks/parser_intstr.pl
@@ -86,6 +87,7 @@ examples/euler.pl
 examples/find_duplicates
 examples/funcs_array.pl
 examples/funcs_seq_array.pl
+examples/funcs_statics.pl
 examples/funcs_wo_sig.pl
 examples/info.txt
 examples/job_postings.pl
@@ -155,6 +157,7 @@ lib/Sq/Manual/Concepts/Bind.pod
 lib/Sq/Manual/Concepts/Exceptions.pod
 lib/Sq/Manual/Concepts/FoldMut.pod
 lib/Sq/Manual/Concepts/Immutability.pm
+lib/Sq/Manual/Concepts/Statics.pod
 lib/Sq/Manual/Cookbook.pm
 lib/Sq/Manual/Design/Evaluator.pod
 lib/Sq/Manual/Design/FoldMut.pod
@@ -193,6 +196,7 @@ lib/Sq/Sig/Hash.pm
 lib/Sq/Sig/Heap.pm
 lib/Sq/Sig/Io.pm
 lib/Sq/Sig/List.pm
+lib/Sq/Sig/Math.pm
 lib/Sq/Sig/Option.pm
 lib/Sq/Sig/Parser.pm
 lib/Sq/Sig/Queue.pm
@@ -253,6 +257,7 @@ t/08-equality.t
 t/09-type_option.t
 t/10-exporter.t
 t/11-math.t
+t/12-reflection.t
 t/Array/00-basics.t
 t/Array/01-bind-flatten.t
 t/Array/03-fibonacci.t

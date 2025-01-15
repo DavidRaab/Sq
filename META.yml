@@ -133,6 +133,8 @@ provides:
     file: lib/Sq/Sig/Io.pm
   Sq::Sig::List:
     file: lib/Sq/Sig/List.pm
+  Sq::Sig::Math:
+    file: lib/Sq/Sig/Math.pm
   Sq::Sig::Option:
     file: lib/Sq/Sig/Option.pm
   Sq::Sig::Parser:
