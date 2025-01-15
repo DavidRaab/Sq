@@ -128,9 +128,9 @@ static children => sub(@paths) {
     return Seq->new(Path::Tiny::path(@paths)->children);
 };
 
-static sha512 => sub(@path) {
+static sha512 => sub(@paths) {
     require Path::Tiny;
-    my $file = Path::Tiny::path(@path);
+    my $file = Path::Tiny::path(@paths);
     my $err = open my $fh, '<:raw', $file;
     return Err("Could not open '$file': $!") if !defined $err;
 
