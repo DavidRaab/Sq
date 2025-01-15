@@ -164,24 +164,26 @@ is(
 
 # check type functions
 {
-     ok(is_str("foo"),      'is_str 1');
-    nok(is_str([]),         'is_str 2');
-     ok(is_num(123),        'is_num 1');
-    nok(is_num("foo"),      'is_num 2');
-     ok(is_array(   []),    'is_array 1');
-     ok(is_array(sq []),    'is_array 2');
-    nok(is_array({}),       'is_array 3');
-     ok(is_hash({}),        'is_hash 1');
-     ok(is_hash(sq {}),     'is_hash 2');
-    nok(is_hash([]),        'is_hash 3');
-     ok(is_seq(seq {}),     'is_seq 1');
-    nok(is_seq([]),         'is_seq 2');
-     ok(is_opt(Some(10)),   'is_opt 1');
-     ok(is_opt(None),       'is_opt 2');
-    nok(is_opt([]),         'is_opt 3');
-     ok(is_result(Ok(10)),  'is_result 1');
-     ok(is_result(Err(10)), 'is_result 2');
-    nok(is_result([]),      'is_result 3');
+     ok(is_str("foo"),       'is_str 1');
+    nok(is_str([]),          'is_str 2');
+     ok(is_num(123),         'is_num 1');
+    nok(is_num("foo"),       'is_num 2');
+     ok(is_array(   []),     'is_array 1');
+     ok(is_array(sq []),     'is_array 2');
+    nok(is_array({}),        'is_array 3');
+     ok(is_hash({}),         'is_hash 1');
+     ok(is_hash(sq {}),      'is_hash 2');
+    nok(is_hash([]),         'is_hash 3');
+     ok(is_seq(seq {}),      'is_seq 1');
+    nok(is_seq([]),          'is_seq 2');
+     ok(is_opt(Some(10)),    'is_opt 1');
+     ok(is_opt(None),        'is_opt 2');
+    nok(is_opt([]),          'is_opt 3');
+     ok(is_result(Ok(10)),   'is_result 1');
+     ok(is_result(Err(10)),  'is_result 2');
+    nok(is_result([]),       'is_result 3');
+     ok(is_regex(qr/\Aasd/), 'is_regex 1');
+    nok(is_regex("asd"),     'is_regex 2');
      ok(is_ref('Foo', bless([], 'Foo')), 'is_ref 1');
     nok(is_ref('Bar', bless([], 'Foo')), 'is_ref 2');
 }

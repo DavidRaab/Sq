@@ -7,7 +7,7 @@ my $export_funcs;
 my $first_load = 1;
 our @EXPORT = (
     qw(sq call key assign seq new multi),
-    qw(is_num is_str is_array is_hash is_seq is_opt is_result is_ref),
+    qw(is_num is_str is_array is_hash is_seq is_opt is_result is_ref is_regex),
     qw(id fst snd),
     qw(by_num by_str by_stri),
     Some    => sub { \&Option::Some           },
@@ -186,6 +186,10 @@ sub is_result :prototype($) {
 
 sub is_ref :prototype($$) {
     return ref $_[1] eq $_[0] ? 1 : 0;
+}
+
+sub is_regex :prototype($) {
+    return ref $_[0] eq 'Regexp' ? 1 : 0;
 }
 
 ### Comparision Functions
