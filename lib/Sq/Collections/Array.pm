@@ -849,8 +849,7 @@ sub reduce($array, $f) {
 
 # TODO: Should equal() be extended that it also can equal with a Regexp?
 sub contains($array, $any) {
-    my $type = ref $any;
-    if ( $type eq 'Regexp' ) {
+    if ( Sq::is_regex($any) ) {
         for my $x ( @$array ) {
             return 1 if $x =~ $any;
         }
