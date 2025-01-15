@@ -36,5 +36,5 @@ my $update =
         });
     });
 
-printf "Album:\n%s\n",  $album->dump;
-printf "Update:\n%s\n", $update->dump;
+printf "Album:\n%s\n",  $album->dumps;
+printf "Update:\n%s\n", $update->dumps;
