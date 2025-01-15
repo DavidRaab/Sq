@@ -101,4 +101,13 @@ is( what(123,   123,      []), {}, 'what ok 1');
 is( what(123, "foo",      []), {}, 'what ok 2');
 is( what(123, "foo", [1,2,3]), {}, 'what ok 3');
 
+# check static implementation
+{
+    my $is_prime = Sq->math->is_prime;
+    like(
+        dies { $is_prime->("foo") },
+        qr/\ASq::Math::is_prime:/,
+        'type-check on returning function');
+}
+
 done_testing;

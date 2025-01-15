@@ -1,4 +1,4 @@
 package Sq::Sig::List;
-use 5.036:
+use 5.036;
 
 1;

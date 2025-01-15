@@ -1,0 +1,152 @@
+=encoding UTF-8
+
+=head1 Statics
+
+In C<Sq> there is a C<static> keyword to create I<static functions>. So
+what are I<static functions>? best way to explain is to understand why
+it was created and how you can use it.
+
+So first we will look into how code is written/used and which problems
+arise without using C<static>.
+
+=head1 Static Functions
+
+Let's look at C<< Sq->math->is_prime($x) >> as an example. Before C<static>
+was implemented, it was defined like this.
+
+    package Sq::Math;
+
+    sub is_prime($class, $x) {
+        # implementation
+    }
+
+here C<is_prime> actually get's an additional argument C<$class>. it is defined
+this way so you can call
+
+    Sq::Math->is_prime($x);
+
+Technically the above function call is the same as
+
+    Sq::Math::is_prime('Sq::Math', $x);
+
+The typical reason for that should be known by Perl programmers. The package
+name is passed so we can C<bless> an object with that C<$class> name.
+
+But here C<is_prime> doesn't use that argument at all. It's completely useless.
+Functions that ignore this argument are called I<static functions>.
+
+=head1 Problems without static
+
+Now consider we want to create a sequence that only keep prime numbers. So
+what we now must write is the following.
+
+    $seq->keep(sub($x) { Sq->math->is_prime($x) });
+
+But when you use an ML language, you learn to directly pass the function
+instead of creating another new lambda. But with C<is_prime> defined
+above, this will not work.
+
+    $seq->keep(\&Sq::Math::is_prime);
+
+This doesn't work because C<is_prime> expects that useless C<$class> argument
+that is of no purpose at all.
+
+I could have changed C<is_prime> to just.
+
+    sub is_prime($x) {
+        # implementation
+    }
+
+but then the system I built with
+
+    Sq->math->is_prime($x)
+
+will not work anymore. C<static> solves this problem.
+
+=head1 Using static
+
+Now C<is_prime> is defined like this.
+
+    package Sq::Math;
+
+    static 'is_prime', sub($x) {
+        # implementation
+    };
+
+This definition now has several advantages.
+
+=head2 Normal calling
+
+First, you still can call the function in both ways. So here it seems nothing
+changed.
+
+    Sq->math->is_prime($x);
+    Sq::Math->is_prime($x);
+
+=head2 Function reference
+
+Second. That useless argument now becomes useful. The value itself is not used.
+But when we call a function that seems to look like we pass no argument at all.
+
+    my $func = Sq->math->is_prime();
+
+then it can return a reference to that function. This is now similar to many
+other languages. For example in JavaScript or C# it is a difference if
+you do
+
+    var result = func();
+
+or
+
+    var result = func;
+
+The first call executes the function C<func> and returns the result. While the
+second just gives you the function itself. A I<static function> works the same.
+Because Perl passes this first useless argument, i can consider this now as
+calling a function without arguments and return the function itself.
+
+So with a C<static> defined function you also can do.
+
+    my $prime  = Sq->math->is_prime;
+    my $result = $prime->($number);
+
+Or, you can write
+
+    $seq->keep(Sq->math->is_prime);
+
+=head2 Signatures
+
+Signatures are also built in a way that they fully support C<static>. This
+has two effects.
+
+=head3 Checks only real arguments
+
+The signature for C<is_prime> now looks like this.
+
+    sig('Sq::Math::is_prime', t_int, t_bool);
+
+Here you can see, that C<sig> only expect C<t_int>. A single argument and
+it is defined to return a C<t_bool>.
+
+When you define a signature for a I<static> you don't need to add a C<t_any>
+like you must do without C<static>.
+
+    # without static
+    sig('Sq::Math::is_prime', t_any, t_int, t_bool);
+
+=head3 No arguments
+
+Signatures are built to type-check it's argument. But the idea of I<static> is
+that when you call a I<static> without any arguments you just get the function
+reference. So in the case of a static, the signature must avoid the defined
+type-checks and just return the function-reference.
+
+So with the above signature installed, you still can do.
+
+    my $prime = Sq->math->is_prime;
+
+But here is the intersting part. The signature type-check is still added to
+C<$prime>. So C<$prime> still checks it's type!
+
+    # Throws exception that it expects an int!
+    $prime->("foo");
