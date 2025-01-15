@@ -14,7 +14,7 @@ static is_prime => sub($x) {
     if ( $primes[-1] < $max ) {
         my $maybe_prime = $primes[-1] + 1;
         while (1) {
-            if ( is_prime($maybe_prime) ) {
+            if ( __SUB__->($maybe_prime) ) {
                 push @primes, $maybe_prime;
             }
             last if $primes[-1] > $max;
