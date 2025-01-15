@@ -1,7 +1,7 @@
 package Sq::Reflection;
 use 5.036;
 use Sq::Exporter;
-our @EXPORT = qw(get_func set_func funcs_of has_func signatures statics);
+our @EXPORT = qw(get_func set_func funcs_of has_func signatures set_static is_static statics);
 
 {
     no strict   'refs';     ## no critic
@@ -50,10 +50,9 @@ sub signatures() {
 
 # Keeps information of static functions
 my %statics;
-sub static($name, $func) {
-    my $full = caller . '::' . $name;
+sub set_static($full, $func) {
     $statics{$full} = 1;
-    Sq::Reflection::set_func($full, sub {
+    set_func($full, sub {
         if ( @_ <= 1 ) {
             return $func;
         }
@@ -63,6 +62,16 @@ sub static($name, $func) {
         }
     });
     return;
+}
+
+sub static($name, $func) {
+    my $full = caller . '::' . $name;
+    set_static($full, $func);
+    return;
+}
+
+sub is_static($func) {
+    return $statics{$func} ? 1 : 0;
 }
 
 sub statics() {

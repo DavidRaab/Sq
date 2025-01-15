@@ -66,21 +66,13 @@ static read_raw => sub($size, @path) {
     });
 };
 
-# TODO: Make it work that it also works with a `state` variable. `static`
-#       has one problem. When signature are loaded, you must specifiy
-#       all needed arguments. So just calling the function without any
-#       argument makes it return an type-error. So `static` and `signature`
-#       must be extended that his works better. Otherwise `static` is useless
-#       with signatures.
-{
-    my $read_text = read_text();
-    static compare_text => sub($file1, $file2) {
-        return equal(
-            $read_text->($file1),
-            $read_text->($file2)
-        );
-    };
-}
+static compare_text => sub($file1, $file2) {
+    state $read_text = read_text();
+    return equal(
+        $read_text->($file1),
+        $read_text->($file2)
+    );
+};
 
 static read_bytes => sub($size, @path) {
     require Path::Tiny;
