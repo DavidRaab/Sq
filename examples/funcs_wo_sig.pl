@@ -3,6 +3,7 @@ use 5.036;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Sq;
+use Sq::Reflection qw(funcs_of signatures);
 use Sq::Gen;
 use Sq::Parser -sig => 1;
 use Sq::Sig;
@@ -32,7 +33,7 @@ sub fqn($package) {
     };
 
     # get functions of package
-    Sq::Reflection::funcs_of($package)
+    funcs_of($package)
     # remove those defined in %skip
     ->remove(sub($name) { $skip->{$name}  })
     # add full package name
@@ -53,11 +54,7 @@ my $funcs = Array::bind(
 
 # dump($funcs);
 
-my $sigs = Sq::Reflection::signatures;
-
-# dump($sigs);
-
 say "Following functions is missing a signature:";
-Array::diff($funcs, $sigs, \&id)->iter_sort(by_str, sub($func) {
-    say $func;
+Sq->fmt->table({
+    data => Array::diff($funcs, signatures(), \&id)->sort(by_str)->columns(4),
 });
