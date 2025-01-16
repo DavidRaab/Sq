@@ -638,7 +638,7 @@ sub extract($array, $pos, $length) {
 
     my $start = $pos < 0 ? @$array + $pos : $pos;
     my $end   = $start+$length < @$array ? $start+$length : @$array;
-    my $new = new('Array');
+    my $new   = new('Array');
     for (my $idx=$start; $idx < $end; $idx++) {
         push @$new, $array->[$idx];
     }
@@ -688,9 +688,9 @@ sub trim($array) {
 
 sub fill($array, $upto, $f_any) {
     return $array if $upto <= @$array;
-    my @new   = @$array;
-    my $idx   = @$array;
-    my $stop  = $upto - 1;
+    my @new  = @$array;
+    my $idx  = @$array;
+    my $stop = $upto - 1;
     while ( $idx <= $stop ) {
         push @new, (scalar $f_any->($idx++));
     }
