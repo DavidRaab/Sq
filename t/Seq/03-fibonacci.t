@@ -8,7 +8,7 @@ use Sq::Test;
 {
     my $fib =
         Seq->concat(
-            Seq->wrap(1,1),
+            Seq->new(1,1),
             Seq->unfold([1,1], sub($state) {
                 my $next = fst($state) + snd $state;
                 return $next, [snd($state),$next];
@@ -27,7 +27,7 @@ use Sq::Test;
 {
     my $fib =
         Seq->concat(
-            Seq->wrap(1,1),
+            Seq->new(1,1),
             Seq->unfold([1,1], sub($state) {
                 my $next = fst($state) + snd($state);
                 $state->[0] = snd $state;
@@ -46,7 +46,7 @@ use Sq::Test;
 {
     my $fib =
         Seq->concat(
-            Seq->wrap(1,1),
+            Seq->new(1,1),
             Seq->unfold({x => 1, y => 1}, sub($state) {
                 my $next = $state->{x} + $state->{y};
                 $state->{x} = $state->{y};

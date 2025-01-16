@@ -22,7 +22,6 @@ sig ('Seq::unfold',     $any, $any,  $sub,         $seq);
 sig ('Seq::init',       $any, t_int,  $sub,        $seq);
 sig ('Seq::range_step', $any, t_num, t_num, t_num, $seq);
 sigt('Seq::new',        t_tuplev($any, t_array),   $seq);
-sigt('Seq::wrap',       t_tuplev($any, t_array),   $seq);
 sig ('Seq::range',      $any, t_int, t_int,        $seq);
 sig ('Seq::from_array', $any, t_array,             $seq);
 sig ('Seq::from_hash',  $any, t_hash,  $sub,       $seq);

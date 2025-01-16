@@ -20,7 +20,7 @@ is(Seq->range(-100, -50)->max,   Some(-50), 'max with negative values');
 is(Seq->empty->max,                   None, 'max on empty');
 is(Seq->empty->max->or(0),               0, 'max on empty with option::or');
 
-my $words = Seq->wrap(qw/Hello World you Are welcome/);
+my $words = seq { qw/Hello World you Are welcome/ };
 
 # min_str
 is($words->min_str,              Some('Are'), 'min_str');

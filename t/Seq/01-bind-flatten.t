@@ -5,18 +5,16 @@ use Sq::Sig;
 use Sq::Test;
 
 # lazy
-my $data1 =
-    Seq->wrap(
-        Seq->wrap(1,1),
-        Seq->wrap(2,3,5,8,13),
-    );
+my $data1 = seq {
+    seq { 1,1 },
+    seq { 2,3,5,8,13 },
+};
 
 # non-lazy
-my $data2 =
-    [
-        [1,1],
-        [2,3,5,8,13],
-    ];
+my $data2 = [
+    [1,1],
+    [2,3,5,8,13],
+];
 
 # non lazy implementation of flatten
 sub flatten($aoa) {

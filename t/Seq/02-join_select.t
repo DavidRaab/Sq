@@ -6,8 +6,8 @@ use Sq::Test;
 
 my $cards =
     Seq::cartesian(
-        Seq->wrap(qw/clubs spades hearts diamond/),
-        Seq->wrap(qw/7 8 9 10 B D K A/),
+        seq {qw/clubs spades hearts diamond/ },
+        seq {qw/7 8 9 10 B D K A/ },
     );
 
 # check cartesian first -- is used by join/select

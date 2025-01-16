@@ -9,8 +9,8 @@ use Sq::Test;
 # chained
 is(
     Seq
-    ->wrap(1,2,3)
-    ->append(Seq->wrap(4,5,6)),
+    ->new(1,2,3)
+    ->append(seq { 4,5,6 }),
     seq {1 .. 6},
     'append with chaining');
 

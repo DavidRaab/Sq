@@ -162,10 +162,6 @@ sub new($, @xs) {
     }, 'Seq');
 }
 
-sub wrap($, @xs) {
-    return new('Seq', @xs);
-}
-
 # Seq->range : int -> int -> Seq<int>
 sub range($, $start, $stop) {
     $start = int $start;
