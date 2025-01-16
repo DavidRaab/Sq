@@ -6,6 +6,7 @@ use Sq::Exporter;
 our @EXPORT = (
     qw(gen),
     qw(gen_run),              # Runners
+    qw(gen_or),               # Combinators
     qw(gen_array gen_repeat), # Array
     qw(gen_sha512 gen_str),   # String
     qw(gen_int gen_float),    # Nums
@@ -15,6 +16,15 @@ our @EXPORT = (
 
 sub gen_run($gen) {
     return sq($gen->());
+}
+
+### COMBINATORS
+
+sub gen_or(@gens) {
+    my $count = @gens;
+    return sub() {
+        return $gens[rand $count]->();
+    }
 }
 
 ### STRING

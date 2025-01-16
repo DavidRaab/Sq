@@ -36,14 +36,14 @@ sub byref($any) {
     }
 }
 
-# Generates Array with 1_000 elements, 250 at least are int
-my $strs   = gen [repeat => 250, [str   => 5, 20]];
-my $ints   = gen [repeat => 250, [int   => 0, 10_000]];
-my $floats = gen [repeat => 250, [float => 0, 10_000]];
-my $arrays = gen [repeat => 250, ['array']];
-my $data   = Array::shuffle(Array::flatten(
-    gen_run gen [array => $strs, $ints, $floats, $arrays]
-));
+# Generates Array with 1_000 elements
+my $data = gen_run
+    gen [repeat => 1_000,
+        [or =>
+            [str   => 5, 20],
+            [int   => 0, 10_000],
+            [float => 0, 10_000],
+            ['array']]];
 
 # dump($data);
 
