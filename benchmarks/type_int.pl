@@ -48,11 +48,15 @@ my $data   = Array::shuffle(Array::flatten(
 # dump($data);
 
 # Test if all return the same
-is($data->keep(\&regex1), $data->keep(\&regex2), 'regex1 vs regex2');
-is($data->keep(\&regex2), $data->keep(\&regex3), 'regex2 vs regex3');
-is($data->keep(\&regex3), $data->keep(\&num),    'regex4 vs num');
-is($data->keep(\&num),    $data->keep(\&byref),  'num vs byref');
-done_testing;
+{
+    my $comp = $data->keep(\&regex1);
+    my $idx = 0;
+    for my $fn ( \&regex2, \&regex3, \&regex4, \&num, \&byref ) {
+        is($comp, $data->keep($fn), "$idx: same");
+        $idx++;
+    }
+    done_testing;
+}
 
 # Benchmark
 Sq->bench->compare(-1, {
