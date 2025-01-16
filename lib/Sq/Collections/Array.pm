@@ -686,6 +686,17 @@ sub trim($array) {
     return CORE::bless(\@new, 'Array');
 }
 
+sub fill($array, $upto, $f_any) {
+    return $array if $upto <= @$array;
+    my @new   = @$array;
+    my $idx   = @$array;
+    my $stop  = $upto - 1;
+    while ( $idx <= $stop ) {
+        push @new, (scalar $f_any->($idx++));
+    }
+    return CORE::bless(\@new, 'Array');
+}
+
 # Noop - Only for API compatibility with Seq
 sub cache($array) { $array }
 

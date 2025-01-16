@@ -1906,4 +1906,11 @@ is(
         'check static init2d');
 }
 
+is(sq([1,2,3])->fill(1,  sub { 0 }), [1,2,3],               'fill 1');
+is(sq([1,2,3])->fill(3,  sub { 0 }), [1,2,3],               'fill 2');
+is(sq([1,2,3])->fill(4,  sub { 0 }), [1,2,3,0],             'fill 3');
+is(sq([1,2,3])->fill(10, sub { 0 }), [1,2,3,0,0,0,0,0,0,0], 'fill 4');
+is(sq([1,2,3])->fill(10, \&id),      [1,2,3,3,4,5,6,7,8,9], 'fill 5');
+is(Array->empty->fill(100, \&id), Array->init(100, \&id),   'fill 6');
+
 done_testing;

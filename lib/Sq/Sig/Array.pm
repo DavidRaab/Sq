@@ -93,6 +93,7 @@ sig ('Array::intersect',         $array, $array, $sub,     $array);
 sig ('Array::shuffle',           $array,                   $array);
 sig ('Array::trim',              $astr,                     $astr);
 sig ('Array::cache',             $array,                   $array);
+sig ('Array::fill',              $array, $pint, $sub,      $array);
 
 ### ARRAY 2D
 
