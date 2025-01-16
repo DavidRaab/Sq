@@ -50,7 +50,7 @@ my $data   = Array::shuffle(Array::flatten(
 # Test if all return the same
 {
     my $comp = $data->keep(\&regex1);
-    my $idx = 0;
+    my $idx  = 0;
     for my $fn ( \&regex2, \&regex3, \&regex4, \&num, \&byref ) {
         is($comp, $data->keep($fn), "$idx: same");
         $idx++;
