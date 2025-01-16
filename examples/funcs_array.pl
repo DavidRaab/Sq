@@ -6,6 +6,9 @@ use Sq;
 use Sq::Sig;
 
 print "All defined Array functions:\n\n";
+my $funcs = Sq::Reflection::funcs_of('Array');
 Sq->fmt->table({
-    data => Sq::Reflection::funcs_of('Array')->sort(by_str)->columns(7),
+    data => $funcs->sort(by_str)->columns(7),
 });
+
+printf "\nTotal defined: %d\n", $funcs->length;
