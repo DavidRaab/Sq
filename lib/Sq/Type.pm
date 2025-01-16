@@ -190,19 +190,15 @@ sub t_num(@checks) {
 
 sub t_int(@checks) {
     return sub($any) {
-        my $type = ref $any;
-        if ( $type eq "" ) {
-            if ( $any =~ m/\A[-+]?\d+\z/ ) {
-                my $err;
-                for my $check ( @checks ) {
-                    $err = $check->($any);
-                    return "int: $err" if defined $err;
-                }
-                return $valid;
+        if ( $any =~ m/\A[-+]?[0-9]+\z/ ) {
+            my $err;
+            for my $check ( @checks ) {
+                $err = $check->($any);
+                return "int: $err" if defined $err;
             }
-            return "int: Not int. Got: '$any'";
+            return $valid;
         }
-        return "int: Not int. Got: $type";
+        return "int: Not int";
     }
 }
 

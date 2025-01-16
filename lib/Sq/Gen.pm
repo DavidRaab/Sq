@@ -7,10 +7,11 @@ our @EXPORT = (
     qw(gen),
     qw(gen_run),              # Runners
     qw(gen_array gen_repeat), # Array
-    qw(gen_sha512),           # String
+    qw(gen_sha512 gen_str),   # String
+    qw(gen_int gen_float),    # Nums
 );
 
-### RUNNSERS
+### RUNNERS
 
 sub gen_run($gen) {
     return sq($gen->());
@@ -26,6 +27,36 @@ sub gen_sha512() {
             $str .= $chars[ rand(16) ];
         }
         return $str;
+    }
+}
+
+sub gen_str($min, $max) {
+    return sub() {
+        state @chars = (0..9, 'a'..'z', 'A'..'Z', ' ', "\n", qw/+ - = ? ( ) { } [ ]/);
+        state $chars = @chars;
+        my $str;
+        my $diff   = $max - $min;
+        my $amount = $min + (rand($diff));
+        for ( 1 .. $amount ) {
+            $str .= $chars[rand($chars)];
+        }
+        return $str;
+    }
+}
+
+### NUMBERS
+
+sub gen_int($min, $max) {
+    return sub() {
+        my $diff = $max - $min;
+        return int( $min + rand($diff) );
+    }
+}
+
+sub gen_float($min, $max) {
+    return sub() {
+        my $diff = $max - $min;
+        return $min + rand($diff);
     }
 }
 
