@@ -111,8 +111,8 @@ sub nok($bool, $message) {
     ERROR:
     my ( $pkg, $file, $line ) = caller;
     my $place = sprintf "at %s: %d\n", $file, $line;
-    warn  "# not ok $count - $message\n";
     warn  "# Expected 0, None or Err()\n";
+    warn  "# not ok $count - $message\n";
     return;
 }
 
