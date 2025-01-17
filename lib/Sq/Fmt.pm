@@ -102,7 +102,11 @@ static html => fmulti(html =>
     arg [tuple => [enum => 'HTML'], ['str']] => sub($t) {
         return $t;
     },
-    # when a string is passed
+    # script tag stays the same without quoting
+    arg [tuple => [enum => 'script', ['str']]] => sub($t) {
+        return $t;
+    },
+    # when a bare string is passed
     arg ['str'] => sub($text) {
         state $escape = escape_html();
         [HTML => $escape->($text)];
@@ -127,14 +131,16 @@ static html => fmulti(html =>
     },
     # a tag with attributes + childs: [a => {href => "url"}, [img {src => "url"}]]
     arg [tuplev => ['str'], ['hash'], [min => 1]] => sub($args) {
+        state $html = html();
         my ($tag, $attr, @tags) = @$args;
-        my $inner = join " ", map { html(undef, $_)->[1] } @tags;
+        my $inner = join " ", map { $html->($_)->[1] } @tags;
         [HTML => sprintf "<%s %s>%s</%s>", $tag, attr($attr), $inner, $tag];
     },
     # a tag with only childs: [p => [a => {href => "url"}] ]
     arg [tuplev => ['str'], ['array']] => sub($args) {
+        state $html = html();
         my ($tag, @tags) = @$args;
-        my $inner = join " ", map { html(undef, $_)->[1] } @tags;
+        my $inner = join " ", map { $html->($_)->[1] } @tags;
         [HTML => sprintf "<%s>%s</%s>", $tag, $inner, $tag];
     },
 );

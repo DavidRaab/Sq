@@ -63,7 +63,7 @@ is(
                 ],
             [p => "Total: £", [output => {name=>"result"}]],
         ],
-        [script => [HTML => "calculate(document.forms.pricecalc);"]]
+        [script => "calculate(document.forms.pricecalc);"],
     ]);
 
     is(
