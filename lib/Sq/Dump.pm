@@ -144,9 +144,10 @@ my $dispatch = {
 };
 
 sub quote($str) {
-    $str =~ s/\r/\\r/;
-    $str =~ s/\n/\\n/;
-    $str =~ s/\t/\\t/;
+    $str =~ s/\"/\\"/g;
+    $str =~ s/\r/\\r/g;
+    $str =~ s/\n/\\n/g;
+    $str =~ s/\t/\\t/g;
     return $str;
 };
 
