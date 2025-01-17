@@ -2,8 +2,8 @@
 use 5.036;
 use Sq;
 use Sq::Gen qw(gen gen_run);
-use Sq::Sig;
 use Sq::Test;
+use Sq::Sig;
 
 warn("# Testing Sq $Sq::VERSION, Perl $], $^X");
 ok($Sq::VERSION >= "0.007", 'Check minimum version number');
