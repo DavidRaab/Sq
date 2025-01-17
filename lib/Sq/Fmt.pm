@@ -88,7 +88,7 @@ static escape_html => sub($str) {
 my sub attr($attr) {
     state $escape = escape_html();
     my (@pairs, $value);
-    for my $key ( sort { fc $a cmp fc $b } keys %$attr ) {
+    for my $key ( sort { $a cmp $b } keys %$attr ) {
         $value = $attr->{$key};
         push @pairs, sprintf("%s=\"%s\"", $key, $escape->($value));
     }
