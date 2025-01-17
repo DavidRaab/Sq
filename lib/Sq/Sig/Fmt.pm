@@ -8,5 +8,6 @@ my $table_input = t_keys(
 );
 
 sig('Sq::Fmt::table', $table_input, t_void);
+sig('Sq::Fmt::escape_html',   t_str, t_str);
 
 1;

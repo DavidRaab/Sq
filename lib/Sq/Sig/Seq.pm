@@ -58,8 +58,10 @@ sig('Seq::snds',          $seq,                 $seq);
 sigt('Seq::zip',          t_array(t_of t_seq),  $seq);
 sig('Seq::rev',           $seq,                 $seq);
 sig('Seq::cache',         $seq,                 $seq);
+sig('Seq::rx',            $seq, t_regex,        $seq);
 sig('Seq::rxm',           $seq, t_regex,        $seq);
 sig('Seq::rxs',           $seq, t_regex, t_sub, $seq);
+sig('Seq::rxsg',          $seq, t_regex, t_sub, $seq);
 sig('Seq::chunked',       $seq, t_int,          $seq);
 sig('Seq::windowed',      $seq, t_int,          $seq);
 sig('Seq::intersperse',   $seq, $any,           $seq);
@@ -74,10 +76,11 @@ sig('Seq::trim',          $seq,                 $seq);
 
 ### SIDE-EFFECTS
 
-sig('Seq::iter',     $seq, $sub, t_void);
-sig('Seq::iteri',    $seq, $sub, t_void);
-sig('Seq::do',       $seq, $sub,   $seq);
-sig('Seq::doi',      $seq, $sub,   $seq);
+sig('Seq::iter',     $seq, $sub,      t_void);
+sig('Seq::iteri',    $seq, $sub,      t_void);
+sig('Seq::do',       $seq, $sub,        $seq);
+sig('Seq::do_every', $seq, t_int, $sub, $seq);
+sig('Seq::doi',      $seq, $sub,        $seq);
 
 ### CONVERTER
 
@@ -122,9 +125,8 @@ sig('Seq::all',        $seq, $sub,                 t_bool);
 sig('Seq::none',       $seq, $sub,                 t_bool);
 sig('Seq::pick',       $seq, $sub,                 $opt);
 sig('Seq::equal',      $seq, $any,                 $any);
-
-# sig('Seq::keyed_by',   $seq, $sub,                t_hash);
-# sig('Seq::count',      $seq,                      t_hash(t_of t_int));
-# sig('Seq::count_by',   $seq, $sub,                t_hash(t_of t_int));
+sig('Seq::count',      $seq,                       t_hash(t_of t_int));
+sig('Seq::count_by',   $seq, $sub,                 t_hash(t_of t_int));
+sig('Seq::intersect',  $seq, $seq, $sub,           t_array);
 
 1;
