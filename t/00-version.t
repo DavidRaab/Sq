@@ -288,4 +288,17 @@ is(
         'in/out history');
 }
 
+# static
+{
+    # Does not fail
+    my $prime = Sq->math->is_prime;
+    is(ref $prime, 'CODE', 'is function');
+    is($prime->(2), 1, 'is_prime 1');
+    like(
+        dies { $prime->("foo") },
+        qr/\ASq::Math::is_prime:/,
+        'type check active');
+    is(Sq->math->is_prime(2), 1, 'is_prime 2')
+}
+
 done_testing;
