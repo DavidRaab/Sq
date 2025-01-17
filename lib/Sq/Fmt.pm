@@ -97,7 +97,7 @@ my sub attr($attr) {
 
 my $void = type [enum => qw/area base br col embed hr img input link meta source track wbr/];
 my sub arg :prototype($) { type [tuple => @_] }
-static html => fmulti(html =>
+static html => fmulti(
     # [HTML => "string"] -> stays without any change
     arg [tuple => [enum => 'HTML'], ['str']] => sub($t) {
         return $t;

@@ -326,24 +326,23 @@ sub new($what, @args) {
     }
 }
 
-sub fmulti($name, @tf) {
+sub fmulti(@tf) {
     return sub {
-        my ($type, $f);
-        for (my $idx=0; $idx < @tf; $idx+=2 ) {
-            ($type, $f) = @tf[$idx, $idx+1];
+        my $it = List::MoreUtils::natatime 2, @tf;
+        while ( my ($type, $f) = $it->() ) {
             if ( Sq::Type::t_valid($type, \@_) ) {
                 return $f->(@_);
             }
         }
         local $Carp::CarpLevel += 1;
-        Carp::croak sprintf("$name: No dispatch for: %s", Sq::Dump::dumps(\@_));
+        Carp::croak sprintf("No dispatch for: %s", Sq::Dump::dumps(\@_));
     };
 }
 
 # creates functions with multi-dispatch based on input type
 sub multi($name, @tf) {
     my $full = caller . '::' . $name;
-    Sq::Reflection::set_func($full, fmulti($full, @tf));
+    Sq::Reflection::set_func($full, fmulti(@tf));
     return;
 }
 
