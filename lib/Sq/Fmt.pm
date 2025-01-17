@@ -87,7 +87,12 @@ static escape_html => sub($str) {
 # TODO: Restrictions for key?
 my sub attr($attr) {
     state $escape = escape_html();
-    return Hash::to_array($attr, sub($k,$v) { sprintf "%s=\"%s\"", $k, $escape->($v) })->join(" ");
+    my (@pairs, $value);
+    for my $key ( sort { fc $a cmp fc $b } keys %$attr ) {
+        $value = $attr->{$key};
+        push @pairs, sprintf("%s=\"%s\"", $key, $escape->($value));
+    }
+    return join(" ", @pairs);
 }
 
 my $void = type [enum => qw/area base br col embed hr img input link meta source track wbr/];
