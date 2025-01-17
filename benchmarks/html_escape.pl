@@ -12,7 +12,8 @@ use HTML::Entities;
 my $escape = Sq->fmt->escape_html;
 
 # generates 1000 random strings with size 10-100
-my $txts = gen_run gen [repeat => 1000 => [str_from => 10, 100, 'a'..'f', qw/< > & { } ' `/]];
+my $txts = gen_run gen [repeat => 1000 => [str_from => 10, 100, 'a'..'z', qw/< > & { } ' `/]];
+# dump($txts);
 Sq->bench->compare(-3, {
     "HTML::Escape" => sub {
         for my $txt ( @$txts ) {
