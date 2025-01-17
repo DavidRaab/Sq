@@ -70,4 +70,40 @@ static 'table', sub($href) {
     return;
 };
 
+# TODO: Add Quoting
+my sub attr($attr) {
+    return Hash::to_array($attr, sub($k,$v) { sprintf "%s=\"%s\"", $k,$v })->join(" ");
+}
+
+# TODO: Improve static+multi
+static html => fmulti('html' =>
+    # when a string is passed
+    type [tuple => ['str']] => sub($text) {
+        # TODO: Add Quoting
+        sprintf "%s", $text;
+    },
+    # just a tag like: ['br']
+    type [tuple => [tuple => ['str']]] => sub($arg) {
+        my ($tag) = @$arg;
+        sprintf "<%s></%s>", $tag, $tag;
+    },
+    # a tag with attributes: [a => {href => "url"}]
+    type [tuple => [tuple => ['str'], ['hash']]] => sub($arg) {
+        my ($tag, $attr) = @$arg;
+        sprintf "<%s %s></%s>", $tag, attr($attr), $tag;
+    },
+    # a tag with attributes + childs: [a => {href => "url"}, [img {src => "url"}]]
+    type [tuple => [tuplev => ['str'], ['hash'], [min => 1]]] => sub($arg) {
+        my ($tag, $attr, @tags) = @$arg;
+        my $inner = join " ", map { html(undef, $_) } @tags;
+        sprintf "<%s %s>%s</%s>", $tag, attr($attr), $inner, $tag;
+    },
+    # a tag with only childs: [p => [a => {href => "url"}] ]
+    type [tuple => [tuplev => ['str'], ['array']]] => sub($arg) {
+        my ($tag, @tags) = @$arg;
+        my $inner = join " ", map { html(undef, $_) } @tags;
+        sprintf "<%s>%s</%s>", $tag, $inner, $tag;
+    },
+);
+
 1;
