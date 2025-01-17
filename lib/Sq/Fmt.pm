@@ -90,6 +90,7 @@ my sub attr($attr) {
     return Hash::to_array($attr, sub($k,$v) { sprintf "%s=\"%s\"", $k, $escape->($v) })->join(" ");
 }
 
+my $void = type [enum => qw/area base br col embed hr img input link meta source track wbr/];
 my sub arg :prototype($) { type [tuple => @_] }
 static html => fmulti(html =>
     # [HTML => "string"] -> stays without any change
@@ -101,7 +102,15 @@ static html => fmulti(html =>
         state $escape = escape_html();
         [HTML => $escape->($text)];
     },
-    # just a tag like: ['br']
+    # void tags like br
+    arg [tuple => $void] => sub($t) {
+        [HTML => sprintf "<%s>", $t->[0]]
+    },
+    # void tags with attributes
+    arg [tuple => $void, ['hash']] => sub($t) {
+        [HTML => sprintf "<%s %s>", $t->[0], attr($t->[1])]
+    },
+    # all other non-void tags, but no attribute or child was passed
     arg [tuple => ['str']] => sub($t) {
         my ($tag) = @$t;
         [HTML => sprintf "<%s></%s>", $tag, $tag];

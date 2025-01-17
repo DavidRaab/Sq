@@ -27,15 +27,16 @@ is(
     ]),
     [HTML => '<body><a href="www.heise.de">Click Me!</a> <a href="www.cool.de">No Me!</a></body>'],
     'body with multiple a');
-ok(
-    sq([
-        [HTML => q{<img src="url" width="500"></img>}],
-        [HTML => q{<img width="500" src="url"></img>}],
-    ])->contains(html([img => {src => 'url', width=>500}])),
+one_of(
+    html([img => {src => 'url', width=>500}]),
+    [
+        [HTML => "<img width=\"500\" src=\"url\">"],
+        [HTML => "<img src=\"url\" width=\"500\">"],
+    ],
     'img');
 is(
     html([p => "Here is some more text", [a => {href => "url"}], ['br'], "more text"]),
-    [HTML => '<p>Here is some more text <a href="url"></a> <br></br> more text</p>'],
+    [HTML => q{<p>Here is some more text <a href="url"></a> <br> more text</p>}],
     'p');
 
 sub ul(@elements) {
