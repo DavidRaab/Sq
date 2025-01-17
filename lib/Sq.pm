@@ -6,7 +6,7 @@ use Scalar::Util ();
 my $export_funcs;
 my $first_load = 1;
 our @EXPORT = (
-    qw(sq call key assign seq new fmulti multi),
+    qw(sq call key assign seq new with_dispatch multi),
     qw(is_num is_str is_array is_hash is_seq is_opt is_result is_ref is_regex),
     qw(id fst snd),
     qw(by_num by_str by_stri),
@@ -314,7 +314,7 @@ sub new($what, @args) {
     }
 }
 
-sub fmulti(@tf) {
+sub with_dispatch(@tf) {
     return sub {
         my $it = List::MoreUtils::natatime 2, @tf;
         while ( my ($type, $f) = $it->() ) {
@@ -330,7 +330,7 @@ sub fmulti(@tf) {
 # creates functions with multi-dispatch based on input type
 sub multi($name, @tf) {
     my $full = caller . '::' . $name;
-    Sq::Reflection::set_func($full, fmulti(@tf));
+    Sq::Reflection::set_func($full, with_dispatch(@tf));
     return;
 }
 
