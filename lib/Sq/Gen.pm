@@ -5,11 +5,11 @@ use Sq::Evaluator;
 use Sq::Exporter;
 our @EXPORT = (
     qw(gen),
-    qw(gen_run),              # Runners
-    qw(gen_or),               # Combinators
-    qw(gen_array gen_repeat), # Array
-    qw(gen_sha512 gen_str),   # String
-    qw(gen_int gen_float),    # Nums
+    qw(gen_run),                         # Runners
+    qw(gen_or),                          # Combinators
+    qw(gen_array gen_repeat),            # Array
+    qw(gen_sha512 gen_str gen_str_from), # String
+    qw(gen_int gen_float),               # Nums
 );
 
 ### RUNNERS
@@ -42,8 +42,24 @@ sub gen_sha512() {
 
 sub gen_str($min, $max) {
     return sub() {
-        state @chars = (0..9, 'a'..'z', 'A'..'Z', ' ', "\n", qw/+ - = ? ( ) { } [ ]/);
+        state @chars = (
+            0..9, 'a'..'z', 'A'..'Z', ' ', "\n",
+            qw/+ - = ? ( ) { } [ ] < > " ' & `/
+        );
         state $chars = @chars;
+        my $str;
+        my $diff   = $max - $min;
+        my $amount = $min + (rand($diff));
+        for ( 1 .. $amount ) {
+            $str .= $chars[rand($chars)];
+        }
+        return $str;
+    }
+}
+
+sub gen_str_from($min, $max, @chars) {
+    return sub() {
+        my $chars = @chars;
         my $str;
         my $diff   = $max - $min;
         my $amount = $min + (rand($diff));
