@@ -258,11 +258,11 @@ sub has_keys($hash, @keys) {
 }
 
 sub to_array($hash, $f) {
-    my $a = Array->new;
+    my @new;
     for my ($key,$value) ( %$hash ) {
-        CORE::push @$a, $f->($key, $value);
+        CORE::push @new, $f->($key, $value);
     }
-    return $a;
+    return CORE::bless(\@new, 'Array');
 }
 
 #
