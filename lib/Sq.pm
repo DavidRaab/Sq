@@ -37,49 +37,37 @@ sub import {
     }
 
     no strict 'refs'; ## no critic
-    # Otherwise just requested
-    if ( @requested > 0 ) {
-        # Build cache for better checking - but only once and only when needed
-        if ( !defined $export_funcs ) {
-            my $idx = 0;
-            while ( $idx < @EXPORT ) {
-                my $func = $EXPORT[$idx];
-                my $next = $EXPORT[$idx+1];
-                if ( ref $next eq 'CODE' ) {
-                    $export_funcs->{$func} = $next;
-                    $idx += 2;
-                }
-                else {
-                    $export_funcs->{$func} = $func;
-                    $idx += 1;
-                }
-            }
-        }
-
-        # Export requested
-        for my $request ( @requested ) {
-            my $fn = $export_funcs->{$request};
-            Carp::croak "Export Func '$request' does not exists"
-                if !defined $fn;
-
-            if ( ref $fn eq 'CODE' ) { *{"$pkg\::$request"} = $fn->()    }
-            else                     { *{"$pkg\::$request"} = \&$request }
-        }
-    }
-    # Export ALL
-    else {
+    # Build cache for easier exporting
+    if ( !defined $export_funcs ) {
         my $idx = 0;
         while ( $idx < @EXPORT ) {
             my $func = $EXPORT[$idx];
             my $next = $EXPORT[$idx+1];
             if ( ref $next eq 'CODE' ) {
-                *{"${pkg}::$func"} = $next->();
+                $export_funcs->{$func} = $next;
                 $idx += 2;
             }
             else {
-                *{"${pkg}::$func"} = \&$func;
+                $export_funcs->{$func} = sub { *{$func}{CODE} };
                 $idx += 1;
             }
+        }
+    }
+
+    # Export only requested
+    if ( @requested > 0 ) {
+        my $fn;
+        for my $request ( @requested ) {
+            $fn = $export_funcs->{$request};
+            Carp::croak "Export Func '$request' does not exists"
+                if !defined $fn;
+            *{"$pkg\::$request"} = $fn->();
+        }
+    }
+    # Export ALL
+    else {
+        for my ($name, $fn) ( %$export_funcs ) {
+            *{"$pkg\::$name"} = $fn->();
         }
     }
 }
