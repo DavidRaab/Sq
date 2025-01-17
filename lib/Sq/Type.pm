@@ -1,6 +1,5 @@
 package Sq::Type;
 use 5.036;
-use Sq qw(is_num Ok Err);
 use Sq::Evaluator;
 use Sq::Exporter;
 our @EXPORT = (
@@ -15,6 +14,11 @@ our @EXPORT = (
     qw(t_any t_sub t_regex t_bool t_seq t_void t_result),
     qw(t_ref t_isa t_can)                             # Objects
 );
+
+# Manual import
+*is_num = \&Scalar::Util::looks_like_number;
+*Ok     = \&Result::Ok;
+*Err    = \&Result::Err;
 
 # TODO
 # Add: t_none, t_any
@@ -261,23 +265,32 @@ sub t_is($predicate) {
     }
 }
 
-sub t_of($is_type) {
+sub t_of(@types) {
+    my $count = @types;
     return sub($any) {
         my $type = ref $any;
         if ( $type eq 'Array' || $type eq 'ARRAY' ) {
-            my ($idx, $err) = (0);
+            if ( @$any % $count > 0 ) {
+                return "of: Array not multiple of $count";
+            }
+            my ($idx, $is_type, $err) = (0);
             for my $x ( @$any ) {
-                $err = $is_type->($x);
+                $is_type = $types[$idx % $count];
+                $err     = $is_type->($x);
                 return "of: index $idx: $err" if defined $err;
                 $idx++;
             }
             return $valid;
         }
         elsif ( $type eq 'Hash' || $type eq 'HASH' ) {
-            my $err;
-            for my $key ( keys %$any ) {
-                $err = $is_type->($any->{$key});
-                return "of: key '$key': $err" if defined $err;
+            my ($err);
+            KEY:
+            for my ($key,$value) ( %$any ) {
+                for my $is_type ( @types ) {
+                    $err = $is_type->($value);
+                    next KEY if !defined $err;
+                }
+                return "of: No type-check was succesfull";
             }
             return $valid;
         }
@@ -508,7 +521,7 @@ sub t_tuplev(@checks) {
     return sub($array) {
         my $type = ref $array;
         if ( $type eq 'Array' || $type eq 'ARRAY' ) {
-            # $array must have at least @checks entries
+            # $array must have at least $min (@checks-1) entries
             if ( @$array >= $min ) {
                 # first check entries that must be present
                 my $err;
@@ -519,10 +532,8 @@ sub t_tuplev(@checks) {
 
                 # slice the rest of the array and check against $varargs
                 my @rest = $array->@[$min .. $#$array];
-                if ( @rest > 0 ) {
-                    $err = $varargs->(\@rest);
-                    return "tuplev: varargs failed: $err" if defined $err;
-                }
+                $err = $varargs->(\@rest);
+                return "tuplev: varargs failed: $err" if defined $err;
 
                 # Otherwise everything is ok
                 return $valid;

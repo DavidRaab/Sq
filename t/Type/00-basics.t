@@ -127,14 +127,21 @@ ok(!t_valid($is_album2, $album_wrong2), 'album.tracks not an array');
 
 # t_of
 {
-    ok( t_valid(t_of(t_hash), []         ), 't_of 1');
-    ok( t_valid(t_of(t_hash), [{}, {}]   ), 't_of 2');
-    ok(!t_valid(t_of(t_hash), [{}, {}, 1]), 't_of 3');
+     ok(t_valid(t_of(t_hash), []         ), 't_of 1');
+     ok(t_valid(t_of(t_hash), [{}, {}]   ), 't_of 2');
+    nok(t_valid(t_of(t_hash), [{}, {}, 1]), 't_of 3');
 
-    ok( t_valid(t_of(t_array), {}                ), 't_of 4');
-    ok( t_valid(t_of(t_array), {a=>[]}           ), 't_of 5');
-    ok( t_valid(t_of(t_array), {a=>[],b=>[]}     ), 't_of 6');
-    ok(!t_valid(t_of(t_array), {a=>[],b=>[],c=>1}), 't_of 7');
+     ok(t_valid(t_of(t_array), {}                ), 't_of 4');
+     ok(t_valid(t_of(t_array), {a=>[]}           ), 't_of 5');
+     ok(t_valid(t_of(t_array), {a=>[],b=>[]}     ), 't_of 6');
+    nok(t_valid(t_of(t_array), {a=>[],b=>[],c=>1}), 't_of 7');
+
+    # hash with values of either int or array
+    my $hash = t_hash(t_of(t_int, t_array));
+     ok(t_valid($hash, {foo =>  1}), 't_of 8');
+     ok(t_valid($hash, {foo => []}), 't_of 9');
+     ok(t_valid($hash, {foo => [], bar => 1}), 't_of 10');
+    nok(t_valid($hash, {foo => [], bar => 1, baz => {}}), 't_of 10');
 }
 
 # t_valid & t_assert
@@ -459,12 +466,19 @@ package main;
     ok(!t_valid($t3, [3,    {}, 1,2,3]),     't_tuplev 13');
     ok(!t_valid($t3, [3,    [], 1,"foo",3]), 't_tuplev 14');
 
-    my $t4 = t_tuplev(t_str, t_int, t_tuple(t_str, t_int));
+    my $t4 = t_tuplev(t_str, t_int, t_array(t_of(t_str, t_int)));
     ok( t_valid($t4, ["foo", 1]),              't_tuplev 15');
     ok( t_valid($t4, ["foo", 1, "bar", 2]),    't_tuplev 16');
     ok(!t_valid($t4, ["foo", 1, "bar"]),       't_tuplev 17');
     ok(!t_valid($t4, ["foo", "t", "bar", 2]),  't_tuplev 18');
     ok(!t_valid($t4, ["foo", 1, "bar", 2, 3]), 't_tuplev 19');
+
+    my $t5 = t_tuplev(t_str, t_array(t_of(t_str, t_int)));
+    ok( t_valid($t5, ["foo"]),                     't_tuplev 15');
+    ok( t_valid($t5, ["foo", "bar", 2]),           't_tuplev 16');
+    ok( t_valid($t5, ["foo", "bar", 2, "maz", 3]), 't_tuplev 17');
+    ok(!t_valid($t5, ["foo", "bar", 2, "maz"]),    't_tuplev 18');
+    ok(!t_valid($t5, ["foo", "bar"]),              't_tuplev 19');
 }
 
 # t_result
