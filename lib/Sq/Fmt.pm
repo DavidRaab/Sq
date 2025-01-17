@@ -70,6 +70,8 @@ static 'table', sub($href) {
     return;
 };
 
+# TODO: I could detect/load HTML::Escape and when present use that as
+#       escape_html(), otherwise the pure perl version is used.
 static escape_html => sub($str) {
     state %mapping = (
         '"' => '&quot;',
