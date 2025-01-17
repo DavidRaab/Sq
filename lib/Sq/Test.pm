@@ -3,7 +3,7 @@ use 5.036;
 use builtin 'blessed';
 use Sq;
 use Sq::Exporter;
-our @EXPORT = qw/is ok nok done_testing dies like check_isa/;
+our @EXPORT = qw/is ok nok one_of done_testing dies like check_isa/;
 
 BEGIN {
     my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
@@ -141,6 +141,33 @@ sub is :prototype($$$) {
              "# not ok $count - $message $place\n";
     }
     return;
+}
+
+sub one_of :prototype($$$) {
+    my ($got, $expects, $message) = @_;
+    $count++;
+
+    if ( Array::contains($expects, $got) ) {
+        print "ok $count - $message\n";
+    }
+    else {
+        print "not ok $count - $message\n";
+        my $dump_g = dumps($got);
+        my $dump_e = dumps($expects);
+        # add # to beginning of every starting line
+        $dump_g =~ s/^/# /mg;
+        $dump_e =~ s/^/# /mg;
+        # but remove leading "#" on starting string
+        $dump_g =~ s/\A#\s*//;
+        $dump_e =~ s/\A#\s*//;
+        # warning
+        my ( $pkg, $file, $line ) = caller;
+        my $place = sprintf "at %s: %d", $file, $line;
+        warn "\n",
+             "# Got:    ", $dump_g, "\n",
+             "# One Of: ", $dump_e, "\n",
+             "# not ok $count - $message $place\n";
+    }
 }
 
 sub done_testing() {
