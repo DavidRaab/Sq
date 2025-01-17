@@ -111,7 +111,8 @@ static html => fmulti(html =>
         state $escape = escape_html();
         [HTML => $escape->($text)];
     },
-    # void tags like br
+    # void tags like br -- i could add type-check that runs into an error
+    #                      when void tags are passed with childs
     arg [tuple => $void] => sub($t) {
         [HTML => sprintf "<%s>", $t->[0]]
     },
@@ -119,17 +120,17 @@ static html => fmulti(html =>
     arg [tuple => $void, ['hash']] => sub($t) {
         [HTML => sprintf "<%s %s>", $t->[0], attr($t->[1])]
     },
-    # all other non-void tags, but no attribute or child was passed
+    # all other non-void tags, but no attribute or child was passed -- is this illegal?
     arg [tuple => ['str']] => sub($t) {
         my ($tag) = @$t;
         [HTML => sprintf "<%s></%s>", $tag, $tag];
     },
-    # a tag with attributes: [a => {href => "url"}]
+    # a tag with attributes and no childs: [a => {href => "url"}]
     arg [tuple => ['str'], ['hash']] => sub($t) {
         my ($tag, $attr) = @$t;
         [HTML => sprintf "<%s %s></%s>", $tag, attr($attr), $tag];
     },
-    # a tag with attributes + childs: [a => {href => "url"}, [img {src => "url"}]]
+    # a tag with attributes and childs: [a => {href => "url"}, [img {src => "url"}]]
     arg [tuplev => ['str'], ['hash'], [min => 1]] => sub($args) {
         state $html = html();
         my ($tag, $attr, @tags) = @$args;
