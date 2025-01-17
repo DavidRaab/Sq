@@ -28,10 +28,10 @@ is(
     [HTML => '<body><a href="www.heise.de">Click Me!</a> <a href="www.cool.de">No Me!</a></body>'],
     'body with multiple a');
 one_of(
-    html([img => {src => 'url', width=>500}]),
+    html([img => {src=>'url', width=>500}]),
     [
-        [HTML => "<img width=\"500\" src=\"url\">"],
-        [HTML => "<img src=\"url\" width=\"500\">"],
+        [HTML => q{<img width="500" src="url">}],
+        [HTML => q{<img src="url" width="500">}],
     ],
     'img');
 is(
