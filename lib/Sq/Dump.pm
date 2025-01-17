@@ -190,12 +190,12 @@ sub to_string($any, $depth=0) {
          : "NOT_IMPLEMENTED REF: $type";
 }
 
-sub dumps($any, $depth=0) {
-    return to_string($any, $depth);
+sub dumps($any) {
+    return to_string($any, 0);
 }
 
-sub dump($any, $depth=0) {
-    warn to_string($any, $depth), "\n";
+sub dump($any) {
+    warn to_string($any, 0), "\n";
     return;
 }
 
