@@ -70,39 +70,58 @@ static 'table', sub($href) {
     return;
 };
 
-# TODO: Add Quoting
+static escape_html => sub($str) {
+    state %mapping = (
+        '"' => '&quot;',
+        '&' => '&amp;',
+        "'" => '&#39;',
+        '<' => '&lt;',
+        '>' => '&gt;',
+        '`' => '&#96;',
+        '{' => '&#123;',
+        '}' => '&#125;',
+    );
+    return $str =~ s/(["&'<>`{}])/$mapping{$1}/rge;
+};
+
+# TODO: Restrictions for key?
 my sub attr($attr) {
-    return Hash::to_array($attr, sub($k,$v) { sprintf "%s=\"%s\"", $k,$v })->join(" ");
+    state $escape = escape_html();
+    return Hash::to_array($attr, sub($k,$v) { sprintf "%s=\"%s\"", $k, $escape->($v) })->join(" ");
 }
 
-# TODO: Improve static+multi
-static html => fmulti('html' =>
+my sub arg :prototype($) { type [tuple => @_] }
+static html => fmulti(html =>
+    # [HTML => "string"] -> stays without any change
+    arg [tuple => [enum => 'HTML'], ['str']] => sub($t) {
+        return $t;
+    },
     # when a string is passed
-    type [tuple => ['str']] => sub($text) {
-        # TODO: Add Quoting
-        sprintf "%s", $text;
+    arg ['str'] => sub($text) {
+        state $escape = escape_html();
+        [HTML => $escape->($text)];
     },
     # just a tag like: ['br']
-    type [tuple => [tuple => ['str']]] => sub($arg) {
-        my ($tag) = @$arg;
-        sprintf "<%s></%s>", $tag, $tag;
+    arg [tuple => ['str']] => sub($t) {
+        my ($tag) = @$t;
+        [HTML => sprintf "<%s></%s>", $tag, $tag];
     },
     # a tag with attributes: [a => {href => "url"}]
-    type [tuple => [tuple => ['str'], ['hash']]] => sub($arg) {
-        my ($tag, $attr) = @$arg;
-        sprintf "<%s %s></%s>", $tag, attr($attr), $tag;
+    arg [tuple => ['str'], ['hash']] => sub($t) {
+        my ($tag, $attr) = @$t;
+        [HTML => sprintf "<%s %s></%s>", $tag, attr($attr), $tag];
     },
     # a tag with attributes + childs: [a => {href => "url"}, [img {src => "url"}]]
-    type [tuple => [tuplev => ['str'], ['hash'], [min => 1]]] => sub($arg) {
-        my ($tag, $attr, @tags) = @$arg;
-        my $inner = join " ", map { html(undef, $_) } @tags;
-        sprintf "<%s %s>%s</%s>", $tag, attr($attr), $inner, $tag;
+    arg [tuplev => ['str'], ['hash'], [min => 1]] => sub($args) {
+        my ($tag, $attr, @tags) = @$args;
+        my $inner = join " ", map { html(undef, $_)->[1] } @tags;
+        [HTML => sprintf "<%s %s>%s</%s>", $tag, attr($attr), $inner, $tag];
     },
     # a tag with only childs: [p => [a => {href => "url"}] ]
-    type [tuple => [tuplev => ['str'], ['array']]] => sub($arg) {
-        my ($tag, @tags) = @$arg;
-        my $inner = join " ", map { html(undef, $_) } @tags;
-        sprintf "<%s>%s</%s>", $tag, $inner, $tag;
+    arg [tuplev => ['str'], ['array']] => sub($args) {
+        my ($tag, @tags) = @$args;
+        my $inner = join " ", map { html(undef, $_)->[1] } @tags;
+        [HTML => sprintf "<%s>%s</%s>", $tag, $inner, $tag];
     },
 );
 
