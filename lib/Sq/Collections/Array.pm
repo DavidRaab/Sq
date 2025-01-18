@@ -293,7 +293,7 @@ sub chunked_size($array, $max_size, $f_size) {
         $value        = $array->[$idx];
         $size         = $f_size->($value);
         $size_so_far += $size;
-        if ( $size_so_far < $max_size ) {
+        if ( $size_so_far <= $max_size ) {
             push @$inner, $value;
         }
         else {

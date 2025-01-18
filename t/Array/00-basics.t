@@ -1930,10 +1930,10 @@ is(Array->empty->fill(100, \&id), Array->init(100, \&id),   'fill 6');
             [
                 "The", "quick", "brown", "fox", "jumps", "over", "the", "lazy",
                 "dog.", "The", "quick", "brown", "fox", "jumps", "over", "the",
-                "lazy", "dog.", "The", "quick", "brown", "fox", "jumps", "over"
+                "lazy", "dog.", "The", "quick", "brown", "fox", "jumps", "over", "the"
             ],
             [
-                "the", "lazy", "dog.", "The", "quick", "brown", "fox", "jumps",
+                "lazy", "dog.", "The", "quick", "brown", "fox", "jumps",
                 "over", "the", "lazy", "dog.", "The", "quick", "brown", "fox",
                 "jumps", "over", "the", "lazy", "dog."
             ]
@@ -1941,7 +1941,7 @@ is(Array->empty->fill(100, \&id), Array->init(100, \&id),   'fill 6');
         'chunked_size');
     is(
         $cs->map(sub($array) { $array->sum_by(\&CORE::length) }),
-        [97, 83],
+        [100, 80],
         'chunked_size str length added');
     is(
         array(split /\s+/, "The quick brown fox jumps over the lazy dog.")->chunked_size(1, \&CORE::length),
@@ -1970,13 +1970,13 @@ is(Array->empty->fill(100, \&id), Array->init(100, \&id),   'fill 6');
 
     check(
         array(1..50)->chunked_size(100, \&id)->map(call 'sum'),
-        sub($array) { $array->all(sub($x) { $x < 100 }) },
+        sub($array) { $array->all(sub($x) { $x <= 100 }) },
         'chunked_size 4');
 
     # same as the above
     check(
         array(1..50)->chunked_size(100, \&id)->map(call 'sum'),
-        call(all => sub($x) { $x < 100 }),
+        call(all => sub($x) { $x <= 100 }),
         'chunked_size 4');
 }
 
