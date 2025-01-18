@@ -332,7 +332,7 @@ is(
     # use ->as_hash instead
     is(
         hash(array(foo => 1, bar => 2, baz => 3)->expand),
-        sq([foo => 1, bar => 2, baz => 3])->as_hash,
+             array(foo => 1, bar => 2, baz => 3)->as_hash,
         'expand with hash');
 
     is(
@@ -340,5 +340,14 @@ is(
         [ {foo => 1}, {bar => 2}, {baz => 3} ],
         'hash with mapn');
 }
+
+is(
+    array(1, "Anny", 100, 2, "Frank", 12, 3, "Peter", 33)->mapn(3, fhash(qw/id name points/)),
+    [
+        {id => 1, name => "Anny",  points => 100},
+        {id => 2, name => "Frank", points => 12 },
+        {id => 3, name => "Peter", points => 33 },
+    ],
+    'fhash');
 
 done_testing;
