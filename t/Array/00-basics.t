@@ -1502,13 +1502,24 @@ is(
         [ "foo", "bar", "baz"],
         'map2 - lambda returns multiple things');
     is(
-        Array::map2([qw/foo bar baz maz hatz/], [1,2,3], sub($w,$n) { [$w,$n] }),
+        Array::map2([qw/foo bar baz maz hatz/], [1,2,3], \&array),
         [
-            ["foo", 1],
-            ["bar", 2],
-            ["baz", 3],
+            ["foo",  1],
+            ["bar",  2],
+            ["baz",  3],
+            ["maz",  3],
+            ["hatz", 3],
         ],
         'map2 - array with different lengths');
+    is(
+        Array::map3([qw/foo bar/], [1,2,3,4], [10], \&array),
+        [
+            ["foo", 1, 10],
+            ["bar", 2, 10],
+            ["bar", 3, 10],
+            ["bar", 4, 10],
+        ],
+        'map3 with different lengths');
 }
 
 # itern
@@ -1866,7 +1877,7 @@ is(
 {
     my $idx = sub ($idx) { $idx };
     is(
-        Array::map2([1,5,8],[$idx,$idx,$idx],Array->init),
+        Array::map2([1,5,8],[$idx],Array->init),
         [
             [ 0 ],
             [ 0, 1, 2, 3, 4 ],
@@ -1876,7 +1887,7 @@ is(
 
     my $idx2 = sub($x,$y) { [$x,$y] };
     is(
-        Array::map3([1,5,8],[1,3,6],[$idx2,$idx2,$idx2],Array->init2d),
+        Array::map3([1,5,8],[1,3,6],[$idx2],Array->init2d),
         [
             # 1,1
             [

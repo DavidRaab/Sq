@@ -218,19 +218,28 @@ sub map($array, $f) {
 }
 
 sub map2($arrayA, $arrayB, $f) {
-    my $min = @$arrayA > @$arrayB ? @$arrayB : @$arrayA;
     my @new;
-    for (my $idx=0; $idx < $min; $idx++) {
-        push @new, (scalar $f->($arrayA->[$idx], $arrayB->[$idx]));
+    my ($maxA,$maxB) = ($arrayA->$#*, $arrayB->$#*);
+    my $max          = $maxA > $maxB ? $maxA : $maxB;
+    my ($idxA,$idxB);
+    for (my $idx=0; $idx <= $max; $idx++) {
+        $idxA = $idx < $maxA ? $idx : $maxA;
+        $idxB = $idx < $maxB ? $idx : $maxB;
+        push @new, (scalar $f->($arrayA->[$idxA], $arrayB->[$idxB]));
     }
     return CORE::bless(\@new, 'Array');
 }
 
 sub map3($arrayA, $arrayB, $arrayC, $f) {
-    my $min = min([scalar @$arrayA, scalar @$arrayB, scalar @$arrayC], 0);
     my @new;
-    for (my $idx=0; $idx < $min; $idx++) {
-        push @new, (scalar $f->($arrayA->[$idx], $arrayB->[$idx], $arrayC->[$idx]));
+    my ($maxA,$maxB,$maxC) = ($arrayA->$#*, $arrayB->$#*, $arrayC->$#*);
+    my $max                = max([$maxA,$maxB,$maxC], 0);
+    my ($idxA,$idxB,$idxC);
+    for (my $idx=0; $idx <= $max; $idx++) {
+        $idxA = $idx < $maxA ? $idx : $maxA;
+        $idxB = $idx < $maxB ? $idx : $maxB;
+        $idxC = $idx < $maxC ? $idx : $maxC;
+        push @new, (scalar $f->($arrayA->[$idxA], $arrayB->[$idxB], $arrayC->[$idxC]));
     }
     return CORE::bless(\@new, 'Array');
 }
