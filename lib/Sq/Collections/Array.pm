@@ -247,7 +247,7 @@ sub map3($arrayA, $arrayB, $arrayC, $f) {
 sub map4($aA, $aB, $aC, $aD, $f) {
     my @new;
     my ($mA,$mB,$mC,$mD) = ($aA->$#*, $aB->$#*, $aC->$#*, $aD->$#*);
-    my $max                = max([$mA,$mB,$mC,$mD], 0);
+    my $max              = max([$mA,$mB,$mC,$mD], 0);
     my ($idxA,$idxB,$idxC,$idxD);
     for (my $idx=0; $idx <= $max; $idx++) {
         $idxA = $idx < $mA ? $idx : $mA;
