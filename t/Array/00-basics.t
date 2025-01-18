@@ -1985,7 +1985,7 @@ is(Array->empty->fill(100, \&id), Array->init(100, \&id),   'fill 6');
         # Generates array with 100 random strings with 3-10 characters
         my $words = gen_run gen [repeat => 100, [str => 3, 10]];
         check(
-            $words->chunked_size(100, sub($str) { length $str }),
+            $words->chunked_size(100, \&CORE::length),
             call(all => sub($array) { $array->sum_by(\&CORE::length) <= 100 }),
             'all chunks <= 100');
     }
