@@ -1516,6 +1516,16 @@ is(
             ["bar", 4, 10],
         ],
         'map3 with different lengths');
+    is(
+        Array::map4(
+            [1,2,3,4],
+            [1,2],
+            [1],
+            [1,2,3],
+            sub($x,$y,$z,$w) { $x + $y + $z + $w }
+        ),
+        [4,7,9,10],
+        'map4');
 }
 
 # itern

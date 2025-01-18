@@ -244,6 +244,21 @@ sub map3($arrayA, $arrayB, $arrayC, $f) {
     return CORE::bless(\@new, 'Array');
 }
 
+sub map4($aA, $aB, $aC, $aD, $f) {
+    my @new;
+    my ($mA,$mB,$mC,$mD) = ($aA->$#*, $aB->$#*, $aC->$#*, $aD->$#*);
+    my $max                = max([$mA,$mB,$mC,$mD], 0);
+    my ($idxA,$idxB,$idxC,$idxD);
+    for (my $idx=0; $idx <= $max; $idx++) {
+        $idxA = $idx < $mA ? $idx : $mA;
+        $idxB = $idx < $mB ? $idx : $mB;
+        $idxC = $idx < $mC ? $idx : $mC;
+        $idxD = $idx < $mD ? $idx : $mD;
+        push @new, (scalar $f->($aA->[$idxA], $aB->[$idxB], $aC->[$idxC], $aD->[$idxD]));
+    }
+    return CORE::bless(\@new, 'Array');
+}
+
 sub map2d($aoa, $f) {
     my @new;
     my ($y, $value) = (0);
