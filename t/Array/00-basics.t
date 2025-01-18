@@ -126,7 +126,7 @@ is($range->sum, $range->rev->sum, 'sum 2');
     # Currently on undef it aborts, should it just skip the undef and return
     # the values from 1 to 6?
     is(Array->new(1,2,3,undef,4,5,6), [1..3], 'new containing an undef');
-    is(Array->new(5), [5], 'new');
+    is(array(5), [5], 'new');
     is(
         array(5)->append(array 10),
         [5, 10],
@@ -171,11 +171,11 @@ is(
     Array->init(10, sub($idx) { [$idx+1, $idx] }),
     'range->indexed vs. init');
 is(
-    (reduce { $a->append($b) } map { Array->new($_) } 1 .. 10),
+    (reduce { $a->append($b) } map { array($_) } 1 .. 10),
     $range,
     'append a list of wrapped values');
 is(
-    Array->concat(map { Array->new($_) } 1 .. 10),
+    Array->concat(map { array($_) } 1 .. 10),
     $range,
     'concat');
 is(
@@ -203,11 +203,11 @@ is(
     Array->concat(
         Array->empty,
         Array->range(1,5),
-        Array->empty,
+        array(),
         Array->range(10,12),
-        Array->empty,
+        sq([]),
         Array->new("Hello"),
-        Array->empty
+        Array->empty,
     ),
     Array->new(1..5, 10..12, "Hello"),
     'concat with empties');
@@ -364,7 +364,7 @@ is(Array::distinct([1,2,3,2,23,123,4,12,2]),     [1,2,3,23,123,4,12], 'distinct 
 }
 
 is(
-    Array->new(qw/A B C D E F/)->mapi(sub($x,$i) { [$x,$i] }),
+    Array->new(qw/A B C D E F/)->mapi(\&array),
     [[A => 0], [B => 1], [C => 2], [D => 3], [E => 4], [F => 5]],
     'mapi');
 
@@ -424,15 +424,15 @@ is($range->find(sub($x) { $x > 10 }),      None, 'find 2');
 is($range->find(sub($x) { $x > 10 })->or(0),  0, 'find 3');
 
 is(
-    $range->bind(sub($x) { Array->new($x) }),
+    $range->bind(sub($x) { array $x }),
     [1 .. 10],
     'bind - somehow like id');
 
 is(
-    Array->new(
-        Array->new(1,1),
+    array(
+        array(1,1),
         [2,3],
-        Array->new(5,8,13),
+        array(5,8,13),
     )->flatten,
     [1,1,2,3,5,8,13],
     'flatten - flattens an array of array');
@@ -600,18 +600,15 @@ is(
     ],
     'Is array of array');
 
-is(
-    Array->new(
-        Array->new(1,2,3),
-        Array->new(4,5,6),
-        Array->new(7,8,9),
-    )->to_array_of_array,
-    [
+{
+    my $data = sq([
         [1,2,3],
         [4,5,6],
         [7,8,9],
-    ],
-    'to_array_of_array is noop');
+    ]);
+    my $aoa = $data->to_array_of_array;
+    is(refaddr($data), refaddr($aoa), 'to_array_of_array is noop');
+}
 
 is($range->any (sub($x) { $x < 1   }), 0, 'any value smaller 0');
 is($range->any (sub($x) { $x < 2   }), 1, 'any value smaller 1');
@@ -1500,7 +1497,7 @@ is(
     is(
         Array::map2($words, $ones, sub($word,$one) { $one, $word }),
         [ "foo", "bar", "baz"],
-        'map2 - lambda returns multiple things');
+        'map2 - behaviour when lambda returns multiple things');
     is(
         Array::map2([qw/foo bar baz maz hatz/], [1,2,3], \&array),
         [
@@ -1875,19 +1872,16 @@ is(
 
 # static checks
 {
-    my $idx = sub ($idx) { $idx };
     is(
-        Array::map2([1,5,8],[$idx],Array->init),
+        Array::map2([1,5,8],[\&id],Array->init),
         [
             [ 0 ],
             [ 0, 1, 2, 3, 4 ],
             [ 0, 1, 2, 3, 4, 5, 6, 7 ]
         ],
         'check static init');
-
-    my $idx2 = sub($x,$y) { [$x,$y] };
     is(
-        Array::map3([1,5,8],[1,3,6],[$idx2],Array->init2d),
+        Array::map3([1,5,8],[1,3,6],[\&array],Array->init2d),
         [
             # 1,1
             [
