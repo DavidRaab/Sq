@@ -3,7 +3,7 @@ use 5.036;
 use builtin 'blessed';
 use Sq;
 use Sq::Exporter;
-our @EXPORT = qw/is ok nok one_of done_testing dies like check_isa/;
+our @EXPORT = qw/is ok nok check one_of done_testing dies like check_isa/;
 
 BEGIN {
     my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
@@ -116,6 +116,26 @@ sub nok($bool, $message) {
     return;
 }
 
+sub check :prototype($$$) {
+    my ($got, $f_expected, $message) = @_;
+    $count++;
+    if ( $f_expected->($got) ) {
+        print "ok $count - $message\n";
+    }
+    else {
+        print "not ok $count - $message\n";
+        # warning
+        my $dump = dumps($got);
+        $dump =~ s/^/# /mg;
+        $dump =~ s/\A#\s*//;
+        my ( $pkg, $file, $line ) = caller;
+        my $place = sprintf "at %s: %d", $file, $line;
+        warn "\n",
+             "# Got: $dump\n",
+             "# not ok $count - $message $place\n";
+    }
+}
+
 sub is :prototype($$$) {
     my ($got, $expected, $message) = @_;
     $count++;
@@ -136,8 +156,8 @@ sub is :prototype($$$) {
         my ( $pkg, $file, $line ) = caller;
         my $place = sprintf "at %s: %d", $file, $line;
         warn "\n",
-             "# Got:      ", $dump_1, "\n",
-             "# Expected: ", $dump_2, "\n",
+             "# Got:      $dump_1\n",
+             "# Expected: $dump_2\n",
              "# not ok $count - $message $place\n";
     }
     return;
