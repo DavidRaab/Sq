@@ -128,7 +128,7 @@ is($range->sum, $range->rev->sum, 'sum 2');
     is(Array->new(1,2,3,undef,4,5,6), [1..3], 'new containing an undef');
     is(Array->new(5), [5], 'new');
     is(
-        Array->new(5)->append(Array->new(10)),
+        array(5)->append(array 10),
         [5, 10],
         'wrap and append');
     is(
@@ -1484,26 +1484,23 @@ is(
 
     # method
     is(
-        $words->map2($ones, sub($word,$one) { [$word, $one] }),
+        $words->map2($ones, \&array),
         [ ["foo",1], ["bar",1], ["baz",1] ],
         'map2 - method');
 
     # functional
     is(
-        Array::map2($words, $ones, sub($word,$one) { [$word, $one] }),
+        Array::map2($words, $ones, \&array),
         [ ["foo",1], ["bar",1], ["baz",1] ],
         'map2 - functional');
-
     is(
-        Array::map2($words, $ones, sub($word,$one) { [$word, $one] })->merge->as_hash,
+        Array::map2($words, $ones, \&array)->merge->as_hash,
         { "foo" => 1, "bar" => 1, "baz" => 1 },
         'map2 - merge->as_hash');
-
     is(
         Array::map2($words, $ones, sub($word,$one) { $one, $word }),
         [ "foo", "bar", "baz"],
         'map2 - lambda returns multiple things');
-
     is(
         Array::map2([qw/foo bar baz maz hatz/], [1,2,3], sub($w,$n) { [$w,$n] }),
         [
@@ -1516,7 +1513,7 @@ is(
 
 # itern
 {
-    my $data = Array->bless([map { $_ => "foo" } 0 .. 9]);
+    my $data = array(map { $_ => "foo" } 0 .. 9);
     my @tuples;
     $data->itern(2, sub($k,$v) {
         push @tuples, [$k,$v];

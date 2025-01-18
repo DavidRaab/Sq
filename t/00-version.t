@@ -301,4 +301,39 @@ is(
     is(Sq->math->is_prime(2), 1, 'is_prime 2')
 }
 
+# array/hash
+{
+    my $array = array(1,2,3,undef,4,5,6);
+    check_isa($array, 'Array', 'array');
+    is($array, [1,2,3,undef,4,5,6], 'no undef handling');
+
+    my $hash = hash(foo => 1, bar => 2);
+    check_isa($hash, 'Hash', 'hash');
+    is($hash, {foo => 1, bar => 2}, 'creates hash');
+
+    # Why those functions? Because very often it happens that you want to
+    # pass a lambda somewhere where all arguments are put into an array/hash.
+    # Instead of writing this lambda again and again, you just can provide
+    # a reference to these functions.
+    one_of(
+        # to_array() passes $key,$value from the hash to the lambda. By just
+        # providing \&array you create an Array/Tuple out of it.
+        sq({ foo => 1, bar => 2, baz => 3})->to_array(\&array),
+        [
+            [[foo => 1], [bar => 2], [baz => 3]],
+            [[foo => 1], [baz => 3], [bar => 2]],
+            [[bar => 2], [foo => 1], [baz => 3]],
+            [[bar => 2], [baz => 3], [foo => 1]],
+            [[baz => 3], [foo => 1], [bar => 2]],
+            [[baz => 3], [bar => 2], [foo => 1]],
+        ],
+        'array');
+
+    # use ->as_hash instead
+    is(
+        hash(array(foo => 1, bar => 2, baz => 3)->expand),
+        sq([foo => 1, bar => 2, baz => 3])->as_hash,
+        'expand with hash');
+
+
 done_testing;

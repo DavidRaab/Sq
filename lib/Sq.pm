@@ -10,6 +10,7 @@ our @EXPORT = (
     qw(is_num is_str is_array is_hash is_seq is_opt is_result is_ref is_regex),
     qw(id fst snd),
     qw(by_num by_str by_stri),
+    qw(array hash),
     Some    => sub { \&Option::Some           },
     None    => sub { \&Option::None           },
     Ok      => sub { \&Result::Ok             },
@@ -333,5 +334,8 @@ sub multi($name, @tf) {
     Sq::Reflection::set_func($full, with_dispatch(@tf));
     return;
 }
+
+sub array(@array) { bless(\@array, 'Array') }
+sub hash (%hash)  { bless(\%hash,  'Hash')  }
 
 1;
