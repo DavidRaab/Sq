@@ -1999,4 +1999,20 @@ is(Array->empty->fill(100, \&id), Array->init(100, \&id),   'fill 6');
     }
 }
 
+is(
+    array("foo", 2, "baz", 3, "tidy", 4)->mapn(2, sub($str,$num) { $str x $num }),
+    ["foofoo", "bazbazbaz", "tidytidytidytidy"],
+    'mapn 1');
+
+is(
+    array(1, "Anny", 100, 2, "Frank", 12, 3, "Peter", 33)->mapn(3, sub($id,$name,$points) {
+        hash(id => $id, name => $name, points => $points);
+    }),
+    [
+        {id => 1, name => "Anny",  points => 100},
+        {id => 2, name => "Frank", points => 12 },
+        {id => 3, name => "Peter", points => 33 },
+    ],
+    'mapn 2');
+
 done_testing;
