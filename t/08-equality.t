@@ -1,8 +1,8 @@
 #!perl
 use 5.036;
 use Sq;
-use Sq::Sig;
 use Sq::Test;
+use Sq::Sig;
 use Scalar::Util qw(refaddr);
 
 # test method
