@@ -335,5 +335,10 @@ is(
         sq([foo => 1, bar => 2, baz => 3])->as_hash,
         'expand with hash');
 
+    is(
+        array(foo => 1, bar => 2, baz => 3)->mapn(2, \&hash),
+        [ {foo => 1}, {bar => 2}, {baz => 3} ],
+        'hash with mapn');
+}
 
 done_testing;

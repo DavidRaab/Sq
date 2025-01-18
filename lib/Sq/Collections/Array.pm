@@ -194,6 +194,16 @@ sub rev($array) {
     return CORE::bless([reverse @$array], 'Array');
 }
 
+sub mapn($array, $count, $f) {
+    local $_;
+    my (@new);
+    my $it = List::MoreUtils::natatime $count, @$array;
+    while ( my @vals = $it->() ) {
+        CORE::push @new, (scalar $f->(@vals));
+    }
+    CORE::bless(\@new, 'Array');
+}
+
 # map : Array<'a> -> ('a -> 'b) -> Array<'b>
 # for_defined
 sub map($array, $f) {
