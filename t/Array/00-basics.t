@@ -3,8 +3,9 @@ use 5.036;
 use List::Util qw(reduce);
 use Scalar::Util qw(refaddr);
 use Sq;
-use Sq::Sig;
+use Sq::Gen;
 use Sq::Test;
+use Sq::Sig;
 
 # Some values, functions, ... for testing
 my $range     = Array->range(1, 10);
@@ -1978,6 +1979,16 @@ is(Array->empty->fill(100, \&id), Array->init(100, \&id),   'fill 6');
         array(1..50)->chunked_size(100, \&id)->map(call 'sum'),
         call(all => sub($x) { $x <= 100 }),
         'chunked_size 4');
+
+    # Easily generate 20 tests -- but also could be just one
+    for ( 1 .. 20 ) {
+        # Generates array with 100 random strings with 3-10 characters
+        my $words = gen_run gen [repeat => 100, [str => 3, 10]];
+        check(
+            $words->chunked_size(100, sub($str) { length $str }),
+            call(all => sub($array) { $array->sum_by(\&CORE::length) <= 100 }),
+            'all chunks <= 100');
+    }
 }
 
 done_testing;
