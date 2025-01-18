@@ -1915,4 +1915,58 @@ is(sq([1,2,3])->fill(10, sub { 0 }), [1,2,3,0,0,0,0,0,0,0], 'fill 4');
 is(sq([1,2,3])->fill(10, \&id),      [1,2,3,3,4,5,6,7,8,9], 'fill 5');
 is(Array->empty->fill(100, \&id), Array->init(100, \&id),   'fill 6');
 
+# chunked_size
+#
+# like chunked, chunked_size creates an array of array. But instead of creating a
+# fixed amount of elements it pushes items into chunks as long a maximum size
+# is not reached. You provide a function for every element to determine it's
+# size.
+{
+    my $str = "The quick brown fox jumps over the lazy dog. " x 5;
+    my $cs  = array(split /\s+/, $str)->chunked_size(100, sub($word) { length $word });
+    is (
+        $cs,
+        [
+            [
+                "The", "quick", "brown", "fox", "jumps", "over", "the", "lazy",
+                "dog.", "The", "quick", "brown", "fox", "jumps", "over", "the",
+                "lazy", "dog.", "The", "quick", "brown", "fox", "jumps", "over"
+            ],
+            [
+                "the", "lazy", "dog.", "The", "quick", "brown", "fox", "jumps",
+                "over", "the", "lazy", "dog.", "The", "quick", "brown", "fox",
+                "jumps", "over", "the", "lazy", "dog."
+            ]
+        ],
+        'chunked_size');
+    is(
+        $cs->map(sub($array) { $array->sum_by(\&CORE::length) }),
+        [97, 83],
+        'chunked_size str length added');
+    is(
+        array(split /\s+/, "The quick brown fox jumps over the lazy dog.")->chunked_size(1, \&CORE::length),
+        [['The'], ['quick'], ['brown'], ['fox'], ['jumps'], ['over'], ['the'], ['lazy'], ['dog.']],
+        'chunked_size 2');
+    is(
+        array(1..50)->chunked_size(100, \&id),
+        [
+            [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 ],
+            [ 14, 15, 16, 17, 18, 19 ],
+            [ 20, 21, 22, 23 ],
+            [ 24, 25, 26 ],
+            [ 27, 28, 29 ],
+            [ 30, 31, 32 ],
+            [ 33, 34 ],
+            [ 35, 36 ],
+            [ 37, 38 ],
+            [ 39, 40 ],
+            [ 41, 42 ],
+            [ 43, 44 ],
+            [ 45, 46 ],
+            [ 47, 48 ],
+            [ 49, 50 ]
+        ],
+        'chunked_size 3');
+}
+
 done_testing;
