@@ -1967,6 +1967,10 @@ is(Array->empty->fill(100, \&id), Array->init(100, \&id),   'fill 6');
             [ 49, 50 ]
         ],
         'chunked_size 3');
+    is(
+        array(1..50)->chunked_size(100, \&id)->map(call 'sum'),
+        [91,99,86,75,84,93,67,71,75,79,83,87,91,95,99],
+        'chunked_size 4');
 }
 
 done_testing;
