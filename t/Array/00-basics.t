@@ -183,13 +183,11 @@ is(
     Array->concat, Array->empty,
     'concat on zero is empty');
 is(
-    Array->new(Array->range(1,10)->expand),
+    array(Array->range(1,10)->expand),
     [1 .. 10],
     'expand');
 is(
-    Array->new(1..5)->append(
-        Array->new(6..10)
-    ),
+    array(1..5)->append(array(6..10)),
     Array->concat(
         sq [1..3],
         sq [4..6],
