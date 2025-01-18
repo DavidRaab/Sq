@@ -47,7 +47,7 @@ my $data = sq [
 {
     my $grouped =
         $data->group_fold(
-            sub { sq {} },
+            sub { hash },
             key 'id',
             sub($hash, $entry) {
                 # this will execute multiple times for each entry, but the

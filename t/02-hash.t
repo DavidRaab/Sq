@@ -44,7 +44,7 @@ my $by_num = sub($x, $y) { $x <=> $y };
 
 # set
 {
-    my $h = Hash->empty;
+    my $h = hash;
 
     $h->set(foo => 1);
     is($h, {foo => 1}, 'content of $h 1');
@@ -53,11 +53,11 @@ my $by_num = sub($x, $y) { $x <=> $y };
     is($h, {foo => 1, bar => 2, baz => 3}, 'content of $h 2');
 }
 
-my $data = Hash->bless({
+my $data = hash(
     foo => 1,
     bar => 10,
     baz => 5,
-});
+);
 
 # keys & values
 is($data->keys->sort($by_str),   [qw/bar baz foo/], 'check keys');
@@ -81,7 +81,7 @@ is($data3, {bar => 10, baz => 5},               'keep');
 check_isa($data3, 'Hash',                       '$data3 isa Hash');
 
 {
-    my $player_points = Hash->new(
+    my $player_points = hash(
         Anne   => 10,
         Marie  => 12,
         Ralph  => 8,
@@ -115,8 +115,8 @@ is($data->length, 3, 'length');
 
 # union, append, intersection, difference
 {
-    my $h = Hash->new(foo => 1, bar => 2);
-    my $i = Hash->new(bar => 3, baz => 4);
+    my $h = hash(foo => 1, bar => 2);
+    my $i = hash(bar => 3, baz => 4);
 
     is(
         $h->union($i, sub($k, $v1, $v2) { $v1 + $v2 }),
@@ -161,7 +161,7 @@ is($data->length, 3, 'length');
 
     # as method call
     is(
-        Hash->new(foo => 1, bar => 2, t => 0)->concat(
+        hash(foo => 1, bar => 2, t => 0)->concat(
             { bar => 3, baz => 4 },
             { maz => 5, foo => 6 },
             { kaz => 7, baz => 8 },
@@ -172,7 +172,7 @@ is($data->length, 3, 'length');
 }
 
 is(
-    Hash->new(foo => 1)->is_subset_of({ foo => 1, bar => 2 }),
+    hash(foo => 1)->is_subset_of({ foo => 1, bar => 2 }),
     1,
     'is_subset_of 1'
 );
@@ -195,10 +195,9 @@ is(
     'is_subset_of 3'
 );
 
-my $tuple = sub($x,$y) { [$x,$y] };
 is(Hash::diff({}, { foo => 1 })->is_empty,                       1, 'is_empty 1');
-is(Hash::intersect({foo => 1}, {bar => 2}, $tuple)->is_empty,    1, 'is_empty 2');
-is(Hash::union({}, {}, $tuple)->is_empty,                        1, 'is_empty 3');
+is(Hash::intersect({foo => 1}, {bar => 2}, \&array)->is_empty,   1, 'is_empty 2');
+is(Hash::union({}, {}, \&array)->is_empty,                       1, 'is_empty 3');
 is(Hash::append({}, {})->is_empty,                               1, 'is_empty 4');
 is(Hash->empty->is_empty,                                        1, 'is_empty 5');
 is(Hash->new->is_empty,                                          1, 'is_empty 6');
@@ -208,7 +207,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 
 # get, set, extract
 {
-    my $h = sq {foo => 1, bar => 2, baz => 3};
+    my $h = hash(foo => 1, bar => 2, baz => 3);
     is($h->get("foo"), Some(1), 'get 1');
     is($h->get("bar"), Some(2), 'get 2');
     is($h->get("baz"), Some(3), 'get 3');
@@ -227,7 +226,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 
 # push
 {
-    my $h = Hash->new;
+    my $h = hash;
     $h->push(foo => 1);
     $h->push(foo => 2,3);
     $h->push(bar => 1);
@@ -241,8 +240,8 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     is($h, {foo => [1..5], bar => [1,2], baz => [9,10]}, 'push 2');
 
     # testing with plain perl array or Array
-    my $t1 = Hash->new(id => 1, tags => ['foo']);
-    my $t2 = Hash->new(id => 2, tags => Array->new('foo'));
+    my $t1 = hash(id => 1, tags => ['foo']);
+    my $t2 = hash(id => 2, tags => array('foo'));
 
     $t1->push(tags => 'bar');
     $t2->push(tags => 'bar');
@@ -252,7 +251,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     check_isa($t1->{tags}, 'Array', 'pushin on perl plain array adds blessing');
 
     # testing "upgrade"
-    my $data = Hash->new(
+    my $data = hash(
         id   => 1,
         tags => 'one',
     );
@@ -272,7 +271,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 
 # push 2
 {
-    my $h = Hash->new;
+    my $h = hash;
 
     $h->push(foo => [1,2,3]);
     is($h, {foo => [[1,2,3]]}, 'push2 1');
@@ -280,7 +279,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     $h->push(foo => [1,2,3]);
     is($h, {foo => [[1,2,3],[1,2,3]]}, 'push2 2');
 
-    my $h2 = Hash->new;
+    my $h2 = hash;
     $h2->push(foo => [1,2,3],[1,2,3]);
     is($h2, {foo => [[1,2,3], [1,2,3]]}, 'push2 3');
 }
@@ -296,9 +295,9 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     ];
 
     my $data = Array->new(
-        Hash->new(id => 1, name => "foo", tags => "one"),
-        Hash->new(id => 1, name => "foo", tags => "two"),
-        Hash->new(id => 1, name => "foo", tags => "three"),
+        hash(id => 1, name => "foo", tags => "one"),
+        hash(id => 1, name => "foo", tags => "two"),
+        hash(id => 1, name => "foo", tags => "three"),
     );
 
     # we can reduce and use push
@@ -318,11 +317,11 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     ], 'push mutates');
 
     # reset first entry
-    $data->[0] = Hash->new(id => 1, name => "foo", tags => "one");
+    $data->[0] = hash(id => 1, name => "foo", tags => "one");
     is($data, $initial, 'reset');
 
     # otherwise it makes sense to use 'fold' to provide the initial new/empty element
-    my $entry2 = $data->fold(Hash->new, sub($x,$state) {
+    my $entry2 = $data->fold(hash(), sub($x,$state) {
         $state->set(
             id => $x->{id},
             name => $x->{name},
@@ -335,7 +334,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 
     # we also could use fold_mut instead as we anyway mutate a reference. so
     # we can omit the return statement in the lambda.
-    my $entry3 = $data->fold_mut(Hash->new, sub($x,$state) {
+    my $entry3 = $data->fold_mut(hash(), sub($x,$state) {
         $state->set(
             id => $x->{id},
             name => $x->{name},
@@ -357,7 +356,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     is($entry4, {id => 1, name => 'foo', tags => [qw/one two three/]}, 'fold_mut copy and push');
 
     # or we do the creation completely different, we compute the tags array from all data
-    my $entry5 = Hash->new(
+    my $entry5 = hash(
         id   => $data->[0]->{id},
         name => $data->[0]->{name},
         tags => $data->map(sub($x) { $x->{tags} }),
@@ -368,7 +367,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 
 # change
 {
-    my $h = Hash->new(
+    my $h = hash(
         foo => [1,2,3],
         bar => [4,5,6],
         baz => "string",
@@ -391,7 +390,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 
 # change pod example
 {
-    my $hash = Hash->new(
+    my $hash = hash(
         name   => 'Anne',
         age    => 20,
         points => 100,
@@ -409,7 +408,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 
 # with & withf
 {
-    my $h = Hash->new(foo => 1);
+    my $h = hash(foo => 1);
     my $i = $h->with(foo => 2, bar => 3);
     my $j = $h->with(bar => 2);
     my $k = $i->with(maz => 4);
@@ -427,7 +426,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     is($l, {foo => 2, bar => 2, maz => 4, ratatat => 1},    'with 5');
     is($m, {foo => 2, bar => "xx", maz => 5, ratatat => 1}, 'withf');
 
-    my $points = Hash->new(Anne => 10, Frank => 3);
+    my $points = hash(Anne => 10, Frank => 3);
     is(
         $points->withf(Anne  => sub($points) { $points + 1 }),
         { Anne => 11, Frank => 3 },
@@ -437,9 +436,9 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
         { Anne => 10, Frank => 4 },
         'pod example 2');
 
-    my $games = Hash->new(
-        n64  => Array->new("Mario 64", "Zelda"),
-        snes => Array->new("Super Mario Kart", "Street Fighter 2"),
+    my $games = hash(
+        n64  => array("Mario 64", "Zelda"),
+        snes => array("Super Mario Kart", "Street Fighter 2"),
     );
     is(
         $games->withf(
@@ -461,7 +460,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 
 # copy
 {
-    my $h = Hash->new(foo => 2);
+    my $h = hash(foo => 2);
     my $i = $h->copy;
 
     $h->set(foo => 1);
@@ -472,7 +471,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 
 # slice
 {
-    my $h = Hash->new(
+    my $h = hash(
         foo => 1, bar => 2,
         baz => 3, maz => 4,
     );
@@ -502,7 +501,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     # because with() only makes shallow copies (yet - maybe change that?)
     # values that are references stay the same across copies
 
-    my $h = Hash->new(foo => 1, bar => [1,2,3]);
+    my $h = hash(foo => 1, bar => [1,2,3]);
     my $i = $h->with(foo => 2);
     $h->push(bar => 4);
 
@@ -519,14 +518,14 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 
 # check if some functions return blessed Array
 {
-    my $h = Hash->new(c => 3, a => 1, d => 4, b => 2);
-    is($h->keys->sort(by_str),   [qw/a b c d/], 'keys sorted');
+    my $h = hash(c => 3, a => 1, d => 4, b => 2);
+    is($h->keys  ->sort(by_str), [qw/a b c d/], 'keys sorted');
     is($h->values->sort(by_num), [1..4],        'values sorted');
 }
 
 # iter
 {
-    my $h = Hash->new(foo => 1, bar => 2, maz => 3);
+    my $h = hash(foo => 1, bar => 2, maz => 3);
 
     my $key;
     my $sum = 0;
@@ -553,7 +552,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 
 # bind
 {
-    my $h = Hash->new(
+    my $h = sq {
         foo => {
             name => 'test',
             no   => 1,
@@ -562,7 +561,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
             name => 'hello',
             no   => 2,
         },
-    );
+    };
 
     my $i = $h->bind(sub($key, $value){
         my ($name, $no) = ($value->{name}, $value->{no});
@@ -583,9 +582,9 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
         'bind'
     );
 
-    my $files = Hash->new(
-        etc => Array->new(qw/fstab passwd crontab/),
-        bin => Array->new(qw/vim ls man ps/),
+    my $files = hash(
+        etc => array(qw/fstab passwd crontab/),
+        bin => array(qw/vim ls man ps/),
     );
 
     my $path_length = $files->bind(sub($folder,$files) {
@@ -612,7 +611,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 
 # to_array / from_array
 {
-    my $h = Hash->new(foo => 1, bar => 2, baz => 3);
+    my $h = hash(foo => 1, bar => 2, baz => 3);
     my $a =
         $h
         ->to_array(sub($k,$v) { [$k,$v] })
@@ -638,8 +637,8 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 
 # equal
 {
-    my $h = Hash->new(foo => 1);
-    my $i = Hash->new(foo => 1);
+    my $h = hash(foo => 1);
+    my $i = hash(foo => 1);
 
     ok($h->equal($i), 'equal');
     ok(!$h->equal($i->with(test => 1)), 'not equal');
@@ -677,7 +676,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 
 # find
 {
-    my $data = Hash->new(
+    my $data = hash(
         1  => 'foo',
         2  => 'bar',
         10 => 'baz',
@@ -737,15 +736,15 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 
 # on & has_keys
 {
-    my $data = Hash->new(
+    my $data = sq {
         foo => 1,
-        bar => Array->new(1..5),
-        baz => Array->new(
-            Hash->new(name => "one"),
-            Hash->new(name => "two"),
-        ),
+        bar => [1..5],
+        baz => [
+            {name => "one"},
+            {name => "two"},
+        ],
         raz => undef,
-    );
+    };
 
     is($data->has_keys(qw/foo/),             1, 'has_keys foo');
     is($data->has_keys(qw/foo bar baz/),     1, 'has_keys foo,bar,baz');
@@ -784,11 +783,11 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 
 # on with multiple keys and functions
 {
-    my $movie = Hash->new(
+    my $movie = sq {
         title    => 'Terminator 2',
-        tags     => Array->new(qw/cool/),
-        liked_by => Array->new(qw/Anny/),
-    );
+        tags     => [qw/cool/],
+        liked_by => [qw/Anny/],
+    };
 
     $movie->on(
         tags     => sub($tags)  { $tags ->push("classic") },
@@ -807,7 +806,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 
 # fold
 {
-    my $money = Hash->new(
+    my $money = hash(
         Anne         => 100,
         Marie        => 50,
         Frankenstein => 250,
@@ -818,7 +817,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     });
     is($total_money, 400, 'total money');
 
-    my $player_names = $money->fold(Array->new, sub($name,$money,$state) {
+    my $player_names = $money->fold(array(), sub($name,$money,$state) {
         $state->push($name);
         $state;
     });
@@ -870,7 +869,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     is($h, {name => "Marie", birthday => '1970-01-01' }, 'but mutation is allowed');
 
     # Second Hash
-    my $j = Hash->new(name => 'Zola')->lock(qw/hair_color/);
+    my $j = hash(name => 'Zola')->lock(qw/hair_color/);
 
     $j->{hair_color} = 'black';
     is($j, {name => 'Zola', hair_color => 'black'}, 'additional key');
