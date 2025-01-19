@@ -1001,7 +1001,7 @@ sub average_by($array, $f_map) {
     return $sum / $count;
 }
 
-sub join($array, $sep) {
+sub join($array, $sep='') {
     return CORE::join($sep, @$array);
 }
 

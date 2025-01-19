@@ -258,7 +258,11 @@ is(Seq->new([A => 1], [B => 2], [C => 3])->sum_by(\&snd), 6, 'sumBy');
 is(
     seq{qw/H e l l o W o r l d !/}->join('-'),
     "H-e-l-l-o-W-o-r-l-d-!",
-    'join');
+    'join 1');
+is(
+    seq{qw/H e l l o W o r l d !/}->join,
+    "HelloWorld!",
+    'join 2');
 
 is(
     Seq->new(qw/Hello World you are awesome/)->to_hash(sub($x) { length $x => $x }),

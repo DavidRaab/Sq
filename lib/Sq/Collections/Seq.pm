@@ -1422,7 +1422,7 @@ sub max_str_by($seq, $f_str) {
 }
 
 # str_join : Seq<string> -> string -> string
-sub join($seq, $sep) {
+sub join($seq, $sep='') {
     return CORE::join($sep, expand($seq));
 }
 

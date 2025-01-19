@@ -114,7 +114,12 @@ sig('Seq::max',        $seq,                       t_opt(t_num));
 sig('Seq::max_by',     $seq, $sub,                 $opt);
 sig('Seq::max_str',    $seq,                       t_opt(t_str));
 sig('Seq::max_str_by', $seq, $sub,                 $opt);
-sig('Seq::join',       $seq, t_str,                t_str);
+sigt('Seq::join',
+    t_or(
+        t_tuple($seq),
+        t_tuple($seq, t_str),
+    ),
+    t_str);
 sig('Seq::split',      $seq, t_regex,              $seq);
 sig('Seq::as_hash',    $seq,                       t_hash);
 sig('Seq::to_hash',    $seq, $sub,                 t_hash);
