@@ -1080,5 +1080,38 @@ is(
     },
     'permute 8');
 
+is(
+    seq {qw/A B/  }->permute->bind(sub($fst) {
+    seq {qw/C G A/}->permute->bind(sub($snd) {
+    seq {qw/T K/  }->permute->bind(sub($third) {
+        seq { Array->concat($fst, $snd, $third) }
+    })})}),
+    seq {
+        ["A","B", "C","G","A", "T","K"],
+        ["A","B", "C","G","A", "K","T"],
+        ["A","B", "C","A","G", "T","K"],
+        ["A","B", "C","A","G", "K","T"],
+        ["A","B", "G","C","A", "T","K"],
+        ["A","B", "G","C","A", "K","T"],
+        ["A","B", "G","A","C", "T","K"],
+        ["A","B", "G","A","C", "K","T"],
+        ["A","B", "A","C","G", "T","K"],
+        ["A","B", "A","C","G", "K","T"],
+        ["A","B", "A","G","C", "T","K"],
+        ["A","B", "A","G","C", "K","T"],
+        ["B","A", "C","G","A", "T","K"],
+        ["B","A", "C","G","A", "K","T"],
+        ["B","A", "C","A","G", "T","K"],
+        ["B","A", "C","A","G", "K","T"],
+        ["B","A", "G","C","A", "T","K"],
+        ["B","A", "G","C","A", "K","T"],
+        ["B","A", "G","A","C", "T","K"],
+        ["B","A", "G","A","C", "K","T"],
+        ["B","A", "A","C","G", "T","K"],
+        ["B","A", "A","C","G", "K","T"],
+        ["B","A", "A","G","C", "T","K"],
+        ["B","A", "A","G","C", "K","T"]
+    },
+    'permute 9');
 
 done_testing;
