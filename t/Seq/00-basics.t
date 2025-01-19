@@ -1038,5 +1038,47 @@ is(
     },
     'permute 6');
 
+is(
+    Seq::cartesian(
+        seq { qw/A B/   }->permute,
+        seq { qw/C G A/ }->permute,
+    ),
+    seq {
+        [ ["A","B"], ["C","G","A"] ],
+        [ ["A","B"], ["C","A","G"] ],
+        [ ["A","B"], ["G","C","A"] ],
+        [ ["A","B"], ["G","A","C"] ],
+        [ ["A","B"], ["A","C","G"] ],
+        [ ["A","B"], ["A","G","C"] ],
+        [ ["B","A"], ["C","G","A"] ],
+        [ ["B","A"], ["C","A","G"] ],
+        [ ["B","A"], ["G","C","A"] ],
+        [ ["B","A"], ["G","A","C"] ],
+        [ ["B","A"], ["A","C","G"] ],
+        [ ["B","A"], ["A","G","C"] ],
+    },
+    'permute 7');
+
+is(
+    Seq::cartesian(
+        seq { qw/A B/   }->permute,
+        seq { qw/C G A/ }->permute,
+    )->map(call 'flatten'),
+    seq {
+        ["A","B", "C","G","A"],
+        ["A","B", "C","A","G"],
+        ["A","B", "G","C","A"],
+        ["A","B", "G","A","C"],
+        ["A","B", "A","C","G"],
+        ["A","B", "A","G","C"],
+        ["B","A", "C","G","A"],
+        ["B","A", "C","A","G"],
+        ["B","A", "G","C","A"],
+        ["B","A", "G","A","C"],
+        ["B","A", "A","C","G"],
+        ["B","A", "A","G","C"],
+    },
+    'permute 8');
+
 
 done_testing;
