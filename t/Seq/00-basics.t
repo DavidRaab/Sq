@@ -1089,6 +1089,19 @@ is(
 # my $snd   = $seqB->permute;
 # my $third = $seqC->permute;
 # return Array->concat($fst,$snd,$third)
+#
+# or when those would be arrays.
+#
+# my @results;
+# for my $fst ( @{ $seqA->permute } ) {
+#     for my $snd ( @{ $seqB->permute } ) {
+#         for my my $third ( @{ $seqC->permute } ) {
+#             push @results, Array->concat($fst,$snd,$third);
+#         }
+#      }
+# }
+#
+# But the sequence does it lazy
 is(
     seq {qw/A B/  }->permute->bind(sub($fst) {
     seq {qw/C G A/}->permute->bind(sub($snd) {
