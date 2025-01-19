@@ -413,7 +413,7 @@ sub merge($seq) {
     });
 }
 
-# cartesian : Seq<'a> -> Seq<'b> -> Seq<'a * 'b>
+# TODO: cartesian with multiple sequences: permute()
 sub cartesian($seqA, $seqB) {
     bind($seqA, sub($a) {
     bind($seqB, sub($b) {
