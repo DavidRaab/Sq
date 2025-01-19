@@ -4,30 +4,31 @@ use Sq::Type;
 use Sq::Signature;
 
 # Some predefined types
-my $any  = t_any;
-my $seq  = t_seq;
-my $sub  = t_sub;
-my $opt  = t_opt;
-my $aos  = t_array(t_of $seq);
-my $hoa  = t_hash (t_of t_array);
-my $aoa  = t_array(t_of t_array);
+my $any   = t_any;
+my $seq   = t_seq;
+my $sub   = t_sub;
+my $opt   = t_opt;
+my $aos   = t_array(t_of $seq);
+my $hoa   = t_hash (t_of t_array);
+my $aoa   = t_array(t_of t_array);
+my $class = t_enum('Seq');
 
 ### CONSTRUCTORS
 
-sig ('Seq::from_sub',   $any,  $sub,               $seq);
-sig ('Seq::always',     $any, $any,                $seq);
-sig ('Seq::empty',      $any,                      $seq);
-sig ('Seq::replicate',  $any, t_int, $any,         $seq);
-sig ('Seq::unfold',     $any, $any,  $sub,         $seq);
-sig ('Seq::init',       $any, t_int,  $sub,        $seq);
-sig ('Seq::range_step', $any, t_num, t_num, t_num, $seq);
-sigt('Seq::new',        t_tuplev($any, t_array),   $seq);
-sig ('Seq::range',      $any, t_int, t_int,        $seq);
-sig ('Seq::from_array', $any, t_array,             $seq);
-sig ('Seq::from_hash',  $any, t_hash,  $sub,       $seq);
-sigt('Seq::concat',     t_tuplev($any, $aos),      $seq);
-sig ('Seq::up',         $any, t_int,               $seq);
-sig ('Seq::down',       $any, t_int,               $seq);
+sig ('Seq::from_sub',   $class,  $sub,               $seq);
+sig ('Seq::always',     $class, $any,                $seq);
+sig ('Seq::empty',      $class,                      $seq);
+sig ('Seq::replicate',  $class, t_int, $any,         $seq);
+sig ('Seq::unfold',     $class, $any,  $sub,         $seq);
+sig ('Seq::init',       $class, t_int,  $sub,        $seq);
+sig ('Seq::range_step', $class, t_num, t_num, t_num, $seq);
+sigt('Seq::new',        t_tuplev($class, t_array),   $seq);
+sig ('Seq::range',      $class, t_int, t_int,        $seq);
+sig ('Seq::from_array', $class, t_array,             $seq);
+sig ('Seq::from_hash',  $class, t_hash,  $sub,       $seq);
+sigt('Seq::concat',     t_tuplev($class, $aos),      $seq);
+sig ('Seq::up',         $class, t_int,               $seq);
+sig ('Seq::down',       $class, t_int,               $seq);
 
 ### METHODS
 

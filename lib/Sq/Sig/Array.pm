@@ -17,22 +17,22 @@ my $opt   = t_opt;
 my $sub   = t_sub;
 my $aopt  = t_array(t_of $opt);
 my $pint  = t_int(t_positive);
-
+my $class = t_enum('Array');
 
 ### CONSTRUCTORS
 
-sigt('Array::new',        t_tuplev($any, $array),    $array);
-sigt('Array::concat',     t_tuplev($any, $aoa),      $array);
-sig ('Array::empty',      $any,                      $array);
+sigt('Array::new',        t_tuplev($class, $array),    $array);
+sigt('Array::concat',     t_tuplev($class, $aoa),      $array);
+sig ('Array::empty',      $class,                      $array);
 sig ('Array::replicate',  $pint, $any,               $array);
-sig ('Array::bless',      $any, $array,              $array);
-sig ('Array::from_array', $any, $array,              $array);
+sig ('Array::bless',      $class, $array,              $array);
+sig ('Array::from_array', $class, $array,              $array);
 sig ('Array::init',       $pint, $sub,               $array);
 sig ('Array::init2d',     $pint, $pint, $sub,        $array);
 # Second argument is 'State, would be good to back-reference the type
-sig ('Array::unfold',     $any, $any, $sub,          $array);
-sig ('Array::range_step', $any, t_num, t_num, t_num, $array);
-sig ('Array::range',      $any, t_int, t_int,        $array);
+sig ('Array::unfold',     $class, $any, $sub,          $array);
+sig ('Array::range_step', $class, t_num, t_num, t_num, $array);
+sig ('Array::range',      $class, t_int, t_int,        $array);
 
 
 ### METHODS
