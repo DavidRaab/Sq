@@ -1015,5 +1015,28 @@ is(
         [ "D", "C", "B", "A" ],
     },
     'permute 4');
+is(
+    seq { qw/Foo Bar Baz/ }->permute,
+    seq {
+        [ "Foo", "Bar", "Baz" ],
+        [ "Foo", "Baz", "Bar" ],
+        [ "Bar", "Foo", "Baz" ],
+        [ "Bar", "Baz", "Foo" ],
+        [ "Baz", "Foo", "Bar" ],
+        [ "Baz", "Bar", "Foo" ],
+    },
+    'permute 5');
+is(
+    seq { qw/Foo Bar Baz/ }->permute->map(call 'join', ""),
+    seq {
+        "FooBarBaz",
+        "FooBazBar",
+        "BarFooBaz",
+        "BarBazFoo",
+        "BazFooBar",
+        "BazBarFoo",
+    },
+    'permute 6');
+
 
 done_testing;
