@@ -339,7 +339,7 @@ sub array(@array) { bless(\@array, 'Array') }
 sub hash (%hash)  { bless(\%hash,  'Hash')  }
 
 # returns a function that generates a hash from just the values. See: t/00-core.t
-sub fhash(@fields)  {
+sub fhash(@fields) {
     return sub(@args) {
         my $hash = bless({}, 'Hash');
         for (my $idx=0; $idx < @args; $idx++) {
