@@ -757,6 +757,22 @@ sub fill($array, $upto, $f_any) {
 # Noop - Only for API compatibility with Seq
 sub cache($array) { $array }
 
+sub permute($array) {
+    state $count_up = Sq->math->permute_count_up;
+    my $pattern = [(0) x @$array];
+    my @permute;
+    while (1) {
+        my @copy = @$array;
+        my @new;
+        for my $idx ( @$pattern ) {
+            push @new, splice(@copy, $idx, 1);
+        }
+        push @permute, \@new;
+        last if !$count_up->($pattern);
+    }
+    return \@permute;
+}
+
 #-----------------------------------------------------------------------------#
 # ARRAY 2D                                                                    #
 #          Here are functions designed for working with 2D Arrays             #
