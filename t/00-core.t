@@ -318,15 +318,8 @@ is(
     one_of(
         # to_array() passes $key,$value from the hash to the lambda. By just
         # providing \&array you create an Array/Tuple out of it.
-        hash(foo => 1, bar => 2, baz => 3)->to_array(\&array),
-        [
-            [[foo => 1], [bar => 2], [baz => 3]],
-            [[foo => 1], [baz => 3], [bar => 2]],
-            [[bar => 2], [foo => 1], [baz => 3]],
-            [[bar => 2], [baz => 3], [foo => 1]],
-            [[baz => 3], [foo => 1], [bar => 2]],
-            [[baz => 3], [bar => 2], [foo => 1]],
-        ],
+        hash (foo => 1, bar => 2, baz => 3)->to_array(\&array),
+        array([foo => 1], [bar => 2], [baz => 3])->permute,
         'array');
 
     # use ->as_hash instead
