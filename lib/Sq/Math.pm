@@ -31,6 +31,15 @@ static is_prime => sub($x) {
     return 1;
 };
 
+static fac => sub($num) {
+    return 1 if $num == 0 || $num == 1;
+    my $result = 1;
+    for my $x ( 2 .. $num ) {
+        $result *= $x;
+    }
+    return $result;
+};
+
 # Expects an array of int
 # For example starts with:
 # [0,0,0,0]
