@@ -2024,4 +2024,54 @@ is(
     ],
     'mapn 3');
 
+is(Array::permute([]),    [],      'permute 0');
+is(Array::permute(['A']), [['A']], 'permute 1');
+is(
+    Array::permute([qw/A B/]),
+    [
+        [qw/A B/],
+        [qw/B A/]
+    ],
+    'permute 2');
+is(
+    Array::permute([qw/A B C/]),
+    [
+        [qw/A B C/],
+        [qw/A C B/],
+        [qw/B A C/],
+        [qw/B C A/],
+        [qw/C A B/],
+        [qw/C B A/],
+    ],
+    'permute 3');
+is(
+    Array::permute([qw/A B C D/]),
+    [
+        [ "A", "B", "C", "D" ],
+        [ "A", "B", "D", "C" ],
+        [ "A", "C", "B", "D" ],
+        [ "A", "C", "D", "B" ],
+        [ "A", "D", "B", "C" ],
+        [ "A", "D", "C", "B" ],
+        [ "B", "A", "C", "D" ],
+        [ "B", "A", "D", "C" ],
+        [ "B", "C", "A", "D" ],
+        [ "B", "C", "D", "A" ],
+        [ "B", "D", "A", "C" ],
+        [ "B", "D", "C", "A" ],
+        [ "C", "A", "B", "D" ],
+        [ "C", "A", "D", "B" ],
+        [ "C", "B", "A", "D" ],
+        [ "C", "B", "D", "A" ],
+        [ "C", "D", "A", "B" ],
+        [ "C", "D", "B", "A" ],
+        [ "D", "A", "B", "C" ],
+        [ "D", "A", "C", "B" ],
+        [ "D", "B", "A", "C" ],
+        [ "D", "B", "C", "A" ],
+        [ "D", "C", "A", "B" ],
+        [ "D", "C", "B", "A" ],
+    ],
+    'permute 4');
+
 done_testing;
