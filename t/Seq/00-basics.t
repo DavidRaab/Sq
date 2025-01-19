@@ -1140,4 +1140,26 @@ is(
     },
     'permute 9');
 
+is(
+    seq { split //, "AAACGTT" }
+    ->permute
+    ->map(call join => "")
+    ->keep(sub($str) { $str eq 'GATTACA' })
+    ->distinct,
+    seq { 'GATTACA' },
+    'GATTACA');
+
+is(
+    seq { split //, "AACGTT" }
+    ->permute
+    ->map(call 'join')
+    ->rx(qr/GATC/),
+    seq {
+        "AGATCT", "AGATCT", "ATGATC", "ATGATC", "AGATCT", "AGATCT", "ATGATC",
+        "ATGATC", "GATCAT", "GATCTA", "GATCAT", "GATCTA", "GATCAT", "GATCTA",
+        "GATCAT", "GATCTA", "TAGATC", "TAGATC", "TGATCA", "TGATCA", "TAGATC",
+        "TAGATC", "TGATCA", "TGATCA"
+    },
+    'DNA');
+
 done_testing;
