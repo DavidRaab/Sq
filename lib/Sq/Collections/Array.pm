@@ -767,10 +767,10 @@ sub permute($array) {
         for my $idx ( @$pattern ) {
             push @new, splice(@copy, $idx, 1);
         }
-        push @permute, \@new;
+        push @permute, CORE::bless(\@new, 'Array');
         last if !$count_up->($pattern);
     }
-    return \@permute;
+    return CORE::bless(\@permute, 'Array');
 }
 
 #-----------------------------------------------------------------------------#
