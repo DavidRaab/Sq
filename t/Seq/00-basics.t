@@ -1080,6 +1080,15 @@ is(
     },
     'permute 8');
 
+# bind() is like binding the inner value of a sequence to a variable
+# so somehow similar like just iterating through a sequence. or like map().
+# but we return another sequence that then is flattened. bind() is like just
+# reversing typical code with assignment from right-to-left to a left-to-right.
+#
+# my $fst   = $seqA->permute;
+# my $snd   = $seqB->permute;
+# my $third = $seqC->permute;
+# return Array->concat($fst,$snd,$third)
 is(
     seq {qw/A B/  }->permute->bind(sub($fst) {
     seq {qw/C G A/}->permute->bind(sub($snd) {
