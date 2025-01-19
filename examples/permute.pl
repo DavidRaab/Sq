@@ -25,8 +25,25 @@ sub count_up($array) {
     return 1;
 }
 
-my $init = [0,0,0,0];
-dump($init);
-while ( count_up($init) ) {
-    dump($init);
+# my $init = [0,0,0,0];
+# dump($init);
+# while ( count_up($init) ) {
+#     dump($init);
+# }
+
+sub permute(@items) {
+    my $pattern = [(0) x @items];
+    my @permute;
+    while (1) {
+        my @copy = @items;
+        my @new;
+        for my $idx ( @$pattern ) {
+            push @new, splice(@copy, $idx, 1);
+        }
+        push @permute, \@new;
+        last if !count_up($pattern);
+    }
+    return \@permute;
 }
+
+dump(permute(qw/A B C D/));
