@@ -966,4 +966,54 @@ is(Seq->down(10)->take(100), Seq->range(10, -89), 'down');
         'intersect 2');
 }
 
+is(Seq->empty->permute,  seq {},        'permute 0');
+is(seq { 'A' }->permute, seq { ['A'] }, 'permute 1');
+is(
+    seq { qw/A B/ }->permute,
+    seq {
+        [qw/A B/],
+        [qw/B A/],
+    },
+    'permute 2');
+is(
+    seq { qw/A B C/ }->permute,
+    seq {
+        [qw/A B C/],
+        [qw/A C B/],
+        [qw/B A C/],
+        [qw/B C A/],
+        [qw/C A B/],
+        [qw/C B A/],
+    },
+    'permute 3');
+is(
+    seq { qw/A B C D/ }->permute,
+    seq {
+        [ "A", "B", "C", "D" ],
+        [ "A", "B", "D", "C" ],
+        [ "A", "C", "B", "D" ],
+        [ "A", "C", "D", "B" ],
+        [ "A", "D", "B", "C" ],
+        [ "A", "D", "C", "B" ],
+        [ "B", "A", "C", "D" ],
+        [ "B", "A", "D", "C" ],
+        [ "B", "C", "A", "D" ],
+        [ "B", "C", "D", "A" ],
+        [ "B", "D", "A", "C" ],
+        [ "B", "D", "C", "A" ],
+        [ "C", "A", "B", "D" ],
+        [ "C", "A", "D", "B" ],
+        [ "C", "B", "A", "D" ],
+        [ "C", "B", "D", "A" ],
+        [ "C", "D", "A", "B" ],
+        [ "C", "D", "B", "A" ],
+        [ "D", "A", "B", "C" ],
+        [ "D", "A", "C", "B" ],
+        [ "D", "B", "A", "C" ],
+        [ "D", "B", "C", "A" ],
+        [ "D", "C", "A", "B" ],
+        [ "D", "C", "B", "A" ],
+    },
+    'permute 4');
+
 done_testing;

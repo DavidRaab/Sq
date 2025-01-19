@@ -1052,6 +1052,31 @@ sub trim($seq) {
     }, 'Seq');
 }
 
+sub permute($seq) {
+    state $count_up = Sq->math->permute_count_up;
+    return bless(sub {
+        my $abort   = 0;
+        my $array   = to_array($seq);
+        my $pattern = [(0) x @$array];
+
+        return sub { undef } if @$array == 0;
+        return sub {
+            return undef if $abort;
+            my @copy = @$array;
+            my @new;
+            for my $idx ( @$pattern ) {
+                push @new, splice(@copy, $idx, 1);
+            }
+            if ( !$count_up->($pattern) ) {
+                $abort = 1;
+                undef $array;
+                undef $pattern;
+            }
+            return CORE::bless(\@new, 'Array');
+        }
+    }, 'Seq');
+}
+
 #-----------------------------------------------------------------------------#
 # SIDE-EFFECTS                                                                #
 #    functions that have side-effects or produce side-effects. Those are      #
