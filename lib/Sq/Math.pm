@@ -31,4 +31,23 @@ static is_prime => sub($x) {
     return 1;
 };
 
+# Expects an array of int
+# For example starts with:
+# [0,0,0,0]
+static permute_count_up => sub($array) {
+    my $idx = $array->$#*;
+    my $max = @$array - ($idx+1);
+
+    UP:
+    $array->[$idx]++;
+    if ( $array->[$idx] > $max ) {
+        $array->[$idx] = 0;
+        $idx--;
+        return if $idx < 0;
+        $max = @$array - ($idx+1);
+        goto UP;
+    }
+    return 1;
+};
+
 1;
