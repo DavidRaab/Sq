@@ -5,9 +5,7 @@ use Sq::Sig;
 use Sq::Test;
 
 # Build Test Data
-sub entry($id, $name, $tag) {
-    return { id => $id, name => $name, tag => $tag }
-}
+*entry = fhash(qw/id name tag/);
 
 my $data = sq [
     entry(1, 'David', 'WoW'),
