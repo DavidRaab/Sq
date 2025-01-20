@@ -8,8 +8,7 @@ use Sq::Test;
 use Sq::Sig;
 
 # Manual import/alias of a static
-*html = Sq->fmt->html;
-
+fn html => Sq->fmt->html;
 
 is(html("click me!"), [HTML => "click me!"], 'text');
 is(

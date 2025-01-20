@@ -29,10 +29,10 @@ sub bar() { ... }
 package main;
 
 # Manual import of function
-# I do this, because when importing of Sq::Reflection fails, because i change
-# something in the Exporter than the test still runs as far as possible
-# to identify the cause of the problem.
-*has_func = \&Sq::Reflection::has_func;
+# I do a mnual import, because when importing of Sq::Reflection fails
+# because i maybe changed som something in the Exporter than the test still
+# runs as far as possible to identify the cause of the problem.
+fn has_func => \&Sq::Reflection::has_func;
 
 like(
     dies { Test->import() },
