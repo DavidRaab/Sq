@@ -759,7 +759,8 @@ sub cache($array) { $array }
 
 sub permute($array) {
     state $count_up = Sq->math->permute_count_up;
-    return CORE::bless([], 'Array') if @$array == 0;
+    return CORE::bless([], 'Array')          if @$array == 0;
+    return CORE::bless([[@$array]], 'Array') if @$array == 1;
     my $pattern = [(0) x @$array];
     my @permute;
     while (1) {

@@ -1059,20 +1059,31 @@ sub permute($seq) {
         my $array   = to_array($seq);
         my $pattern = [(0) x @$array];
 
-        return sub { undef } if @$array == 0;
-        return sub {
-            return undef if $abort;
-            my @copy = @$array;
-            my @new;
-            for my $idx ( @$pattern ) {
-                push @new, splice(@copy, $idx, 1);
-            }
-            if ( !$count_up->($pattern) ) {
+        if ( @$array == 0 ) {
+            return sub { undef }
+        }
+        elsif ( @$array == 1 ) {
+            return sub {
+                return undef if $abort;
                 $abort = 1;
-                undef $array;
-                undef $pattern;
+                return $array;
             }
-            return CORE::bless(\@new, 'Array');
+        }
+        else {
+            return sub {
+                return undef if $abort;
+                my @copy = @$array;
+                my @new;
+                for my $idx ( @$pattern ) {
+                    push @new, splice(@copy, $idx, 1);
+                }
+                if ( !$count_up->($pattern) ) {
+                    $abort = 1;
+                    undef $array;
+                    undef $pattern;
+                }
+                return CORE::bless(\@new, 'Array');
+            }
         }
     }, 'Seq');
 }
