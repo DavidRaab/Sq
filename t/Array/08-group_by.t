@@ -5,7 +5,7 @@ use Sq::Sig;
 use Sq::Test;
 
 # Build Test Data
-*entry = fhash(qw/id name tag/);
+fn entry => record(qw/id name tag/);
 
 my $data = sq [
     entry(1, 'David', 'WoW'),

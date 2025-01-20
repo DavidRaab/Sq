@@ -2019,7 +2019,7 @@ is(
     'mapn 2');
 
 is(
-    array(1, "Anny", 100, 2, "Frank", 12, 3, "Peter", 33)->mapn(3, fhash(qw/id name points/)),
+    array(1, "Anny", 100, 2, "Frank", 12, 3, "Peter", 33)->mapn(3, record(qw/id name points/)),
     [
         {id => 1, name => "Anny",  points => 100},
         {id => 2, name => "Frank", points => 12 },
