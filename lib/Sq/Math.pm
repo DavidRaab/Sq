@@ -44,7 +44,7 @@ static fac => sub($num) {
 # For example starts with:
 # [0,0,0,0]
 static permute_count_up => sub($array) {
-    my $idx = $array->$#*;
+    my $idx = $array->$#* - 1;
     my $max = @$array - ($idx+1);
 
     UP:
