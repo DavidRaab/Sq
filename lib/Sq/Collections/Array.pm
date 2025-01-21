@@ -776,6 +776,51 @@ sub permute($array) {
     return CORE::bless(\@permute, 'Array');
 }
 
+sub map_rec($array, $f_map) {
+    my $new = CORE::bless([], 'Array');
+    my $type;
+    for my $value ( @$array ) {
+        $type = ref $value;
+        if ( $type eq 'Array' || $type eq 'ARRAY' ) {
+            push @$new, (scalar map_rec($value, $f_map));
+        }
+        else {
+            push @$new, (scalar $f_map->($value));
+        }
+    }
+    return $new;
+}
+
+sub fold_rec($array, $f_init, $f_state) {
+    my $state = $f_init->();
+    my $type;
+    for my $value ( @$array ) {
+        $type = ref $value;
+        if ( $type eq 'Array' || $type eq 'ARRAY' ) {
+            $state = $f_state->(fold_rec($value, $f_init, $f_state), $state);
+        }
+        else {
+            $state = $f_state->($value, $state);
+        }
+    }
+    return $state;
+}
+
+# TODO: maybe another/better name?
+sub map_array($array, $f_map, $f_fold) {
+    my ($new, $type) = (CORE::bless([], 'Array'));
+    for my $value ( @$array ) {
+        $type = ref $value;
+        if ( $type eq 'Array' || $type eq 'ARRAY' ) {
+            push @$new, map_array($value, $f_map, $f_fold);
+        }
+        else {
+            push @$new, $f_map->($value);
+        }
+    }
+    return $f_fold->($new);
+}
+
 #-----------------------------------------------------------------------------#
 # ARRAY 2D                                                                    #
 #          Here are functions designed for working with 2D Arrays             #

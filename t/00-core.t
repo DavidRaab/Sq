@@ -69,6 +69,18 @@ is(
     ],
     'call 2');
 
+# but there is also a map_rec that works recursively through any depth of an array
+# and maps each value while containing it's structure.
+is(
+    $data->map_rec(sub($x) { $x+1 }),
+    [
+        [2,3,4],
+        [5,6,7],
+        [8,9,10],
+        [],
+    ],
+    'map_rec');
+
 # seq {} syntax
 is(
     seq {1,2,3,undef,4,5,6},

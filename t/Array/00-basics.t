@@ -2077,4 +2077,97 @@ is(
     ],
     'permute 4');
 
+is(
+    array(1,2,3,4)->fold_rec(sub{0}, sub($x,$state) { $state + $x }),
+    10,
+    'fold_rec 1');
+is(
+    sq([
+        [1,2,3,4], # 10 * 2 -> 20 * 2 ->  40
+        [5,6,7,8], # 26 * 2 -> 52 * 2 -> 104
+    ])->fold_rec(sub{0}, sub($x,$state) { $state + ($x*2) }),
+    144,
+    'fold_rec 2');
+is(
+    sq([
+        ["foo", "bar", "baz"],
+        ["whatever", "lena"],
+    ])->fold_rec(sub{""}, sub($x,$state) { $state eq "" ? $x : "$state $x" }),
+    "foo bar baz whatever lena",
+    'fold_rec 3');
+
+is(
+    sq([
+        [1,2,[3,4]],
+        [5,[6],7,[8, [9,10,11]]],
+    ])->map_rec(sub($x) { $x * 2 }),
+    [
+        [2,4,[6,8]],
+        [10,[12],14,[16,[18,20,22]]],
+    ],
+    'map_rec 1');
+
+
+is(
+    sq([
+        [1,2,3,4], # 10 * 2 -> 20
+        [5,6,7,8], # 26 * 2 -> 52
+    ])->map_array(sub($x) { $x * 2 }, sub($array) { $array->sum }),
+    72,
+    'map_array 1');
+is(
+    sq([
+        ["foo", "bar", "baz"],
+        ["whatever", "lena"],
+    ])->map_array(\&id, call join => " "),
+    "foo bar baz whatever lena",
+    'map_array 2');
+{
+    my $got = sq [
+        "body",
+        [a => {href => "www.heise.de"}, "Click Me!"],
+        [a => {href => "www.cool.de"},  "No Me!"],
+    ];
+    my $expected = [
+        "body",
+        {},
+        [a => {href => "www.heise.de"}, "Click Me!"],
+        [a => {href => "www.cool.de"},  "No Me!"],
+    ];
+    is(
+        $got->map_array(\&id, sub($tag) {
+            if ( is_type(type [tuplev => ['str'],['hash'],['array']], $tag) ) {
+                return $tag;
+            }
+            return [$tag->[0], {}, $tag->@[1..$tag->$#*]];
+        }),
+        $expected,
+        'map_array 3');
+}
+{
+    my $got = sq [
+        "body",
+        [a => {href => "www.heise.de"}, "Click Me!"],
+        [a => {href => "www.cool.de"},  "No Me!"],
+    ];
+    my $expected = [
+        "body",
+        {},
+        [a => {href => "www.heise.de"}, "Click Me!"],
+        [a => {href => "www.cool.de"},  "No Me!"],
+    ];
+    my $f = type_cond(
+        type [tuplev => ['str'],['hash'],['array']] => sub($tag) {
+            $tag
+        },
+        type ['any'] => sub($tag) {
+            [$tag->[0], {}, $tag->@[1..$tag->$#*]];
+        },
+    );
+    is(
+        $got->map_array(\&id, $f),
+        $expected,
+        'map_array 4');
+}
+
 done_testing;

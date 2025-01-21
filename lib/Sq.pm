@@ -6,8 +6,9 @@ use Scalar::Util ();
 my $export_funcs;
 my $first_load = 1;
 our @EXPORT = (
-    qw(sq call key assign seq new with_dispatch multi fn),
+    qw(sq call key assign seq new),
     qw(is_num is_str is_array is_hash is_seq is_opt is_result is_ref is_regex),
+    qw(fn multi with_dispatch type_cond),
     qw(id fst snd),
     qw(by_num by_str by_stri),
     qw(array hash record),
@@ -326,6 +327,20 @@ sub with_dispatch(@tf) {
         }
         local $Carp::CarpLevel += 1;
         Carp::croak sprintf("No dispatch for: %s", Sq::Dump::dumps(\@_));
+    };
+}
+
+sub type_cond(@tf) {
+    return sub($any) {
+        my $it = List::MoreUtils::natatime 2, @tf;
+        my ($type,$f);
+        while ( ($type, $f) = $it->() ) {
+            if ( Sq::Type::t_valid($type, $any) ) {
+                return $f->($any);
+            }
+        }
+        local $Carp::CarpLevel += 1;
+        Carp::croak sprintf("No dispatch for: %s", Sq::Dump::dumps($any));
     };
 }
 
