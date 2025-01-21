@@ -22,11 +22,12 @@ my $data = sq [
     [1,2,3],
     [4,5,6],
     [7,8,9],
+    [],
 ];
 
 # call examples
-is($data->map(call 'sum'),                  [6,15,24], 'call 1');
-is($data->map(sub($array) { $array->sum }), [6,15,24], 'same without call');
+is($data->map(call 'sum'),                  [6,15,24,0], 'call 1');
+is($data->map(sub($array) { $array->sum }), [6,15,24,0], 'same without call');
 
 is(
     Array::map([[1,2,3], [4,5,6], [7,8,9]], \&Array::sum),
@@ -38,24 +39,33 @@ is(
     [6,15,24],
     'call now also supports unblessed Arrays/Hashes');
 
-# max returns an optional value
+# max returns an optional value, because there can be no max value on an empty array
 is(
-    $data->map(call 'max')->keep_some,
-    [3,6,9],
+    $data->map(call 'max'),
+    [Some(3), Some(6), Some(9), None],
     'calls max on each inner array');
 
 # but you also can specify a default, then no optional is returned anymore
 is(
     $data->map(call 'max', 0),
+    [3,6,9,0],
+    'calls max on each inner array');
+
+# ->keep_some() only keeps Some() values and unpacks them.
+is(
+    $data->map(call 'max')->keep_some,
     [3,6,9],
     'calls max on each inner array');
 
+# Perl: map { map { f($_) } @$_ } @array
+# We map an array, and call 'map' again on each inner array
 is(
     $data->map(call 'map', sub($x) { $x+1 }),
     [
         [2,3,4],
         [5,6,7],
         [8,9,10],
+        [],
     ],
     'call 2');
 
