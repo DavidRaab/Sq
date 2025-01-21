@@ -80,7 +80,7 @@ my @data = (
         'group_fold');
 
     is(
-        $grouped->values->sort(sub($x,$y) { $x->{id} <=> $y->{id} }),
+        $grouped->values->sort_by(by_num, key 'id'),
         [
             {
                 'id'   => 1,

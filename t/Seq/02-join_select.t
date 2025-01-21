@@ -23,8 +23,8 @@ is(
 
 # testing full output
 is(
-    $cards->to_array,
-    [
+    $cards,
+    seq {
         ['clubs'  ,'7'],['clubs'  ,'8'],['clubs'  ,'9'],['clubs'  ,'10'],
         ['clubs'  ,'B'],['clubs'  ,'D'],['clubs'  ,'K'],['clubs'  ,'A' ],
         ['spades' ,'7'],['spades' ,'8'],['spades' ,'9'],['spades' ,'10'],
@@ -33,7 +33,7 @@ is(
         ['hearts' ,'B'],['hearts' ,'D'],['hearts' ,'K'],['hearts' ,'A' ],
         ['diamond','7'],['diamond','8'],['diamond','9'],['diamond','10'],
         ['diamond','B'],['diamond','D'],['diamond','K'],['diamond','A' ],
-    ],
+    },
     'cartesian 2');
 
 # testing against non-lazy variant

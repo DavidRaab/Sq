@@ -324,7 +324,7 @@ is(
     'count');
 
 is(
-    Array->new(qw/Hello World Awesome World/)->count_by(sub($str) { length $str }),
+    Array->new(qw/Hello World Awesome World/)->count_by(Str->length),
     {
         5 => 3,
         7 => 1,
@@ -336,12 +336,12 @@ is(
     ->map(sub($x) { length $x })
     ->count,
 
-    Array->new(qw/Hello World Awesome World/)->count_by(sub($str) { length $str }),
+    Array->new(qw/Hello World Awesome World/)->count_by(Str->length),
     'map->count same as count_by');
 
 is(Array->new(1,1,2,3,1,4,5,4,3,2,6)->distinct, [1..6],              'distinct 1');
 is(Array->new(1,2,3,2,23,123,4,12,2)->distinct, [1,2,3,23,123,4,12], 'distinct 2');
-is(Array::distinct([1,2,3,2,23,123,4,12,2]),     [1,2,3,23,123,4,12], 'distinct 3');
+is(Array::distinct([1,2,3,2,23,123,4,12,2]),    [1,2,3,23,123,4,12], 'distinct 3');
 
 # distinct_by tests
 {
@@ -354,9 +354,9 @@ is(Array::distinct([1,2,3,2,23,123,4,12,2]),     [1,2,3,23,123,4,12], 'distinct 
 
     is($data->length, 4, 'distinct_by starts with 4');
     is($data->distinct->length, 4, 'still 4 as HashRefs are always unequal');
-    is($data->distinct_by(sub($x) { $x->{id} })->length, 3, 'one element less');
+    is($data->distinct_by(key 'id')->length, 3, 'one element less');
     is(
-        $data->distinct_by(sub($x) { $x->{id} }),
+        $data->distinct_by(key 'id'),
         [
             {id => 1, name => "Foo"},
             {id => 2, name => "Bar"},
@@ -386,7 +386,7 @@ is(
     [[A => 0], [B => 1], [C => 2]],
     'mapi with default variable');
 
-is(Array->init( 0,  sub($idx) { $idx }), [], 'init with length 0');
+is(Array->init(0, \&id),      [], 'init with length 0');
 is(Array->range_step(1,1,1), [1], 'range_step with 1,1,1');
 
 # TODO: floating point inaccuraccy
@@ -426,7 +426,8 @@ is($range->find(sub($x) { $x > 10 }),      None, 'find 2');
 is($range->find(sub($x) { $x > 10 })->or(0),  0, 'find 3');
 
 is(
-    $range->bind(sub($x) { array $x }),
+    # turns every single element into an array - than flattens it again
+    $range->bind(\&array),
     [1 .. 10],
     'bind - somehow like id');
 
@@ -479,7 +480,7 @@ is(
     ];
 
     is(
-        $data->sort_by(sub($x,$y) { $x <=> $y }, sub($x) { $x->{id} }),
+        $data->sort_by(by_num, key 'id'),
         [
             { id => 1, char => 'W' },
             { id => 2, char => 'O' },
@@ -490,7 +491,7 @@ is(
         'sort_by 1');
 
     is(
-        $data->sort_by(sub($x,$y) { $x cmp $y }, sub($x) { $x->{char} }),
+        $data->sort_by(by_str, key 'char'),
         [
             { id => 5, char => 'D' },
             { id => 4, char => 'L' },
@@ -506,7 +507,7 @@ is(
         ->sort(sub($x,$y) {  $x->[0] <=> $y->[0]  })
         ->map (sub($x)    {  $x->[1]              }),
 
-        $data->sort_by(sub($x,$y) { $x <=> $y }, sub($x) { $x->{id} }),
+        $data->sort_by(by_num, key 'id'),
         'sort_by 3');
 }
 
@@ -522,7 +523,7 @@ is(
 is(
     Array::zip(
         Array->range(1,6),
-        Array->new(qw(A B C D E F))
+        array(qw(A B C D E F))
     ),
     [[qw/1 A/],[qw/2 B/],[qw/3 C/],[qw/4 D/],[qw/5 E/],[qw/6 F/]],
     'zip 1');
@@ -530,7 +531,7 @@ is(
 is(
     Array::zip(
         Array->range(1,3),
-        Array->new(qw(A B C D E F))
+        array(qw(A B C D E F))
     ),
     [[qw/1 A/],[qw/2 B/],[qw/3 C/]],
     'zip 2');
@@ -538,7 +539,7 @@ is(
 is(
     Array::zip(
         Array->range(1,6),
-        Array->new(qw(A B C D))
+        array(qw(A B C D))
     ),
     [[qw/1 A/],[qw/2 B/],[qw/3 C/],[qw/4 D/]],
     'zip 3');
@@ -546,7 +547,7 @@ is(
 is(
     Array::zip(
         Array->empty,
-        Array->new(qw(A B C D E F))
+        array(qw(A B C D E F))
     ),
     [],
     'zip 4');
@@ -1167,11 +1168,13 @@ is(Array::diff([1..10],  [1,3,7,2], \&id), [4,5,6,8,9,10], 'diff 2');
 {
     my sub entry($id,$name) { {id => $id, name => $name } }
     is(
-        Array::diff([
+        Array::diff(
+            [
                 entry(1, "hello"),
                 entry(2, "world"),
                 entry(3, "test"),
-            ], [
+            ],
+            [
                 entry(2, "abba"),
                 entry(3, "test"),
                 entry(5, "what"),
@@ -1182,11 +1185,13 @@ is(Array::diff([1..10],  [1,3,7,2], \&id), [4,5,6,8,9,10], 'diff 2');
         'diff 3');
 
     is(
-        Array::diff([
+        Array::diff(
+            [
                 entry(1, "hello"),
                 entry(2, "world"),
                 entry(3, "test"),
-            ], [
+            ],
+            [
                 entry(2, "abba"),
                 entry(3, "test"),
                 entry(5, "what"),
@@ -1197,12 +1202,14 @@ is(Array::diff([1..10],  [1,3,7,2], \&id), [4,5,6,8,9,10], 'diff 2');
         'diff 4');
 
     is(
-        Array::diff([
+        Array::diff(
+            [
                 entry(2, "world"),
                 entry(1, "hello"),
                 entry(3, "test"),
                 entry(4, "new"),
-            ], [
+            ],
+            [
                 entry(3, "test"),
                 entry(5, "what"),
                 entry(2, "world"),
@@ -1213,12 +1220,14 @@ is(Array::diff([1..10],  [1,3,7,2], \&id), [4,5,6,8,9,10], 'diff 2');
         'diff 5');
 
     is(
-        Array::diff([
+        Array::diff(
+            [
                 entry(4, "new"),
                 entry(3, "test"),
                 entry(2, "world"),
                 entry(1, "hello"),
-            ], [
+            ],
+            [
                 entry(3, "test"),
                 entry(5, "what"),
                 entry(2, "world"),
@@ -1229,12 +1238,14 @@ is(Array::diff([1..10],  [1,3,7,2], \&id), [4,5,6,8,9,10], 'diff 2');
         'diff 6');
 
     is(
-        Array::diff([
+        Array::diff(
+            [
                 entry(2, "world"),
                 entry(1, "hello"),
                 entry(3, "test"),
                 entry(4, "new"),
-            ], [
+            ],
+            [
                 entry(3, "test"),
                 entry(5, "what"),
                 entry(2, "foo"),

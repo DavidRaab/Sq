@@ -32,7 +32,7 @@ use Sq::Test;
 
     is($data->length, 3, 'length from hashref is 3');
     is(
-        $data->to_array->sort(by_str),
+        $data->sort(by_str),
         ["1Foo", "2Bar", "3Baz"],
         'hash to sequence');
 
@@ -41,7 +41,7 @@ use Sq::Test;
 
     is($data->length, 4, 'length from hashref is 4');
     is(
-        $data->to_array->sort(by_str),
+        $data->sort(by_str),
         ["1Foo", "2Bar", "3Baz", "4Maz"],
         'hash to sequence after added key');
 }

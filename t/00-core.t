@@ -168,7 +168,7 @@ is(
         'sq on multiple values in option');
 }
 
-# sq with result
+# check if sq adds blessing to things inside a Result
 {
     is(
         sq(Ok([1,2,3]))->map(sub { $_[0]->length }),

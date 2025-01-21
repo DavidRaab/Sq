@@ -1,8 +1,8 @@
 #!perl
 use 5.036;
 use Sq;
-use Sq::Sig;
 use Sq::Test;
+use Sq::Sig;
 use FindBin qw($Bin);
 use Path::Tiny;
 use IO::File;
@@ -91,8 +91,7 @@ is($file->skip(1) ->first->or('EMPTY'), "File\n", 'getting second line');
 is($file->skip(10)->first->or('EMPTY'), "EMPTY",  'getting default value');
 is($file->skip(10)->first,        None, 'getting undef');
 
-my $length_of_lines =
-    $file->map(sub($line) { length $line });
+my $length_of_lines = $file->map(Str->length);
 
 is($length_of_lines->to_array, [8, 5, 7],    'line lengths');
 is($length_of_lines->reduce($add), Some(20), 'characters in file');
@@ -160,7 +159,7 @@ my $contains_undef = Seq->from_sub(sub {
     my @data = (1,2,3,undef,4,5,6);
     my $idx  = 0;
     return sub {
-        # This ust work because of two reason.
+        # This just work because of two reason.
         #  1. index 3 returns undef, so it should abort there
         #  2. index 7+ also returns undef
         return $data[$idx++];

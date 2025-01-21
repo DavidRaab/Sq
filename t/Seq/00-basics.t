@@ -121,11 +121,11 @@ is(
     Seq->init(10, sub($idx) { [$idx+1,$idx ] }),
     'range->indexed vs. init');
 is(
-    (reduce { $a->append($b) } map { Seq->new($_) } 1 .. 10),
+    (reduce { $a->append($b) } map { seq { $_ } } 1 .. 10),
     $range,
     'append a list of wrapped values');
 is(
-    Seq->concat(map { Seq->new($_) } 1 .. 10),
+    Seq->concat(map { seq { $_ } } 1 .. 10),
     $range,
     'concat');
 is(
@@ -133,17 +133,17 @@ is(
     Seq->empty,
     'concat on zero is empty');
 is(
-    Seq->new(Seq->range(1,10)->expand)->to_array,
-    [1 .. 10],
+    seq { Seq->range(1,10)->expand },
+    seq { 1 .. 10 },
     'expand and wrap is isomorph');
 is(
     Seq->new(1..5)->append(
         Seq->new(6..10)
     ),
     Seq->concat(
-        Seq->new(1..3),
-        Seq->new(4..6),
-        Seq->new(7..10),
+        seq { 1..3 },
+        seq { 4..6 },
+        seq { 7..10 },
     ),
     'append vs. concat');
 is(
@@ -308,9 +308,9 @@ is(Seq->new(1,2,3,3,4,2,1,5,6,5,4,7,10,8)->distinct, seq {1,2,3,4,5,6,7,10,8}, '
 
     is($data->length, 4, 'distinct_by starts with 4');
     is($data->distinct->length, 4, 'still 4 as HashRefs are always unequal');
-    is($data->distinct_by(sub($x) { $x->{id} })->length, 3, 'one element less');
+    is($data->distinct_by(key 'id')->length, 3, 'one element less');
     is(
-        $data->distinct_by(sub($x) { $x->{id} }),
+        $data->distinct_by(key 'id'),
         seq {
             {id => 1, name => "Foo"},
             {id => 2, name => "Bar"},
@@ -320,7 +320,7 @@ is(Seq->new(1,2,3,3,4,2,1,5,6,5,4,7,10,8)->distinct, seq {1,2,3,4,5,6,7,10,8}, '
 }
 
 is(
-    Seq->new(qw/A B C D E F/)->mapi(sub($x,$i) { [$x,$i] }),
+    Seq->new(qw/A B C D E F/)->mapi(\&array),
     seq { [A => 0], [B => 1], [C => 2], [D => 3], [E => 4], [F => 5] },
     'mapi');
 
@@ -362,21 +362,21 @@ is($range->find(sub($x) { $x > 10 }),      None, 'find 2');
 is($range->find(sub($x) { $x > 10 })->or(0),  0, 'find 3');
 
 is(
-    $range->bind(sub($x) { Seq->new($x) }),
+    $range->bind(sub($x) { seq {$x} }),
     Seq->range(1,10),
     'bind - somehow like id');
 
 is(
     Seq->new(
-        Seq->new(1,1),
-        Seq->new(2,3,5,8,13),
+        seq { 1,1 },
+        seq { 2,3,5,8,13 },
     )->flatten,
     seq {1,1,2,3,5,8,13},
     'flatten - flattens a seq of seq');
 
-is(Seq->new([1,1], [1,2])->to_array, [[1,1],[1,2]], 'wrap with arrays');
-is(Seq->new([1,1])       ->to_array, [[1,1]],       'wrap with array');
-is(Seq->from_array([1,1]) ->to_array, [1,1],         'from_array vs. wrap');
+is(Seq->new([1,1], [1,2]), seq { [1,1],[1,2] }, 'wrap with arrays');
+is(Seq->new([1,1])       , seq { [1,1] },       'wrap with array');
+is(Seq->from_array([1,1]), seq { 1,1 },         'from_array vs. wrap');
 
 is($range->reduce($add),           Some(55), 'reduce');
 is(Seq->empty->reduce($add),           None, 'reduce on empty 1');
@@ -452,48 +452,48 @@ is($fs->fsts->to_array, [1,2,3,4],            'fsts');
 is($fs->snds->to_array, [qw/Hi Foo Bar Mug/], 'snds');
 
 is(
-    Seq->new([1,2,3], [4,5,6], [7,8,9])->merge->to_array,
-    [1..9],
+    Seq->new([1,2,3], [4,5,6], [7,8,9])->merge,
+    seq { 1..9 },
     'flatten_array');
 
 is(
     Seq::zip(
         Seq->range(1,6),
         Seq->new(qw(A B C D E F))
-    )->to_array,
-    [[qw/1 A/],[qw/2 B/],[qw/3 C/],[qw/4 D/],[qw/5 E/],[qw/6 F/]],
+    ),
+    seq { [qw/1 A/],[qw/2 B/],[qw/3 C/],[qw/4 D/],[qw/5 E/],[qw/6 F/] },
     'zip 1');
 
 is(
     Seq::zip(
         Seq->range(1,3),
         Seq->new(qw(A B C D E F))
-    )->to_array,
-    [[qw/1 A/],[qw/2 B/],[qw/3 C/]],
+    ),
+    seq { [qw/1 A/],[qw/2 B/],[qw/3 C/] },
     'zip 2');
 
 is(
     Seq::zip(
         Seq->range(1,6),
         Seq->new(qw(A B C D))
-    )->to_array,
-    [[qw/1 A/],[qw/2 B/],[qw/3 C/],[qw/4 D/]],
+    ),
+    seq { [qw/1 A/],[qw/2 B/],[qw/3 C/],[qw/4 D/] },
     'zip 3');
 
 is(
     Seq::zip(
         Seq->empty,
         Seq->new(qw(A B C D E F))
-    )->to_array,
-    [],
+    ),
+    Seq->empty,
     'zip 4');
 
 is(
     Seq::zip(
         Seq->range(1,6),
         Seq->empty,
-    )->to_array,
-    [],
+    ),
+    Seq->empty,
     'zip 5');
 
 is(
@@ -714,48 +714,44 @@ is(
 is(
     Seq
     ->new(1, 3, 20, -40, 20, 12, 100, 5, 20)
-    ->take_while(sub($x) { $x < 100 })
-    ->to_array,
-    [1,3,20,-40,20,12],
+    ->take_while(sub($x) { $x < 100 }),
+    seq { 1,3,20,-40,20,12 },
     'take_while 1'
 );
 
 is(
     Seq
     ->new(1, 3, 20, -40, 20, 12, 100, 5, 20)
-    ->take_while(sub($x) { $x > 100 })
-    ->to_array,
-    [],
+    ->take_while(sub($x) { $x > 100 }),
+    Seq->empty,
     'take_while 2'
 );
 
 is(
     Seq
     ->new(1, 3, 20, -40, 20, 12, 100, 5, 20)
-    ->skip_while(sub($x) { $x < 100 })
-    ->to_array,
-    [100, 5, 20],
+    ->skip_while(sub($x) { $x < 100 }),
+    seq { 100, 5, 20 },
     'skip_while 1'
 );
 
 is(
     Seq
     ->new(1, 3, 20, -40, 20, 12, 100, 5, 20)
-    ->skip_while(sub($x) { $x > 100 })
-    ->to_array,
-    [1,3,20,-40,20,12,100,5,20],
+    ->skip_while(sub($x) { $x > 100 }),
+    seq { 1,3,20,-40,20,12,100,5,20 },
     'skip_while 2'
 );
 
 # iter
 {
-    my @iter;    $range->iter(   sub($x) { push @iter,    $x });
+    my @iter; $range->iter(sub($x) { push @iter, $x });
     is(\@iter, [1..10],   'iter');
 }
 
 # iteri
 {
-    my @iteri;    $range->iteri(   sub($x,$i) { push @iteri,    [$i,$x] });
+    my @iteri; $range->iteri(sub($x,$i) { push @iteri, [$i,$x] });
     is(\@iteri, [[0,1], [1,2], [2,3], [3,4], [4,5], [5,6], [6,7], [7,8], [8,9], [9,10]], 'iteri');
 }
 
@@ -805,13 +801,13 @@ is(
         ->split(qr/\+/);
 
     is(
-        $words->to_array,
-        [[qw/Foo Bar Baz/], [qw/maz faz/]],
+        $words,
+        seq { [qw/Foo Bar Baz/], [qw/maz faz/] },
         'strings splitted into arrays');
 
     is(
-        $words->map(sub($inner) { $inner->join('+') })->to_array,
-        ["Foo+Bar+Baz", "maz+faz"],
+        $words->map(sub($inner) { $inner->join('+') }),
+        seq { "Foo+Bar+Baz", "maz+faz" },
         'joining inner arrays');
 }
 
@@ -885,7 +881,7 @@ is(
         'chunked on large Seq');
 
     is(
-        Seq->range(1,1_000_000_000)->chunked(10)->map(sub($a) { $a->sum })->take(3),
+        Seq->range(1,1_000_000_000)->chunked(10)->map(call 'sum')->take(3),
         seq { 55, 155, 255 },
         'chunked check if array is blessed');
 }
@@ -895,7 +891,7 @@ is(
     seq { [1 .. 10], [2 .. 11], [3 .. 12] },
     'windowed on large Seq');
 is(
-    Seq->range(1,1_000_000_000)->windowed(10)->map(sub($a) { $a->sum })->take(3),
+    Seq->range(1,1_000_000_000)->windowed(10)->map(call 'sum')->take(3),
     seq { 55, 65, 75 },
     'windowed - check if array is blessed');
 is(

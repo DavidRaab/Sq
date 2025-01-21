@@ -1,13 +1,13 @@
 #!perl
 use 5.036;
 use Sq;
-use Sq::Sig;
 use Sq::Test;
+use Sq::Sig;
 
 my $data1 =
     Array->new(
-        Array->new(1,1),
-        Array->new(2,3,5,8,13),
+        array(1,1),
+        array(2,3,5,8,13),
     );
 
 # test both calling styles

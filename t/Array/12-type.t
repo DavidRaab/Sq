@@ -6,7 +6,7 @@ use Sq::Test;
 use Sq::Sig;
 
 # hex and time parser
-my $hex  = p_matchf(qr/0x([0-9a-zA-Z]+)/, sub($hex) { hex $hex });
+my $hex  = p_matchf(qr/0x([0-9a-zA-Z]+)/, Str->hex);
 my $time = p_matchf(qr/(\d\d?):(\d\d?)/,  sub($hour,$min) {
     $hour < 24 && $min < 60 ? ($hour,$min) : ();
 });

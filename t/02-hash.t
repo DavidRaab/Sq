@@ -4,10 +4,6 @@ use Sq;
 use Sq::Sig;
 use Sq::Test;
 
-# Helper functions
-my $by_str = sub($x, $y) { $x cmp $y };
-my $by_num = sub($x, $y) { $x <=> $y };
-
 # new & bless
 {
 
@@ -60,8 +56,8 @@ my $data = hash(
 );
 
 # keys & values
-is($data->keys->sort($by_str),   [qw/bar baz foo/], 'check keys');
-is($data->values->sort($by_num), [1, 5, 10],        'check values');
+is($data->keys->sort(by_str),   [qw/bar baz foo/], 'check keys');
+is($data->values->sort(by_num), [1, 5, 10],        'check values');
 
 # map
 my $data2 = $data->map(sub($k,$v) {
@@ -262,7 +258,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
         tags => ['one', 'two'],
     }, 'pushing on not array, turns it into an array');
 
-    $data->change(tags => sub($array) { $array->join(',') });
+    $data->change(tags => call 'join', ',');
     is($data, {
         id => 1,
         tags => 'one,two',
@@ -294,7 +290,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
         {id => 1, name => "foo", tags => "three" },
     ];
 
-    my $data = Array->new(
+    my $data = array(
         hash(id => 1, name => "foo", tags => "one"),
         hash(id => 1, name => "foo", tags => "two"),
         hash(id => 1, name => "foo", tags => "three"),
@@ -359,7 +355,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     my $entry5 = hash(
         id   => $data->[0]->{id},
         name => $data->[0]->{name},
-        tags => $data->map(sub($x) { $x->{tags} }),
+        tags => $data->map(key 'tags'),
     );
     is($data, $initial, '$data does not mutate');
     is($entry5, {id => 1, name => 'foo', tags => [qw/one two three/]}, 'Hash->new with $data->map');
@@ -442,17 +438,17 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     );
     is(
         $games->withf(
-            n64  => sub($array) { $array->join(',') },
-            snes => sub($array) { $array->join(',') },
+            n64  => call('join', ','),
+            snes => call('join', ','),
         ),
         { n64 => "Mario 64,Zelda", snes => "Super Mario Kart,Street Fighter 2" },
         'pod example 3');
 
     is(
         $games->withf(
-            n64  => sub($array) { $array->join(',') },
-            snes => sub($array) { $array->join(',') },
-            blub => sub($array) { $array->join(',') },
+            n64  => call('join', ','),
+            snes => call('join', ','),
+            blub => call('join', ','),
         ),
         { n64 => "Mario 64,Zelda", snes => "Super Mario Kart,Street Fighter 2" },
         'not existing keys are ignored');
