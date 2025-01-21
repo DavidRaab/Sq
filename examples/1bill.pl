@@ -14,15 +14,13 @@ my $first  =
 my $second =
     Seq->range(0,1_000_000_000);
 
-my $start = time();
+Sq->bench->it(sub{
+    print "Are those sequences lazy?\n";
+    if ( equal($first,$second) ) {
+        print "Yep!\n";
+    }
+    else {
+        print "Yep!\n";
+    }
+});
 
-print "Are those sequences lazy?\n";
-if ( equal($first,$second) ) {
-    print "Yep!\n";
-}
-else {
-    print "Yep!\n";
-}
-
-my $stop = time();
-printf "Time took: %f seconds\n", ($stop - $start);
