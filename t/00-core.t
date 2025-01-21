@@ -91,6 +91,44 @@ is(
     is($fib, seq { 1,1,2,3,5,8,13,21,34,55,89,144 }, 'fibs');
 }
 
+# For a lazy fibonacci sequence you can write
+{
+    # This defines a fibonacci sequence, but will not calculate any value
+    # when you not query it for data. It would be theoretically infinite.
+    # But it isn't because we just have 64bit floating values, so at some point
+    # you have an float-overlflow
+    my $fib =
+        Seq->concat(
+            seq { 1,1 },
+            Seq->unfold([1,1], sub($state) {
+                # fst() is same as $array->[0]
+                # snd() is same as $array->[1]
+                my $next = fst($state) + snd($state);
+                return $next, [snd $state, $next];
+            })
+        );
+
+    # take(20) will only compute 20 values at max. The Testing system understands
+    # sequences and can compare them!
+    is(
+        $fib->take(20),
+        seq { 1,1,2,3,5,8,13,21,34,55,89,144,233,377,610,987,1597,2584,4181,6765 },
+        'First 20 Fibonacci numbers 1');
+
+    # to_array() will immediately calculate the 20 values and creates an array
+    is(
+        $fib->take(20)->to_array,
+        [ 1,1,2,3,5,8,13,21,34,55,89,144,233,377,610,987,1597,2584,4181,6765 ],
+        'First 20 Fibonacci numbers 2');
+
+    # taking only a certain amount of numbers from a sequence is built into to_array
+    is(
+        $fib->to_array(20),
+        [ 1,1,2,3,5,8,13,21,34,55,89,144,233,377,610,987,1597,2584,4181,6765 ],
+        'First 20 Fibonacci numbers 3');
+}
+
+
 # key is a function to just select a key from a hash.
 {
     my $data = sq [
