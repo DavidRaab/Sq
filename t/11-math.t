@@ -101,4 +101,14 @@ use Sq::Test;
     );
 }
 
+{
+    my $fac = Sq->math->fac;
+    is($fac->(0),   1, 'fac 1');
+    is($fac->(1),   1, 'fac 2');
+    is($fac->(2),   2, 'fac 3');
+    is($fac->(3),   6, 'fac 4');
+    is($fac->(4),  24, 'fac 5');
+    is($fac->(5), 120, 'fac 6');
+}
+
 done_testing;
