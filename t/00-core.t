@@ -82,6 +82,8 @@ is(
     'map_rec');
 
 # seq {} syntax
+# Useful for directly defining a sequence with some values - undef is used internally
+# in a sequence for aborting the sequence. So no value after an undef will be used.
 is(
     seq {1,2,3,undef,4,5,6},
     seq {1,2,3},
