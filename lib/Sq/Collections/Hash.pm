@@ -81,7 +81,7 @@ sub pick($hash, $f_opt) {
     my $opt;
     for my ($k,$v) ( %$hash ) {
         $opt = $f_opt->($k,$v);
-        return $opt if Option::is_some($opt);
+        return $opt if @$opt;
     }
     return Option::None();
 }
