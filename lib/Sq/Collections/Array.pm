@@ -367,6 +367,7 @@ sub keep($array, $predicate) {
     return CORE::bless([grep { $predicate->($_) } @$array], 'Array');
 }
 
+# TODO: Should keep_some work with an array of different types?
 sub keep_some($array_of_opt) {
     my @new;
     for my $opt ( @$array_of_opt ) {
