@@ -27,7 +27,7 @@ sub locked($, $href) {
 }
 
 sub init($, $amount, $f) {
-    my $hash = new('Hash');
+    my $hash = CORE::bless({}, 'Hash');
     for my $idx ( 0 .. $amount-1 ) {
         my ($k,$v) = $f->($idx);
         $hash->{$k} = $v;
@@ -36,7 +36,7 @@ sub init($, $amount, $f) {
 }
 
 sub from_array($, $array, $f) {
-    my $new  = new('Hash');
+    my $new  = CORE::bless({}, 'Hash');
     my $stop = @$array;
     my ($k,$v);
     for (my $i=0; $i < $stop; $i++) {
@@ -214,7 +214,7 @@ sub copy($hash) {
 
 # Hash<'a> -> ListContext<string> -> Array<Option<'a>>
 sub extract($hash, @keys) {
-    my $array = Array->new;
+    my $array = CORE::bless([], 'Array');
     for my $key ( @keys ) {
         push @$array, Option::Some($hash->{$key});
     }
@@ -222,9 +222,10 @@ sub extract($hash, @keys) {
 }
 
 sub slice($hash, @keys) {
-    my $new = Hash->new;
+    my $new = CORE::bless({}, 'Hash');
+    my $v;
     for my $key ( @keys ) {
-        my $v = $hash->{$key};
+        $v = $hash->{$key};
         $new->{$key} = $v if defined $v;
     }
     return $new;
