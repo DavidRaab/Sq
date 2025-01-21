@@ -12,6 +12,7 @@ our @EXPORT = (
     qw(id fst snd),
     qw(by_num by_str by_stri),
     qw(array hash record),
+    qw(Str),
     Some    => sub { \&Option::Some           },
     None    => sub { \&Option::None           },
     Ok      => sub { \&Result::Ok             },
@@ -30,6 +31,7 @@ sub import {
 
     # Load some modules on import()
     if ( $first_load ) {
+        require Sq::Core::Str;
         require Sq::Type;
         require Sq::Fs;
         require Sq::Io;
@@ -96,6 +98,9 @@ sub fs($)    { 'Sq::Fs'    }
 sub math($)  { 'Sq::Math'  }
 sub fmt($)   { 'Sq::Fmt'   }
 sub bench($) { require Sq::Bench; return 'Sq::Bench' }
+
+# Like a Str module
+sub Str :prototype() { return 'Sq::Core::Str' }
 
 # Important functions used in FP code. So adding them.
 sub id  :prototype($) { return $_[0]    }

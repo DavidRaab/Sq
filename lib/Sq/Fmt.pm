@@ -70,25 +70,9 @@ static 'table', sub($href) {
     return;
 };
 
-# TODO: I could detect/load HTML::Escape and when present use that as
-#       escape_html(), otherwise the pure perl version is used.
-static escape_html => sub($str) {
-    state %mapping = (
-        '"' => '&quot;',
-        '&' => '&amp;',
-        "'" => '&#39;',
-        '<' => '&lt;',
-        '>' => '&gt;',
-        '`' => '&#96;',
-        '{' => '&#123;',
-        '}' => '&#125;',
-    );
-    return $str =~ s/(["&'<>`{}])/$mapping{$1}/rge;
-};
-
 # TODO: Restrictions for key?
 my sub attr($attr) {
-    state $escape = escape_html();
+    state $escape = Str->escape_html;
     my (@pairs, $value);
     for my $key ( sort { $a cmp $b } keys %$attr ) {
         $value = $attr->{$key};
@@ -110,7 +94,7 @@ static html => with_dispatch(
     },
     # when a bare string is passed
     arg ['str'] => sub($text) {
-        state $escape = escape_html();
+        state $escape = Str->escape_html;
         [HTML => $escape->($text)];
     },
     # void tags like br -- i could add type-check that runs into an error
