@@ -452,14 +452,14 @@ It exports the following functions by default:
 
 | Category    | Functions                        |
 |----         | ---                              |
-| Creation    | sq key Some None Ok Err new type |
-| Functions   | multi static                     |
+| Creation    | sq key Some None Ok Err new type array hash |
+| Functions   | fn multi static with_dispatch type_cond record |
 | Equality    | equal                            |
 | OBJ         | call                             |
 | Scope       | assign lazy                      |
 | Helpers     | id fst snd dump dumps            |
 | Comparision | by_num by_str by_stri            |
-| Type-checks | is_num is_str is_array is_hash is_seq is_opt is_result is_ref |
+| Type-checks | is_num is_str is_array is_hash is_seq is_opt is_result is_ref is_regex is_type |
 
 # SYNOPSIS
 
