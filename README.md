@@ -307,6 +307,14 @@ my $result =
         Some => sub($x) { $x * $x },
         None => sub     { 0       },
     );
+
+# this will throw an exception because "some/none" instead of "Some/None"
+# was passed.
+my $result =
+    $opt->match(
+        some => sub($x) { $x * $x },
+        none => sub     { 0       },
+    );
 ```
 
 # Seq Module
@@ -326,7 +334,7 @@ my $big = Seq->range(1, 1_000_000_000);
 # because it works on 64-bit floats
 my $fib =
     Seq->concat(
-        Seq->new(1,1),
+        seq { 1,1 },
         Seq->unfold([1,1], sub($state) {
             my $next = $state->[0] + $state->[1];
             return $next, [$state->[1],$next];
@@ -354,19 +362,25 @@ $fib->take(5)->iter(sub($x) {
 my $cards =
     Seq::cartesian(
         seq { qw/clubs spades hearts diamond/ },
-        seq { qw/7 8 9 10 J Q K A/)           },
+        seq { qw/7 8 9 10 J Q K A/            },
     );
 
 use Path::Tiny qw(path);
 # get the maximum id from test-files so far
 my $maximum_id =
-    Sq->io->children('t')        # a sequence of Path::Tiny objects
+    Sq->fs
+    ->children('t')              # a sequence of Path::Tiny objects
     ->map(call 'basename')       # calls ->basename method on objects
-    ->rxm(qr/\A(\d+) .*\.t/xms)  # matches and auto extract () in array
+    ->rxm(qr/\A(\d+) .*\.t/xms)  # matches and auto extract all () in an array
     ->fsts                       # returns idx0 of inner array
     ->max                        # pick highest numbers - starts computation
     ->or(0);                     # max returns optional
                                  #   or(0) extracts or gives default value
+
+# Now starts calculating the 10_000 items and prints them
+$smaller->iter(sub($x) {
+    say $x;
+});
 ```
 
 # Seq counting to 1 Billion
@@ -381,23 +395,21 @@ use Time::HiRes qw(time);
 my $first  =
     Seq
     ->range(1,1_000_000_000)
-    ->do(sub($num){ print "$num\n" if $num % 100_000 == 0 });
+    ->do_every(100_000, sub($num,$idx){ print "$num\n" });
 
 my $second =
     Seq->range(1,1_000_000_000);
 
-my $start = time();
-
-print "Are those sequences lazy?\n";
-if ( equal($first,$second) ) {
-    print "Yep!\n";
-}
-else {
-    print "No!\n";
-}
-
-my $stop = time();
-printf "Time took: %f seconds\n", ($stop - $start);
+# this executes the subroutine and prints how long it took when finished.
+Sq->bench->it(sub {
+    print "Are those sequences lazy?\n";
+    if ( equal($first,$second) ) {
+        print "Yes, and they are the same!\n";
+    }
+    else {
+        print "Yes, but not the same!\n";
+    }
+});
 ```
 
 or: `t/Seq/11-lazy.t`
