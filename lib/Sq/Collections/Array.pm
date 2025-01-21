@@ -377,9 +377,9 @@ sub keep_some($array_of_opt) {
 }
 
 sub keep_some_by($array, $f) {
-    my @new;
+    my (@new, $opt);
     for my $x ( @$array ) {
-        my $opt = $f->($x);
+        $opt = $f->($x);
         push @new, @$opt if @$opt;
     }
     return CORE::bless(\@new, 'Array');
