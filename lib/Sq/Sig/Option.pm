@@ -35,7 +35,7 @@ sig('Option::bind4',        $opt, $opt, $opt, $opt, t_sub, $opt);
 sigt('Option::bind_v',
     t_array(
         t_of (t_or($opt, t_sub)), # this is not completely correct. only last one is sub
-        t_idx(-1, t_sub)           # expect last one as function
+        t_idx(-1, t_sub)          # expect last one as function
     ),
     $opt
 );
@@ -47,7 +47,7 @@ sig('Option::map4',        $opt, $opt, $opt, $opt, t_sub, $opt);
 sigt('Option::map_v',
     t_array(
         t_of (t_or($opt, t_sub)), # this is not completely correct. only last one is sub
-        t_idx(-1, t_sub)           # expect last one as function
+        t_idx(-1, t_sub)          # expect last one as function
     ),
     $opt
 );
