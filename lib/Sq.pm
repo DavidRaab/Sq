@@ -318,7 +318,8 @@ sub new($what, @args) {
 sub with_dispatch(@tf) {
     return sub {
         my $it = List::MoreUtils::natatime 2, @tf;
-        while ( my ($type, $f) = $it->() ) {
+        my ($type,$f);
+        while ( ($type, $f) = $it->() ) {
             if ( Sq::Type::t_valid($type, \@_) ) {
                 return $f->(@_);
             }
