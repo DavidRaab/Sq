@@ -84,8 +84,9 @@ my sub attr($attr) {
 my $void = type [enum => qw/area base br col embed hr img input link meta source track wbr/];
 
 # Usually i would suggest to use `with_dispatch` as it can handle multiple
-# function arguments. But here `html` is written to only expect a single
-# input argument. Then you also can use `type_cond`.
+# function arguments. But here all cases of `html` are written to only expect
+# a single input argument. Either a string, or an array. When your function
+# only has a single argument you also can use `type_cond`.
 static html => type_cond(
     # [HTML => "string"] -> stays without any change
     type [tuple => [eq => 'HTML'], ['str']] => sub($t) {
