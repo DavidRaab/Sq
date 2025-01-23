@@ -82,49 +82,52 @@ my sub attr($attr) {
 }
 
 my $void = type [enum => qw/area base br col embed hr img input link meta source track wbr/];
-my sub arg :prototype($) { type [tuple => @_] }
-static html => with_dispatch(
+
+# Usually i would prefer to use `with_dispatch` as it can handle multiple
+# function arguments. But here `html` is written to only expect a single
+# input argument. Then you also can use `type_cond`.
+static html => type_cond(
     # [HTML => "string"] -> stays without any change
-    arg [tuple => [eq => 'HTML'], ['str']] => sub($t) {
+    type [tuple => [eq => 'HTML'], ['str']] => sub($t) {
         return $t;
     },
     # TODO: script tag has no quoting at all?
-    arg [tuple => [eq => 'script'], ['str']] => sub($t) {
+    type [tuple => [eq => 'script'], ['str']] => sub($t) {
         return [HTML => sprintf "<script>%s</script>", $t->[1]];
     },
     # when a bare string is passed
-    arg ['str'] => sub($text) {
+    type ['str'] => sub($text) {
         state $escape = Str->escape_html;
         [HTML => $escape->($text)];
     },
     # void tags like br -- i could add type-check that runs into an error
     #                      when void tags are passed with childs
-    arg [tuple => $void] => sub($t) {
+    type [tuple => $void] => sub($t) {
         [HTML => sprintf "<%s>", $t->[0]]
     },
     # void tags with attributes
-    arg [tuple => $void, ['hash']] => sub($t) {
+    type [tuple => $void, ['hash']] => sub($t) {
         [HTML => sprintf "<%s %s>", $t->[0], attr($t->[1])]
     },
     # all other non-void tags, but no attribute or child was passed -- is this illegal?
-    arg [tuple => ['str']] => sub($t) {
+    type [tuple => ['str']] => sub($t) {
         my ($tag) = @$t;
         [HTML => sprintf "<%s></%s>", $tag, $tag];
     },
     # a tag with attributes and no childs: [a => {href => "url"}]
-    arg [tuple => ['str'], ['hash']] => sub($t) {
+    type [tuple => ['str'], ['hash']] => sub($t) {
         my ($tag, $attr) = @$t;
         [HTML => sprintf "<%s %s></%s>", $tag, attr($attr), $tag];
     },
     # a tag with attributes and childs: [a => {href => "url"}, [img {src => "url"}]]
-    arg [tuplev => ['str'], ['hash'], [min => 1]] => sub($args) {
+    type [tuplev => ['str'], ['hash'], [min => 1]] => sub($args) {
         state $html = html();
         my ($tag, $attr, @tags) = @$args;
         my $inner = join " ", map { $html->($_)->[1] } @tags;
         [HTML => sprintf "<%s %s>%s</%s>", $tag, attr($attr), $inner, $tag];
     },
     # a tag with only childs: [p => [a => {href => "url"}] ]
-    arg [tuplev => ['str'], ['array']] => sub($args) {
+    type [tuplev => ['str'], ['array']] => sub($args) {
         state $html = html();
         my ($tag, @tags) = @$args;
         my $inner = join " ", map { $html->($_)->[1] } @tags;
