@@ -83,7 +83,7 @@ my sub attr($attr) {
 
 my $void = type [enum => qw/area base br col embed hr img input link meta source track wbr/];
 
-# Usually i would prefer to use `with_dispatch` as it can handle multiple
+# Usually i would suggest to use `with_dispatch` as it can handle multiple
 # function arguments. But here `html` is written to only expect a single
 # input argument. Then you also can use `type_cond`.
 static html => type_cond(
