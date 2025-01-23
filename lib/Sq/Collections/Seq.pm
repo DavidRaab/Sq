@@ -8,8 +8,7 @@ use subs 'bind', 'join', 'select', 'last', 'sort', 'map', 'length';
 #       chain
 #       extract(predicate, predicate)
 #       foldBack, average, average_by,
-#       pairwise, transpose, unzip
-#       transpose,
+#       unzip, transpose
 #       minmax, minmax_by,
 #       scan, mapFold, except/exclude
 #       splitInto
