@@ -4,8 +4,6 @@ use 5.036;
 use Hash::Util ();
 use subs 'bind', 'keys', 'values', 'bless', 'map', 'delete', 'length';
 
-# TODO: equal, eual_values, is_disjoint
-
 ### CONSTRUCTORS
 
 sub empty($) {
