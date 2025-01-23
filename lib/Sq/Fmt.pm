@@ -81,8 +81,9 @@ my sub attr($attr) {
     return join(" ", @pairs);
 }
 
+# HTML tags that are "void". Means, they have no children and because of
+# that they don't need a closing tag. Like: <br>
 my $void = type [enum => qw/area base br col embed hr img input link meta source track wbr/];
-
 # Usually i would suggest to use `with_dispatch` as it can handle multiple
 # function arguments. But here all cases of `html` are written to only expect
 # a single input argument. Either a string, or an array. When your function
