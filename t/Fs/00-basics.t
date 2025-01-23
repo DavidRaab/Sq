@@ -8,6 +8,8 @@ use Sq::Sig;
 use FindBin qw($Dir);
 use Path::Tiny;
 
+# TODO: temp-file, current working dir, forlder of binary
+
 ok(Sq->fs->compare_text(
     path($Dir, 'data', 'hop-preface.txt'),
     path($Dir, 'data', 'hop-preface.md'),
@@ -19,11 +21,11 @@ is($file->length, 52, 'file lines');
 is($file->rxm(qr/lisp/i)->length, 15, 'lines mentioned lisp');
 is(
     $file->rx(qr/lisp/i)->first,
-    Some("Around 1993 I started reading books about Lisp, and I discovered something\n"),
+    Some("Around 1993 I started reading books about Lisp, and I discovered something"),
     'first line containing lisp');
 is(
     $file->rx(qr/lisp/i)->first,
-    Some("Around 1993 I started reading books about Lisp, and I discovered something\n"),
+    Some("Around 1993 I started reading books about Lisp, and I discovered something"),
     'first line containing lisp');
 
 ok(Sq->fs->recurse($Dir)->length > 3, 'more than 3 files');
@@ -43,7 +45,7 @@ is(
 
 is(
     Sq->fs->read_text_gz($Dir, 'data', 'hop-preface.md.gz')->take(1),
-    seq { "# Preface\n" },
+    seq { "# Preface" },
     'read one line from gz');
 
 is(
@@ -54,27 +56,27 @@ is(
 is(
     Sq->fs->read_text($Dir, 'data', 'utf8.txt'),
     seq {
-        "# Höder\n",
-        "\n",
-        "Töxt with söme höder.\n",
+        "# Höder",
+        "",
+        "Töxt with söme höder.",
     },
     'read utf8.txt');
 
 is(
     Sq->fs->read_text_gz($Dir, 'data', 'utf8.txt.gz'),
     seq {
-        "# Höder\n",
-        "\n",
-        "Töxt with söme höder.\n",
+        "# Höder",
+        "",
+        "Töxt with söme höder.",
     },
     'read utf8.txt.gz');
 
 is(
     Sq->fs->read_text($Dir, 'data', 'utf8.txt'),
     seq {
-        "# Höder\n",
-        "\n",
-        "Töxt with söme höder.\n",
+        "# Höder",
+        "",
+        "Töxt with söme höder.",
     },
     'read utf8.txt');
 
@@ -90,6 +92,7 @@ is(
 
 nok(Sq->fs->sha512($Dir, 'data', 'NotExisting'), 'sha512 2');
 
+# is the same because text is ASCII
 is(
       Sq->fs->read_raw  (100, $Dir, 'data', 'hop-preface.md')->to_array(1),
     [ Sq->fs->read_bytes(100, $Dir, 'data', 'hop-preface.md')->get ],

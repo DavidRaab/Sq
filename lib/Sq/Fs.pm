@@ -15,7 +15,10 @@ static read_text => sub(@path) {
             my $line;
             return sub {
                 $line = <$fh>;
-                return $line if defined $line;
+                if ( defined $line ) {
+                    chomp $line;
+                    return $line;
+                }
                 close $fh;
                 undef $fh;
             };
@@ -140,7 +143,10 @@ static read_text_gz => sub(@path) {
             my $line;
             return sub {
                 $line = <$fh>;
-                return $line if defined $line;
+                if ( defined $line ) {
+                    chomp $line;
+                    return $line;
+                }
                 close $fh;
                 undef $fh;
             };
