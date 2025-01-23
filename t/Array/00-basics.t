@@ -2181,4 +2181,12 @@ is(
         'map_array 4');
 }
 
+{
+    my $data = array(1,2,3,4,5);
+    is($data->head, 1, 'head 1');
+    is($data->tail, [2,3,4,5], 'tail 1');
+    is($data->tail->head, 2, 'head 2');
+    is($data, [1,2,3,4,5], '$data unchanged');
+}
+
 done_testing;

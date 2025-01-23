@@ -821,6 +821,13 @@ sub map_array($array, $f_map, $f_fold) {
     return $f_fold->($new);
 }
 
+# not very efficent ...
+sub tail($array) {
+    Carp::croak "Array::tail on empty Array" if @$array == 0;
+    return CORE::bless([], 'Array') if @$array == 1;
+    return CORE::bless([$array->@[1.. $array->$#*]], 'Array');
+}
+
 #-----------------------------------------------------------------------------#
 # ARRAY 2D                                                                    #
 #          Here are functions designed for working with 2D Arrays             #
@@ -943,6 +950,11 @@ sub iter2d($aoa, $f) {
 # CONVERTER                                                                   #
 #         Those are functions converting Array to none Array types            #
 #-----------------------------------------------------------------------------#
+
+sub head($array) {
+    Carp::croak "Array::head: Array must have at least one element" if @$array == 0;
+    $array->[0];
+}
 
 # fold : Array<'a> -> 'State -> (a -> 'State -> 'State) -> 'State
 sub fold($array, $state, $folder) {

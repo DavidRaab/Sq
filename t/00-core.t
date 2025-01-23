@@ -403,6 +403,25 @@ is(
         {id => 2, name => "Frank", points => 12 },
         {id => 3, name => "Peter", points => 33 },
     ],
-    'fhash');
+    'record');
+
+# Haskell's "slow" QuickSort
+{
+    # generate an array with random 1_000 ints
+    my $array = gen_run gen [repeat => 1_000, [int => 1_000, 5_000]];
+
+    sub qsort($array) {
+        return $array if @$array == 0 || @$array == 1;
+        my $pivot = $array->head;
+        my $rest  = $array->tail;
+        Array->concat(
+            qsort($rest->keep(sub($x) { $x <= $pivot })),
+            [$pivot],
+            qsort($rest->keep(sub($x) { $x >  $pivot })),
+        );
+    }
+
+    is(qsort($array), $array->sort(by_num), 'qsort');
+}
 
 done_testing;
