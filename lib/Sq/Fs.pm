@@ -23,6 +23,109 @@ static read_text => sub(@path) {
     });
 };
 
+my $path = type [or => ['str'], [ref => 'Path::Tiny']];
+static write_text => with_dispatch(
+    type [tuple => $path, ['str']] => sub($file,$content) {
+        # We want to write utf-8 but still open as raw because the encoding
+        # is done manually. Perl string are either raw (Latin1 ISO-8859-1)
+        # or Unicode (UTF-8). When a user provides a raw string
+        # then no additionaly encoding to UTF-8 is done, and we assume
+        # the user already did an Encode::encode('UTF-8', $str) or similar
+        # call. Without this handling we would get double encoded output.
+        my $err = open my $fh, '>:raw', $file;
+        if ( !defined $err ) {
+            return Err({op => 'open', file => $file, message => $!});
+        }
+
+        # when string is in unicode, we encode it to utf8 before printing
+        if ( utf8::is_utf8($content) ) {
+            utf8::encode($content);
+            $err = print {$fh} $content;
+        }
+        # string without unicode (utf8) flag is printed as-is. We assume
+        # the user already encoded the string.
+        else {
+            $err = print {$fh} $content;
+        }
+        # check print for errors
+        if ( !$err ) {
+            close $fh;
+            return Err({op => 'print', file => $file, message => $!});
+        }
+
+        # close file
+        $err = close $fh;
+        if ( !$err ) {
+            return Err({op => 'close', file => $file, message => $!});
+        }
+
+        return Ok(1);
+    },
+    type [tuple => $path, [array => [of => ['str']]]] => sub($file,$aoa) {
+        # open file
+        my $err = open my $fh, '>:raw', $file;
+        if ( !defined $err ) {
+            return Err({op => 'open', file => $file, message => $!});
+        }
+
+        # write file
+        for ( @$aoa ) {
+            # we need a copy, not an alias. Otherwise the function would
+            # change encoding of the string in the array.
+            my $line = $_;
+            if ( utf8::is_utf8($line) ) {
+                utf8::encode($line);
+                $err = print {$fh} $line, "\n";
+            }
+            else {
+                $err = print {$fh} $line, "\n";
+            }
+            if ( !$err ) {
+                close $fh;
+                return Err({op => 'print', file => $file, message => $!});
+            }
+        }
+
+        # close file
+        $err = close $fh;
+        if ( !$err ) {
+            return Err({op => 'close', file => $file, message => $!});
+        }
+
+        return Ok(1);
+    },
+    type [tuple => $path, ['seq']] => sub($file, $seq) {
+        # open file
+        my $err = open my $fh, '>:raw', $file;
+        if ( !defined $err ) {
+            return Err({op => 'open', file => $file, message => $!});
+        }
+
+        # write file
+        $seq->iter(sub($line) {
+            if ( utf8::is_utf8($line) ) {
+                utf8::encode($line);
+                $err = print {$fh} $line, "\n";
+            }
+            else {
+                $err = print {$fh} $line, "\n";
+            }
+            if ( !$err ) {
+                close $fh;
+                return Err({op => 'print', file => $file, message => $!});
+            }
+        });
+
+        # close file
+        $err = close $fh;
+        if ( !$err ) {
+            return Err({op => 'close', file => $file, message => $!});
+        }
+
+        return Ok(1);
+    },
+);
+
 # reads a text file that is compressed as .gz
 static read_text_gz => sub(@path) {
     require PerlIO::gzip;

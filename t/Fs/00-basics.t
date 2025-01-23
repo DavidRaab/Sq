@@ -95,4 +95,51 @@ is(
     [ Sq->fs->read_bytes(100, $Dir, 'data', 'hop-preface.md')->get ],
     'read_bytes');
 
+# write_text(file,string)
+{
+    my $txt = "hällö\n";
+    my $tmp = Path::Tiny->tempfile("SqTestXXXXXXX");
+    ok(utf8::is_utf8($txt),            'string is unicode');
+    ok(Sq->fs->write_text($tmp, $txt), 'write file');
+    ok(utf8::is_utf8($txt),            'string stays unicode');
+    is(
+        Sq->fs->read_text($tmp),
+        seq { "hällö" },         # newlines are auto-removed when reading a file
+        'written file same as string');
+}
+
+# write_tex(file,aoa)
+{
+    my $content = [
+        "# Hällö",
+        "",
+        "This is an example for writing multiple lines",
+        "stored in an array",
+    ];
+
+    my $tmp = Path::Tiny->tempfile("SqTestXXXXXXX");
+    ok(utf8::is_utf8($content->[0]),       'string is unicode');
+    ok(Sq->fs->write_text($tmp, $content), 'write file');
+    ok(utf8::is_utf8($content->[0]),       'string stays unicode');
+    is(
+        Sq->fs->read_text($tmp)->to_array,
+        $content,
+        'written file same as string');
+}
+
+# write_tex(file,seq)
+{
+    my $content = Seq->concat(
+        seq { "# Hälö" },
+        Seq->init(10, sub($idx) { "1" x $idx }),
+    );
+
+    my $tmp = Path::Tiny->tempfile("SqTestXXXXXXX");
+    ok(Sq->fs->write_text($tmp, $content), 'write file');
+    is(
+        Sq->fs->read_text($tmp),
+        $content,
+        'written file same as string');
+}
+
 done_testing;
