@@ -75,7 +75,7 @@ static permute_count_up => sub($array) {
     if ( $array->[$idx] > $max ) {
         $array->[$idx] = 0;
         $idx--;
-        return if $idx < 0;
+        return 0 if $idx < 0;
         $max = @$array - ($idx+1);
         goto UP;
     }

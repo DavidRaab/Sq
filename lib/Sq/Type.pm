@@ -5,7 +5,7 @@ use Sq::Exporter;
 our @EXPORT = (
     qw(type),
     qw(t_run t_valid t_assert t_or t_is t_not),       # Basic
-    qw(t_str t_enum t_match t_matchf t_parser),       # String
+    qw(t_str t_enum t_match t_matchf t_parser t_eq),  # String
     qw(t_num t_int t_positive t_negative t_range),    # Numbers
     qw(t_opt),
     qw(t_hash t_with_keys t_keys t_as_hash t_key_is), # Hash
@@ -163,6 +163,16 @@ sub t_keys(%kt) {
             return $valid;
         }
         return 'keys: not a hash';
+    }
+}
+
+sub t_eq($expect) {
+    return sub($any) {
+        if ( ref $any eq "" ) {
+            return $valid if $any eq $expect;
+            return "eq: Expected '$expect' Got '$any'";
+        }
+        return "eq: Not a string";
     }
 }
 

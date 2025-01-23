@@ -11,7 +11,7 @@ my $opt   = t_opt;
 my $aos   = t_array(t_of $seq);
 my $hoa   = t_hash (t_of t_array);
 my $aoa   = t_array(t_of t_array);
-my $class = t_enum('Seq');
+my $class = t_eq('Seq');
 
 ### CONSTRUCTORS
 
@@ -69,6 +69,7 @@ sig('Seq::intersperse',   $seq, $any,           $seq);
 sig('Seq::infinity',      $seq,                 $seq);
 sig('Seq::repeat',        $seq, t_int,          $seq);
 sig('Seq::trim',          $seq,                 $seq);
+sig('Seq::permute',       $seq,                 $seq);
 
 # sig('Seq::sort_hash_str', $aoh,    t_str,        $aoh);
 # sigt('Seq::slice',             t_tuplev($seq, $aint), $seq);

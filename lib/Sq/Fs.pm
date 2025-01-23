@@ -236,7 +236,7 @@ static sha512 => sub(@paths) {
     return Err("Could not open '$file': $!") if !defined $err;
 
     require Digest::SHA;
-    my $sha  = Digest::SHA->new('sha512');
+    my $sha = Digest::SHA->new('sha512');
     $sha->addfile($fh);
 
     return Ok($sha->hexdigest);

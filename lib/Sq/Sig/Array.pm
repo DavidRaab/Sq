@@ -6,29 +6,30 @@ use Sq::Signature;
 # Some predefined types
 my $array = t_array;
 my $hash  = t_hash;
-my $aoa   = t_array(t_of t_array);
-my $aoh   = t_array(t_of t_hash);
-my $hoa   = t_hash (t_of t_array);
-my $aint  = t_array(t_of t_int);
-my $anum  = t_array(t_of t_num);
-my $astr  = t_array(t_of t_str);
 my $any   = t_any;
 my $opt   = t_opt;
 my $sub   = t_sub;
+my $aoa   = t_array(t_of $array);
+my $aoh   = t_array(t_of $hash);
+my $hoa   = t_hash (t_of $array);
+my $aint  = t_array(t_of t_int);
+my $anum  = t_array(t_of t_num);
+my $astr  = t_array(t_of t_str);
 my $aopt  = t_array(t_of $opt);
+my $ares  = t_array(t_of t_result);
 my $pint  = t_int(t_positive);
-my $class = t_enum('Array');
+my $class = t_eq('Array');
 
 ### CONSTRUCTORS
 
 sigt('Array::new',        t_tuplev($class, $array),    $array);
 sigt('Array::concat',     t_tuplev($class, $aoa),      $array);
 sig ('Array::empty',      $class,                      $array);
-sig ('Array::replicate',  $pint, $any,               $array);
+sig ('Array::replicate',  $pint, $any,                 $array);
 sig ('Array::bless',      $class, $array,              $array);
 sig ('Array::from_array', $class, $array,              $array);
-sig ('Array::init',       $pint, $sub,               $array);
-sig ('Array::init2d',     $pint, $pint, $sub,        $array);
+sig ('Array::init',       $pint, $sub,                 $array);
+sig ('Array::init2d',     $pint, $pint, $sub,          $array);
 # Second argument is 'State, would be good to back-reference the type
 sig ('Array::unfold',     $class, $any, $sub,          $array);
 sig ('Array::range_step', $class, t_num, t_num, t_num, $array);
@@ -37,35 +38,38 @@ sig ('Array::range',      $class, t_int, t_int,        $array);
 
 ### METHODS
 
-sig ('Array::copy',          $array,                       $array);
-sig ('Array::bind',          $array, $sub,                 $array);
-sig ('Array::flatten',       $aoa,                         $array);
-sig ('Array::merge',         $aoa,                         $array);
-sig ('Array::cartesian',     $array, $array,               t_array(t_of t_tuple($any, $any)));
-sig ('Array::append',        $array, $array,               $array);
-sig ('Array::rev',           $array,                       $array);
-sig ('Array::map',           $array, $sub,                 $array);
-sig ('Array::map2',          $array, $array, $sub,         $array);
-sig ('Array::map3',          $array, $array, $array, $sub, $array);
-sig ('Array::map_e',         $array, t_str,                $array);
-sig ('Array::map2d',         $aoa,   $sub,                   $aoa);
-sig ('Array::choose',        $array, $sub,                 $array);
-sig ('Array::mapi',          $array, $sub,                 $array);
-sig ('Array::keep',          $array, $sub,                 $array);
-sig ('Array::keep_type',     $array, $sub,                 $array);
-sig ('Array::keep_ok',       t_array(t_of t_result),       $array);
-sig ('Array::keep_ok_by',    t_array, $sub,                $array);
-sig ('Array::keep_e',        $array, t_str,                $array);
-sig ('Array::remove',        $array, $sub,                 $array);
-sig ('Array::skip',          $array, $pint,                $array);
-sig ('Array::take',          $array, $pint,                $array);
-sig ('Array::indexed',       $array,                       t_array(t_of t_tuple($any, t_int)));
-sigt('Array::zip',           t_array(t_of $array),           $aoa);
-sig ('Array::sort',          $array, $sub,                 $array);
-sig ('Array::sort_by',       $array, $sub, $sub,           $array);
-sig ('Array::sort_hash',     $array, $sub, t_str,          $array);
-sig ('Array::fsts',          $aoa,                         $array);
-sig ('Array::snds',          $aoa,                         $array);
+sig ('Array::copy',          $array,                               $array);
+sig ('Array::bind',          $array, $sub,                         $array);
+sig ('Array::flatten',       $aoa,                                 $array);
+sig ('Array::merge',         $aoa,                                 $array);
+sig ('Array::cartesian',     $array, $array,   t_array(t_of t_tuple($any, $any)));
+sig ('Array::append',        $array, $array,                       $array);
+sig ('Array::rev',           $array,                               $array);
+sig ('Array::map',           $array, $sub,                         $array);
+sig ('Array::map_rec',       $array, $sub,                         $array);
+sig ('Array::map2',          $array, $array, $sub,                 $array);
+sig ('Array::map3',          $array, $array, $array, $sub,         $array);
+sig ('Array::map4',          $array, $array, $array, $array, $sub, $array);
+sig ('Array::map_e',         $array, t_str,                        $array);
+sig ('Array::map2d',         $aoa,   $sub,                           $aoa);
+sig ('Array::mapi',          $array, $sub,                         $array);
+sig ('Array::mapn',          $array, $pint, $sub,                  $array);
+sig ('Array::choose',        $array, $sub,                         $array);
+sig ('Array::keep',          $array, $sub,                         $array);
+sig ('Array::keep_type',     $array, $sub,                         $array);
+sig ('Array::keep_ok',       t_array(t_of t_result),               $array);
+sig ('Array::keep_ok_by',    t_array, $sub,                        $array);
+sig ('Array::keep_e',        $array, t_str,                        $array);
+sig ('Array::remove',        $array, $sub,                         $array);
+sig ('Array::skip',          $array, $pint,                        $array);
+sig ('Array::take',          $array, $pint,                        $array);
+sig ('Array::indexed',       $array,          t_array(t_of t_tuple($any, t_int)));
+sigt('Array::zip',           t_array(t_of $array),                   $aoa);
+sig ('Array::sort',          $array, $sub,                         $array);
+sig ('Array::sort_by',       $array, $sub, $sub,                   $array);
+sig ('Array::sort_hash',     $array, $sub, t_str,                  $array);
+sig ('Array::fsts',          $aoa,                                 $array);
+sig ('Array::snds',          $aoa,                                 $array);
 sigt('Array::to_array',
     t_or(
         t_tuple($array),
@@ -94,6 +98,8 @@ sig ('Array::shuffle',           $array,                   $array);
 sig ('Array::trim',              $astr,                     $astr);
 sig ('Array::cache',             $array,                   $array);
 sig ('Array::fill',              $array, $pint, $sub,      $array);
+sig ('Array::permute',           $array,                     $aoa);
+sig ('Array::chunked_size',      $array, $pint, $sub,        $array);
 
 ### ARRAY 2D
 
@@ -133,18 +139,18 @@ sigt('Array::join',
     ), t_str);
 sig('Array::split',      $astr, t_regex,              t_array(t_of $astr));
 sigt('Array::min',
-    t_or(t_tuple($anum), t_tuple($anum, t_any)),
+    t_or(t_tuple($anum), t_tuple($anum, $any)),
     t_or(t_opt(t_num), t_num));
 sigt('Array::min_str',
-    t_or(t_tuple($astr), t_tuple($astr, t_any)),
+    t_or(t_tuple($astr), t_tuple($astr, $any)),
     t_or(t_opt(t_str), t_str));
 sig('Array::min_by',     $array, $sub,                 $opt);
 sig('Array::min_str_by', $array, $sub,                 $opt);
 sigt('Array::max',
-    t_or(t_tuple($anum), t_tuple($anum, t_any)),
+    t_or(t_tuple($anum), t_tuple($anum, $any)),
     t_or(t_opt(t_num), t_num));
 sigt('Array::max_str',
-    t_or(t_tuple($astr), t_tuple($astr, t_any)),
+    t_or(t_tuple($astr), t_tuple($astr, $any)),
     t_or(t_opt(t_str), t_str));
 sig('Array::max_by',     $array, $sub,                 $opt);
 sig('Array::max_str_by', $array, $sub,                 $opt);
@@ -163,12 +169,16 @@ sig('Array::none',       $array, $sub,                 t_bool);
 sig('Array::pick',       $array, $sub,                 $opt);
 sig('Array::to_seq',     $array,                       t_seq);
 sig('Array::contains',   $array, $any,                 t_bool);
+sig('Array::fold_rec',   $array, $sub, $sub,           $any);
+sig('Array::map_array',  $array, $sub, $sub,           $any);
 
 
 ### OPTION MODULE
 
 sig('Array::all_some',     $aopt,        $opt);
 sig('Array::all_some_by',  $array, $sub, $opt);
+sig('Array::all_ok',       $ares,        t_opt(t_array));
+sig('Array::all_ok_by',    $array, $sub, t_opt(t_array));
 sig('Array::keep_some',    $aopt,        $array);
 sig('Array::keep_some_by', $array, $sub, $array);
 

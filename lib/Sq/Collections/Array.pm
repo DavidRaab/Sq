@@ -196,7 +196,7 @@ sub rev($array) {
 
 sub mapn($array, $count, $f) {
     local $_;
-    my (@new);
+    my @new;
     my $it = List::MoreUtils::natatime $count, @$array;
     while ( my @vals = $it->() ) {
         CORE::push @new, (scalar $f->(@vals));
@@ -407,10 +407,10 @@ sub all_ok($array_of_results) {
     return CORE::bless([\@new], 'Option');
 }
 
-sub all_ok_by($array_of_results, $f_result) {
+sub all_ok_by($array, $f_result) {
     my @new;
     my $result;
-    for my $x ( @$array_of_results ) {
+    for my $x ( @$array ) {
         $result = $f_result->($x);
         if ( $result->[0] == 1 ) {
             push @new, $result->[1];
