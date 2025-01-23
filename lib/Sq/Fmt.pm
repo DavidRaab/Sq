@@ -85,12 +85,12 @@ my $void = type [enum => qw/area base br col embed hr img input link meta source
 my sub arg :prototype($) { type [tuple => @_] }
 static html => with_dispatch(
     # [HTML => "string"] -> stays without any change
-    arg [tuple => [enum => 'HTML'], ['str']] => sub($t) {
+    arg [tuple => [eq => 'HTML'], ['str']] => sub($t) {
         return $t;
     },
-    # script tag stays the same without quoting
-    arg [tuple => [enum => 'script', ['str']]] => sub($t) {
-        return $t;
+    # TODO: script tag has no quoting at all?
+    arg [tuple => [eq => 'script'], ['str']] => sub($t) {
+        return [HTML => sprintf "<script>%s</script>", $t->[1]];
     },
     # when a bare string is passed
     arg ['str'] => sub($text) {
