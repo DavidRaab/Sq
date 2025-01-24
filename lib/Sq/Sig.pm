@@ -1,8 +1,7 @@
 package Sq::Sig;
 use 5.036;
 use Sq;
-use Sq::Sig::Option;
-use Sq::Sig::Result;
+use Sq::Sig::Core;
 use Sq::Sig::Array;
 use Sq::Sig::Hash;
 use Sq::Sig::Seq;
