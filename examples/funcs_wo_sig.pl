@@ -26,16 +26,17 @@ sub fqn($package) {
     # basically provide a subroutine to compute the value that then is only
     # computed once.
     state $skip = assign {
-        my %skip;
+        my %skip = (
+            import         => 1,
+            load_signature => 1,
+            '(""'          => 1, # string overload
+            '(('           => 1, # string overload
+
+        );
         # Skip imported/exported functions by Sq
         for my $name ( @Sq::EXPORT ) {
             $skip{$name} = 1 if is_str($name);
         }
-        # also skip import() function
-        $skip{import} = 1;
-        # skip string overload in packages
-        $skip{'(""'} = 1;
-        $skip{'(('}  = 1;
         return \%skip;
     };
 

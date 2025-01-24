@@ -5,8 +5,32 @@ use open ':std', ':encoding(UTF-8)';
 use Sq -sig => 1;
 use Sq::Test;
 
+# check lazy loading of Sq::Fmt
+{
+    # Because Sq::Fmt is not loaded by default anymore. `Sq::Fmt::table` should
+    # not appear in $statics;
+    my $statics    = Sq::Reflection::statics;
+    my $signatures = Sq::Reflection::signatures;
+
+    nok($statics   ->contains('Sq::Fmt::table'), 'No Sq::Fmt::table');
+    nok($signatures->contains('Sq::Fmt::table'), 'No signature for Sq::Fmt::table');
+
+    # This line loads Sq::Fmt
+    my $table = Sq->fmt->table;
+    ok(is_sub($table), '$table is sub-ref');
+
+    # reload statics & signatures
+    $statics    = Sq::Reflection::statics;
+    $signatures = Sq::Reflection::signatures;
+
+    ok($statics   ->contains('Sq::Fmt::table'), 'Sq::Fmt::table is now available');
+    ok($signatures->contains('Sq::Fmt::table'), 'Signature also loaded for Sq::Fmt::table');
+}
+
+
 my $statics = Sq::Reflection::statics;
 check_isa($statics, 'Array', 'statics is Array');
+
 
 my @statics = (
     "Sq::Fmt::table",

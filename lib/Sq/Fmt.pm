@@ -1,6 +1,9 @@
 package Sq::Fmt;
 use 5.036;
 use Sq;
+use Sq::Exporter;
+our $SIGNATURE = 'Sq/Sig/Fmt.pm';
+our @EXPORT    = ();
 
 # This will be a module that help in formating/printing things.
 # For example pass it an array of array and it prints a table.

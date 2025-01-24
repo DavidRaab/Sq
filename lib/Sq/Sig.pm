@@ -10,7 +10,6 @@ use Sq::Sig::Queue;
 use Sq::Sig::Heap;
 use Sq::Sig::Io;
 use Sq::Sig::Fs;
-use Sq::Sig::Fmt;
 use Sq::Sig::Math;
 
 1;

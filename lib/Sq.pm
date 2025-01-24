@@ -44,7 +44,6 @@ sub import {
         require Sq::Fs;
         require Sq::Io;
         require Sq::Math;
-        require Sq::Fmt;
         $first_load = 0;
     }
 
@@ -128,7 +127,13 @@ use Sq::Equality;
 sub io($)    { 'Sq::Io'    }
 sub fs($)    { 'Sq::Fs'    }
 sub math($)  { 'Sq::Math'  }
-sub fmt($)   { 'Sq::Fmt'   }
+sub fmt($)   {
+    if ( !exists $INC{'Sq/Fmt.pm'} ) {
+        require Sq::Fmt;
+        Sq::Fmt->load_signature();
+    }
+    return 'Sq::Fmt';
+}
 sub bench($) { require Sq::Bench; return 'Sq::Bench' }
 
 # Like a Str module

@@ -7,7 +7,8 @@ no warnings 'once';
 
 sub import {
     my ($pkg) = caller;
-    *{"$pkg\::import"} = \&export_import;
+    *{"$pkg\::import"}         = \&export_import;
+    *{"$pkg\::load_signature"} = \&load_signature;
 }
 
 sub export_import($own, @args) {
@@ -34,11 +35,8 @@ sub export_import($own, @args) {
         }
     }
 
-    if ( $Sq::LOAD_SIGNATURE && $signature ) {
-        local $@;
-        eval { require $signature };
-        Carp::croak $@ if $@;
-    }
+    # Load Signature
+    $own->load_signature();
 
     # Export default
     if ( @cmds == 0 ) {
@@ -57,6 +55,13 @@ sub export_import($own, @args) {
             Carp::croak "function '$func' does not exists. Check \@EXPORT in $own" if !defined $fn;
             *{"$target\::$func"} = $fn;
         }
+    }
+}
+
+sub load_signature($own) {
+    my $signature = ${"$own\::SIGNATURE"};
+    if ( $Sq::LOAD_SIGNATURE && $signature ) {
+        require $signature;
     }
 }
 
