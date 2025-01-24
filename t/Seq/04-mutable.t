@@ -1,7 +1,6 @@
 #!perl
 use 5.036;
-use Sq;
-use Sq::Sig;
+use Sq -sig => 1;
 use Sq::Test;
 
 # Stuff that is possible because arrayref are mutable

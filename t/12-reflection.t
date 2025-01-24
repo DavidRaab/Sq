@@ -2,9 +2,8 @@
 use 5.036;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
-use Sq;
+use Sq -sig => 1;
 use Sq::Test;
-use Sq::Sig;
 
 my $statics = Sq::Reflection::statics;
 check_isa($statics, 'Array', 'statics is Array');

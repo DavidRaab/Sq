@@ -2,7 +2,8 @@
 use 5.036;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
-use Sq;
+use Sq -sig => 1;
+use Sq::Signature;
 use Sq::Reflection qw(funcs_of signatures);
 # Explicitly loaded all modules because of lazy-loading
 use Sq::Core::Str;
@@ -12,8 +13,7 @@ use Sq::Fmt;
 use Sq::Math;
 use Sq::Gen;
 use Sq::Bench;
-use Sq::Parser -sig => 1;
-use Sq::Sig;
+use Sq::Parser;
 
 # This script prints all functions in Sq, that have no type-check with
 # signature added.

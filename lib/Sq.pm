@@ -55,8 +55,12 @@ sub import {
         while ( $idx < @EXPORT ) {
             my $func = $EXPORT[$idx];
             my $next = $EXPORT[$idx+1];
+
             if ( ref $next eq 'CODE' ) {
                 $export_funcs->{$func} = $next;
+                $idx += 2;
+            }
+            elsif ( $func eq '-sig' ) {
                 $idx += 2;
             }
             else {
@@ -66,14 +70,34 @@ sub import {
         }
     }
 
+    # Build new @req with options removed
+    my ($idx, @req, $value) = (0);
+    while ( $idx < @requested ) {
+        $value = $requested[$idx];
+        if ( $value eq '-sig' ) {
+            $LOAD_SIGNATURE = 1 if $requested[$idx+1];
+            $idx += 2;
+        }
+        else {
+            push @req, $value;
+            $idx += 1;
+        }
+    }
+
+    # Load signature if requested
+    if ( $LOAD_SIGNATURE ) {
+        require Sq::Sig;
+    }
+
     # Export only requested
-    if ( @requested > 0 ) {
+    if ( @req > 0 ) {
         my $fn;
-        for my $request ( @requested ) {
+        for my $request ( @req ) {
             $fn = $export_funcs->{$request};
             Carp::croak "Export Func '$request' does not exists"
                 if !defined $fn;
             *{"$pkg\::$request"} = $fn->();
+            $idx++;
         }
     }
     # Export ALL

@@ -1,9 +1,8 @@
 #!perl
 use 5.036;
-use Sq;
-use Sq::Parser -sig => 1;
+use Sq -sig => 1;
+use Sq::Parser;
 use Sq::Test;
-use Sq::Sig;
 
 # This is the Test file created while writing the intro to Sq::Parser
 

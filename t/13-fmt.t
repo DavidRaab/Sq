@@ -2,10 +2,9 @@
 use 5.036;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
-use Sq;
-use Sq::Parser -sig => 1;
+use Sq -sig => 1;
+use Sq::Parser;
 use Sq::Test;
-use Sq::Sig;
 
 # Manual import/alias of a static
 fn html => Sq->fmt->html;

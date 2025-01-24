@@ -1,8 +1,7 @@
 #!perl
 use 5.036;
-use Sq;
+use Sq -sig => 1;
 use Sq::Test;
-use Sq::Sig;
 use FindBin qw($Bin);
 use Path::Tiny;
 use IO::File;

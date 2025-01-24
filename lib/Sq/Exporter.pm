@@ -34,9 +34,7 @@ sub export_import($own, @args) {
         }
     }
 
-    # Load default signature when -sig => 1 is provided and $SIGNATURE
-    # is defined in module
-    if ( $opt{-sig} && defined $signature ) {
+    if ( $Sq::LOAD_SIGNATURE && $signature ) {
         local $@;
         eval { require $signature };
         Carp::croak $@ if $@;

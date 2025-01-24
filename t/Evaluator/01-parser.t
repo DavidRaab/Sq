@@ -1,8 +1,7 @@
 #!perl
 use 5.036;
-use Sq;
+use Sq -sig => 1;
 use Sq::Parser qw(parser p_run);
-use Sq::Sig;
 use Sq::Test;
 
 # LISP list

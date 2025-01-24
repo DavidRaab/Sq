@@ -1,8 +1,7 @@
 #!perl
 use 5.036;
-use Sq;
+use Sq -sig => 1;
 use Sq::Type qw(t_run t_valid type);
-use Sq::Sig;
 use Sq::Test;
 use Sq::Gen;
 use Path::Tiny qw(path);

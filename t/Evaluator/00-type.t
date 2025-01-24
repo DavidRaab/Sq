@@ -1,9 +1,8 @@
 #!perl
 use 5.036;
-use Sq;
+use Sq -sig => 1;
 use Sq::Type;
 use Sq::Test;
-use Sq::Sig;
 
 my $album = type
     [hash => [keys =>

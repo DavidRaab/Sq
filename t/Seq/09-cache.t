@@ -1,8 +1,7 @@
 #!perl
 use 5.036;
-use Sq;
+use Sq -sig => 1;
 use Sq::Test;
-use Sq::Sig;
 
 #---------- Check if cache really caches the iterator
 

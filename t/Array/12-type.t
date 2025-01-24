@@ -1,9 +1,8 @@
 #!perl
 use 5.036;
-use Sq;
-use Sq::Parser -sig => 1;
+use Sq -sig => 1;
+use Sq::Parser;
 use Sq::Test;
-use Sq::Sig;
 
 # hex and time parser
 my $hex  = p_matchf(qr/0x([0-9a-zA-Z]+)/, Str->hex);

@@ -1,10 +1,9 @@
 #!perl
 use 5.036;
-use Sq;
+use Sq -sig => 1;
 use Sq::Type;
-use Sq::Parser -sig => 1;
+use Sq::Parser;
 use Sq::Test;
-use Sq::Sig;
 
 # data used for checking
 my $album = sq {

@@ -2,10 +2,9 @@
 use 5.036;
 use List::Util qw(reduce);
 use Scalar::Util qw(refaddr);
-use Sq;
+use Sq -sig => 1;
 use Sq::Gen qw(gen_run gen);
 use Sq::Test;
-use Sq::Sig;
 
 # Some values, functions, ... for testing
 my $range     = Array->range(1, 10);

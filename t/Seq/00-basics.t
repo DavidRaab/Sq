@@ -2,8 +2,7 @@
 use 5.036;
 use Scalar::Util qw(refaddr);
 use List::Util qw(reduce);
-use Sq;
-use Sq::Sig;
+use Sq -sig => 1;
 use Sq::Test;
 
 # Some values, functions, ... for testing

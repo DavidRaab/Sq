@@ -2,9 +2,8 @@
 use 5.036;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
-use Sq;
+use Sq -sig => 1;
 use Sq::Test;
-use Sq::Sig;
 
 is(Str->length("foo"), 3, 'length 1');
 is(array(qw/foo bar baz/)->map(Str->length), [3,3,3], 'length 2');
