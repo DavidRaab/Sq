@@ -9,6 +9,7 @@ benchmarks/bool.pl
 benchmarks/even_num.pl
 benchmarks/func_key.pl
 benchmarks/hash_append.pl
+benchmarks/html_escape.pl
 benchmarks/keep.pl
 benchmarks/list_foldback.pl
 benchmarks/moose.pl
@@ -29,6 +30,7 @@ benchmarks/seq_range.pl
 benchmarks/seq_range_step.pl
 benchmarks/signature.pl
 benchmarks/string_check_array.pl
+benchmarks/type_int.pl
 Build.PL
 Changes
 example
@@ -96,6 +98,7 @@ examples/job_postings_pp.pl
 examples/option_divide.pl
 examples/permutation.pl
 examples/permutation_random.pl
+examples/permute.pl
 examples/primes.pl
 examples/same_basename.pl
 lib/Sq.pm
@@ -132,6 +135,7 @@ lib/Sq/Core/Measure.pm
 lib/Sq/Core/Option.pod
 lib/Sq/Core/Record.pm
 lib/Sq/Core/Result.pod
+lib/Sq/Core/Str.pm
 lib/Sq/Data/CSV.pm
 lib/Sq/Data/JSON.pm
 lib/Sq/Data/XML.pm
@@ -189,6 +193,7 @@ lib/Sq/Reflection.pm
 lib/Sq/Reflection.pod
 lib/Sq/Sig.pm
 lib/Sq/Sig/Array.pm
+lib/Sq/Sig/Core.pm
 lib/Sq/Sig/Fmt.pm
 lib/Sq/Sig/Fork.pm
 lib/Sq/Sig/Fs.pm
@@ -197,11 +202,10 @@ lib/Sq/Sig/Heap.pm
 lib/Sq/Sig/Io.pm
 lib/Sq/Sig/List.pm
 lib/Sq/Sig/Math.pm
-lib/Sq/Sig/Option.pm
 lib/Sq/Sig/Parser.pm
 lib/Sq/Sig/Queue.pm
-lib/Sq/Sig/Result.pm
 lib/Sq/Sig/Seq.pm
+lib/Sq/Sig/Str.pm
 lib/Sq/Signature.pm
 lib/Sq/Test.pm
 lib/Sq/Type.pm
@@ -244,7 +248,7 @@ sqs/status
 sqs/store
 sqs/tag
 sqs/trash
-t/00-version.t
+t/00-core.t
 t/01-queue.t
 t/02-hash.t
 t/03-heap.t
@@ -258,6 +262,8 @@ t/09-type_option.t
 t/10-exporter.t
 t/11-math.t
 t/12-reflection.t
+t/13-fmt.t
+t/14-str.t
 t/Array/00-basics.t
 t/Array/01-bind-flatten.t
 t/Array/03-fibonacci.t

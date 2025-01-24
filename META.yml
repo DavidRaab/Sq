@@ -77,6 +77,8 @@ provides:
     file: lib/Sq/Core.pm
   Sq::Core::Measure:
     file: lib/Sq/Core/Measure.pm
+  Sq::Core::Str:
+    file: lib/Sq/Core/Str.pm
   Sq::Data::CSV:
     file: lib/Sq/Data/CSV.pm
   Sq::Data::JSON:
@@ -119,6 +121,8 @@ provides:
     file: lib/Sq/Sig.pm
   Sq::Sig::Array:
     file: lib/Sq/Sig/Array.pm
+  Sq::Sig::Core:
+    file: lib/Sq/Sig/Core.pm
   Sq::Sig::Fmt:
     file: lib/Sq/Sig/Fmt.pm
   Sq::Sig::Fork:
@@ -135,16 +139,14 @@ provides:
     file: lib/Sq/Sig/List.pm
   Sq::Sig::Math:
     file: lib/Sq/Sig/Math.pm
-  Sq::Sig::Option:
-    file: lib/Sq/Sig/Option.pm
   Sq::Sig::Parser:
     file: lib/Sq/Sig/Parser.pm
   Sq::Sig::Queue:
     file: lib/Sq/Sig/Queue.pm
-  Sq::Sig::Result:
-    file: lib/Sq/Sig/Result.pm
   Sq::Sig::Seq:
     file: lib/Sq/Sig/Seq.pm
+  Sq::Sig::Str:
+    file: lib/Sq/Sig/Str.pm
   Sq::Signature:
     file: lib/Sq/Signature.pm
   Sq::Test:
