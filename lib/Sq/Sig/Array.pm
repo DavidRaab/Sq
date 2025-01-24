@@ -99,7 +99,9 @@ sig ('Array::trim',              $astr,                     $astr);
 sig ('Array::cache',             $array,                   $array);
 sig ('Array::fill',              $array, $pint, $sub,      $array);
 sig ('Array::permute',           $array,                     $aoa);
-sig ('Array::chunked_size',      $array, $pint, $sub,        $array);
+sig ('Array::chunked_size',      $array, $pint, $sub,      $array);
+sig ('Array::tail',              t_array(t_min 1),         $array);
+
 
 ### ARRAY 2D
 
@@ -171,6 +173,7 @@ sig('Array::to_seq',     $array,                       t_seq);
 sig('Array::contains',   $array, $any,                 t_bool);
 sig('Array::fold_rec',   $array, $sub, $sub,           $any);
 sig('Array::map_array',  $array, $sub, $sub,           $any);
+sig('Array::head',       t_array(t_min 1),             $any);
 
 
 ### OPTION MODULE

@@ -411,7 +411,7 @@ is(
     my $array = gen_run gen [repeat => 1_000, [int => 1_000, 5_000]];
 
     sub qsort($array) {
-        return $array if @$array == 0 || @$array == 1;
+        return $array if @$array <= 1;
         my $pivot = $array->head;
         my $rest  = $array->tail;
         Array->concat(

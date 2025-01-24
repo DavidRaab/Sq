@@ -28,6 +28,8 @@ like(dies { Array->range(1,10)->windowed("foo") }, qr/\AArray::/, 'windowed');
 like(dies { sq([1,2,3])->repeat("foo")          }, qr/\AArray::/, 'repeat');
 like(dies { Array::fill2d([{}], sub {})         }, qr/\AArray::/, 'fill2d');
 like(dies { Array::split(["foo+bar"], '+')      }, qr/\AArray::split:/, 'split');
+like(dies { Array::head([])                     }, qr/\AArray::head/,   'head');
+like(dies { Array::tail([])                     }, qr/\AArray::tail/,   'tail');
 
 like(dies { sq(["12-12", "10-10", []])->rxm(qr/\A(\d\d)-(\d\d)\z/) }, qr/\AArray::/, 'rxm');
 done_testing;
