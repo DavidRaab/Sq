@@ -4,7 +4,14 @@ use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Sq;
 use Sq::Reflection qw(funcs_of signatures);
+# Explicitly loaded all modules because of lazy-loading
+use Sq::Core::Str;
+use Sq::Io;
+use Sq::Fs;
+use Sq::Fmt;
+use Sq::Math;
 use Sq::Gen;
+use Sq::Bench;
 use Sq::Parser -sig => 1;
 use Sq::Sig;
 
@@ -47,8 +54,8 @@ sub fqn($package) {
 # Array::bind($strs, \&fqn);
 my $funcs = Array::bind(
     [
-        qw/Array Hash Seq Option Result Sq::Parser Sq::Gen Sq::Fmt Sq::Fs/,
-        qw/Sq::Math Sq::Bench Sq::Io/
+        qw/Array Hash Seq Queue Option Result Sq::Parser Sq::Gen Sq::Fmt Sq::Fs/,
+        qw/Sq::Math Sq::Bench Sq::Io Sq::Core::Str/
     ],
     \&fqn);
 
