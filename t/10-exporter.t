@@ -21,7 +21,7 @@ package Test2;
 use Sq;
 use Sq::Exporter;
 our @EXPORT    = qw(foo bar);
-our $SIGNATURE = 'Sq::Sig::Array';
+our $SIGNATURE = 'Sq/Sig/Array.pm';
 
 sub foo() { ... }
 sub bar() { ... }

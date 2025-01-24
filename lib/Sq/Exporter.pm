@@ -38,7 +38,7 @@ sub export_import($own, @args) {
     # is defined in module
     if ( $opt{-sig} && defined $signature ) {
         local $@;
-        eval "require $signature";
+        eval { require $signature };
         Carp::croak $@ if $@;
     }
 

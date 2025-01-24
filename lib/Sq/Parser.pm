@@ -3,7 +3,7 @@ use 5.036;
 use Sq ();
 use Sq::Evaluator;
 use Sq::Exporter;
-our $SIGNATURE = 'Sq::Sig::Parser';
+our $SIGNATURE = 'Sq/Sig/Parser.pm';
 our @EXPORT = (
     qw(parser),
     qw(p_run p_valid),                        # runners

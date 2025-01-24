@@ -7,7 +7,7 @@ Use it in a module.
     package MyModule;
     use 5.036;
     use Sq::Exporter;
-    our $SIGNATURE = 'Sig::MyModule';
+    our $SIGNATURE = 'Sig/MyModule.pm';
     our @EXPORT    = qw(this that);
 
     sub this() { ... }
