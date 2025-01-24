@@ -1,8 +1,7 @@
 #!/usr/bin/env perl
 use v5.36;
 use open ':std', ':encoding(UTF-8)';
-use Sq;
-use Sq::Sig;
+use Sq -sig => 1;
 use Path::Tiny qw(path);
 
 # Control if Dump should show color or not.

@@ -2,8 +2,7 @@
 use v5.36;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
-use Sq;
-use Sq::Sig;
+use Sq -sig => 1;
 
 my $square  = sub($x) { $x * $x     };
 my $is_even = sub($x) { $x % 2 == 0 };

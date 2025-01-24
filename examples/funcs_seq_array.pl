@@ -2,8 +2,7 @@
 use 5.036;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
-use Sq;
-use Sq::Sig;
+use Sq -sig => 1;
 
 my %seq_skip   = map { $_ => 1 } qw/bless blit pop push shift shuffle unshift map_e keep_e/;
 my %array_skip = map { $_ => 1 } qw/always cache do doi infinity/;

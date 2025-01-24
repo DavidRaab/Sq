@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use v5.36;
 use open ':std', ':encoding(UTF-8)';
+#use Sq -sig => 1
 use Sq;
 #use Sq::Sig;
 

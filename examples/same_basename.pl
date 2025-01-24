@@ -2,8 +2,7 @@
 use 5.036;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
-use Sq;
-use Sq::Sig;
+use Sq -sig => 1;
 
 # I have this script in one of my folders. It usually contains 'mp4' files
 # captured from my smartphone. But those video files from the smartphone

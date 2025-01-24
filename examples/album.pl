@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 use v5.36;
-use Sq;
+use Sq -sig => 1;
 
 sub seconds_to_str($seconds) {
     my $minutes = int ($seconds / 60);

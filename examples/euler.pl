@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use v5.36;
 use open ':std', ':encoding(UTF-8)';
-use Sq;
+use Sq -sig => 1;
 
 # 1 + (1/1) + (1 / 1*2) + (1 / 1*2*3) + (1 / 1*2*3*4) + ...
 my $euler_seq = Seq->unfold(0, sub($i){ return (1/fac($i)), $i+1 });

@@ -2,9 +2,8 @@
 use 5.036;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
-use Sq;
+use Sq -sig => 1;
 use Sq::Reflection qw(statics signatures);
-use Sq::Sig;
 
 print "Currently defined statics.\n";
 my $statics = statics();

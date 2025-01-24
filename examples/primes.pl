@@ -3,8 +3,7 @@ use v5.36;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Time::HiRes qw(sleep);
-use Sq;
-use Sq::Sig;
+use Sq -sig => 1;
 
 print "Sequence of primes runs twice to show cache().\n\n";
 

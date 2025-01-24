@@ -2,8 +2,7 @@
 use 5.036;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
-use Sq;
-use Sq::Sig;
+use Sq -sig => 1;
 
 print "All defined Array functions:\n\n";
 my $funcs = Sq::Reflection::funcs_of('Array');
