@@ -1,6 +1,9 @@
 package Sq::Math;
 use 5.036;
 use Sq qw(static);
+use Sq::Exporter;
+our $SIGNATURE = 'Sq/Sig/Math.pm';
+our @EXPORT    = ();
 
 static is_prime => sub($x) {
     state @primes = (

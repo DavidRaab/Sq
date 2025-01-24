@@ -58,7 +58,7 @@ use Sq::Test;
     my $primes =
         Seq
         ->up(2)
-        ->keep(Sq::Math::is_prime) # Direct function-call
+        ->keep(Sq::Math::is_prime()) # Direct function-call
         ->take(100);
 
     is(

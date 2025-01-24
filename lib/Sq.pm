@@ -43,7 +43,6 @@ sub import {
         require Sq::Type;
         require Sq::Fs;
         require Sq::Io;
-        require Sq::Math;
         $first_load = 0;
     }
 
@@ -126,7 +125,13 @@ use Sq::Equality;
 # Access to submodules
 sub io($)    { 'Sq::Io'    }
 sub fs($)    { 'Sq::Fs'    }
-sub math($)  { 'Sq::Math'  }
+sub math($)  {
+    if ( !exists $INC{'Sq/Math.pm'} ) {
+        require Sq::Math;
+        Sq::Math->load_signature();
+    }
+    return 'Sq::Math';
+}
 sub fmt($)   {
     if ( !exists $INC{'Sq/Fmt.pm'} ) {
         require Sq::Fmt;

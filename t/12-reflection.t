@@ -3,6 +3,7 @@ use 5.036;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Sq -sig => 1;
+use Sq::Math; # Explicitly load module
 use Sq::Test;
 
 # check lazy loading of Sq::Fmt
@@ -56,5 +57,10 @@ for my $static ( @statics ) {
     ok($statics->contains($static), "statics $idx");
     $idx++;
 }
+
+# Also check if explicitly loading Sq::Math loads signature
+ok(
+    Sq::Reflection::signatures->contains('Sq::Math::is_prime'),
+    'sig for Sq::Math::is_prime loaded');
 
 done_testing;
