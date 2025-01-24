@@ -7,8 +7,8 @@ use Scalar::Util ();
 #
 #     use Sq sig => 1
 #
-# Then all other modules that use Sq::Exporter will load it's defined
-# signature file.
+# Then all other modules that use Sq::Exporter will automatically load it's
+# defined signature file (when some is defined).
 our $LOAD_SIGNATURE = 0;
 # All functions that are Exported
 our @EXPORT = (
@@ -39,7 +39,6 @@ sub import {
 
     # Load some modules on import()
     if ( $first_load ) {
-        require Sq::Core::Str;
         require Sq::Type;
         $first_load = 0;
     }
