@@ -4,6 +4,7 @@ use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Sq -sig => 1;
 use Sq::Math; # Explicitly load module
+use Sq::Fs;
 use Sq::Test;
 
 # check lazy loading of Sq::Fmt

@@ -1,6 +1,9 @@
 package Sq::Core::Str;
 use 5.036;
 use Sq;
+use Sq::Exporter;
+our $SIGNATURE = 'Sq/Sig/Str.pm';
+our @EXPORT    = ();
 
 static length  => sub($str) { length $str      };
 static lc      => sub($str) { lc $str          };

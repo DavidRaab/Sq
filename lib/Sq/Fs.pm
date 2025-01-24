@@ -1,6 +1,9 @@
 package Sq::Fs;
 use 5.036;
 use Sq;
+use Sq::Exporter;
+our $SIGNATURE = 'Sq/Fs.pm';
+our @EXPORT    = ();
 
 # Opens a file as UTF-8 text
 static read_text => sub(@path) {

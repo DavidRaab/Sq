@@ -1,7 +1,6 @@
 #!/usr/bin/env perl
 use v5.36;
-use Sq;
-use Sq::Sig;
+use Sq -sig => 1;
 use Sq::Test;
 
 my @primes;

@@ -1,6 +1,9 @@
 package Sq::Bench;
 use 5.036;
 use Sq qw(static);
+use Sq::Exporter;
+our $SIGNATURE;
+our @EXPORT = ();
 use Benchmark qw(timestr timeit cmpthese);
 
 static 'it', sub ($f) {

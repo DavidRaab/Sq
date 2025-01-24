@@ -41,8 +41,6 @@ sub import {
     if ( $first_load ) {
         require Sq::Core::Str;
         require Sq::Type;
-        require Sq::Fs;
-        require Sq::Io;
         $first_load = 0;
     }
 
@@ -123,26 +121,50 @@ use Sq::Dump;
 use Sq::Equality;
 
 # Access to submodules
-sub io($)    { 'Sq::Io'    }
-sub fs($)    { 'Sq::Fs'    }
-sub math($)  {
+sub io($) {
+    if ( !exists $INC{'Sq/Io.pm'} ) {
+        require Sq::Io;
+        Sq::Io->load_signature();
+    }
+    return 'Sq::Io';
+}
+sub fs($) {
+    if ( !exists $INC{'Sq/Fs.pm'} ) {
+        require Sq::Fs;
+        Sq::Fs->load_signature();
+    }
+    return 'Sq::Fs';
+}
+sub math($) {
     if ( !exists $INC{'Sq/Math.pm'} ) {
         require Sq::Math;
         Sq::Math->load_signature();
     }
     return 'Sq::Math';
 }
-sub fmt($)   {
+sub fmt($) {
     if ( !exists $INC{'Sq/Fmt.pm'} ) {
         require Sq::Fmt;
         Sq::Fmt->load_signature();
     }
     return 'Sq::Fmt';
 }
-sub bench($) { require Sq::Bench; return 'Sq::Bench' }
+sub bench($) {
+    if ( !exists $INC{'Sq/Bench.pm'} ) {
+        require Sq::Bench;
+        Sq::Bench->load_signature();
+    }
+    return 'Sq::Bench';
+}
 
-# Like a Str module
-sub Str :prototype() { return 'Sq::Core::Str' }
+# Str Module
+sub Str :prototype() {
+    if ( !exists $INC{'Sq/Core/Str.pm'} ) {
+        require Sq::Core::Str;
+        Sq::Core::Str->load_signature();
+    }
+    return 'Sq::Core::Str';
+}
 
 # Important functions used in FP code. So adding them.
 sub id  :prototype($) { return $_[0]    }
