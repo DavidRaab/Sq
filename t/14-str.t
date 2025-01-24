@@ -49,5 +49,6 @@ is(array("foo\n","bar")   ->map(Str->chop),    ["foo","ba"],    "chop");
 is(array("foo\n","bar")   ->map(Str->reverse), ["\noof","rab"], "reverse");
 is(array("foo","bar")     ->map(Str->ord),     [102,98],        'ord');
 is(array("0xff","ff","10")->map(Str->hex),     [255,255,16],    'hex');
+is(array(32, 97, 100)     ->map(Str->chr),     [" ", "a","d"],  'chr');
 
 done_testing;

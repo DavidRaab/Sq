@@ -9,6 +9,7 @@ static chomp   => sub($str) { chomp $str; $str };
 static chop    => sub($str) { chop $str; $str  };
 static reverse => sub($str) { reverse $str     };
 static ord     => sub($str) { ord $str         };
+static chr     => sub($str) { chr $str         };
 static hex     => sub($str) { hex $str         };
 
 static trim   => sub($str) {
