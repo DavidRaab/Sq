@@ -1,14 +1,14 @@
 package Sq::Fs;
 use 5.036;
 use Sq;
+use Path::Tiny qw(path);
 use Sq::Exporter;
 our $SIGNATURE = 'Sq/Fs.pm';
 our @EXPORT    = ();
 
 # Opens a file as UTF-8 text
 static read_text => sub(@path) {
-    require Path::Tiny;
-    my $file = Path::Tiny::path(@path);
+    my $file = path(@path);
     return Seq->from_sub(sub {
         open my $fh, '<:encoding(UTF-8)', $file;
         if ( !defined $fh ) {
@@ -135,8 +135,7 @@ static write_text => with_dispatch(
 # reads a text file that is compressed as .gz
 static read_text_gz => sub(@path) {
     require PerlIO::gzip;
-    require Path::Tiny;
-    my $file = Path::Tiny::path(@path);
+    my $file = path(@path);
     return Seq->from_sub(sub {
         open my $fh, '<:raw:gzip:encoding(UTF-8)', $file;
         if ( !defined $fh ) {
@@ -158,8 +157,7 @@ static read_text_gz => sub(@path) {
 };
 
 static read_raw => sub($size, @path) {
-    require Path::Tiny;
-    my $file = Path::Tiny::path(@path);
+    my $file = path(@path);
     return Seq->from_sub(sub {
         open my $fh, '<:raw', $file;
         if ( !defined $fh ) {
@@ -187,8 +185,7 @@ static compare_text => sub($file1, $file2) {
 };
 
 static read_bytes => sub($size, @path) {
-    require Path::Tiny;
-    my $file = Path::Tiny::path(@path);
+    my $file = path(@path);
 
     open my $fh, '<:raw', $file
         or return Err("Could not open file '$file': $!");
@@ -199,11 +196,9 @@ static read_bytes => sub($size, @path) {
 };
 
 static make_link => sub($source, $destination) {
-    require Path::Tiny;
-
-    $source      = Path::Tiny::path($source)->absolute;
-    $destination = Path::Tiny::path($destination);
-    my $cwd = Path::Tiny->cwd;
+    $source      = path($source)->absolute;
+    $destination = path($destination);
+    my $cwd      = Path::Tiny->cwd;
 
     chdir($destination->parent)
         or die "Cannot chdir: $!\n";
@@ -215,9 +210,8 @@ static make_link => sub($source, $destination) {
 };
 
 static recurse => sub(@paths) {
-    require Path::Tiny;
     Seq->from_sub(sub {
-        my $it = Path::Tiny::path(@paths)->iterator({
+        my $it = path(@paths)->iterator({
             recurse         => 1,
             follow_symlinks => 1,
         });
@@ -228,14 +222,12 @@ static recurse => sub(@paths) {
 };
 
 static children => sub(@paths) {
-    require Path::Tiny;
-    return Seq->new(Path::Tiny::path(@paths)->children);
+    return seq { path(@paths)->children };
 };
 
 static sha512 => sub(@paths) {
-    require Path::Tiny;
-    my $file = Path::Tiny::path(@paths);
-    my $err = open my $fh, '<:raw', $file;
+    my $file = path(@paths);
+    my $err  = open my $fh, '<:raw', $file;
     return Err("Could not open '$file': $!") if !defined $err;
 
     require Digest::SHA;
