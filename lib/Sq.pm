@@ -3,11 +3,17 @@ use 5.036;
 our $VERSION = '0.007';
 use Carp ();
 use Scalar::Util ();
-my $export_funcs;
-my $first_load = 1;
+# This variable is by default 0 and will be set to 1 when user does
+#
+#     use Sq sig => 1
+#
+# Then all other modules that use Sq::Exporter will load it's defined
+# signature file.
+our $LOAD_SIGNATURE = 0;
+# All functions that are Exported
 our @EXPORT = (
     qw(sq call key assign seq new),
-    qw(is_num is_str is_array is_hash is_seq is_opt is_result is_ref is_regex),
+    qw(is_num is_str is_array is_hash is_seq is_opt is_result is_sub is_regex is_ref),
     qw(fn multi with_dispatch type_cond),
     qw(id fst snd),
     qw(by_num by_str by_stri),
@@ -25,6 +31,8 @@ our @EXPORT = (
     is_type => sub { \&Sq::Type::t_valid      },
     static  => sub { \&Sq::Reflection::static },
 );
+my $export_funcs;
+my $first_load = 1;
 sub import {
     my ( $own, @requested ) = @_;
     my ( $pkg ) = caller;
@@ -167,25 +175,12 @@ sub is_hash :prototype($) {
     return 0;
 }
 
-sub is_seq :prototype($) {
-    return ref $_[0] eq 'Seq' ? 1 : 0;
-}
-
-sub is_opt :prototype($) {
-    return ref $_[0] eq 'Option' ? 1 : 0;
-}
-
-sub is_result :prototype($) {
-    return ref $_[0] eq 'Result' ? 1 : 0;
-}
-
-sub is_ref :prototype($$) {
-    return ref $_[1] eq $_[0] ? 1 : 0;
-}
-
-sub is_regex :prototype($) {
-    return ref $_[0] eq 'Regexp' ? 1 : 0;
-}
+sub is_seq    :prototype($)  { return ref $_[0] eq 'Seq'    ? 1 : 0 }
+sub is_opt    :prototype($)  { return ref $_[0] eq 'Option' ? 1 : 0 }
+sub is_result :prototype($)  { return ref $_[0] eq 'Result' ? 1 : 0 }
+sub is_ref    :prototype($$) { return ref $_[1] eq $_[0]    ? 1 : 0 }
+sub is_regex  :prototype($)  { return ref $_[0] eq 'Regexp' ? 1 : 0 }
+sub is_sub    :prototype($)  { return ref $_[0] eq 'CODE'   ? 1 : 0 }
 
 ### Comparision Functions
 
@@ -200,7 +195,7 @@ sub by_str :prototype() {
 }
 
 sub by_stri :prototype() {
-    state $fn = sub($x,$y) { fc $x cmp $y };
+    state $fn = sub($x,$y) { fc($x) cmp fc($y) };
     return $fn;
 }
 
