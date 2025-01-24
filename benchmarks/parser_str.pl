@@ -4,7 +4,6 @@ use open ':std', ':encoding(UTF-8)';
 use Sq;
 use Sq::Parser;
 use Sq::Test;
-use Benchmark qw(cmpthese);
 
 sub pstr_1($string) {
     return sub($ctx,$str) {
@@ -29,7 +28,7 @@ sub pstr_2($string) {
 # Tests
 my @funcs = (qw/pstr_1 pstr_2/);
 for my $func ( @funcs ) {
-    no strict 'refs';
+    no strict 'refs'; ## no critic
     my $fn = *{$func}{CODE};
     my $af = p_and(map { $fn->($_) } "a" .. "f");
     is(p_run($af, "abcdef"), Some(['a' .. 'f']), 'a .. f');
@@ -42,7 +41,7 @@ my $af2 = p_and(map { pstr_2($_) } "a" .. "f");
 my $afc = p_and(map { p_strc($_) } "a" .. "f");
 
 my $str = 'abcdef';
-cmpthese(-1, {
+Sq->bench->compare(-1, {
     pstr_1  => sub { for ( 1 .. 1_000) { my $r = p_run($af1, $str) } },
     pstr_2  => sub { for ( 1 .. 1_000) { my $r = p_run($af2, $str) } },
     current => sub { for ( 1 .. 1_000) { my $r = p_run($afc, $str) } },

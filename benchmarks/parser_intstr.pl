@@ -4,7 +4,6 @@ use open ':std', ':encoding(UTF-8)';
 use Sq;
 use Sq::Parser;
 use Sq::Test;
-use Benchmark qw(cmpthese);
 
 # Benchmark that test performance of p_str with multiple values compared
 # to using p_or( p_str, p_str )
@@ -17,7 +16,7 @@ is(p_run($int1, $str), Some([1,2,3,4,5]), '$int1');
 is(p_run($int2, $str), Some([1,2,3,4,5]), '$int2');
 done_testing;
 
-cmpthese(-1, {
+Sq->bench->compare(-1, {
     int1 => sub { for ( 1 .. 1_000 ) { my $r = p_run($int1, $str) } },
     int2 => sub { for ( 1 .. 1_000 ) { my $r = p_run($int2, $str) } },
 });

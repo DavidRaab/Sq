@@ -4,7 +4,6 @@ use open ':std', ':encoding(UTF-8)';
 use Sq;
 use Sq::Parser;
 use Sq::Test;
-use Benchmark qw(cmpthese);
 
 # Benchmark that shows two different ways to get the same result. Mainly
 # allowing - and _ in an integer and throw those extra characters away.
@@ -31,7 +30,7 @@ for my $int ( $int1, $int2, $int3 ) {
 }
 done_testing;
 
-cmpthese(-3, {
+Sq->bench->compare(-3, {
     int1_complex    => sub { for ( 1 .. 1_000 ) { my $x = p_run($int1, '1-00-00') } },
     int2_matchf     => sub { for ( 1 .. 1_000 ) { my $x = p_run($int2, '1-00-00') } },
     int3_matchf_opt => sub { for ( 1 .. 1_000 ) { my $x = p_run($int3, '1-00-00') } },

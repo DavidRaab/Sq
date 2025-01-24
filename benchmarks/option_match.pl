@@ -3,7 +3,6 @@ use v5.36;
 use open ':std', ':encoding(UTF-8)';
 use Sq;
 use Sq::Test;
-use Benchmark qw(cmpthese);
 
 # Using goto on a subroutine reference means that no call-stack is created.
 # It basically is a so called "tail-call optimization".
@@ -80,7 +79,7 @@ sub match_goto {
 }
 
 my $opts = Array->init(10_000, sub($idx) { Some $idx });
-cmpthese(-1, {
+Sq->bench->compare(-1, {
     match_opt => sub {
         for my $opt ( @$opts ) {
             my $x = match_opt($opt,

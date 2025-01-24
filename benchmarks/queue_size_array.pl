@@ -1,11 +1,8 @@
 #!/usr/bin/env perl
 use 5.036;
 use open ':std', ':encoding(UTF-8)';
-use Sq;
-use Sq::Sig;
-use Sq::Type;
+use Sq -sig => 1;
 use Sq::Test;
-use Benchmark qw(cmpthese);
 use Devel::Size qw(total_size);
 
 my @queue = ();

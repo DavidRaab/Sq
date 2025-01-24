@@ -45,7 +45,7 @@ my @funcs = qw(min1 min2 min3);
 my $data = Array->range(1,10_000);
 $data->shuffle;
 for my $func ( @funcs ) {
-    no strict 'refs';
+    no strict 'refs'; ## no critic
     my $fn = *{$func}{CODE};
     is($fn->([]),       None, "check $func on []");
     is($fn->($data), Some(1), "check $func");

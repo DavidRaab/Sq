@@ -2,10 +2,9 @@
 use 5.036;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
-use Sq;
+use Sq -sig => 1;
 use Sq::Gen;
 use Sq::Test;
-use Sq::Sig;
 
 sub regex1($any) {
     return $any =~ m/\A[-+]?\d+\z/ ? 1 : 0;

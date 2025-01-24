@@ -33,7 +33,7 @@ my $data = [1..10_000];
 # check if it is really the same
 my @funcs = (qw/rev1 rev2 rev3 rev4/);
 for my $func ( @funcs ) {
-    no strict 'refs';
+    no strict 'refs'; ## no critic
     my $fn = *{$func}{CODE};
     is($fn->($data), [reverse @$data], "check $func");
     # short check that array did not change

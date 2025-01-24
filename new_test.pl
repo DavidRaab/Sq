@@ -80,10 +80,9 @@ __DATA__
 use 5.036;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
-use Sq;
+use Sq -sig => 1;
 use Sq::Parser -sig => 1;
 use Sq::Test;
-use Sq::Sig;
 
 ok(1, 'Write a test');
 

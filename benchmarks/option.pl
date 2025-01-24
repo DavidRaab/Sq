@@ -1,8 +1,8 @@
 #!/usr/bin/env perl
 use v5.36;
 use open ':std', ':encoding(UTF-8)';
+use Sq;
 use Sq::Test;
-use Benchmark qw(cmpthese);
 
 # Benchmark for checking implementation of either array-ref or
 # scalar-ref
@@ -58,7 +58,7 @@ done_testing;
 
 # Benchmarks
 printf "Benchmark initialization.\n";
-cmpthese(-3, {
+Sq->bench->compare(-3, {
     array => sub {
         for ( 1 .. 10_000 ) {
             my $o = a_Some(1);
@@ -93,7 +93,7 @@ my @opt_scalars = map { s_Some(1) } 1 .. 10_000;
 }
 
 printf "\nBenchmarking iteration.\n";
-cmpthese(-3, {
+Sq->bench->compare(-3, {
     array => sub {
         for my $opt ( @opt_arrays ) {
             a_iter($opt, sub($x) { $x+1 });

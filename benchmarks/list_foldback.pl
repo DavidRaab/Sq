@@ -4,7 +4,6 @@ use open ':std', ':encoding(UTF-8)';
 use Getopt::Long::Descriptive;
 use Sq;
 use Test2::V0 qw(is done_testing);
-use Benchmark qw(cmpthese);
 
 my ($opt, $usage) = describe_options(
     'Usage: %c %o',
@@ -292,14 +291,14 @@ sub map_v11($list, $f) {
 my $tl = List->range(1,10);
 my $double = sub($x) { $x * 2 };
 for my $func ( qw/map_v1 map_v2 map_v3 map_v4 map_v5 map_v6 map_v7 map_v8 map_v9 map_v10 map_v11/ ) {
-    no strict 'refs';
+    no strict 'refs'; ## no critic
     is($tl->map($double), *{$func}->($tl, $double), $func);
 }
 done_testing;
 
 # Benchmarking
 print "\nBenchmarking foldBack implementations\n";
-cmpthese(-1, {
+Sq->bench->compare(-1, {
     'current' => sub { my $xs = $list->map($double) },
     'map_v1'  => sub { my $xs = map_v1($list, $double) },
     'map_v2'  => sub { my $xs = map_v2($list, $double) },
@@ -311,7 +310,7 @@ cmpthese(-1, {
 print "\n";
 
 print "Benchmarking map implementations\n";
-cmpthese(-1, {
+Sq->bench->compare(-1, {
     'current' => sub { my $xs = $list->map($double) },
     'map_v3'  => sub { my $xs = map_v3($list, $double) },
     'map_v4'  => sub { my $xs = map_v4($list, $double) },

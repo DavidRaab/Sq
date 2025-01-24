@@ -2,7 +2,6 @@
 use v5.36;
 use open ':std', ':encoding(UTF-8)';
 use Sq;
-use Benchmark qw(cmpthese);
 
 package Movie;
 use Moose;
@@ -57,11 +56,11 @@ sub desc($self, $desc=undef) {
 package main;
 
 sub movie(@args) {
-    return Hash->new->lock(qw/title rating desc/)->set(@args);
+    return hash->lock(qw/title rating desc/)->set(@args);
 }
 
 printf "Benchmarking initialization\n";
-cmpthese(-1, {
+Sq->bench->compare(-1, {
     moose => sub {
         for ( 1 .. 1_000 ) {
             my $m = Movie->new(
@@ -78,6 +77,15 @@ cmpthese(-1, {
                 rating => 5,
                 desc   => 'Awesome',
             };
+        }
+    },
+    'hash()'    => sub {
+        for ( 1 .. 1_000 ) {
+            my $m = hash(
+                title  => 'Terminator 2',
+                rating => 5,
+                desc   => 'Awesome',
+            );
         }
     },
     "Hash->new" => sub {
@@ -98,7 +106,7 @@ cmpthese(-1, {
             });
         }
     },
-    sq_func => sub {
+    sq_func_locked => sub {
         for ( 1 .. 1_000 ) {
             my $m = movie(
                 title  => 'Terminator 2',
@@ -109,7 +117,7 @@ cmpthese(-1, {
     },
     sq_func_inlined => sub {
         for ( 1 .. 1_000 ) {
-            my $m = Hash->new->lock(qw/title rating desc/)->set(
+            my $m = hash->lock(qw/title rating desc/)->set(
                 title  => 'Terminator 2',
                 rating => 5,
                 desc   => 'Awesome',
@@ -153,7 +161,7 @@ cmpthese(-1, {
             };
         }
     },
-    perl_hash_bless => sub {
+    manual_hash_bless => sub {
         for ( 1 .. 1_000 ) {
             my $m = bless({
                 title  => 'Terminator 2',
@@ -190,7 +198,7 @@ my $moose = Movie->new(
 );
 
 printf "\nReading just title\n";
-cmpthese(-1, {
+Sq->bench->compare(-1, {
     moose => sub {
         for ( 1 .. 1_000 ) {
             my $title = $moose->title;
@@ -214,7 +222,7 @@ cmpthese(-1, {
 });
 
 printf "\nSetting title to a new value\n";
-cmpthese(-1, {
+Sq->bench->compare(-1, {
     moose => sub {
         for ( 1 .. 1_000 ) {
             $moose->title('Terminator 3');

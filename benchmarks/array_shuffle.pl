@@ -4,7 +4,6 @@ use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Sq;
 use Sq::Test;
-use Sq::Sig;
 use List::Util qw(shuffle);
 
 # swap every element with a random new one

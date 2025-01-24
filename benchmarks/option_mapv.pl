@@ -1,10 +1,8 @@
 #!/usr/bin/env perl
 use v5.36;
 use open ':std', ':encoding(UTF-8)';
-use Sq;
-use Sq::Sig;
+use Sq -sig => 1;
 use Sq::Test;
-use Benchmark qw(cmpthese);
 
 ### map, map2 and map_v
 
@@ -74,7 +72,7 @@ done_testing;
 ### Benchmarks
 
 my $test = Array->init(10_000, sub($idx) { Some($idx) });
-cmpthese(-1, {
+Sq->bench->compare(-1, {
     'map' => sub {
         my $add1 = sub($x) { $x + 1 };
         for my $opt ( @$test ) {
@@ -91,7 +89,7 @@ cmpthese(-1, {
 
 say "";
 my $test2 = Array->init(10_000, sub($idx) { Some 1 });
-cmpthese(-1, {
+Sq->bench->compare(-1, {
     'map2' => sub {
         my $add = sub($x,$y) { $x + $y };
 
@@ -114,7 +112,7 @@ cmpthese(-1, {
 
 say "";
 my $test3 = Array->init(10_000, sub($idx) { Some 1 });
-cmpthese(-1, {
+Sq->bench->compare(-1, {
     'map3' => sub {
         my $add = sub($x,$y,$z) { $x + $y + $z };
 
@@ -138,7 +136,7 @@ cmpthese(-1, {
 });
 
 say "";
-cmpthese(-1, {
+Sq->bench->compare(-1, {
     map_v => sub {
         my $add1 = sub($x) { $x + 1 };
         for my $opt ( @$test ) {

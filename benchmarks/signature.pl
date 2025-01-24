@@ -6,7 +6,6 @@ use Sq::Type;
 use Sq::Signature;
 use Types::Standard qw( ArrayRef CodeRef Any );
 use Params::ValidationCompiler qw( validation_for );
-use Benchmark qw(cmpthese);
 
 # A Benchmark at the moment to compare a version without any type-checks at all (bsearch)
 # then the same function with Sq::Signature added (bsearch_sq)
@@ -186,7 +185,7 @@ say "Max: " , $array->[-1];
 
 my $by_num = sub { $a <=> $b };
 # Benchmark different solutions
-cmpthese(-2, {
+Sq->bench->compare(-2, {
     bsearch => sub {
         for ( 1 .. 250 ) {
             my $idx1 = bsearch($by_num, $array,  25_000);

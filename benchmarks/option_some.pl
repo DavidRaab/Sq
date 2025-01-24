@@ -2,9 +2,8 @@
 use 5.036;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
-use Sq;
+use Sq -sig => 1;
 use Sq::Test;
-use Sq::Sig;
 use Getopt::Long::Descriptive;
 
 my ($opt, $usage) = describe_options(

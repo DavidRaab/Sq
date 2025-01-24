@@ -3,7 +3,6 @@ use v5.36;
 use open ':std', ':encoding(UTF-8)';
 use Sq;
 use Getopt::Long::Descriptive;
-use Benchmark qw(cmpthese);
 use Devel::Size qw(size);
 
 my ($opt, $usage) = describe_options(
@@ -45,7 +44,7 @@ sub perl_array() {
 # perl_array();
 
 
-cmpthese(-1, {
+Sq->bench->compare(-1, {
     'Queue'      => sub { queue()      },
     'Perl Array' => sub { perl_array() },
 });
