@@ -1216,7 +1216,7 @@ sub head($seq) {
 #   -> ('State -> 'a -> 'State)
 #   -> Hash<'Key,'State>
 sub group_fold($seq, $get_state, $get_key, $folder) {
-    my $new = Hash->new;
+    my $new = Hash->empty;
     iter($seq, sub($a) {
         my $key = $get_key->($a);
         if ( exists $new->{$key} ) {
@@ -1231,7 +1231,7 @@ sub group_fold($seq, $get_state, $get_key, $folder) {
 
 # group_by : Seq<'a> -> ('a -> 'Key) -> Hash<'Key,Array<'a>>
 sub group_by($seq, $get_key) {
-    state $new_array = sub()      { Array->new        };
+    state $new_array = sub()      { Array->empty      };
     state $folder    = sub($s,$x) { push(@$s, $x); $s };
     return group_fold($seq, $new_array, $get_key, $folder);
 }
@@ -1474,7 +1474,7 @@ sub split($seq, $regex) {
 }
 
 sub as_hash($seq) {
-    my $h  = Hash->new;
+    my $h  = Hash->empty;
     my $it = $seq->();
 
     my ($key, $value);
@@ -1492,7 +1492,7 @@ sub as_hash($seq) {
 
 # to_hash : Seq<'a> -> ('a -> string,'b) -> Hash<'b>
 sub to_hash($seq, $f_map) {
-    my $hash = Hash->new;
+    my $hash = Hash->empty;
     my $it = $seq->();
     my $x;
     while ( defined($x = $it->()) ) {
@@ -1508,7 +1508,7 @@ sub to_hash($seq, $f_map) {
 #
 # to_hash_of_array: Seq<'a> -> ('a -> 'Key) -> Hash<'Key, Array<'a>>
 sub to_hash_of_array($seq, $f_map) {
-    my $hash = Hash->new;
+    my $hash = Hash->empty;
     iter($seq, sub($x) {
         my ($key, $value) = $f_map->($x);
         Hash::push($hash, $key, $value);
@@ -1518,7 +1518,7 @@ sub to_hash_of_array($seq, $f_map) {
 
 # to_array_of_array : Seq<Seq<'a>> -> Array<Array<'a>>
 sub to_array_of_array($seq) {
-    my $outer = Array->new;
+    my $outer = Array->empty;
     iter($seq, sub($inner) {
         push @$outer, to_array($inner);
     });
