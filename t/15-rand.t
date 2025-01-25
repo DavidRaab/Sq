@@ -27,14 +27,36 @@ ok(Sq->rand->int(10,20)->take(100)->all(sub($x) { $x >= 10 && $x <= 20 }), 'int 
 }
 
 # num
-ok(Sq->rand->num(0,1) ->take(100)->all(sub($x) { $x >= 0 && $x <  1 }), 'num 1');
-ok(Sq->rand->num(1,10)->take(100)->all(sub($x) { $x >= 1 && $x < 10 }), 'num 2');
-ok(Sq->rand->num(9,10)->take(100)->all(sub($x) { $x >= 9 && $x < 10 }), 'num 3');
+check(
+    Sq->rand->num(0,1)->take(100),
+    call(all => sub($x) { $x >= 0 && $x <  1 }),
+    'num 1');
+
+check(
+    Sq->rand->num(1,10)->take(100),
+    call(all => sub($x) { $x >= 1 && $x < 10 }),
+    'num 2');
+
+check(
+    Sq->rand->num(9,10)->take(100),
+    call(all => sub($x) { $x >= 9 && $x < 10 }),
+    'num 3');
 
 # str
-ok(Sq->rand->str(0,0) ->take(100)->all(sub($x) { length $x ==  0 }), 'str 1');
-ok(Sq->rand->str(1,1) ->take(100)->all(sub($x) { length $x ==  1 }), 'str 2');
-ok(Sq->rand->str(1,10)->take(100)->all(sub($x) { length $x <= 10 }), 'str 3');
+check(
+    Sq->rand->str(0,0)->take(100),
+    call(all => sub($x) { length $x ==  0 }),
+    'str 1');
+
+check(
+    Sq->rand->str(1,1) ->take(100),
+    call(all => sub($x) { length $x ==  1 }),
+    'str 2');
+
+check(
+    Sq->rand->str(1,10)->take(100),
+    call(all => sub($x) { length $x <= 10 }),
+    'str 3');
 
 fn rstr => Sq->rand->str;
 is(rstr(1,10, "abc") ->take(100)->rx(qr/\A[abc]+\z/) ->length, 100, 'str 4');
