@@ -407,7 +407,7 @@ is(
 # Haskell's slow "QuickSort"
 {
     # generate an array with random 1_000 ints
-    my $array = gen_run gen [repeat => 1_000, [int => 1_000, 5_000]];
+    my $array = Sq->rand->int(1_000,5_000)->to_array(1_000);
 
     sub qsort($array) {
         return $array if @$array <= 1;

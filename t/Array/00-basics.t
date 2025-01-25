@@ -2189,8 +2189,9 @@ is(
     is($data, [1,2,3,4,5],         '$data unchanged');
 }
 
-is(Array->one(1), [1],   'one 1');
-check_isa(Array->one(1), 'Array', 'one 2');
+is(Array->one(1),      [1], 'one 1');
+is(Array->one(1), array(1), 'one 2');
+check_isa(Array->one(1), 'Array', 'one 3');
 
 is(array() ->is_empty, 1, 'is_empty 1');
 is(array(1)->is_empty, 0, 'is_empty 2');
