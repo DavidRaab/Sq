@@ -9,7 +9,7 @@ our @EXPORT = (
     qw(gen_or),                          # Combinators
     qw(gen_array gen_repeat),            # Array
     qw(gen_sha512 gen_str gen_str_from), # String
-    qw(gen_int gen_float),               # Nums
+    qw(gen_int gen_num),                 # Nums
 );
 
 ### RUNNERS
@@ -79,7 +79,7 @@ sub gen_int($min, $max) {
     }
 }
 
-sub gen_float($min, $max) {
+sub gen_num($min, $max) {
     return sub() {
         my $diff = $max - $min;
         return $min + rand($diff);
