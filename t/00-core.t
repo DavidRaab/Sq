@@ -36,7 +36,7 @@ is(
 is(
     Array::map([[1,2,3], [4,5,6], [7,8,9]], call 'sum'),
     [6,15,24],
-    'call now also supports unblessed Arrays/Hashes');
+    'call also supports unblessed Arrays/Hashes');
 
 # max returns an optional value, because there can be no max value on an empty array
 is(
@@ -404,7 +404,7 @@ is(
     ],
     'record');
 
-# Haskell's "slow" QuickSort
+# Haskell's slow "QuickSort"
 {
     # generate an array with random 1_000 ints
     my $array = gen_run gen [repeat => 1_000, [int => 1_000, 5_000]];
