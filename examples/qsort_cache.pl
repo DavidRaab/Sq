@@ -8,16 +8,17 @@ use IO::Handle;
 
 # Haskell's slow "QuickSort"
 print "This sorts/prints a sequence of 5_000 random integers.\n";
-print "It takes around ~30 seconds to start.\n";
+print "Because ->cache is used on the sequences, it is faster\n";
+print "but consumes more memory.\n";
 
 sub qsort($seq) {
     return $seq if $seq->is_empty;
     my $pivot = $seq->head;
     my $rest  = $seq->tail;
     Seq->concat(
-        qsort($rest->keep(sub($x) { $x <= $pivot })),
+        qsort($rest->keep(sub($x) { $x <= $pivot })->cache),
         Seq->one($pivot),
-        qsort($rest->keep(sub($x) { $x >  $pivot })),
+        qsort($rest->keep(sub($x) { $x >  $pivot })->cache),
     );
 }
 
