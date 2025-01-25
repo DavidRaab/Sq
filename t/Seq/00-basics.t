@@ -1157,4 +1157,11 @@ is(
     },
     'DNA');
 
+is(Seq->one(1),       seq{1}, 'one 1');
+check_isa(Seq->one(1), 'Seq', 'one 2');
+
+is(seq {}     ->is_empty, 1,         'is_empty 1');
+is(seq {1}    ->is_empty, 0,         'is_empty 2');
+is(seq {1,2,3}->tail,     seq {2,3}, 'tail 1');
+
 done_testing;

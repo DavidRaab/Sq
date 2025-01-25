@@ -22,6 +22,8 @@ static replicate => sub($count, $initial) {
     return CORE::bless([($initial) x $count], 'Array');
 };
 
+sub one($, $x) { CORE::bless([$x], 'Array') }
+
 # creates new array, stops at first undef
 sub new($, @array) {
     my @new;
@@ -950,7 +952,8 @@ sub iter2d($aoa, $f) {
 #         Those are functions converting Array to none Array types            #
 #-----------------------------------------------------------------------------#
 
-sub head($array) { $array->[0] }
+sub is_empty($array) { @$array == 0 ? 1 : 0 }
+sub head    ($array) { $array->[0] }
 
 # fold : Array<'a> -> 'State -> (a -> 'State -> 'State) -> 'State
 sub fold($array, $state, $folder) {

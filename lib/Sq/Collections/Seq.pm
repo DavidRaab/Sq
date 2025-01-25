@@ -24,7 +24,11 @@ use subs 'bind', 'join', 'select', 'last', 'sort', 'map', 'length';
 #                    Functions that create sequences                          #
 #-----------------------------------------------------------------------------#
 
-# creates a sequence from a subroutine
+# creates a sequence from a subroutine. It already implements the logic
+# that when the subroutine returns "undef" once. The sequence correctly
+# aborts and free the iterator. Otherwise this function also can be used
+# as a Template for every new sequence implementation. As this must be
+# the default for sequences.
 sub from_sub($, $f) {
     return bless(sub {
         my $abort = 0;
@@ -37,6 +41,17 @@ sub from_sub($, $f) {
             }
             $abort = 1;
             undef $it;
+        }
+    }, 'Seq');
+}
+
+sub one($, $x) {
+    bless(sub {
+        my $abort = 0;
+        return sub {
+            return undef if $abort;
+            $abort = 1;
+            return $x;
         }
     }, 'Seq');
 }
@@ -1087,6 +1102,8 @@ sub permute($seq) {
     }, 'Seq');
 }
 
+sub tail($seq) { $seq->skip(1) }
+
 #-----------------------------------------------------------------------------#
 # SIDE-EFFECTS                                                                #
 #    functions that have side-effects or produce side-effects. Those are      #
@@ -1177,6 +1194,17 @@ sub do_every($seq, $count, $f) {
 # CONVERTER                                                            #
 #         Those are functions converting Seq to none Seq types         #
 #----------------------------------------------------------------------#
+
+sub is_empty($seq) {
+    my $x = $seq->()();
+    return defined $x ? 0 : 1;
+}
+
+sub head($seq) {
+    my $x = $seq->()();
+    return $x if defined $x;
+    Carp::croak "Seq::head Sequence was empty";
+}
 
 # group_fold :
 #   Seq<'a>
