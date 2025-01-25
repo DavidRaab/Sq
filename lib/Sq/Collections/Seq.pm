@@ -629,15 +629,18 @@ sub take($seq, $amount) {
 
 # take_while : Seq<'a> -> ('a -> bool) -> Seq<'a>
 sub take_while($seq, $predicate) {
-    from_sub('Seq', sub {
-        my $it = $seq->();
+    bless(sub {
+        my $abort = 0;
+        my $it    = $seq->();
         my $value;
         return sub {
+            return undef if $abort;
             $value = $it->();
             return $value if $predicate->($value);
-            return undef;
+            $abort = 1;
+            undef $it;
         };
-    });
+    }, 'Seq');
 }
 
 # skip : Seq<'a> -> int -> Seq<'a>
@@ -1547,7 +1550,7 @@ sub all($seq, $predicate) {
     my $it = $seq->();
     my $x;
     while ( defined($x = $it->()) ) {
-        return 0 if not $predicate->($x);
+        return 0 if !$predicate->($x);
     }
     return 1;
 }

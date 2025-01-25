@@ -1288,7 +1288,7 @@ sub any($array, $predicate) {
 
 sub all($array, $predicate) {
     for my $x ( @$array ) {
-        return 0 if not $predicate->($x);
+        return 0 if !$predicate->($x);
     }
     return 1;
 }
