@@ -264,6 +264,16 @@ sub to_array($hash, $f) {
     return CORE::bless(\@new, 'Array');
 }
 
+sub with_default($hash, %def) {
+    my %new = %$hash;
+    for my ($key,$value) ( %def ) {
+        if ( !exists $new{$key} ) {
+            $new{$key} = $value;
+        }
+    }
+    return CORE::bless(\%new, 'Hash');
+}
+
 #
 # SIDE-EFFECTS
 #

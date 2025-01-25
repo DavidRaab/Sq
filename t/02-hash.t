@@ -900,4 +900,59 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
         'iter_sort');
 }
 
+{
+    my $data = sq {
+        title => "Greatest Hits",
+    };
+
+    # TODO: Consider that it doesn't make a copy of tracks for example,
+    #       so re-using the same hash somewhere instead of directly inlining
+    #       the hash in the function will create shared data over multiple values
+    #       But i anyway plan to implement a global copy().
+    my $album = $data->with_default(
+        title  => "Unkown",
+        desc   => "",
+        artist => "Nobody",
+        tracks => [
+            { id => 1, duration => 10 },
+        ],
+    );
+
+    is($data, { title => "Greatest Hits" }, '$data unchanged');
+    is(
+        $album,
+        {
+            title  => "Greatest Hits",
+            desc   => "",
+            artist => "Nobody",
+            tracks => [
+                { id => 1, duration => 10 },
+            ],
+        },
+        'title stays, all other values added');
+
+    # with() overwrites values, while with_default() keeps the values.
+    my $album2 = $data->with(
+        title  => "Unkown",
+        desc   => "",
+        artist => "Nobody",
+        tracks => [
+            { id => 1, duration => 10 },
+        ],
+    );
+
+    is($data, { title => "Greatest Hits" }, '$data unchanged');
+    is(
+        $album2,
+        {
+            title  => "Unkown", # Now overwritten
+            desc   => "",
+            artist => "Nobody",
+            tracks => [
+                { id => 1, duration => 10 },
+            ],
+        },
+        'title is overwritten');
+}
+
 done_testing;
