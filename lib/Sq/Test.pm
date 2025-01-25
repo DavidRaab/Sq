@@ -19,7 +19,7 @@ my $count = 0;
 sub ok($bool, $message) {
     $count++;
     if ( is_num $bool ) {
-        Carp::croak "Error: ok() only expects 0 or 1 as numbers. Got: $bool\n" if ($bool != 0 && $bool != 1);
+        Carp::croak "ok() only expects 0 or 1 as numbers. Got: $bool\n" if ($bool != 0 && $bool != 1);
         if ( $bool ) {
             print "ok $count - $message\n"
         }
@@ -58,8 +58,9 @@ sub ok($bool, $message) {
             return;
         }
 
-        Carp::croak "Error: ok() got: $bool\n" if $type eq "";
-        Carp::croak "Error: ok() got ref: $type\n";
+        Carp::croak "ok() Got: Empty string" if $type eq "" && $bool eq "";
+        Carp::croak "ok() Got: $bool" if $type eq "";
+        Carp::croak "ok() Got ref: $type";
     }
     return;
 }
@@ -67,7 +68,7 @@ sub ok($bool, $message) {
 sub nok($bool, $message) {
     $count++;
     if ( is_num($bool) ) {
-        Carp::croak "Error: ok() only expects 0 or 1 as numbers Got: $bool\n" if ($bool != 0 && $bool != 1);
+        Carp::croak "ok() only expects 0 or 1 as numbers Got: $bool\n" if ($bool != 0 && $bool != 1);
         if ( $bool == 0 ) {
             print "ok $count - $message\n";
             return;
@@ -101,8 +102,8 @@ sub nok($bool, $message) {
             return;
         }
 
-        Carp::croak "Error: nok got: $bool\n" if ref eq "";
-        Carp::croak "Error: nok() got ref: $type\n";
+        Carp::croak "nok() Got: $bool\n" if ref eq "";
+        Carp::croak "nok() Got ref: $type\n";
     }
 
     # C-style error handling without exception crap.
