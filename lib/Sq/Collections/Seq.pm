@@ -1229,11 +1229,18 @@ sub group_fold($seq, $get_state, $get_key, $folder) {
     return $new;
 }
 
-# group_by : Seq<'a> -> ('a -> 'Key) -> Hash<'Key,Array<'a>>
-sub group_by($seq, $get_key) {
-    state $new_array = sub()      { Array->empty      };
-    state $folder    = sub($s,$x) { push(@$s, $x); $s };
-    return group_fold($seq, $new_array, $get_key, $folder);
+sub group_by($seq, $f_key) {
+    my (%hash, $key, $x);
+    my $it = $seq->();
+    while ( defined($x = $it->()) ) {
+        $key = $f_key->($x);
+        push @{$hash{$key}}, $x;
+    }
+    # Add Array blessings
+    for my $value ( CORE::values %hash ) {
+        CORE::bless($value, 'Array');
+    }
+    return CORE::bless(\%hash, 'Hash');
 }
 
 # fold : Seq<'a> -> 'State -> ('a -> 'State -> 'State) -> 'State

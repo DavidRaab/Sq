@@ -19,7 +19,6 @@ my @data = (
     my $grouped = Seq->from_array(\@data)->group_by(key 'id');
     check_isa($grouped, 'Hash', 'group_by return Hash');
     is($grouped->length, 3, '3 elements');
-
     is(
         $grouped,
         {
@@ -37,6 +36,11 @@ my @data = (
             ]
         },
         'group_by');
+
+    # check if all values are blessed arrays
+    $grouped->values->iter(sub($value) {
+        is(ref($value), 'Array', 'is blessed Array');
+    });
 }
 
 # group_fold
