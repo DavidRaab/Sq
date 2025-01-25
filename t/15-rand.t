@@ -16,6 +16,12 @@ ok(Sq->rand->int(10,20)->take(100)->all(sub($x) { $x >= 10 && $x <= 20 }), 'int 
     my $ints = Sq->rand->int(1,10)->take(1_000_000);
     my $seen = Hash->init(10, sub($idx) { $idx+1 => 0 });
 
+    # This isn't optimal. As the sequence depends on a mutable state that
+    # is defined/used outside the sequence itself. Evaluating the sequence
+    # multiple times would not produce the same results. But when the sequence
+    # is directly defined, not saved everywhere and directly ->count() is called
+    # on it, then it doesn't produce any problem as the sequence is only used
+    # a single time.
     my $hash = $ints->take_while(sub($x) {
         $seen->{$x} = 1;
         # take as long any value in hash is equal to 0
