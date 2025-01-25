@@ -155,6 +155,13 @@ sub bench($) {
     }
     return 'Sq::Bench';
 }
+sub rand($) {
+    if ( !exists $INC{'Sq/Rand.pm'} ) {
+        require Sq::Rand;
+        Sq::Rand->load_signature();
+    }
+    return 'Sq::Rand';
+}
 
 # Str Module
 sub Str :prototype() {
