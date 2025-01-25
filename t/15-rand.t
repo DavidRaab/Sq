@@ -28,7 +28,10 @@ ok(Sq->rand->int(10,20)->take(100)->all(sub($x) { $x >= 10 && $x <= 20 }), 'int 
         $seen->values->any(sub($x) { $x == 0 });
     })->count;
 
-    ok($hash->values->all(sub($v) { $v > 0 }),           'count');
+    check(
+        $hash->values,
+        call(all => sub($v) { $v > 0 }),
+        'count');
     is($seen, Hash->init(10, sub($idx) { $idx+1 => 1 }), 'all seen');
 }
 
