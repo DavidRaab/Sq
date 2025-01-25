@@ -3,6 +3,16 @@ use 5.036;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Sq -sig => 1;
+# Explicitly load all modules. Otherwise this program doesn't show
+# much because all of them are lazily loaded
+use Sq::Core::Str;
+use Sq::Io;
+use Sq::Fs;
+use Sq::Math;
+use Sq::Fmt;
+use Sq::Gen;
+use Sq::Rand;
+use Sq::Bench;
 use Sq::Reflection qw(statics signatures);
 
 print "Currently defined statics.\n";
