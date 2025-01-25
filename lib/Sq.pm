@@ -15,7 +15,7 @@ our @EXPORT = (
     qw(sq call key assign seq new),
     qw(is_num is_str is_array is_hash is_seq is_opt is_result is_sub is_regex is_ref),
     qw(fn multi with_dispatch type_cond),
-    qw(id fst snd),
+    qw(id fst snd copy),
     qw(by_num by_str by_stri),
     qw(array hash record),
     qw(Str),
@@ -431,5 +431,8 @@ sub fn($name,$sub) {
     my $full = caller . '::' . $name;
     Sq::Reflection::set_func($full,$sub);
 }
+
+# Not yet implemented
+sub copy($any) { ... }
 
 1;
