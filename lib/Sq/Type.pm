@@ -16,9 +16,10 @@ our @EXPORT = (
 );
 
 # Manual import
-*is_num = \&Scalar::Util::looks_like_number;
-*Ok     = \&Result::Ok;
-*Err    = \&Result::Err;
+*blessed = \&Scalar::Util::blessed;
+*is_num  = \&Scalar::Util::looks_like_number;
+*Ok      = \&Result::Ok;
+*Err     = \&Result::Err;
 
 # TODO
 # Add: t_none, t_any
@@ -572,7 +573,7 @@ sub t_even_sized() {
 
 sub t_can(@methods) {
     return sub($any) {
-        my $class = builtin::blessed($any);
+        my $class = blessed($any);
         if ( defined $class ) {
             my $sub;
             for my $method ( @methods ) {
