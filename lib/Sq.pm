@@ -247,17 +247,17 @@ sub is_sub    :prototype($)  { return ref $_[0] eq 'CODE'   ? 1 : 0 }
 ### Comparision Functions
 
 sub by_num :prototype() {
-    state $fn = sub($x,$y) { $x <=> $y };
+    state $fn = sub { $_[0] <=> $_[1] };
     return $fn;
 }
 
 sub by_str :prototype() {
-    state $fn = sub($x,$y) { $x cmp $y };
+    state $fn = sub { $_[0] cmp $_[1] };
     return $fn;
 }
 
 sub by_stri :prototype() {
-    state $fn = sub($x,$y) { fc($x) cmp fc($y) };
+    state $fn = sub { fc($_[0]) cmp fc($_[1]) };
     return $fn;
 }
 
