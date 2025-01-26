@@ -900,6 +900,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
         'iter_sort');
 }
 
+# with_default()
 {
     my $data = sq {
         title => "Greatest Hits",
