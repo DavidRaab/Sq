@@ -6,7 +6,8 @@ use Sq;
 # use Sq -sig => 1;
 
 print "Generating Cache in Memory.\n";
-my $cache = seq { 0 .. 9 }->permute->to_array;
+# my $cache = seq { 0 .. 9 }->permute->to_array;
+my $cache = Array::permute([0..9]);
 
 Sq->bench->it(sub {
     my @permute = ('A' .. 'J');
