@@ -172,14 +172,31 @@ sub flatten($array_of_array) {
     *merge = \&flatten;
 }
 
-sub cartesian($as, $bs) {
-    my $new = new('Array');
-    for my $a ( @$as ) {
-        for my $b ( @$bs ) {
-            push @$new, CORE::bless([$a, $b], 'Array');
+sub cartesian(@arrays) {
+    state $count_up = sub($max, $counter) {
+        my $idx = $counter->$#*;
+        UP:
+        $counter->[$idx]++;
+        if ( $counter->[$idx] >= $max->[$idx] ) {
+            $counter->[$idx] = 0;
+            $idx--;
+            return 0 if $idx < 0;
+            goto UP;
         }
+        return 1;
+    };
+
+    my $maxs    = [map { scalar @$_ } @arrays];
+    my $counter = [(0) x (scalar @arrays)];
+    my @new     = [map { $_->[0] } @arrays];
+    while ( $count_up->($maxs, $counter) ) {
+        my @inner;
+        for (my $aidx=0; $aidx < @arrays; $aidx++) {
+            push @inner, $arrays[$aidx][$counter->[$aidx]];
+        }
+        push @new, CORE::bless(\@inner, 'Array');
     }
-    return $new;
+    return CORE::bless(\@new, 'Array');
 }
 
 # append : Array<'a> -> Array<'a> -> Array<'a>

@@ -42,7 +42,7 @@ sig ('Array::copy',          $array,                               $array);
 sig ('Array::bind',          $array, $sub,                         $array);
 sig ('Array::flatten',       $aoa,                                 $array);
 sig ('Array::merge',         $aoa,                                 $array);
-sig ('Array::cartesian',     $array, $array,   t_array(t_of t_tuple($any, $any)));
+sigt('Array::cartesian',     t_array(t_of t_array(t_min 1)),         $aoa);
 sig ('Array::append',        $array, $array,                       $array);
 sig ('Array::rev',           $array,                               $array);
 sig ('Array::map',           $array, $sub,                         $array);
