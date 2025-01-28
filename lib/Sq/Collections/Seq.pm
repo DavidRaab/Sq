@@ -429,15 +429,23 @@ sub merge($seq) {
 
 sub cartesian(@seqs) {
     return bless(sub {
-        my $abort  = 0;
-        my @its    = map { $_->() } @seqs;
-        my $last   = @its - 1;
+        my $abort = 0;
+        my @its   = map { $_->() } @seqs;
+        my $last  = @its - 1;
         my @values;
         return sub {
             return undef if $abort;
             # first call
             if ( @values == 0 ) {
                 @values = map { $_->() } @its;
+                # TODO:
+                # When one sequence is empty i just abort. Another idea would be
+                # to skip empty sequences. But then the behaviour should be the
+                # same in an Array::cartesian
+                if ( grep { !defined } @values ) {
+                    $abort = 1;
+                    return undef;
+                }
                 return bless([@values], 'Array');
             }
             # all others
