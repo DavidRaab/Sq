@@ -1079,6 +1079,48 @@ is(
     },
     'permute 8');
 
+is(
+    Seq::cartesian(seq{1,2,3}, seq{qw/A B C/}, seq{qw/foo bar/}, seq{0,1}),
+    seq {
+        [1,"A","foo",0],
+        [1,"A","foo",1],
+        [1,"A","bar",0],
+        [1,"A","bar",1],
+        [1,"B","foo",0],
+        [1,"B","foo",1],
+        [1,"B","bar",0],
+        [1,"B","bar",1],
+        [1,"C","foo",0],
+        [1,"C","foo",1],
+        [1,"C","bar",0],
+        [1,"C","bar",1],
+        [2,"A","foo",0],
+        [2,"A","foo",1],
+        [2,"A","bar",0],
+        [2,"A","bar",1],
+        [2,"B","foo",0],
+        [2,"B","foo",1],
+        [2,"B","bar",0],
+        [2,"B","bar",1],
+        [2,"C","foo",0],
+        [2,"C","foo",1],
+        [2,"C","bar",0],
+        [2,"C","bar",1],
+        [3,"A","foo",0],
+        [3,"A","foo",1],
+        [3,"A","bar",0],
+        [3,"A","bar",1],
+        [3,"B","foo",0],
+        [3,"B","foo",1],
+        [3,"B","bar",0],
+        [3,"B","bar",1],
+        [3,"C","foo",0],
+        [3,"C","foo",1],
+        [3,"C","bar",0],
+        [3,"C","bar",1]
+    },
+    'cartesian on many sequences');
+
 # bind() is like binding the inner value of a sequence to a variable
 # so somehow similar like just iterating through a sequence. or like map().
 # but we return another sequence that then is flattened. bind() is like just

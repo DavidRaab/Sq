@@ -39,7 +39,7 @@ sig('Seq::map2',          $seq, $seq, $sub,     $seq);
 sig('Seq::bind',          $seq, $sub,           $seq);
 sig('Seq::flatten',       $seq,                 $seq);
 sig('Seq::merge',         $seq,                 $seq);
-sig('Seq::cartesian',     $seq, $seq,           $seq);
+sigt('Seq::cartesian',    t_array(t_of $seq),   $seq);
 sig('Seq::left_join',     $seq, $seq, $sub,     $seq);
 # sig('Seq::merge',         $seq, $sub,           $seq);
 sig('Seq::select',        $seq, $any, $any,     $seq);
