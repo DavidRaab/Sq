@@ -1177,6 +1177,69 @@ is(
     },
     'permute 9');
 
+# same as permute 9 but with cartesian
+is(
+    Seq::cartesian(
+        seq {qw/A B/  }->permute,
+        seq {qw/C G A/}->permute,
+        seq {qw/T K/  }->permute,
+    )->map(call 'flatten'),
+    seq {
+        ["A","B", "C","G","A", "T","K"],
+        ["A","B", "C","G","A", "K","T"],
+        ["A","B", "C","A","G", "T","K"],
+        ["A","B", "C","A","G", "K","T"],
+        ["A","B", "G","C","A", "T","K"],
+        ["A","B", "G","C","A", "K","T"],
+        ["A","B", "G","A","C", "T","K"],
+        ["A","B", "G","A","C", "K","T"],
+        ["A","B", "A","C","G", "T","K"],
+        ["A","B", "A","C","G", "K","T"],
+        ["A","B", "A","G","C", "T","K"],
+        ["A","B", "A","G","C", "K","T"],
+        ["B","A", "C","G","A", "T","K"],
+        ["B","A", "C","G","A", "K","T"],
+        ["B","A", "C","A","G", "T","K"],
+        ["B","A", "C","A","G", "K","T"],
+        ["B","A", "G","C","A", "T","K"],
+        ["B","A", "G","C","A", "K","T"],
+        ["B","A", "G","A","C", "T","K"],
+        ["B","A", "G","A","C", "K","T"],
+        ["B","A", "A","C","G", "T","K"],
+        ["B","A", "A","C","G", "K","T"],
+        ["B","A", "A","G","C", "T","K"],
+        ["B","A", "A","G","C", "K","T"]
+    },
+    'permute 10');
+
+# when cartesian contains an empty we cannot compute a cartesian
+is(
+    Seq::cartesian(seq{1,2,3}, Seq->empty, seq {qw/A B/}),
+    seq {},
+    'cartesian with empty seq');
+
+{
+    my $az   = seq {'a' .. 'z'};
+    # this would generate 11_881_376 items when fully runned
+    my $cart = Seq::cartesian($az, $az, $az, $az, $az)->take(10);
+    is(
+        $cart,
+        seq {
+            [ "a", "a", "a", "a", "a" ],
+            [ "a", "a", "a", "a", "b" ],
+            [ "a", "a", "a", "a", "c" ],
+            [ "a", "a", "a", "a", "d" ],
+            [ "a", "a", "a", "a", "e" ],
+            [ "a", "a", "a", "a", "f" ],
+            [ "a", "a", "a", "a", "g" ],
+            [ "a", "a", "a", "a", "h" ],
+            [ "a", "a", "a", "a", "i" ],
+            [ "a", "a", "a", "a", "j" ],
+        },
+        'cartesian on big sequence');
+    is($cart->length, 10, '$cart is 10');
+}
+
 is(
     seq { split //, "AAACGTT" }
     ->permute
