@@ -427,12 +427,53 @@ sub merge($seq) {
     });
 }
 
-# TODO: cartesian with multiple sequences: permute()
-sub cartesian($seqA, $seqB) {
-    bind($seqA, sub($a) {
-    bind($seqB, sub($b) {
-        new ('Seq', CORE::bless([$a, $b], 'Array'));
-    })});
+sub cartesian(@seqs) {
+    return bless(sub {
+        my $abort  = 0;
+        my @its    = map { $_->() } @seqs;
+        my $last   = @its - 1;
+        my @values;
+        return sub {
+            return undef if $abort;
+            # first call
+            if ( @values == 0 ) {
+                @values = map { $_->() } @its;
+                return bless([@values], 'Array');
+            }
+            # all others
+            else {
+                my $idx = $last;
+                UP:
+                my $x = $its[$idx]->();
+                # when last iterator returns new element we save new value
+                # and can immediately return
+                if ( defined $x ) {
+                    $values[$idx] = $x;
+                    return bless([@values], 'Array');
+                }
+                # last/current iterator ended
+                else {
+                    # re-initalize current iterator again, and get first value again
+                    # current starts being last, but the loop maybe needs to
+                    # reset multiple iterators again.
+                    $its[$idx]    = $seqs[$idx]->();
+                    $values[$idx] = $its[$idx]->();
+                    $idx--;
+                    # when we reach -1 then the sequence ends
+                    if ( $idx < 0 ) {
+                        $abort = 1;
+                        undef @its;
+                        undef @values;
+                        return undef;
+                    }
+                    # we now try previous $idx and loop
+                    else {
+                        goto UP;
+                    }
+                }
+            }
+        }
+    }, 'Seq');
 }
 
 # join creates the cartesian product, but only for those elements

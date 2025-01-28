@@ -11,13 +11,13 @@ my $cards =
 
 # check cartesian first -- is used by join/select
 is(
-    $cards->to_array,
-    [
+    $cards,
+    seq {
         (map { [clubs   => $_ ] } qw/7 8 9 10 B D K A/),
         (map { [spades  => $_ ] } qw/7 8 9 10 B D K A/),
         (map { [hearts  => $_ ] } qw/7 8 9 10 B D K A/),
         (map { [diamond => $_ ] } qw/7 8 9 10 B D K A/),
-    ],
+    },
     'cartesian 1');
 
 # testing full output
@@ -35,24 +35,13 @@ is(
     },
     'cartesian 2');
 
-# testing against non-lazy variant
-sub cartesian($arrayA, $arrayB) {
-    my @output;
-    for my $a ( @$arrayA ) {
-        for my $b ( @$arrayB ) {
-            push @output, [$a, $b];
-        }
-    }
-    return \@output;
-}
-
 is(
     $cards->to_array,
-    cartesian(
+    Array::cartesian(
         [qw/clubs spades hearts diamond/],
         [qw/7 8 9 10 B D K A/],
     ),
-    'cartesian non-lazy');
+    'Seq::cartesian vs Array::cartesian');
 
 #--- ---
 
