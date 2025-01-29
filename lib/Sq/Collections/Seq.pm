@@ -1278,6 +1278,16 @@ sub group_fold($seq, $get_state, $get_key, $folder) {
     return $new;
 }
 
+sub keyed_by($seq, $f_key) {
+    my (%hash, $key, $x);
+    my $it = $seq->();
+    while ( defined($x = $it->()) ) {
+        $key = $f_key->($x);
+        $hash{$key} = $x;
+    }
+    return CORE::bless(\%hash, 'Hash');
+}
+
 sub group_by($seq, $f_key) {
     my (%hash, $key, $x);
     my $it = $seq->();

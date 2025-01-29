@@ -1398,4 +1398,34 @@ is(seq {1,2,3}->tail,     seq {2,3}, 'tail 1');
     nok($data->contains(qr/\A\z/),                   'regexp 2');
 }
 
+# keyed_by
+{
+    my $data = seq {
+        {id => 1, name => "foo"},
+        {id => 2, name => "foo"},
+        {id => 3, name => "Whatever"},
+        {id => 4, name => "But not Lena"},
+    };
+
+    is(
+        $data->keyed_by(key 'id'),
+        {
+            1 => {id => 1, name => "foo"},
+            2 => {id => 2, name => "foo"},
+            3 => {id => 3, name => "Whatever"},
+            4 => {id => 4, name => "But not Lena"},
+        },
+        'keyed_by');
+
+    is(
+        $data->keyed_by(key 'name')->length,
+        3,
+        'keyed_by name only has 3 entries');
+
+    is(
+        $data->keyed_by(key 'name')->values->map(key 'name')->sort(by_str),
+        $data->distinct_by(key 'name')->map(key 'name')->sort(by_str),
+        'keyed_by->values is like distinct_by');
+}
+
 done_testing;
