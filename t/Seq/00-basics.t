@@ -1428,4 +1428,50 @@ is(seq {1,2,3}->tail,     seq {2,3}, 'tail 1');
         'keyed_by->values is like distinct_by');
 }
 
+# itern
+{
+    my $data = seq { map { $_ => "foo" } 0 .. 9 };
+    my @tuples;
+    $data->itern(2, sub($k,$v) {
+        push @tuples, [$k,$v];
+    });
+    is(\@tuples, [
+        [0 => "foo"],
+        [1 => "foo"],
+        [2 => "foo"],
+        [3 => "foo"],
+        [4 => "foo"],
+        [5 => "foo"],
+        [6 => "foo"],
+        [7 => "foo"],
+        [8 => "foo"],
+        [9 => "foo"],
+    ], 'itern 1');
+
+    my @sum2;
+    $data->itern(4, sub($k1,$v1,$k2,$v2) {
+        push @sum2, [$k1+$k2, $v1.$v2];
+    });
+    is(\@sum2, [
+        [1  => "foofoo"],
+        [5  => "foofoo"],
+        [9  => "foofoo"],
+        [13 => "foofoo"],
+        [17 => "foofoo"],
+    ], 'itern 2');
+
+    my @iter3;
+    Seq->range(1, 1_000_000_000)->take(10)->itern(3, sub($x,$y,$z) {
+        push @iter3, [$x,$y,$z]
+    }),
+    is(
+        \@iter3,
+        [
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9],
+        ],
+        'itern 3');
+}
+
 done_testing;

@@ -1170,6 +1170,22 @@ sub iter($seq, $f) {
     return;
 }
 
+sub itern($seq, $amount, $f) {
+    Carp::croak 'Seq::itern: $amount should be at least 2' if $amount < 2;
+    my $it         = $seq->();
+    my ($count,$x) = (0);
+    my @values;
+    while ( defined($x = $it->()) ) {
+        push @values, $x;
+        if ( ++$count >= $amount ) {
+            $f->(@values);
+            @values = ();
+            $count  = 0;
+        }
+    }
+    return;
+}
+
 sub iteri($seq, $f) {
     my $it        = $seq->();
     my ($idx, $x) = (0, undef);
