@@ -1313,6 +1313,15 @@ sub fold_mut($seq, $state, $f_state) {
     return $state;
 }
 
+sub index($seq, $idx) {
+    my $it            = $seq->();
+    my ($current, $x) = (0);
+    while ( defined($x = $it->()) ) {
+        return Option::Some($x) if $idx == $current++;
+    }
+    return Option::None();
+}
+
 sub count($seq) {
     my (%new, $x);
     my $it = $seq->();
