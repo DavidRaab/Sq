@@ -1010,7 +1010,6 @@ sub reduce($array, $f) {
     return Option::Some($init);
 }
 
-# TODO: Should equal() be extended that it also can equal with a Regexp?
 sub contains($array, $any) {
     if ( Sq::is_regex($any) ) {
         for my $x ( @$array ) {
