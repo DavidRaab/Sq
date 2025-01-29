@@ -29,6 +29,7 @@ sig ('Seq::from_hash',  $class, t_hash,  $sub,       $seq);
 sigt('Seq::concat',     t_tuplev($class, $aos),      $seq);
 sig ('Seq::up',         $class, t_int,               $seq);
 sig ('Seq::down',       $class, t_int,               $seq);
+sig ('Seq::one',        $class, $any,                $seq);
 
 ### METHODS
 
@@ -70,6 +71,7 @@ sig('Seq::infinity',      $seq,                 $seq);
 sig('Seq::repeat',        $seq, t_int,          $seq);
 sig('Seq::trim',          $seq,                 $seq);
 sig('Seq::permute',       $seq,                 $seq);
+sig('Seq::tail',          $seq,                 $seq);
 
 # sig('Seq::sort_hash_str', $aoh,    t_str,        $aoh);
 # sigt('Seq::slice',             t_tuplev($seq, $aint), $seq);
@@ -86,6 +88,8 @@ sig('Seq::doi',      $seq, $sub,        $seq);
 
 ### CONVERTER
 
+sig('Seq::is_empty',   $seq,                   t_bool);
+sig('Seq::head',       $seq,                     $any);
 sig('Seq::sort',       $seq, $sub,            t_array);
 sig('Seq::sort_by',    $seq, $sub, $sub,      t_array);
 sig('Seq::group_fold', $seq, $sub, $sub, $sub, t_hash);
@@ -95,6 +99,7 @@ sig('Seq::fold_mut',   $seq, $any, $sub,         $any);
 sig('Seq::reduce',     $seq, $sub,               $opt);
 sig('Seq::first',      $seq,                     $opt);
 sig('Seq::last',       $seq,                     $opt);
+sig('Seq::contains',   $seq, $any,             t_bool);
 sigt('Seq::to_array',
     t_or(
         t_tuple($seq),
@@ -102,6 +107,12 @@ sigt('Seq::to_array',
     ),
     t_array
 );
+sigt('Seq::index',
+    t_or(
+        t_tuple($seq, t_int),
+        t_tuple($seq, t_int, $any),
+    ),
+    $any);
 sig('Seq::to_seq',     $seq, $seq);
 #sig('Seq::expand',    $seq, ...);
 sig('Seq::length',     $seq,                       t_int);

@@ -34,6 +34,7 @@ sig ('Array::init2d',     $pint, $pint, $sub,          $array);
 sig ('Array::unfold',     $class, $any, $sub,          $array);
 sig ('Array::range_step', $class, t_num, t_num, t_num, $array);
 sig ('Array::range',      $class, t_int, t_int,        $array);
+sig ('Array::one',        $class, $any,                $array);
 
 
 ### METHODS
@@ -122,11 +123,18 @@ sig('Array::iter_sort', $array, $sub, $sub,  t_void);
 
 ### CONVERTER
 
+sig('Array::is_empty',   $array,                      t_bool);
 sig('Array::fold',       $array, $any, $sub,            $any);
 sig('Array::fold_mut',   $array, $any, $sub,            $any);
 sig('Array::scan',       $array, $any, $sub,         t_array);
 sig('Array::average',    $array,                       t_num);
 sig('Array::average_by', $array, $sub,                 t_num);
+sigt('Array::index',
+    t_or(
+        t_tuple($array, t_int),
+        t_tuple($array, t_int, $any),
+    ),
+    $any);
 sig('Array::reduce',     $array, $sub,                  $opt);
 sig('Array::length',     $array,                       $pint);
 #sig('Array::expand',   $array, ...);
