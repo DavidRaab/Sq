@@ -1,0 +1,223 @@
+=head1 Folding
+
+In functional programming you often see the term B<fold>. Here I
+want to describe what folding means. Also when you can use B<fold_mut>.
+
+=head1 for loops
+
+We begin by an easy an example. Let's consider you have an array with numbers
+and you just want to sum those numbers together to get a sum. In procedural/OO
+programming that doesn't already provide you a function getting the sum
+you maybe will implement it like this.
+
+    my $sum = 0;
+    for my $x ( @array ) {
+        $sum += $x;
+    }
+
+First we define C<$sum>. This C<$sum> is defined outside the loop. We could
+call this the B<State>. Then we loop over every element of the array.
+Inside the loop we then use that B<State> with every element of the array
+to produce a new State. Here C<$sum> is mutable, that's why all of this work.
+
+=head1 fold
+
+C<fold> does the same as our for-loop. We pass three arguments to C<fold>.
+The B<Array> we want to loop over, the B<initial state> and a subroutine
+that acts as the B<loop body>. Summing the numbers with C<fold> looks like
+this.
+
+    my $sum = Array::fold($array, 0, sub($x,$state) {
+        $state + $x
+    });
+
+Maybe you ask why functional programming use a function instead of looping
+constructs. The answer is because functional programming often use immutable
+data and immutable variables.
+
+Because when you cannot change variables or data, then you need to built
+new data at every iteration step. The way how C<fold> is implemented
+usually works nice in a language that assumes immutability.
+
+Consider that a for-loop that couldn't change any variable outside it's
+own scope would be completely useless! You couldn't even compute a sum
+when you couldn't change C<$sum>.
+
+But using C<fold> also has another advnatage. It usually abstracts away
+how you loop over data-structures. A for-loop is only written to loop over
+B<Arrays>, but you can implement C<fold> for every data-structure.
+
+For example this is how you can compute the sum of a sequence.
+
+    my $sum = Seq::fold($array, 0, sub($x,$state) {
+        $state + $x
+    });
+
+You don't need to know how to exactly iterate a sequence. The C<Seq::fold>
+does that for you! Here is how you could compute the sum of an immutable list.
+
+    my $sum = List::fold($array, 0, sub($x,$state) {
+        $state + $x
+    });
+
+and here would be the sum of an asynchronous sequence.
+
+    my $sum = AsyncSeq::fold($array, 0, sub($x,$state) {
+        $state + $x
+    });
+
+and here from a B<Bag>
+
+    my $sum = Bag::fold($array, 0, sub($x,$state) {
+        $state + $x
+    });
+
+What is a B<Bag>? How is a B<Bag> implemented? I don't know, but i could
+compute the sum when it provides me a C<fold>.
+
+Also consider that all calls expect the same function. In all cases i just
+pass a two argument function that adds two numbers together. So you only
+have this one function that can be used at a dozens of places!
+
+Because of immutability and this re-use of functions you have a nice
+abstraction that is just a little bit more useful than just a for-loop
+that is only defined for iterating an Array.
+
+=head1 Hash::fold
+
+Also C<Hash> offers a C<fold> function. But because a C<Hash> is a B<key,value>
+mapping it also passes this B<key,value> to the subroutine. This makes
+it a little bit different to the other C<fold>, but in it's core it is still
+the same.
+
+For example when you have a C<Hash> that only have numbers as values and
+you want to add them together.
+
+    my $sum = Hash::fold($hash, 0, sub($key,$value,$state) { $state + $value });
+
+=head1 Disadvantages of fold
+
+One disadvantage is also an advantage at the same time. The idea that it
+operates on immutable data. For example when you have an immutable List
+then you will end up using C<fold> and C<fold_back> a lot.
+
+Because looping and building a new list out of an already defined list is a
+little bit harder. Getting the looping logic right, also not write it in
+a recursive way, that has no problem with deep-recursion takes some
+extra effort. And you defenitely don't want to write this again and again.
+
+In this case using C<fold> is fine. But when you want to build
+something on top of a B<mutable> data-structures this isn't the best idea.
+Consider that C<fold> always need to return something new, you don't mutate
+things. For example let's say you want to go through an Array. Add +1
+to every number and get the result into a new Array. Instead of mutate
+every element of an Array.
+
+Sure in Perl you just could use C<map>.
+
+    my @added = map { $_ + 1 } @array;
+
+But how would you implement this kind of code without C<map>? When you implement
+it with C<fold> you would write.
+
+    my $added = Array::fold($array, [], sub($x,$state) { [@$state, $x+1] });
+
+This is extremely inefficent. Why?
+
+Because on every iteration you basically built a whole new Array. You start
+with the empty array as C<$state>. But then inside your C<sub> you create
+a new array with all elements you had so far copied and one element added.
+
+Consider that this isn't how truly immutable data-structures work. They are
+usually a lot better than making a whole copy of a data-structure. But when
+you use this kind of concept on an Array this is what you need to write.
+
+=head1 fold_mut
+
+This problem is avoided by C<fold_mut>. Consider the following. C<fold>
+internally creates a new data-structure for every iteration. This also isn't
+much a difference to using a for-loop.
+
+When you have an Array with 1,000 entries then you also have to update C<$sum>
+a thousand time. But you usually just keep track of the last one. C<fold_mut>
+also works the same. It expects that you pass a reference as B<State>
+that you then can update at every step. So you can write.
+
+    my $added = Array::fold($array, [], sub($x,$state) { push @$state, ($x+1) });
+
+While C<fold> uses the return value of what you subroutine returns. C<fold_mut>
+does not. It just ignores whatever is returned. Here the empty array-reference
+C<[]> is passed as the second argument to C<fold_mut> and this one is updated
+at every iteration step. Once C<fold_mut> runs through it just returns
+this reference as-is.
+
+So C<fold_mut> allows you to still have an API that is closely to just C<fold>
+that can be defined for every data-structures. But it avoids building
+a whole new data-structure or making a copy of a whole structure at every
+iteration step.
+
+This makes it a lot more efficent when you want to build a mutable
+data-structures like an B<Array> or B<Hash>.
+
+For example when you want to turn a B<Sequence> into an B<Array> you just
+could write.
+
+    my $array = Seq::fold_mut($seq, [], sub($x,$state) { push @$state, $x });
+
+and it builds an B<Array> for you, without that you need to know how to
+exactly iterate a B<Sequence>. Or consider it this way. C<fold> and C<fold_mut>
+does the iteration logic for you.
+
+And still it will only create a single Array that is updated with C<push>
+in a mutable way, not built thousands of Arrays copies for every new value.
+
+=head1 fold_back
+
+C<fold_back> iterates something backwards. Most of the time we iterate
+something forward. For example when iterating an Array we start at index 0
+and increase the index up the last index. C<fold_back> starts at the last
+index and runs to index 0.
+
+Running something B<backwards> is usually needed for immutable data-structures.
+For example with an immutable list you cannot append an element at the end
+easily/efficent, but instead you can very easily/efficent prepend elements
+at the beginning.
+
+So when you build a new immutable list out of an already defined immutable list
+you usually iterate the already defined list backwards.
+
+=head1 Summary
+
+As a summary we just can say. C<fold> is the same as B<looping>. C<fold>
+takes the data-structure that you want to iterate as the first argument.
+
+The B<State> that you want to build, that is usually defined outside a
+for-loop is passed as the second argument.
+
+And the third-argument is a suborutine that you just can consider the
+B<loop body>. You always get the B<State> of the previous calculation and
+the next element of your data-structure. The subroutine you pass always
+returns the next B<State> and when all your elements are iterated then
+C<fold> returns the last B<State>.
+
+=head1 Practice
+
+Getting used to C<fold> is just a matter of practice. The same you was
+getting used to iterating with a B<for-loop>. At least when I started
+programming I also had a learning phase where I needeed to remember the
+syntax of a for-loop and getting used to it.
+
+It's the same for C<fold>. But some programmers probably forgot their learning
+phase and think something is hard just because there are not used to it.
+
+At the same time I would encourage you to not think too much of everything.
+It is completely fine to mix mutation and looping. Consider that all kind
+of internal implementation you see for functional programming also depends
+on mutation. But this is usually hidden from the user of a language.
+
+Also you can use a for-loop everywhere you need. You are not forced to use
+C<fold>. You always can loop to every Array created by the B<Array> module.
+
+Still getting used to C<fold> has one advantage. You can easily switch between
+data-structures for example from C<Array> to C<Seq> without changing your code
+much. You don't get this advantage when you iterate an Array with a for-loop!
