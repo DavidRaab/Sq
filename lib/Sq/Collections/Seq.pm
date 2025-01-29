@@ -1313,6 +1313,22 @@ sub fold_mut($seq, $state, $f_state) {
     return $state;
 }
 
+sub contains($seq, $any) {
+    my $it = $seq->();
+    my $x;
+    if ( Sq::is_regex($any) ) {
+        while ( defined($x = $it->()) ) {
+            return 1 if $x =~ $any;
+        }
+    }
+    else {
+        while ( defined($x = $it->()) ) {
+            return 1 if Sq::Equality::equal($x, $any);
+        }
+    }
+    return 0;
+}
+
 sub index($seq, $idx, $default=undef) {
     my $it            = $seq->();
     my ($current, $x) = (0);
