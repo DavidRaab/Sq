@@ -100,3 +100,6 @@
 
 # Avoid NYTProf
 ^nytprof/
+
+# Skip temp files from script
+examples/permute_10.txt.gz

@@ -115,6 +115,8 @@ provides:
     file: lib/Sq/Parser/JSON.pm
   Sq::Parser::Markdown:
     file: lib/Sq/Parser/Markdown.pm
+  Sq::Rand:
+    file: lib/Sq/Rand.pm
   Sq::Reflection:
     file: lib/Sq/Reflection.pm
   Sq::Sig:

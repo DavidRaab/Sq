@@ -29,6 +29,7 @@ benchmarks/range.pl
 benchmarks/seq_range.pl
 benchmarks/seq_range_step.pl
 benchmarks/signature.pl
+benchmarks/sort.pl
 benchmarks/string_check_array.pl
 benchmarks/type_int.pl
 Build.PL
@@ -82,6 +83,7 @@ examples/AoC-2023/01p1.txt
 examples/AoC-2023/01p2.pl
 examples/AoC-2023/01p2.txt
 examples/bench_it.pl
+examples/cartesian.pl
 examples/choose.pl
 examples/colors.pl
 examples/dump.pl
@@ -99,8 +101,13 @@ examples/option_divide.pl
 examples/permutation.pl
 examples/permutation_random.pl
 examples/permute.pl
+examples/permute_cache.pl
 examples/primes.pl
+examples/qsort.pl
+examples/qsort_cache.pl
+examples/read_permute.pl
 examples/same_basename.pl
+examples/write_permute.pl
 lib/Sq.pm
 lib/Sq.pod
 lib/Sq/Args.pm
@@ -159,7 +166,7 @@ lib/Sq/Manual.pod
 lib/Sq/Manual/BindChain.pod
 lib/Sq/Manual/Concepts/Bind.pod
 lib/Sq/Manual/Concepts/Exceptions.pod
-lib/Sq/Manual/Concepts/FoldMut.pod
+lib/Sq/Manual/Concepts/Folding.pod
 lib/Sq/Manual/Concepts/Immutability.pm
 lib/Sq/Manual/Concepts/Statics.pod
 lib/Sq/Manual/Cookbook.pm
@@ -189,6 +196,7 @@ lib/Sq/Parser.pod
 lib/Sq/Parser/HTML.pm
 lib/Sq/Parser/JSON.pm
 lib/Sq/Parser/Markdown.pm
+lib/Sq/Rand.pm
 lib/Sq/Reflection.pm
 lib/Sq/Reflection.pod
 lib/Sq/Sig.pm
@@ -264,6 +272,7 @@ t/11-math.t
 t/12-reflection.t
 t/13-fmt.t
 t/14-str.t
+t/15-rand.t
 t/Array/00-basics.t
 t/Array/01-bind-flatten.t
 t/Array/03-fibonacci.t
