@@ -1332,11 +1332,16 @@ is(
         },
         'hex count up');
 
-    is($hex->index(0),   Some("00"), "index 0");
-    is($hex->index(1),   Some("01"), "index 1");
-    is($hex->index(15),  Some("0f"), "index 2");
-    is($hex->index(16),  Some("10"), "index 3");
-    is($hex->index(255), Some("ff"), "index 4");
+    is($hex->index(-1),        None, "index 0");
+    is($hex->index(0),   Some("00"), "index 1");
+    is($hex->index(1),   Some("01"), "index 2");
+    is($hex->index(15),  Some("0f"), "index 3");
+    is($hex->index(16),  Some("10"), "index 4");
+    is($hex->index(255), Some("ff"), "index 5");
+    is($hex->index(256),       None, "index 6");
+
+    is($hex->index(-1,  "00"), "00", "index 7");
+    is($hex->index(256, "00"), "00", "index 8");
 }
 
 is(

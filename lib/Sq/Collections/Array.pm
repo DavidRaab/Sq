@@ -993,6 +993,13 @@ sub fold_mut($array, $state, $folder) {
     return $state;
 }
 
+sub index($array, $idx, $default=undef) {
+    if ( $idx < 0 || $idx >= @$array ) {
+        return defined $default ? $default : Option::None();
+    }
+    return defined $default ? $array->[$idx] : Option::Some($array->[$idx]);
+}
+
 sub reduce($array, $f) {
     return Option::None()            if @$array == 0;
     return Option::Some($array->[0]) if @$array == 1;
