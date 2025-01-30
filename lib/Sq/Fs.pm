@@ -239,8 +239,8 @@ static read_text_gz => sub(@path) {
     require PerlIO::gzip;
     my $file = path(@path);
     return Seq->from_sub(sub {
-        open my $fh, '<:raw:gzip:encoding(UTF-8)', $file;
-        if ( !defined $fh ) {
+        my $err = open my $fh, '<:raw:gzip:encoding(UTF-8)', $file;
+        if ( !defined $err ) {
             return sub { undef }
         }
         else {
