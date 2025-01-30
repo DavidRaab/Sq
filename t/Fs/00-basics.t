@@ -110,7 +110,7 @@ is(
         'written file same as string');
 }
 
-# write_tex(file,aoa)
+# write_text(file,aoa)
 {
     my $content = [
         "# Hällö",
@@ -129,7 +129,7 @@ is(
         'written file same as string');
 }
 
-# write_tex(file,seq)
+# write_text(file,seq)
 {
     my $content = Seq->concat(
         seq { "# Hälö" },
@@ -137,11 +137,58 @@ is(
     );
 
     my $tmp = Path::Tiny->tempfile("SqTestXXXXXXX");
-    ok(Sq->fs->write_text($tmp, $content), 'write file');
+    ok(Sq->fs->write_text($tmp, $content), 'gz write file');
     is(
         Sq->fs->read_text($tmp),
         $content,
+        'gz written file same as string');
+}
+
+# write_text_gz(file,string)
+{
+    my $txt = "hällö\n";
+    my $tmp = Path::Tiny->tempfile("SqTestXXXXXXX");
+    ok(utf8::is_utf8($txt),               'gz string is unicode');
+    ok(Sq->fs->write_text_gz($tmp, $txt), 'gz write file');
+    ok(utf8::is_utf8($txt),               'gz string stays unicode');
+    is(
+        Sq->fs->read_text_gz($tmp),
+        seq { "hällö" },         # newlines are auto-removed when reading a file
         'written file same as string');
+}
+
+# write_text_gz(file,aoa)
+{
+    my $content = [
+        "# Hällö",
+        "",
+        "This is an example for writing multiple lines",
+        "stored in an array",
+    ];
+
+    my $tmp = Path::Tiny->tempfile("SqTestXXXXXXX");
+    ok(utf8::is_utf8($content->[0]),          'gz string is unicode');
+    ok(Sq->fs->write_text_gz($tmp, $content), 'gz write file');
+    ok(utf8::is_utf8($content->[0]),          'gz string stays unicode');
+    is(
+        Sq->fs->read_text_gz($tmp)->to_array,
+        $content,
+        'gz written file same as string');
+}
+
+# write_text_gz(file,seq)
+{
+    my $content = Seq->concat(
+        seq { "# Hälö" },
+        Seq->init(10, sub($idx) { "1" x $idx }),
+    );
+
+    my $tmp = Path::Tiny->tempfile("SqTestXXXXXXX");
+    ok(Sq->fs->write_text_gz($tmp, $content), 'write file');
+    is(
+        Sq->fs->read_text_gz($tmp),
+        $content,
+        'gz written file same as string');
 }
 
 done_testing;

@@ -6,7 +6,7 @@ use Sq;
 # use Sq -sig => 1;
 
 if ( !-e "permute_10.txt.gz" ) {
-    print "Run write_permute.pl first. Then gzip the file 'permute_10.txt.gz'\n";
+    print "Run 'write_permute.pl' first.\n";
 }
 
 Sq->bench->it(sub {
