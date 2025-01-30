@@ -101,13 +101,13 @@ examples/option_divide.pl
 examples/permutation.pl
 examples/permutation_random.pl
 examples/permute.pl
+examples/permute_10_read.pl
+examples/permute_10_write.pl
 examples/permute_cache.pl
 examples/primes.pl
 examples/qsort.pl
 examples/qsort_cache.pl
-examples/read_permute.pl
 examples/same_basename.pl
-examples/write_permute.pl
 lib/Sq.pm
 lib/Sq.pod
 lib/Sq/Args.pm

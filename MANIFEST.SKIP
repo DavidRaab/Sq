@@ -102,4 +102,4 @@
 ^nytprof/
 
 # Skip temp files from script
-examples/permute_10.txt.gz
+examples/permute_10.cache.gz
