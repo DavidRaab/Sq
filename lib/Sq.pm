@@ -362,8 +362,8 @@ sub seq :prototype(&) {
 # (hash foo 1)
 sub new($what, @args) {
     state %new = (
-        Array => sub { Array->new(@_) },
-        Hash  => sub { Hash ->new(@_) },
+        Array => \&array,
+        Hash  => \&hash,
         Seq   => sub { Seq  ->new(@_) },
         Queue => sub { Queue->new(@_) },
         List  => sub { List ->new(@_) },
