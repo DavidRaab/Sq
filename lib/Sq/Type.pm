@@ -22,11 +22,8 @@ our @EXPORT = (
 *Err     = \&Result::Err;
 
 # TODO
-# Add: t_none, t_any
+# Add: t_none
 # Add: t_tuplen
-# Add: t_repeat(t_int, t_str, t_int)
-#      would be a function that expects the types one or many times in a single array
-#      [1,"foo",2,   1,"foo",2,   1,"foo",2, ...]
 
 # type-checks return undef for valid, or otherwise an error. Currently
 # the error will just be a string. but this reduces the whole checking
