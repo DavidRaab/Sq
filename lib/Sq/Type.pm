@@ -8,8 +8,8 @@ our @EXPORT = (
     qw(t_str t_enum t_match t_matchf t_parser t_eq),  # String
     qw(t_num t_int t_positive t_negative t_range),    # Numbers
     qw(t_opt),
-    qw(t_hash t_with_keys t_keys t_as_hash t_key_is), # Hash
-    qw(t_array t_idx t_tuple t_tuplev t_even_sized),  # Array
+    qw(t_hash t_with_keys t_keys t_okeys t_as_hash t_key_is), # Hash
+    qw(t_array t_idx t_tuple t_tuplev t_even_sized),          # Array
     qw(t_of t_min t_max t_length),
     qw(t_any t_sub t_regex t_bool t_seq t_void t_result),
     qw(t_ref t_isa t_can)                             # Objects
@@ -164,6 +164,24 @@ sub t_keys(%kt) {
             return $valid;
         }
         return 'keys: not a hash';
+    }
+}
+
+sub t_okeys(%kt) {
+    return sub($any) {
+        my $type = ref $any;
+        if ( $type eq 'Hash' || $type eq 'HASH' ) {
+            my ($err, $value);
+            for my $key ( keys %kt ) {
+                $value = $any->{$key};
+                # when key is not defined we skip type-check
+                next if !defined $value;
+                $err   = $kt{$key}->($value);
+                return "okeys: $key $err" if defined $err;
+            }
+            return $valid;
+        }
+        return 'okeys: not a hash';
     }
 }
 

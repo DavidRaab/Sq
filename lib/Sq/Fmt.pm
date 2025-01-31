@@ -8,18 +8,30 @@ our @EXPORT    = ();
 # This will be a module that help in formating/printing things.
 # For example pass it an array of array and it prints a table.
 
-my $table_aoh = [keys =>
-    header => [array => [of => ['str']]],
-    data   => [array => [of => ['hash']]],
+### Types for table().
+# when data is array of hash, then header must be specified, border is optional
+# but must be bool when specified.
+my $table_aoh = [hash =>
+    [keys =>
+        header => [array => [of => ['str']]],
+        data   => [array => [of => ['hash']]],
+    ],
+    [okeys =>
+        border => ['bool'],
+    ]
 ];
 
-my $table_aoa = [keys =>
-    data => [array => [of => ['array']]]
+# otherwise data must be an AoA containing strings and header/border is optional
+my $table_aoa = [hash =>
+    [keys =>
+        data => [array => [of => [array => [of => ['str']]]]]
+    ],
+    [okeys =>
+        header => [array => [of => ['str']]],
+        border => ['bool'],
+    ],
 ];
 
-# TODO: Add something to type-check that allows optional field in a hash
-#       When a field is defined it must type-check. Otherwise when not provided
-#       the type-check is just skipped.
 static table => with_dispatch(
     type [tuple => $table_aoa] => sub ($args) {
         my $header = $args->{header} // 0;
