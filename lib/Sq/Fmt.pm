@@ -8,70 +8,86 @@ our @EXPORT    = ();
 # This will be a module that help in formating/printing things.
 # For example pass it an array of array and it prints a table.
 
+my $table_aoh = [keys =>
+    header => [array => [of => ['str']]],
+    data   => [array => [of => ['hash']]],
+];
+
+my $table_aoa = [keys =>
+    data => [array => [of => ['array']]]
+];
+
 # TODO: Add something to type-check that allows optional field in a hash
 #       When a field is defined it must type-check. Otherwise when not provided
 #       the type-check is just skipped.
-static 'table', sub($href) {
-    my $header = $href->{header} // 0;
-    my $border = $href->{border} // 0;
-    my $aoa    = $href->{data};
+static table => with_dispatch(
+    type [tuple => $table_aoa] => sub ($args) {
+        my $header = $args->{header} // 0;
+        my $border = $args->{border} // 0;
+        my $aoa    = $args->{data};
 
-    # Calling functions in function-style has the benefit that they always
-    # work. You don't need to add a blessing to be sure. This can potential
-    # increase performance. But the impact isn't that big.
-    #
-    # Instead of `sq` you also can use Array->bless, Hash->bless to just bless
-    # the first level, sometimes that can also be enough, as every function
-    # always returns blessed data. But why bless and then call a method when
-    # you just can directly call the function?
-    #
-    # The intersting part. When everything is called in functional-style
-    # no blessing wouldn't be needed anymore. This would interestingly
-    # increase performance of the whole system, also makes code easier.
-    #
-    # The bad part. Exhaustive Lisp nesting is very annoying when you have
-    # to put additional "," between every damn element.
-    my $maxY = @$aoa;
-    return if $maxY == 0;
-    my $maxX = Array::map($aoa, call 'length')->max(0);
-    return if $maxX == 0;
+        # check that we have at least one entry
+        my $maxY = @$aoa;
+        return if $maxY == 0;
+        my $maxX = Array::map($aoa, call 'length')->max(0);
+        return if $maxX == 0;
 
-    # just turn AoA into string lengths and transpose
-    my $cols = assign {
-        my $sizes = $header ? [$header, @$aoa] : $aoa;
-        Array::transpose_map($sizes, sub ($str,$,$) { length $str })
-             ->map(call 'max', 0);
-    };
+        # just turn AoA into string lengths and transpose
+        my $cols = assign {
+            my $sizes = $header ? [$header, @$aoa] : $aoa;
+            Array::transpose_map($sizes, sub ($str,$,$) { length $str })
+                ->map(call 'max', 0);
+        };
 
-    # local $Sq::Dump::INLINE = 0;
-    # dump($cols);
+        # local $Sq::Dump::INLINE = 0;
+        # dump($cols);
 
-    # First all strings in data AoA are expanded to its full column size
-    $aoa = Array::map2d($aoa, sub($str,$x,$y) {
-        my $length = $cols->[$x];
-        sprintf "%-${length}s", $str;
-    });
-    # Same for header when it is defined
-    if ( $header ) {
-        $header = Array::mapi($header, sub($str,$x) {
+        # First all strings in data AoA are expanded to its full column size
+        $aoa = Array::map2d($aoa, sub($str,$x,$y) {
             my $length = $cols->[$x];
             sprintf "%-${length}s", $str;
         });
-    }
+        # Same for header when it is defined
+        if ( $header ) {
+            $header = Array::mapi($header, sub($str,$x) {
+                my $length = $cols->[$x];
+                sprintf "%-${length}s", $str;
+            });
+        }
 
-    # print header
-    if ( $header ) {
-        if ( $border ) { printf "| %s |\n", $header->join(' | ') }
-        else           { print $header->join(" "), "\n"          }
-    }
-    # print data
-    for my $inner ( @$aoa ) {
-        if ( $border ) { printf "| %s |\n", $inner->join(' | ') }
-        else           { print $inner->join(" "), "\n"          }
-    }
+        # print header
+        if ( $header ) {
+            if ( $border ) { printf "| %s |\n", $header->join(' | ') }
+            else           { print $header->join(" "), "\n"          }
+        }
+        # print data
+        for my $inner ( @$aoa ) {
+            if ( $border ) { printf "| %s |\n", $inner->join(' | ') }
+            else           { print $inner->join(" "), "\n"          }
+        }
 
-    return;
-};
+        return;
+    },
+    type [tuple => $table_aoh] => sub($args) {
+        state $table = table();
+        # on the data array, call "extract" on every hash to turn it into an array
+        # with the defined order in "header". This returns optionals that are then
+        # mapped with "or" so non existing keys in the hash turn into empty strings.
+
+        # map every element in data that is an hash
+        my $aoa = Array::map($args->{data}, sub($hash) {
+            # "extract" creates an array of those keys in the exact order they
+            # are specified, but as optionals. We map every element and turn every
+            # None value (keys that didn't exists in the hash) into an empty string
+            Hash::extract($hash, $args->{header}->@*)->map(call 'or', "");
+        });
+
+        # call table again with the AoA
+        $table->(Hash::with($args, data => $aoa));
+
+        return;
+    },
+);
 
 # TODO: Restrictions for key?
 my sub attr($attr) {
