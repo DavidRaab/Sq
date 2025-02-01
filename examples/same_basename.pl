@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use 5.036;
-use utf8;
-use open ':std', ':encoding(UTF-8)';
+# use utf8;
+# use open ':std', ':encoding(UTF-8)';
 use Sq -sig => 1;
 
 # I have this script in one of my folders. It usually contains 'mp4' files
@@ -12,24 +12,18 @@ use Sq -sig => 1;
 # This script helps me quickly to identify which 'mp4' file is maybe already
 # reencoded to a m4v file. Then i delete that file.
 
-# Defines how many elements should be dumped in a sequence
-$Sq::Dump::SEQ_AMOUNT = 1000;
+my $files =
+    Sq->fs
+    ->children('.')
+    ->keep(call 'is_file')
+    ->map (call 'stringify')
+    ->group_by(sub($file) { $file =~ s/\. .*\z//rx })
+    ->remove(  sub($k,$v) { $k eq ""               })
+    ->keep(    sub($k,$v) { $v->length > 1         });
 
-my $mp4files =
-    Sq->fs->children('.')
-    ->keep(call 'is_file')->rx(qr/\.mp4\z/)
-    ->split(qr/\./);
-
-my $mv4files =
-    Sq->fs->children('.')
-    ->keep(call 'is_file')->rx(qr/\.m4v\z/)
-    ->split(qr/\./);
-
-# dump($mp4files);
-# dump($mv4files);
-
-print "Possible converted files that can be deleted.\n";
-$mp4files->intersect($mv4files, \&fst)->iter(sub($tuple) {
-    say ' + ', $tuple->join('.');
+print "Files with same name and different file-endings.\n";
+$files->iter_sort(by_str, sub($k,$v) {
+    printf "= %d files\n", $v->length;
+    $v->iter(sub($file) { printf "+ %s\n", $file });
+    say "";
 });
-
