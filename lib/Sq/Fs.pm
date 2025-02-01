@@ -10,8 +10,8 @@ our @EXPORT    = ();
 static read_text => sub(@path) {
     my $file = path(@path);
     return Seq->from_sub(sub {
-        open my $fh, '<:encoding(UTF-8)', $file;
-        if ( !defined $fh ) {
+        my $err = open my $fh, '<:encoding(UTF-8)', $file;
+        if ( !defined $err ) {
             return sub { undef }
         }
         else {
@@ -261,8 +261,8 @@ static read_text_gz => sub(@path) {
 static read_raw => sub($size, @path) {
     my $file = path(@path);
     return Seq->from_sub(sub {
-        open my $fh, '<:raw', $file;
-        if ( !defined $fh ) {
+        my $err = open my $fh, '<:raw', $file;
+        if ( !defined $err ) {
             return sub { undef }
         }
         else {
