@@ -1475,8 +1475,8 @@ is(seq {1,2,3}->tail,     seq {2,3}, 'tail 1');
 }
 
 # to_arrays
-{
-    my $data = seq {
+is(
+    Seq::to_arrays(seq {
         foo => seq {1,2,3},
         bar => seq {
             file1  => "whatever",
@@ -1508,45 +1508,40 @@ is(seq {1,2,3}->tail,     seq {2,3}, 'tail 1');
                 Some([Seq->range(1,3), Seq->range(3,1)]),
             ],
         }
-    };
-
-    is(
-        $data->to_arrays,
-        [
-            foo => [1,2,3],
-            bar => [
-                file1   => "whatever",
-                folder1 => [
-                    file2 => "blub",
-                    file3 => "Whaaaagh!",
-                ],
-                folder2 => [
-                    folder3 => [
-                        file4 => "For The Emporer!",
-                    ],
+    }),
+    [
+        foo => [1,2,3],
+        bar => [
+            file1   => "whatever",
+            folder1 => [
+                file2 => "blub",
+                file3 => "Whaaaagh!",
+            ],
+            folder2 => [
+                folder3 => [
+                    file4 => "For The Emporer!",
                 ],
             ],
-            "test",
-            maz => [
-                Ok ([qw/foo bar/]),
-                Err([qw/foo bar/]),
-            ],
-            folder4 => [
-                [4,5,6],
-                "foo",
-                [7,8,9],
-            ],
-            {
-                content1 => [6,6,6],
-                content2 => [
-                    [1,1,1],
-                    [2,2,2],
-                    Some([[1,2,3], [3,2,1]]),
-                ],
-            },
-
         ],
-        'to_arrays');
-}
+        "test",
+        maz => [
+            Ok ([qw/foo bar/]),
+            Err([qw/foo bar/]),
+        ],
+        folder4 => [
+            [4,5,6],
+            "foo",
+            [7,8,9],
+        ],
+        {
+            content1 => [6,6,6],
+            content2 => [
+                [1,1,1],
+                [2,2,2],
+                Some([[1,2,3], [3,2,1]]),
+            ],
+        },
+    ],
+    'to_arrays');
 
 done_testing;
