@@ -956,4 +956,20 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
         'title is overwritten');
 }
 
+{
+    my $data = sq {
+        foo => [],
+        bar => [1],
+        baz => [1,2],
+        maz => [1,2,3],
+    };
+    is(
+        $data->remove(sub($k,$v) { $v->length < 2 }),
+        {
+            baz => [1,2],
+            maz => [1,2,3],
+        },
+        'remove');
+}
+
 done_testing;

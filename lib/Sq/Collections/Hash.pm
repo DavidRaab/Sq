@@ -94,6 +94,16 @@ sub keep($hash, $predicate) {
     return CORE::bless(\%new, 'Hash');
 }
 
+sub remove($hash, $predicate) {
+    my %new;
+    for my ($key,$value) ( %$hash ) {
+        if ( !$predicate->($key, $value) ) {
+            $new{$key} = $value;
+        }
+    }
+    return CORE::bless(\%new, 'Hash');
+}
+
 sub fold($hash, $state, $f) {
     for my ($key,$value) ( %$hash ) {
         $state = $f->($key, $value, $state);
