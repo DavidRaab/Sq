@@ -2,8 +2,7 @@
 use 5.036;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
-use Sq;
-# use Sq -sig => 1;
+use Sq -sig => 0;
 
 # The generation of the permutation itself contains a lot of array copying/creation
 # permute_10_write.pl creates the permutation just of the number 0..9 so it basically
