@@ -1476,6 +1476,7 @@ is(seq {1,2,3}->tail,     seq {2,3}, 'tail 1');
 
 # to_arrays
 is(
+    # Got
     Seq::to_arrays(seq {
         foo => seq {1,2,3},
         bar => seq {
@@ -1492,8 +1493,8 @@ is(
         },
         "test",
         maz => seq {
-            Ok (seq{ qw/foo bar/ }),
-            Err(seq{ qw/foo bar/ }),
+            Ok (seq{qw/foo bar/}),
+            Err(seq{qw/foo bar/}),
         },
         folder4 => [
             seq {4,5,6},
@@ -1509,6 +1510,7 @@ is(
             ],
         }
     }),
+    # Expected
     [
         foo => [1,2,3],
         bar => [
