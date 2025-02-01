@@ -1474,4 +1474,44 @@ is(seq {1,2,3}->tail,     seq {2,3}, 'tail 1');
         'itern 3');
 }
 
+# to_arrays
+{
+    my $data = seq {
+        foo => seq {1,2,3},
+        bar => seq {
+            file1  => "whatever",
+            folder1 => seq {
+                file2 => "blub",
+                file3 => "Whaaaagh!",
+            },
+            folder2 => seq {
+                folder3 => seq {
+                    file4 => "For The Emporer!",
+                },
+            },
+        },
+        maz => seq {},
+    };
+
+    is(
+        $data->to_arrays,
+        [
+            foo => [1,2,3],
+            bar => [
+                file1   => "whatever",
+                folder1 => [
+                    file2 => "blub",
+                    file3 => "Whaaaagh!",
+                ],
+                folder2 => [
+                    folder3 => [
+                        file4 => "For The Emporer!",
+                    ],
+                ],
+            ],
+            maz => [],
+        ],
+        'to_arrays');
+}
+
 done_testing;

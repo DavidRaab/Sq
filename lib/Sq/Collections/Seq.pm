@@ -1426,6 +1426,20 @@ sub to_array($seq, $count=undef) {
     return bless(\@new, 'Array');
 }
 
+sub to_arrays($seq) {
+    my (@new, $x);
+    my $it = $seq->();
+    while ( defined($x = $it->()) ) {
+        if ( ref $x eq 'Seq' ) {
+            push @new, to_arrays($x);
+        }
+        else {
+            push @new, $x;
+        }
+    }
+    return bless(\@new, 'Array');
+}
+
 # to_seq: Seq<'a> -> Seq<'a>
 sub to_seq($seq) {
     return $seq;
@@ -1677,9 +1691,9 @@ sub none($seq, $predicate) {
 # pick : Seq<'a> -> ('a -> option<'b>) -> 'b
 sub pick($seq, $f_opt) {
     my $it = $seq->();
-    my ($x, $is_some, $v);
+    my ($x, $opt);
     while ( defined($x = $it->()) ) {
-        my $opt = Option::Some($f_opt->($x));
+        $opt = Option::Some($f_opt->($x));
         return $opt if @$opt;
     }
     return Option::None();
