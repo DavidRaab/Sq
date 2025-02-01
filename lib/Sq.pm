@@ -286,6 +286,9 @@ sub sq :prototype($) {
     elsif ( $type eq 'Result' ) {
         sq $any->[1];
     }
+    # TODO: I also could check for Seq and return a new Seq that adds the
+    #       blessings to it's inner values. But at the moment i never came
+    #       across that (problem).
     else {
         # Do nothing for unknown type
     }
