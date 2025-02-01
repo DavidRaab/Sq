@@ -1458,6 +1458,12 @@ sub to_arrays($any) {
     }
 }
 
+# Copy function to Array for API Compatibility
+{
+    no warnings 'once';
+    *Array::to_arrays = \&to_arrays;
+}
+
 # to_seq: Seq<'a> -> Seq<'a>
 sub to_seq($seq) {
     return $seq;
