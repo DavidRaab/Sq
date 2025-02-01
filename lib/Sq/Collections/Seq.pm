@@ -1430,8 +1430,12 @@ sub to_arrays($seq) {
     my (@new, $x);
     my $it = $seq->();
     while ( defined($x = $it->()) ) {
-        if ( ref $x eq 'Seq' ) {
-            push @new, to_arrays($x);
+        my $type = ref $x;
+        if ( $type eq 'Seq'   ) {
+            push @new, to_arrays($x)
+        }
+        elsif ( $type eq 'Array' || $type eq 'ARRAY' ) {
+            push @new, bless([map { to_arrays($_) } @$x], 'Array');
         }
         else {
             push @new, $x;
