@@ -1426,22 +1426,36 @@ sub to_array($seq, $count=undef) {
     return bless(\@new, 'Array');
 }
 
-sub to_arrays($seq) {
-    my (@new, $x);
-    my $it = $seq->();
-    while ( defined($x = $it->()) ) {
-        my $type = ref $x;
-        if ( $type eq 'Seq'   ) {
-            push @new, to_arrays($x)
+sub to_arrays($any) {
+    my $type = ref $any;
+
+    if ( $type eq 'Seq' ) {
+        my (@new, $x);
+        my $it = $any->();
+        while ( defined($x = $it->()) ) {
+            push @new, to_arrays($x);
         }
-        elsif ( $type eq 'Array' || $type eq 'ARRAY' ) {
-            push @new, bless([map { to_arrays($_) } @$x], 'Array');
-        }
-        else {
-            push @new, $x;
-        }
+        return bless(\@new, 'Array');
     }
-    return bless(\@new, 'Array');
+    elsif ( $type eq 'Array' || $type eq 'ARRAY' ) {
+        return bless([map { to_arrays($_) } @$any], 'Array');
+    }
+    elsif ( $type eq 'Hash' || $type eq 'HASH' ) {
+        my %new;
+        for my ($k,$v) ( %$any ) {
+            $new{$k} = to_arrays($v);
+        }
+        return bless(\%new, 'Hash');
+    }
+    elsif ( $type eq 'Option' ) {
+        return bless([map { to_arrays($_) } @$any], 'Option');
+    }
+    elsif ( $type eq 'Result' ) {
+        return bless([$any->[0], to_arrays($any->[1])], 'Result');
+    }
+    else {
+        return $any;
+    }
 }
 
 # to_seq: Seq<'a> -> Seq<'a>

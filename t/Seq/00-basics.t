@@ -1490,11 +1490,24 @@ is(seq {1,2,3}->tail,     seq {2,3}, 'tail 1');
                 },
             },
         },
-        maz => seq {},
+        "test",
+        maz => seq {
+            Ok (seq{ qw/foo bar/ }),
+            Err(seq{ qw/foo bar/ }),
+        },
         folder4 => [
             seq {4,5,6},
+            "foo",
             seq {7,8,9},
         ],
+        {
+            content1 => seq {6,6,6},
+            content2 => [
+                seq {1,1,1},
+                seq {2,2,2},
+                Some([Seq->range(1,3), Seq->range(3,1)]),
+            ],
+        }
     };
 
     is(
@@ -1513,11 +1526,25 @@ is(seq {1,2,3}->tail,     seq {2,3}, 'tail 1');
                     ],
                 ],
             ],
-            maz => [],
+            "test",
+            maz => [
+                Ok ([qw/foo bar/]),
+                Err([qw/foo bar/]),
+            ],
             folder4 => [
                 [4,5,6],
+                "foo",
                 [7,8,9],
             ],
+            {
+                content1 => [6,6,6],
+                content2 => [
+                    [1,1,1],
+                    [2,2,2],
+                    Some([[1,2,3], [3,2,1]]),
+                ],
+            },
+
         ],
         'to_arrays');
 }
