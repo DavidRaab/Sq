@@ -2450,4 +2450,48 @@ is(
     ],
     'to_arrays');
 
+{
+    # Generates Array of Hashes
+    # id goes from 1..10
+    # names are provided
+    # points are random
+    my $data = Array::map3(
+        Array->range(1,10),
+        [qw/Anny Lilly Lena Angel Cherry Kristel Candy Cleopatra Sweetie Crista/],
+        Sq->rand->int(1,100)->to_array(10),
+        record(qw/id name points/),
+    );
+
+    dump($data);
+
+    is(
+        $data->find_windowed(3, sub($hash) { $hash->{id} == 4 }),
+        Some($data->slice(0..6)),
+        'find 4 with 3 amount');
+    is(
+        $data->find_windowed(1, sub($hash) { $hash->{id} == 4 }),
+        Some($data->slice(2,3,4)),
+        'find 4 with 1 amount');
+    is(
+        $data->find_windowed(0, sub($hash) { $hash->{id} == 4 }),
+        Some($data->slice(3)),
+        'find 4 with 0 amount');
+    is(
+        $data->find_windowed(100, sub($hash) { $hash->{id} == 4 }),
+        Some($data),
+        'find with amount bigger than $data');
+    is(
+        $data->find_windowed(3, sub($hash) { $hash->{id} == 1 }),
+        Some($data->slice(0,1,2,3)),
+        'find first');
+    is(
+        $data->find_windowed(3, sub($hash) { $hash->{id} == 100 }),
+        None,
+        'find not existing');
+    is(
+        $data->find_windowed(3, sub($hash) { $hash->{id} == 10 }),
+        Some($data->slice(6,7,8,9)),
+        'find last');
+}
+
 done_testing;

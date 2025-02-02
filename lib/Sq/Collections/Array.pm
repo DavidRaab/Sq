@@ -1298,6 +1298,32 @@ sub find($array, $predicate) {
     return Option::None();
 }
 
+sub find_windowed($array, $amount, $predicate) {
+    my @queue;
+    my ($idx, $found, $x) = (0,0);
+    for (; $idx < @$array; $idx++ ) {
+        $x = $array->[$idx];
+        push @queue, $x;
+        if ( $predicate->($x) ) {
+            $found = 1;
+            last;
+        }
+        shift @queue if @queue > $amount;
+    }
+    if ( $found ) {
+        my $count = 0;
+        NEXT:
+        goto FINISH if $count++ >= $amount;
+        $x = $array->[++$idx];
+        goto FINISH if !defined $x;
+        push @queue, $x;
+        goto NEXT;
+    }
+    FINISH:
+    return CORE::bless([CORE::bless(\@queue, 'Array')], 'Option') if $found;
+    return CORE::bless([], 'Option');
+}
+
 sub any($array, $predicate) {
     for my $x ( @$array ) {
         return 1 if $predicate->($x);
