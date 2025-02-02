@@ -515,7 +515,7 @@ is($fs->fsts, [1,2,3,4],            'fsts');
 is($fs->snds, [qw/Hi Foo Bar Mug/], 'snds');
 
 is(
-    Array->new([1,2,3], [4,5,6], [7,8,9])->flatten,
+    array([1,2,3], [4,5,6], [7,8,9])->flatten,
     [1..9],
     'flatten');
 
@@ -685,31 +685,31 @@ is(
 is(
     Array::zip(
         Array->replicate(10, 1),
-        Array->new(qw/A B C D E F/),
+        array(qw/A B C D E F/),
     ),
     [ [1,'A'],[1,'B'],[1,'C'],[1,'D'],[1,'E'],[1,'F'] ],
     'replicate with zip');
 
 is(
     Array::zip(
-        Array->new(1,2)->repeat(9),
-        Array->new(qw/A B C D E F/),
+        array(1,2)->repeat(9),
+        array(qw/A B C D E F/),
     ),
     [ [1,'A'],[2,'B'],[1,'C'],[2,'D'],[1,'E'],[2,'F'] ],
     'repeat with zip 1');
 
 is(
     Array::zip(
-        Array->new(1,2)->repeat(2),
-        Array->new(qw/A B C D E F/),
+        array(1,2)->repeat(2),
+        array(qw/A B C D E F/),
     ),
     [ [1,'A'],[2,'B'],[1,'C'],[2,'D'] ],
     'repeat with zip 2');
 
 is(
     Array::zip(
-        Array->new(1,2)->repeat(20),
-        Array->new(qw/A B C D E/)->repeat(20),
+        array(1,2)->repeat(20),
+        array(qw/A B C D E/)->repeat(20),
     )->take(12),
     [
         [1,'A'],[2,'B'],[1,'C'],[2,'D'],[1,'E'],
@@ -961,7 +961,7 @@ is(
         'strings splitted into arrays');
 
     is(
-        $words->map(sub($inner) { $inner->join('+') }),
+        $words->map(call join => '+'),
         ["Foo+Bar+Baz", "maz+faz"],
         'joining inner arrays');
 }
@@ -1376,7 +1376,7 @@ is(
         ],
         'init2d 4');
 
-    # same as init2d 4
+    # same as "init2d 4" but expanded the "call" functions
     is(
         Array
         ->init2d(4, 4, sub($x,$y) { [$y,$x] })
@@ -1818,14 +1818,13 @@ is(
     # @columns. Then iterate with an index above all three and always pick
     # the one from every array with the same index. But this is what map2, map3,
     # map_v does.
-
-    my $starts  = [1  .. 10];
-    my $stops   = [11 .. 20];
-    my $columns = [1  .. 10];
-
-    my $cols = Array::map3($starts, $stops, $columns, sub($start,$stop,$col) {
-        Array->range($start, $stop)->columns($col);
-    });
+    my $cols = Array::map3(
+        [1  .. 10],
+        [11 .. 20],
+        [1  .. 10],
+        sub($start,$stop,$col) {
+            Array->range($start, $stop)->columns($col);
+        });
 
     is($cols,[
         [[1],[2],[3],[4],[5],[6],[7],[8],[9],[10],[11]],
@@ -1962,11 +1961,11 @@ is(Array->empty->fill(100, \&id), Array->init(100, \&id),   'fill 6');
         ],
         'chunked_size');
     is(
-        $cs->map(sub($array) { $array->sum_by(\&CORE::length) }),
+        $cs->map(call 'sum_by', Str->length),
         [100, 80],
         'chunked_size str length added');
     is(
-        array(split /\s+/, "The quick brown fox jumps over the lazy dog.")->chunked_size(1, \&CORE::length),
+        array(split /\s+/, "The quick brown fox jumps over the lazy dog.")->chunked_size(1, Str->length),
         [['The'], ['quick'], ['brown'], ['fox'], ['jumps'], ['over'], ['the'], ['lazy'], ['dog.']],
         'chunked_size 2');
     is(
@@ -2007,7 +2006,7 @@ is(Array->empty->fill(100, \&id), Array->init(100, \&id),   'fill 6');
         my $words = gen_run gen [repeat => 100, [str => 3, 10]];
         check(
             $words->chunked_size(100, \&CORE::length),
-            call(all => sub($array) { $array->sum_by(\&CORE::length) <= 100 }),
+            call(all => sub($array) { $array->sum_by(Str->length) <= 100 }),
             'all chunks <= 100');
     }
 }

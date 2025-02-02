@@ -331,7 +331,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     # we can omit the return statement in the lambda.
     my $entry3 = $data->fold_mut(hash(), sub($x,$state) {
         $state->set(
-            id => $x->{id},
+            id   => $x->{id},
             name => $x->{name},
         );
         $state->push(tags => $x->{tags});
@@ -841,7 +841,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 
 # lock
 {
-    my $h = Hash->new(
+    my $h = hash(
         name     => 'Anne',
         birthday => '1970-01-01',
     )->lock;
