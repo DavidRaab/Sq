@@ -12,7 +12,7 @@ use Scalar::Util ();
 our $LOAD_SIGNATURE = 0;
 # All functions that are Exported
 our @EXPORT = (
-    qw(sq call key assign seq new),
+    qw(sq call key key_equal assign seq new),
     qw(is_num is_str is_array is_hash is_seq is_opt is_result is_sub is_regex is_ref),
     qw(fn multi with_dispatch type_cond),
     qw(id fst snd copy),
@@ -190,6 +190,13 @@ sub key :prototype($) {
     $func = sub($hash) { return $hash->{$name} };
     $cache{$name} = $func;
     return $func;
+}
+
+sub key_equal($key, $value) {
+    return sub($hash) {
+        return 1 if Sq::Equality::equal($hash->{$key}, $value);
+        return 0;
+    };
 }
 
 # returns a function that calls $method with its arguments on an object
