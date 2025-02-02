@@ -1,0 +1,22 @@
+#!/usr/bin/env perl
+use 5.036;
+use utf8;
+use open ':std', ':encoding(UTF-8)';
+use Sq -sig => 1;
+
+# TODO: find_windowed() only find one/first index but i also want
+#       all matches with a window not just first one.
+
+Sq->fs->recurse('lib')
+->keep(call 'is_file')
+->rx  (qr/\.pm\z/)
+->iter(sub($file) {
+    Sq->fs->read_text($file)->indexed
+    ->find_windowed(3, sub($t) { $t->[0] =~ m/\A \s* \# \s* TODO/x })->iter(sub($lines) {
+        printf "File: %s\n", $file;
+        $lines->iter(sub($line) {
+            printf "%04d: %s\n", $line->[1], $line->[0];
+        });
+        print "\n";
+    });
+});
