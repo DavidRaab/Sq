@@ -370,6 +370,28 @@ sub map2($seqA, $seqB, $f) {
     }, 'Seq');
 }
 
+sub map3($seqA, $seqB, $seqC, $f) {
+    return bless(sub {
+        my $abort = 0;
+        my $itA = $seqA->();
+        my $itB = $seqB->();
+        my $itC = $seqC->();
+        my ($a,$b,$c);
+        return sub {
+            return undef if $abort;
+            if ( defined($a = $itA->()) ) {
+            if ( defined($b = $itB->()) ) {
+            if ( defined($c = $itC->()) ) {
+                return $f->($a,$b,$c);
+            }}}
+            $abort = 1;
+            undef $itA;
+            undef $itB;
+            undef $itC;
+        }
+    }, 'Seq');
+}
+
 # bind : Seq<'a> -> ('a -> Seq<'b>) -> Seq<'b>
 sub bind($seq, $f) {
     return bless(sub {
@@ -737,6 +759,17 @@ sub skip_while($seq, $predicate) {
             }
         }
     });
+}
+
+# TODO: IMPORTANT: Make this better, but at the moment i just need
+# something working.
+sub slice($seq, @idxs) {
+    my @new;
+    for my $idx ( @idxs ) {
+        my $x = $seq->index($idx);
+        push @new, @$x if @$x;
+    }
+    bless(\@new, 'Array');
 }
 
 # indexed : Seq<'a> -> Seq<'a * int>
@@ -1680,6 +1713,31 @@ sub find($seq, $predicate) {
         return Option::Some($x) if $predicate->($x);
     }
     return Option::None();
+}
+
+sub find_windowed($seq, $amount, $predicate) {
+    my (@queue, $x);
+    my ($found, $it) = (0, $seq->());
+    while ( defined($x = $it->()) ) {
+        push @queue, $x;
+        if ( $predicate->($x) ) {
+            $found = 1;
+            last;
+        }
+        shift @queue if @queue > $amount;
+    }
+    if ( $found ) {
+        my $count = 0;
+        NEXT:
+        goto FINISH if $count++ >= $amount;
+        $x = $it->();
+        goto FINISH if !defined $x;
+        push @queue, $x;
+        goto NEXT;
+    }
+    FINISH:
+    return CORE::bless([CORE::bless(\@queue, 'Array')], 'Option') if $found;
+    return CORE::bless([], 'Option');
 }
 
 # any : Seq<'a> -> ('a -> bool) -> bool
