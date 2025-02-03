@@ -761,6 +761,7 @@ sub skip_while($seq, $predicate) {
     });
 }
 
+# TODO: indexes beyond maximum
 sub slice($seq, @idxs) {
     # result of slice
     my @new;
