@@ -698,11 +698,9 @@ sub skip_while($array, $predicate) {
     return CORE::bless([$array->@[$index .. $array->$#*]], 'Array');
 }
 
-# TODO: Make the same as Seq::slice
 sub slice($array, @idxs) {
     my $max = @$array;
-    my $min = (-$max) - 1;
-    return CORE::bless([$array->@[grep {$_ < $max && $_ > $min} @idxs]], 'Array');
+    return CORE::bless([$array->@[grep { $_ >= 0 && $_ <= $max } @idxs]], 'Array');
 }
 
 # TODO: Other name

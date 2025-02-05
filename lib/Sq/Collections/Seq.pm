@@ -761,29 +761,33 @@ sub skip_while($seq, $predicate) {
     });
 }
 
-# TODO: indexes beyond maximum
 sub slice($seq, @idxs) {
+    return [] if @idxs == 0;
     # result of slice
     my @new;
     # first we remove negative indexes
     @idxs = grep { $_ >= 0 } @idxs;
-    # then a mapping 10,5,7,9 => { 10 => 0, 5 => 1, 7 => 2, 9 => 3 }
+    # then a mapping 10,5,7,5,9 => { 10 => [0], 5 => [1,3], 7 => [2], 9 => [3] }
     my %mapping;
     for (my $idx=0; $idx < @idxs; $idx++) {
-        $mapping{$idxs[$idx]} = $idx;
+        push $mapping{$idxs[$idx]}->@*, $idx;
     }
     # retrieve the highest index we need to fetch from sequence
     my $max = Array::max(\@idxs, -1);
     my $it  = $seq->();
-    my ($x, $dst);
+    my ($x, $dsts);
     for (my $idx=0; $idx <= $max; $idx++) {
-        $x   = $it->();
+        $x    = $it->();
         last if !defined $x;
-        $dst = $mapping{$idx};
-        if ( defined $dst ) {
-            $new[$dst] = $x;
+        $dsts = $mapping{$idx};
+        if ( defined $dsts ) {
+            for my $dst ( @$dsts ) {
+                $new[$dst] = $x;
+            }
         }
     }
+    # Only keep defined values. This removes indexes beyond maximum
+    @new = grep { defined } @new;
     bless(\@new, 'Array');
 }
 

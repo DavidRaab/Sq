@@ -1057,10 +1057,11 @@ is(
     my $range = Array->range(0,10);
     is($range->slice(),              [],            'slice wo args');
     is($range->slice(1,5,5,2,3,9),   [1,5,5,2,3,9], 'slice');
-    is($range->slice(-1, -2, -3),    [10,9,8],      'slice with negative index');
+    is($range->slice(-1, -2, -3),    [],            'slice with negative index is not supported');
     is($range->slice(20,30),         [],            'slice with out of bound 1');
     is($range->slice(1,20,2,-20,3),  [1,2,3],       'slice with out of bound 2');
-    is($range->slice(10,-11),        [10,0],        'slice exact bounds');
+    is($range->slice(10,-11),        [10],          'slice exact bounds 1');
+    is($range->slice(-11,10),        [10],          'slice exact bounds 2');
 }
 
 # distinct_by POD example
