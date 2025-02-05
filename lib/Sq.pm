@@ -30,6 +30,7 @@ our @EXPORT = (
     type    => sub { \&Sq::Type::type         },
     is_type => sub { \&Sq::Type::t_valid      },
     static  => sub { \&Sq::Reflection::static },
+    union   => sub { \&Sq::Core::DU::union    },
 );
 my $export_funcs;
 my $first_load = 1;
@@ -106,6 +107,7 @@ sub import {
 # Load Core
 use Sq::Reflection;
 use Sq::Core;
+use Sq::Core::DU;
 
 # Load Collections
 use Sq::Collections::Array;

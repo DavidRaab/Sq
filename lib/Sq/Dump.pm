@@ -110,6 +110,12 @@ sub benchmark($bench, $depth=0) {
     }, $depth);
 }
 
+# TODO: Dump of non-cases
+# Discriminated Union
+sub du($union, $depth=0) {
+    return sprintf('$union->case(%s => %s)', $union->{case}, to_string($union->{data}, $depth+2))
+}
+
 ### Dumping Logic
 
 sub num {
@@ -131,6 +137,7 @@ my $dispatch = {
     '_STRING'           => \&string,
     'CODE'              => sub { 'sub { DUMMY }'                },
     'Sq::Control::Lazy' => sub { 'lazy { DUMMY }'               },
+    'Sq::Core::DU'      => \&du,
     'ARRAY'             => \&array,
     'Array'             => \&array,
     'Queue'             => \&queue,
