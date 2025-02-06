@@ -51,9 +51,26 @@ sub result($result, $other) {
     return equal($result->[1], $other->[1]);
 }
 
+sub du($union, $other) {
+    return equal($union->[0], $other->[0]);
+}
+
+sub du_case($union, $other) {
+    if ( $union->[2] eq $other->[2] ) {
+        if ( equal($union->[0], $other->[0]) ) {
+            if ( equal($union->[3], $union->[3]) ) {
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
 my $dispatch = {
-    'Result' => \&result,
-    'Seq'    => \&seq,
+    'Result'             => \&result,
+    'Seq'                => \&seq,
+    'Sq::Core::DU'       => \&du,
+    'Sq::Core::DU::Case' => \&du_case,
 };
 
 sub equal($any1, $any2) {
@@ -122,6 +139,7 @@ sub add_equality($type, $func) {
 }
 
 # Add equal function to other packages
+no warnings 'once';
 *Hash::equal   = \&equal;
 *Array::equal  = \&equal;
 *Option::equal = \&equal;

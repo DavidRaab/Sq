@@ -1,46 +1,55 @@
 package Sq::Core::DU;
 use 5.036;
 
-sub union(%cases) {
-    for my ($case,$sub) ( %cases ) {
-        goto ERROR if ref $case ne "";
-        goto ERROR if ref $sub  ne 'CODE';
+sub union(@cases) {
+    # check if @cases is correct
+    for my ($case,$array) ( @cases ) {
+        goto ERROR if ref $case  ne "";
+        goto ERROR if ref $array ne 'Array' && ref $array ne 'ARRAY';
     }
-    return bless({
-        cases => \%cases,
-        case  => undef,
-        data  => undef,
-    }, 'Sq::Core::DU');
+    # Create type
+    my %cases;
+    for my ($case,$type) ( @cases ) {
+        $cases{$case} = Sq::Type::type($type);
+    }
+    # return object
+    return bless([\@cases, \%cases], 'Sq::Core::DU');
 
     ERROR:
     Carp::croak "union() must be called with 'string => type'";
 }
 
 sub case($union, $case, $data) {
+    my ($def, $cases) = @$union;
+    my $type = $cases->{$case};
+
     # check if $case is valid
-    if ( !exists $union->{cases}{$case} ) {
-        my $cases = join(",", keys $union->{cases}->%*);
+    if ( !defined $type ) {
+        my $cases = join(",", keys %$cases);
         my $msg   = sprintf("Case '%s' invalid: Valid cases are '%s'", $case, $cases);
         Carp::croak $msg;
     }
 
     # check if $data is valid for $case
-    my $result = Sq::Type::t_run($union->{cases}{$case}, $data);
+    my $result = Sq::Type::t_run($type, $data);
     if ( $result->is_err ) {
-        my $msg = sprintf("Data for case '%s' invalid Got: %s", $case, Sq::Dump::dumps($data));
+        my $msg = sprintf("Data for case '%s' invalid Expected: %s Got: %s",
+            $case,
+            Sq::Dump::dumps({$union->[0]->@*}),
+            Sq::Dump::dumps($data),
+        );
         Carp::croak $msg;
     }
 
     # create union
-    return bless({
-        cases => $union->{cases},
-        case  => $case,
-        data  => $data,
-    }, 'Sq::Core::DU');
+    return bless([$def, $cases, $case, $data], 'Sq::Core::DU::Case');
 }
 
+package Sq::Core::DU::Case;
+use 5.036;
+
 sub match($union, %cf) {
-    my $cases = $union->{cases};
+    my ($def, $cases, $case, $data) = @$union;
     # check if user provided a match for every case
     for my $case ( keys %$cases ) {
         if ( !exists $cf{$case} ) {
@@ -48,7 +57,7 @@ sub match($union, %cf) {
         }
     }
     # dispatch
-    return $cf{$union->{case}}->($union->{data});
+    return $cf{$case}->($data);
 }
 
 1;

@@ -7,72 +7,102 @@ use Sq::Parser -sig => 1;
 use Sq::Test;
 use Path::Tiny qw(path);
 
-# API not stable. Will very likely change. First concept.
-
 # this creates a type-union. It's like an enum but instead of just a name
-# to a number mapping. Every case can be of any complex type.
+# to a number mapping every case can be of any complex type.
 # Here it describes a type that either is a "File" or "Folder" and every
 # case must be a Path::Tiny object.
 my $fs = union(
-    File   => type [ref => 'Path::Tiny'],
-    Folder => type [ref => 'Path::Tiny'],
+    File   => [ref => 'Path::Tiny'],
+    Folder => [ref => 'Path::Tiny'],
 );
 
+# Two cases of an union, and they can be equal
+is(
+    $fs->case(File => path('/etc/fstab')),
+    $fs->case(File => path('/etc/fstab')),
+    'cases can be equal');
+
 # Here we create cases. The cases type-check in two ways. You only can
-# specify "File" or "Folder" and whatever we pass to it must be type-check
+# specify "File" or "Folder" and whatever we pass to it must type-check
+# against the definition
 my @cases = (
     $fs->case(File   => path('/etc/fstab')),
     $fs->case(File   => path('/etc/passwd')),
     $fs->case(Folder => path('/etc')),
 );
 
-my ($files, $folders) = (0,0);
-for my $case ( @cases ) {
-    # Pattern matching. A case can be pattern matched. We don't know which case
-    # we have and we must provide a sub-ref for every case. match() fails when
-    # we do not provide a sub-ref for every defined case.
-    $case->match(
-        File   => sub($file)   { $files++   },
-        Folder => sub($folder) { $folders++ },
-    );
+# "FILE" not valid case
+like(
+    dies { $fs->case(FILE => path('/etc/fstab')) },
+    qr/\ACase 'FILE' invalid/,
+    'wrong case dies');
+
+# string not allowed for "File"
+like(
+    dies { $fs->case(File => '/etc/fstab') },
+    qr/\AData for case 'File' invalid/,
+    'wrong type for case dies');
+
+# match
+{
+    my ($files, $folders) = (0,0);
+    for my $case ( @cases ) {
+        # Pattern matching. A case can be pattern matched. We don't know which case
+        # we have and we must provide a sub-ref for every case. match() fails when
+        # we do not provide a sub-ref for every defined case.
+        $case->match(
+            File   => sub($file)   { $files++   },
+            Folder => sub($folder) { $folders++ },
+        );
+    }
+
+    is($files,   2, 'one file');
+    is($folders, 1, 'one folder');
 }
 
-is($files,   2, 'one file');
-is($folders, 1, 'one folder');
+# match() with 'file' instead of 'File' as case.
+like(
+    dies {
+        $cases[0]->match(
+            file   => sub { }, # wrong
+            Folder => sub { },
+        );
+    },
+    qr/\ACase 'File' not handled/,
+    'wrong case names in match()');
 
-# Do i really need Discriminated Unions in a dynamic-typed language?
-# In some cases in the past i just used [File => ...] for this.
-# but it has no match() and checking in it. Or I have to re-write it again
-# and again.
+# Comparison of type definition
+{
+    my $other = union(
+        File   => [ref => 'Path::Tiny'],
+        Folder => [ref => 'Path::Tiny'],
+    );
+    is($fs, $other, 'types are the same');
 
-# Another approach would be to use a type for this. I can write.
+    # Even though we have two cases that are created from two different types
+    # they are still considered the same/equal because the type-definition
+    # of $fs and $other are the same.
+    is(
+        $fs   ->case(File => path('/etc/fstab')),
+        $other->case(File => path('/etc/fstab')),
+        'Is equal');
+}
 
-my $fs_type = type [or =>
-    [tuple => [eq => 'File'],   [ref => 'Path::Tiny']],
-    [tuple => [eq => 'Folder'], [ref => 'Path::Tiny']],
-];
+# Comparison of different types
+{
+    my $other = union(
+        File   => [ref => 'Path::Tiny'],
+        Folder => [ref => 'Path::Tiny'],
+        Link   => [ref => 'Path::Tiny'],
+    );
+    nok(equal($fs, $other), 'types not the same');
 
-# this describes a type of two cases. I just could create a match() function
-# that takes a type and a case and it does the checking and dispatch based on
-# it.
-
-# for convenince i also could create union() that automatically is a "or"
-# expecting tuples with the first one being an string. This would
-# make the definition shorter, but otherwise creates the exact same type.
-
-# Something like:
-
-# my $fs_type = union(
-#     File   => [ref => 'Path::Tiny'],
-#     Folder => [ref => 'Path::Tiny'],
-# );
-#
-# my $case = case($fs_type, File => ...);
-#
-# match($case,
-#     File   => sub { ... },
-#     Folder => sub { ... },
-# );
+    # The same cases but from types that are different are not considered equal
+    nok(equal(
+        $fs   ->case(File => path('/etc/fstab')),
+        $other->case(File => path('/etc/fstab')),
+    ), 'Same cases from different union types not equal');
+}
 
 # TODO: Some other idea i suddenly had
 # sub Array;

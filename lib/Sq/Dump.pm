@@ -110,10 +110,13 @@ sub benchmark($bench, $depth=0) {
     }, $depth);
 }
 
-# TODO: Dump of non-cases
 # Discriminated Union
 sub du($union, $depth=0) {
-    return sprintf('$union->case(%s => %s)', $union->{case}, to_string($union->{data}, $depth+2))
+    return sprintf("Union Type " . to_string({$union->[0]->@*}, $depth+2));
+}
+
+sub du_case($union, $depth=0) {
+    return sprintf('$union->case(%s => %s)', $union->[2], to_string($union->[3], $depth+2))
 }
 
 ### Dumping Logic
@@ -132,22 +135,23 @@ sub string {
 
 # Dispatch Table for types
 my $dispatch = {
-    '_UNDEF'            => sub { 'undef'                        },
-    '_NUM'              => \&num,
-    '_STRING'           => \&string,
-    'CODE'              => sub { 'sub { DUMMY }'                },
-    'Sq::Control::Lazy' => sub { 'lazy { DUMMY }'               },
-    'Sq::Core::DU'      => \&du,
-    'ARRAY'             => \&array,
-    'Array'             => \&array,
-    'Queue'             => \&queue,
-    'HASH'              => \&hash,
-    'Hash'              => \&hash,
-    'Option'            => \&option,
-    'Seq'               => \&seq,
-    'Result'            => \&result,
-    'Benchmark'         => \&benchmark,
-    'Path::Tiny'        => sub { 'path(' . string(quote($_[0]->stringify)) .')' },
+    '_UNDEF'             => sub { 'undef'                        },
+    '_NUM'               => \&num,
+    '_STRING'            => \&string,
+    'CODE'               => sub { 'sub { DUMMY }'                },
+    'Sq::Control::Lazy'  => sub { 'lazy { DUMMY }'               },
+    'Sq::Core::DU'       => \&du,
+    'Sq::Core::DU::Case' => \&du_case,
+    'ARRAY'              => \&array,
+    'Array'              => \&array,
+    'Queue'              => \&queue,
+    'HASH'               => \&hash,
+    'Hash'               => \&hash,
+    'Option'             => \&option,
+    'Seq'                => \&seq,
+    'Result'             => \&result,
+    'Benchmark'          => \&benchmark,
+    'Path::Tiny'         => sub { 'path(' . string(quote($_[0]->stringify)) .')' },
 };
 
 sub quote($str) {
