@@ -112,7 +112,7 @@ sub benchmark($bench, $depth=0) {
 
 # Discriminated Union
 sub du($union, $depth=0) {
-    return sprintf("Union Type " . to_string({$union->[0]->@*}, $depth+2));
+    return sprintf("Union Type " . to_string($union->[0], $depth+2));
 }
 
 sub du_case($union, $depth=0) {

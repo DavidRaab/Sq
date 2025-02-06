@@ -13,7 +13,7 @@ sub union(@cases) {
         $cases{$case} = Sq::Type::type($type);
     }
     # return object
-    return bless([\@cases, \%cases], 'Sq::Core::DU');
+    return bless([{@cases}, \%cases], 'Sq::Core::DU');
 
     ERROR:
     Carp::croak "union() must be called with 'string => type'";
@@ -35,7 +35,7 @@ sub case($union, $case, $data) {
     if ( $result->is_err ) {
         my $msg = sprintf("Data for case '%s' invalid Expected: %s Got: %s",
             $case,
-            Sq::Dump::dumps({$union->[0]->@*}),
+            Sq::Dump::dumps($union->[0]),
             Sq::Dump::dumps($data),
         );
         Carp::croak $msg;

@@ -7,6 +7,8 @@ use Sq::Parser -sig => 1;
 use Sq::Test;
 use Path::Tiny qw(path);
 
+# TODO: Recursive DUs
+
 # this creates a type-union. It's like an enum but instead of just a name
 # to a number mapping every case can be of any complex type.
 # Here it describes a type that either is a "File" or "Folder" and every
@@ -15,6 +17,8 @@ my $fs = union(
     File   => [ref => 'Path::Tiny'],
     Folder => [ref => 'Path::Tiny'],
 );
+
+# dump($fs);
 
 # Two cases of an union, and they can be equal
 is(
@@ -30,6 +34,8 @@ my @cases = (
     $fs->case(File   => path('/etc/passwd')),
     $fs->case(Folder => path('/etc')),
 );
+
+# dump(\@cases);
 
 # "FILE" not valid case
 like(
@@ -74,8 +80,8 @@ like(
 # Comparison of type definition
 {
     my $other = union(
-        File   => [ref => 'Path::Tiny'],
         Folder => [ref => 'Path::Tiny'],
+        File   => [ref => 'Path::Tiny'],
     );
     is($fs, $other, 'types are the same');
 
