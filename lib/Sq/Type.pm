@@ -500,12 +500,6 @@ sub t_void() {
     state $fn = sub($any) {
         # Scalar Context
         return $valid if !defined $any;
-        # List context will be checked that the whole list is passed
-        # as an array. So someone just can use array checks for list context
-        my $type = ref $any;
-        if ( $type eq 'Array' || $type eq 'ARRAY' ) {
-            return $valid if @$any == 0;
-        }
         return "void: Not void";
     };
     return $fn;

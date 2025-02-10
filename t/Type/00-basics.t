@@ -378,8 +378,7 @@ ok(!t_valid($is_album2, $album_wrong2), 'album.tracks not an array');
 
 # t_void
 {
-    ok( t_valid(t_void, undef), 't_void 1'); # scalar context
-    ok( t_valid(t_void,    []), 't_void 2'); # list context
+    ok( t_valid(t_void, undef), 't_void 1');
 
     ok(!t_valid(t_void,     1), 't_void 3');
     ok(!t_valid(t_void, "foo"), 't_void 4');
