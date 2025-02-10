@@ -41,7 +41,7 @@ sub case($union, $case, $data) {
         Carp::croak $msg;
     }
 
-    # create union
+    # create case
     return bless([$def, $cases, $case, $data], 'Sq::Core::DU::Case');
 }
 

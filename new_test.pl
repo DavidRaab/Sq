@@ -36,7 +36,7 @@ my $use = lazy {
 
 # Here lazy{} not really makes sense, because the `$use->force` is always evaluated.
 # So we don't really need that. But what makes lazy different is that another new
-# call `$use->force` will not run the function twice. Code is only runned once
+# call to `$use->force` will not run the function twice. Code is only runned once
 # and the result is saved/cached.
 my ($opt, $usage) = describe_options(
     $use->force,
@@ -81,7 +81,7 @@ use 5.036;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Sq -sig => 1;
-use Sq::Parser -sig => 1;
+use Sq::Parser;
 use Sq::Test;
 
 ok(1, 'Write a test');

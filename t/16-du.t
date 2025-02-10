@@ -3,7 +3,6 @@ use 5.036;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Sq -sig => 1;
-use Sq::Parser -sig => 1;
 use Sq::Test;
 use Path::Tiny qw(path);
 
@@ -62,7 +61,7 @@ like(
         );
     }
 
-    is($files,   2, 'one file');
+    is($files,   2, 'two files');
     is($folders, 1, 'one folder');
 }
 
