@@ -4,15 +4,16 @@ use Sq::Evaluator;
 use Sq::Exporter;
 our @EXPORT = (
     qw(type),
-    qw(t_run t_valid t_assert t_or t_is t_not),       # Basic
-    qw(t_str t_enum t_match t_matchf t_parser t_eq),  # String
-    qw(t_num t_int t_positive t_negative t_range),    # Numbers
+    qw(t_run t_valid t_assert t_or t_is t_not t_rec),         # Basic
+    qw(t_str t_enum t_match t_matchf t_parser t_eq),          # String
+    qw(t_num t_int t_positive t_negative t_range),            # Numbers
     qw(t_opt),
     qw(t_hash t_with_keys t_keys t_okeys t_as_hash t_key_is), # Hash
     qw(t_array t_idx t_tuple t_tuplev t_even_sized),          # Array
     qw(t_of t_min t_max t_length),
     qw(t_any t_sub t_regex t_bool t_seq t_void t_result),
-    qw(t_ref t_isa t_can)                             # Objects
+    qw(t_ref t_isa t_can),                                    # Objects
+    qw(t_union t_runion),
 );
 
 # Manual import
@@ -677,6 +678,33 @@ sub t_not(@checks) {
             return "not: check valid" if !defined $err;
         }
         return $valid;
+    }
+}
+
+sub t_rec($sub) {
+    Carp::croak "rec needs a sub-ref" if ref $sub ne 'CODE';
+    return sub($any) {
+        my $type = $sub->();
+        my $err  = $type->($any);
+        return "rec: $err" if defined $err;
+        return $valid;
+    }
+}
+
+sub t_union($union) {
+    Carp::croak "Need an union-type" if ref $union ne 'Sq::Core::DU';
+    return sub($any) {
+        return $valid if Sq::Core::DU::is_case($union, $any);
+        return "union: Not a case of union";
+    }
+}
+
+sub t_runion($f_union) {
+    Carp::croak "Need an union-type" if ref $f_union ne 'CODE';
+    return sub($any) {
+        my $union = $f_union->();
+        return $valid if Sq::Core::DU::is_case($union, $any);
+        return "runion: Not a case of union";
     }
 }
 

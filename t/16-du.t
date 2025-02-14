@@ -34,6 +34,10 @@ my @cases = (
     $fs->case(Folder => path('/etc')),
 );
 
+for my $case ( @cases ) {
+    is($fs->is_case($case), 1, 'Is case of $fs');
+}
+
 # dump(\@cases);
 
 # "FILE" not valid case
@@ -107,6 +111,59 @@ like(
         $fs   ->case(File => path('/etc/fstab')),
         $other->case(File => path('/etc/fstab')),
     ), 'Same cases from different union types not equal');
+
+    # check failure of is_case
+    is($fs->is_case($other->case(File => path('/etc/fstab'))), 0, 'Not a case');
+}
+
+# Recursive Union. Example to create an immutable list
+#
+# This is very inefficent, and also by far not how for example the immutable
+# list in Sq is implemented. But this comes close to what you will write
+# for example in F# to implement an immutable List.
+#
+# F#:
+# type List<'a> =
+#     | Empty
+#     | Cons of 'a * List<'a>
+my $list;
+$list = union(
+    Empty => ['void'],
+    Cons  => [tuple => ['any'], [runion => sub { $list }]],
+);
+
+{
+    # fold for list DU
+    sub fold($list, $state, $f) {
+        $list->match(
+            Empty => sub{$state},
+            Cons  => sub($data) {
+                my ($head,$tail) = @$data;
+                return fold($tail, $f->($head, $state), $f);
+            }
+        );
+    }
+
+    # function to create immutable list
+    my $empty = $list->case('Empty');
+    sub list(@data) {
+        my $new = $empty;
+        for my $x ( reverse @data ) {
+            $new = $list->case(Cons => [$x,$new]);
+        }
+        return $new;
+    }
+
+    # function to turn immutable list back to array
+    sub to_array($list) {
+        fold($list, [], sub($x,$state) { push @$state, $x; $state });
+    }
+
+    # back and forth
+    is(
+        to_array(list(1,2,3,4)),
+        [1,2,3,4],
+        'list to array');
 }
 
 # TODO: Some other idea i suddenly had

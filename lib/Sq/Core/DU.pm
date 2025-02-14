@@ -19,7 +19,7 @@ sub union(@cases) {
     Carp::croak "union() must be called with 'string => type'";
 }
 
-sub case($union, $case, $data) {
+sub case($union, $case, $data=undef) {
     my ($def, $cases) = @$union;
     my $type = $cases->{$case};
 
@@ -43,6 +43,18 @@ sub case($union, $case, $data) {
 
     # create case
     return bless([$def, $cases, $case, $data], 'Sq::Core::DU::Case');
+}
+
+sub is_case($union, $case) {
+    my ($def, $cases) = @$union;
+    if ( ref $case eq 'Sq::Core::DU::Case' ) {
+        if ( exists $union->[1]{$case->[2]} ) {
+            if ( Sq::Equality::equal($union->[0], $case->[0]) ) {
+                return 1;
+            }
+        }
+    }
+    return 0;
 }
 
 package Sq::Core::DU::Case;
