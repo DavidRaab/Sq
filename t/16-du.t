@@ -116,7 +116,6 @@ like(
     is($fs->is_case([]),                                       0, 'is_case accepts any value 2');
 }
 
-{
 # Recursive Union. Example to create an immutable list
 #
 # This is very inefficent, and also by far not how for example the immutable
@@ -127,6 +126,7 @@ like(
 # type List<'a> =
 #     | Empty
 #     | Cons of 'a * List<'a>
+{
     my $list;
     $list = union(
         Empty => ['void'],
