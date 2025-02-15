@@ -58,11 +58,16 @@ sub du($union, $other) {
 sub du_case($union, $other) {
     if ( $union->[2] eq $other->[2] ) {
         if ( equal($union->[0], $other->[0]) ) {
-            if ( equal($union->[3], $union->[3]) ) {
+            if ( equal($union->[3], $other->[3]) ) {
                 return 1;
             }
         }
     }
+    return 0;
+}
+
+sub path_tiny($obj, $other) {
+    return 1 if $obj eq $other;
     return 0;
 }
 
@@ -71,6 +76,7 @@ my $dispatch = {
     'Seq'                => \&seq,
     'Sq::Core::DU'       => \&du,
     'Sq::Core::DU::Case' => \&du_case,
+    'Path::Tiny'         => \&path_tiny,
 };
 
 sub equal($any1, $any2) {
