@@ -1,6 +1,8 @@
 package Sq::Core::DU;
 use 5.036;
 
+### CONSTRUCTOR
+
 sub union(@args) {
     my @cases;
     # Allow empty cases
@@ -36,6 +38,8 @@ sub union(@args) {
     ERROR:
     Carp::croak "union() must be called with 'string => type'";
 }
+
+### METHODS
 
 sub case($union, $case, $data=undef) {
     my ($def, $cases) = @$union;
@@ -73,6 +77,17 @@ sub is_case($union, $case) {
         }
     }
     return 0;
+}
+
+sub install($union) {
+    my ($pkg) = caller;
+    for my $case ( keys $union->[0]->%* ) {
+        my $full = $pkg . '::' . $case;
+        Sq::Reflection::set_func($full, sub {
+            return $union->case($case, @_);
+        });
+    }
+    return;
 }
 
 package Sq::Core::DU::Case;

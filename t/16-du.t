@@ -212,4 +212,23 @@ like(
     ), 'Not the same');
 }
 
+{
+    # Haskell words for Option type
+    my $maybe = union(
+        'Nothing',
+        Just => ['any'],
+    );
+
+    # install functions for the cases
+    $maybe->install;
+
+    is(Nothing(), Nothing(),        'Nothings are the same');
+    nok(equal(Nothing(), Just(10)), 'Not the same');
+    is(Just(10), Just(10),          'Just the same');
+    nok(equal(Just(10), Just(9)),   'Different Just');
+
+    ok($maybe->is_case(Nothing()),  'Nothing is maybe');
+    ok($maybe->is_case(Just(10)),   'Just is maybe');
+}
+
 done_testing;
