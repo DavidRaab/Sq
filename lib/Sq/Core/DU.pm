@@ -1,7 +1,25 @@
 package Sq::Core::DU;
 use 5.036;
 
-sub union(@cases) {
+sub union(@args) {
+    my @cases;
+    # Allow empty cases
+    my ($idx,$case,$next) = (0);
+    while ( $idx < @args ) {
+        $case = $args[$idx];
+        $next = $args[$idx+1];
+        # When next is not a ref, we assume we have an empty case
+        if ( ref $next eq "" ) {
+            push @cases, $case, ['void'];
+            $idx += 1;
+        }
+        # otherwise we assume we have CASE => DEF
+        else {
+            push @cases, $case, $next;
+            $idx  += 2;
+        }
+    }
+
     # check if @cases is correct
     for my ($case,$array) ( @cases ) {
         goto ERROR if ref $case  ne "";

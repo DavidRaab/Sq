@@ -6,8 +6,6 @@ use Sq -sig => 1;
 use Sq::Test;
 use Path::Tiny qw(path);
 
-# TODO: Recursive DUs
-
 # this creates a type-union. It's like an enum but instead of just a name
 # to a number mapping every case can be of any complex type.
 # Here it describes a type that either is a "File" or "Folder" and every
@@ -116,6 +114,7 @@ like(
     is($fs->is_case($other->case(File => path('/etc/fstab'))), 0, 'Not a case');
 }
 
+{
 # Recursive Union. Example to create an immutable list
 #
 # This is very inefficent, and also by far not how for example the immutable
@@ -126,13 +125,12 @@ like(
 # type List<'a> =
 #     | Empty
 #     | Cons of 'a * List<'a>
-my $list;
-$list = union(
-    Empty => ['void'],
-    Cons  => [tuple => ['any'], [runion => sub { $list }]],
-);
+    my $list;
+    $list = union(
+        Empty => ['void'],
+        Cons  => [tuple => ['any'], [runion => sub { $list }]],
+    );
 
-{
     # fold for list DU
     sub fold($list, $state, $f) {
         $list->match(
@@ -164,6 +162,54 @@ $list = union(
         to_array(list(1,2,3,4)),
         [1,2,3,4],
         'list to array');
+}
+
+# Example how to implement an Option type with an Union. In F# it's defined like this:
+# type Option<'a> =
+#     | None
+#     | Some of 'a
+#
+# The Option type in Sq is more efficently implemented but also not exactly the
+# same like here. In Sq it allows multiple values.
+{
+    my $option = union(
+        'None',
+        Some => ['any'],
+    );
+
+    my $option_full = union(
+        None => ['void'],
+        Some => ['any'],
+    );
+
+    is($option, $option_full, 'Should be the same');
+
+    # Empty case at end
+    my $option2 = union(
+        Some => ['any'],
+        'None',
+    );
+    is($option2, $option_full, 'Also the same');
+
+    is(
+        $option->case('None'),
+        $option2->case('None'),
+        'None is the same');
+
+    is(
+        $option ->case(Some => "Hello"),
+        $option2->case(Some => "Hello"),
+        'Some are the same 1');
+
+    is(
+        $option ->case(Some => [qw/Hello World/]),
+        $option2->case(Some => [qw/Hello World/]),
+        'Some are the same 2');
+
+    nok(equal(
+        $option ->case(Some => [qw/Hello World !/]),
+        $option2->case(Some => [qw/Hello World/]),
+    ), 'Not the same');
 }
 
 # TODO: Some other idea i suddenly had
