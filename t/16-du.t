@@ -112,6 +112,8 @@ like(
 
     # check failure of is_case
     is($fs->is_case($other->case(File => path('/etc/fstab'))), 0, 'Not a case');
+    is($fs->is_case("foo"),                                    0, 'is_case accepts any value 1');
+    is($fs->is_case([]),                                       0, 'is_case accepts any value 2');
 }
 
 {
