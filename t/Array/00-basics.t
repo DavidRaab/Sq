@@ -264,6 +264,30 @@ is($range->take(5)->skip(2),  [3,4,5], 'take->skip 1');
 is($range->take(5)->skip(4),  [5],     'take->skip 2');
 is($range->take(5)->skip(6),  [],      'take->skip 2');
 
+{
+    my $data1 = array(
+        array(1,1),
+        array(2,3,5,8,13),
+    );
+
+    # test both calling styles
+    is(
+        Array::flatten($data1),
+        $data1->flatten,
+        'flatten');
+
+    ## Implementing bind with map->flatten
+    my $bind = sub($s, $f) {
+        return $s->map($f)->flatten;
+    };
+
+    # check if bind is same as map->flatten
+    is(
+        $data1->bind(\&id),
+        $bind->($data1, \&id),
+        'bind implemented with map and flatten');
+}
+
 is(
     Array->concat(
         Array->range(1,10),
