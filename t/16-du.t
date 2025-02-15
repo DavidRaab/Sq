@@ -212,9 +212,4 @@ like(
     ), 'Not the same');
 }
 
-# TODO: Some other idea i suddenly had
-# sub Array;
-# my $array_init1 = Array('init', 3, sub($idx) { $idx });
-# my $array_init2 = Array init => 3, sub($idx) { $idx };
-
 done_testing;

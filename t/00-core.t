@@ -423,4 +423,18 @@ is(
     is(qsort($array), $array->sort(by_num), 'qsort');
 }
 
+# This change is interesting and would be a way to make Sq compatible so
+# it could be published on CPAN. But it would have some kind of overhead
+# on every function call. But this would change a lot. I cannot have a package
+# Array and a function Array. This change would need a change to every
+# function-style call like: Array::init()
+#
+# So this will not happen any time soon. Maybe never at all. Still keep that
+# idea here, maybe i will find a purpose for that idea.
+#
+# TODO: Some other idea i suddenly had
+# sub Array;
+# my $array_init1 = Array('init', 3, sub($idx) { $idx });
+# my $array_init2 = Array init => 3, sub($idx) { $idx };
+
 done_testing;
