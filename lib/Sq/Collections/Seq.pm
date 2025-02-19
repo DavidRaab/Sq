@@ -762,7 +762,7 @@ sub skip_while($seq, $predicate) {
 }
 
 sub slice($seq, @idxs) {
-    return [] if @idxs == 0;
+    return bless([], 'Array') if @idxs == 0;
     # result of slice
     my @new;
     # first we remove negative indexes
