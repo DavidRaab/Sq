@@ -16,10 +16,12 @@ BEGIN {
 
 my $count = 0;
 
+# Expects a valid value. A valid value is every number not "0", a not
+# empty string. And every Some($value) value and every Ok($value).
 sub ok($bool, $message) {
     $count++;
     if ( is_num $bool ) {
-        Carp::croak "ok() only expects 0 or 1 as numbers. Got: $bool\n" if ($bool != 0 && $bool != 1);
+        Carp::croak "ok() only expects 0 or 1 as numbers. Got: $bool" if ($bool != 0 && $bool != 1);
         if ( $bool ) {
             print "ok $count - $message\n"
         }
@@ -65,6 +67,8 @@ sub ok($bool, $message) {
     return;
 }
 
+# Expects a "not okay" value. In Sq this means 0 or the "None" or "Err" values
+# from the Option/Result are considered as valid values.
 sub nok($bool, $message) {
     $count++;
     if ( !defined $bool ) {
