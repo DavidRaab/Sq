@@ -119,6 +119,12 @@ sub du_case($union, $depth=0) {
     return sprintf('$union->case(%s => %s)', $union->[2], to_string($union->[3], $depth+2))
 }
 
+sub datetime($dt, $depth=0) {
+    return $COLOR
+        ? sprintf "DateTime($COLOR_STRING\"%s\"$COLOR_RESET)", $dt->rfc3339
+        : sprintf "DateTime(%s)", $dt->rfc3339;
+}
+
 ### Dumping Logic
 
 sub num {
@@ -144,6 +150,7 @@ my $dispatch = {
     'Sq::Core::DU::Case' => \&du_case,
     'ARRAY'              => \&array,
     'Array'              => \&array,
+    'DateTime'           => \&datetime,
     'Queue'              => \&queue,
     'HASH'               => \&hash,
     'Hash'               => \&hash,
