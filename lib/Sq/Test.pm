@@ -67,8 +67,11 @@ sub ok($bool, $message) {
 
 sub nok($bool, $message) {
     $count++;
-    if ( is_num($bool) ) {
-        Carp::croak "ok() only expects 0 or 1 as numbers Got: $bool\n" if ($bool != 0 && $bool != 1);
+    if ( !defined $bool ) {
+        Carp::croak "nok() expects 0 or 1. Got undef";
+    }
+    elsif ( is_num($bool) ) {
+        Carp::croak "nok() only expects 0 or 1 as numbers Got: $bool" if ($bool != 0 && $bool != 1);
         if ( $bool == 0 ) {
             print "ok $count - $message\n";
             return;
@@ -102,17 +105,18 @@ sub nok($bool, $message) {
             return;
         }
 
-        Carp::croak "nok() Got: $bool\n" if ref eq "";
-        Carp::croak "nok() Got ref: $type\n";
+        Carp::croak "nok() Got: $bool" if ref eq "";
+        Carp::croak "nok() Got ref: $type";
     }
 
     # C-style error handling without exception crap.
-    # You know that if i would throw an exception and catch that, it would
-    # logical the same as an goto? Just maybe only 100 times slower?
+    # You know that throwing an exception and catch that, it would
+    # logical the same as an goto? But the exceptions is maybe around
+    # 100 times slower?
     ERROR:
     my ( $pkg, $file, $line ) = caller;
     my $place = sprintf "at %s: %d\n", $file, $line;
-    warn  "# Expected 0, None or Err()\n";
+    warn  "# Expected 0, None() or Err()\n";
     warn  "# not ok $count - $message\n";
     return;
 }
