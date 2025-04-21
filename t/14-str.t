@@ -50,4 +50,14 @@ is(array("foo","bar")     ->map(Str->ord),     [102,98],        'ord');
 is(array("0xff","ff","10")->map(Str->hex),     [255,255,16],    'hex');
 is(array(32, 97, 100)     ->map(Str->chr),     [" ", "a","d"],  'chr');
 
+
+# is(Str->chunk("0123456789", 0), ["012", "345", "678", "9"], 'chunk 0');
+is(Str->chunk("0123456789", 1),  [qw/0 1 2 3 4 5 6 7 8 9/],  'chunk 1');
+is(Str->chunk("0123456789", 3),  ["012", "345", "678", "9"], 'chunk 3');
+is(Str->chunk("0123456789", 20), ["0123456789"],             'chunk 20');
+is(
+    Str->chunk("0123456789", 3)->join(","),
+    "012,345,678,9",
+    "chunk->join");
+
 done_testing;

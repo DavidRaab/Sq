@@ -74,4 +74,15 @@ static contains => sub($str, $contains) {
     return 0;
 };
 
+static chunk => sub($str, $size) {
+    my @chunks;
+    my $max     = length $str;
+    my $current = 0;
+    while ( $current < $max ) {
+        push @chunks, substr($str, $current, $size);
+        $current += $size;
+    }
+    return bless(\@chunks, 'Array');
+};
+
 1;
