@@ -85,4 +85,16 @@ static chunk => sub($str, $size) {
     return bless(\@chunks, 'Array');
 };
 
+static map => sub($str, $f) {
+    return join "", (map { $f->($_) } (split //, $str));
+};
+
+static keep => sub($str, $f) {
+    return join "", grep { $f->($_) } (split //, $str);
+};
+
+static remove => sub($str, $f) {
+    return join "", grep { $f->($_) == 0 } (split //, $str);
+};
+
 1;

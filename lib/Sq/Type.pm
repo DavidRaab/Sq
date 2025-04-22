@@ -380,7 +380,7 @@ sub t_min($min) {
         if ( $type eq "" ) {
             if ( is_num($any) ) {
                 return $valid if $any >= $min;
-                return "min: $any > $min";
+                return "min: $min Got: $any";
             }
             else {
                 return $valid if length($any) >= $min;
