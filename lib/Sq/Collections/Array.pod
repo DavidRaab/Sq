@@ -84,6 +84,145 @@ in this package as methods on an array.
 
 =back
 
+=head1 OVERVIEW
+
+    # Constructors
+    Array->empty
+    Array->replicate($count, $init)
+    Array->one($x)
+    Array->new(@elems)
+    Array->bless($array_ref)
+    Array->from_array($array_ref)
+    Array->concat(@arrays)
+    Array->init($count, $f)
+    Array->init2d($width, $height, $f)
+    Array->unfold($state, $f_opt)
+    Array->range($start, $stop)
+    Array->range_step($start, $step, $stop)
+
+    # Methods
+    $array->copy
+    $array->bind($f)
+    $array->cartesian(@arrays)
+    $array->append($array)
+    $array->rev
+    $array->mapn($count, $f)
+    $array->map($array, $f)
+    $array->map2($arrayB, $f)
+    $array->map3($arrayB, $arrayC, $f)
+    $array->map4($arrayB, $arrayC, $arrayD, $f)
+    $array->map2d($aoa, $f)
+    $array->map_e($expr)
+    $array->chunked($size)
+    $array->chunked_size($max_size, $f_size)
+    $array->columns($amount)
+    $array->choose($f_opt)
+    $array->mapi($f)
+    $array->keep($predicate)
+    $array->keep_some($array_of_opt)
+    $array->keep_some_by($f)
+    $array->keep_type($type)
+    $array->all_ok($array_of_results)
+    $array->all_ok_by($f_result)
+    $array->keep_ok($array_of_results)
+    $array->keep_ok_by($f_result)
+    $array->keep_e($expr)
+    $array->remove($predicate)
+    $array->skip($amount)
+    $array->take($amount)
+    $array->indexed()
+    $array->zip(@arrays)
+    $array->sort($comparer)
+    $array->sort_by($comparer, $f_key)
+    $array->sort_hash($comparer, $key)
+    $array->fsts
+    $array->snds
+    $array->to_array($count = undef)
+    $array->to_array_of_array()
+    $array->distinct
+    $array->distinct_by($f_str)
+    $array->rx($regex)
+    $array->rxm($regex)
+    $array->rxs($regex,  $f)
+    $array->rxsg($regex, $f)
+    $array->windowed($size)
+    $array->intersperse($value)
+    $array->repeat($count)
+    $array->take_while($predicate)
+    $array->skip_while($predicate)
+    $array->slice(@idxs)
+    $array->extract($pos, $length)
+    $array->diff($arrayB, $f_key)
+    $array->intersect($arrayB, $f_key)
+    $array->shuffle
+    $array->trim
+    $array->fill($upto, $f_any)
+    $array->cache
+    $array->permute
+    $array->map_rec($f_map)
+    $array->fold_rec($f_init, $f_state)
+    $array->map_array($f_map, $f_fold)
+    $array->head
+    $array->tail;
+    $aoa  ->fill2d($f)
+    $aoa  ->transpose
+    $aoa  ->transpose_map($f)
+    $array->is_empty
+    $array->fold($state, $folder)
+    $array->fold_mut($state, $folder)
+    $array->scan($state, $f_state)
+    $array->index($idx, $default=undef)
+    $array->reduce($f)
+    $array->contains($any)
+    $array->length
+    $array->expand
+    $array->first
+    $array->last
+    $array->sum
+    $array->sum_by($f_map)
+    $array->average
+    $array->average_by($f_map)
+    $array->join($sep="")
+    $array->split($regex)
+    $array->min($default=undef)
+    $array->min_by($f_num)
+    $array->min_str($default=undef)
+    $array->min_str_by($f_str)
+    $array->max($default=undef)
+    $array->max_by($f_num)
+    $array->max_str($f_str)
+    $array->group_fold($f_init, $f_str, $f_state)
+    $array->to_hash($f_map)
+    $array->to_hash_of_array($f_map)
+    $array->as_hash
+    $array->keyed_by($f_key)
+    $array->group_by($f_key)
+    $array->count
+    $array->count_by($f_key)
+    $array->find($predicate)
+    $array->find_windowed($amount, $predicate)
+    $array->any($predicate)
+    $array->all($predicate)
+    $array->none($predicate)
+    $array->pick($f_opt)
+    $array->to_seq
+    $array->all_some
+    $array->all_some_by($f)
+
+    # Mutation
+    $array->push(@values)
+    $array->pop
+    $array->shift
+    $array->unshift(@values)
+    $array->blit($array_index, $target_array, $target_index, $amount)
+
+    # Side-Effects
+    $array->iter($f)
+    $array->itern($amount, $f)
+    $array->iter_sort($comparer, $f)
+    $array->iteri($f)
+    $aoa  ->iter2d($f)
+
 =head1 CONSTRUCTORS
 
 Constructor functions are package functions that helps in the creation of
