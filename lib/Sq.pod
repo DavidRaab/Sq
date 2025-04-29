@@ -27,11 +27,14 @@ a C<Queue>, C<List> and a C<Heap> data-structure.
 It uses an C<Option> and C<Result> type for representing the absence of values
 or representing B<Ok/Err> values.
 
-It is planned to implement B<Discriminated Unions>.
+B<Discriminated Unions> are implemented but not considered fully stable, I have
+to test and use them first.
 
 Instead of classes, typing is done with an Structural Typing approach. It is
 available under C<Sq::Type> but not completed and documented yet.
-This can be used as an argument validator or even as a testing tool.
+This can be used as an argument validator or even as a testing tool. Sq comes
+with a loadable B<Signature> concepts that adds type-checking to functions, this
+already use C<Sq::Type>.
 
 Under C<Sq::Parser> there is a Combinator based approach to parsing. It
 is already usuable and can be used for certain things but sill lacks some
@@ -41,8 +44,8 @@ C<Sq> don't invent new syntax, it just uses Perl as much as possible. It
 is also implemented in pure Perl so far.
 
 The idea of C<Sq> is to combine procedural and functional programming and
-stick to a design that splits Data from Code. Because it leads to better
-software, is easier to develop and has more reusable code.
+stick to a design that splits Data from Code, because it leads to better
+code and is easier to develop and has more reusable code.
 
 The whole point is that it offers all basic operations you usually do in Perl
 like reading files, directories, parsing in general, parsing arguments, testing
@@ -50,12 +53,146 @@ and a lot of other stuff in it's own System that uses the provided data-structur
 like C<Seq>, C<Array>, C<Option> and C<Result> so you can use it as a foundation
 to develop more abstract things without re-implementing the basics again and again.
 
+It also acts as a B<Hub> that provides more functionality you probably need, but
+because Perl has to Parse/Load everything on startup C<Sq> uses a lazy loading
+approach. Some Modules are only loaded when you use them. This also makes C<Sq>
+fast to start.
+
+=head1 MODULES
+
+=head2 Sq->io
+
+No functions yet.
+
+=head2 Sq->fs
+
+    Sq->fs->read_text
+    Sq->fs->read_text_gz
+    Sq->fs->write_text
+    Sq->fs->write_text_gz
+    Sq->fs->read_raw
+    Sq->fs->compare_text
+    Sq->fs->read_bytes
+    Sq->fs->make_link
+    Sq->fs->recurse
+    Sq->fs->children
+    Sq->fs->sha512
+
+=head2 Sq->math
+
+    Sq->math->is_prime
+    Sq->math->fac
+    Sq->math->permute_count_up
+
+=head2 Sq->fmt
+
+    Sq->fmt->table
+    Sq->fmt->html
+
+=head2 Sq->bench
+
+    Sq->bench->it
+    Sq->bench->compare
+
+=head2 Sq->rand
+
+    Sq->rand->int
+    Sq->rand->num
+    Sq->rand->str
+
+=head2 Str
+
+All functions are B<static>
+
+    Str->length
+    Str->lc
+    Str->uc
+    Str->chomp
+    Str->chop
+    Str->reverse
+    Str->ord
+    Str->chr
+    Str->hex
+    Str->trim
+    Str->collapse
+    Str->nospace
+    Str->escape_html
+    Str->repeat
+    Str->starts_with
+    Str->ends_with
+    Str->contains
+    Str->chunk
+    Str->map
+    Str->keep
+    Str->remove
+
+=head2 Static Functions
+
+TODO: Describe what static means.
+
 =head1 IMPORTED FUNCTIONS
+
+=head2 seq { ... }
+
+A sequence is usually a lazyily computed sequence. But we still need to create
+sequences with pre-defined uncomputed values. seq() creates one of them.
+
+    my $seq = seq { 1, 2, 3 }
+
+seq expects a block of code, so you can write any computation in it. Consider
+that the computation is only done a single time.
+
+=head2 array(x,y,z, ...)
+
+Creates an Array with a blessing.
+
+    my $data = array(1,2,3);
+
+This is nearly the same as
+
+    my $data = [1,2,3];
+
+But the added blessing allows you to call a lot of methods on it. See the C<Array>
+package.
+
+    my $sum = array(1,2,3,4)->map(sub($x) { $x * 2 })->sum; # 20
+
+=head2 hash(key1 => value1, key2 => value2, ...)
+
+Creates a Hash but with a blessing added that allows you to call the Methods
+in the C<Hash> package on it.
+
+    my $album = hash(
+        artist => 'Michael Jackson',
+        title  => 'Thriller',
+        tracks => array(
+            hash(title => "Wanna Be Startin’ Somethin", duration => 363),
+            hash(title => "Baby Be Mine",               duration => 260),
+            hash(title => "The Girl Is Mine",           duration => 242),
+            hash(title => "Thriller",                   duration => 357),
+            hash(title => "Beat It",                    duration => 258),
+            hash(title => "Billie Jean",                duration => 294),
+            hash(title => "Human Nature",               duration => 246),
+            hash(title => "P.Y.T.",                     duration => 239),
+            hash(title => "The Lady in My Life",        duration => 300),
+        ),
+    );
+
+    my $total_runtime =
+        $album->{tracks}->sum_by(sub($track) { $track->{duration} });
+
+=head2 key($string)
+
+Creates a function that selects a key from a hash.
+
+    my $total_runtime =
+        $album->{tracks}->sum_by(key 'duration');
 
 =head2 sq($any) : $any
 
 Recursively traverses through a data-structure and adds Array/Hash blessings to
-the data-structure. Also traverses into Option values.
+the data-structure. Also traverses into Option/Result values ands adds blessings.
+This is usually preferred over using array()/hash() functions.
 
     my $album = sq {
         artist => 'Michael Jackson',
@@ -92,6 +229,42 @@ the data-structure. Also traverses into Option values.
         }
         return $sum;
     };
+
+=head2 assign { ... }
+
+This allows you to easily create a new scope where you can define
+temporarily variables. The last expression of C<assign { ... }> is
+returned.
+
+    my $value = assign {
+        my $x = ...  # code to compute $x
+        my $y = ...  # code to compute $y
+        $x + $y;
+    };
+
+Same as
+
+    my $value;
+    {
+        my $x  = ...  # code to compute $x
+        my $y  = ...  # code to compute $y
+        $value = $x + $y;
+    }
+
+It is a good practice when variables are only visible/limited to the scope
+they are really needed. An assign block can help here. assign also works very
+well with state variables.
+
+    state $array = assign {
+        my @built;
+        for ( ... ) {
+            push @built, ...
+        }
+        return \@built;
+    };
+
+This way you can easily have a full code block with any statements and use it
+for assignment of a state variable that is still only computed once.
 
 =head2 Some($x) : $opt_x
 
@@ -148,19 +321,30 @@ This function is also available as a method on the types.
 
     my $bool = Array->replicate(3, "foo")->equal(["foo", "foo", "foo"]);
 
-=head2 is_num($str) : $bool
+=head2 key_equal($key, $value)
 
-returns a truish value if C<$str> is a number.
+Returns a function that returns a boolean value if the $key of a hash is
+$value.
 
-=head2 is_str($str) : $bool
+    my $result = $array->find_windowed(3, key_equal(id => 4));
 
-returns a truish value if C<$str> is a string.
+Without key_equal you would have written.
 
-=head2 key($name) : $f_key_of_hash
+    my $result = $array->find_windowed(3, sub($hash) { equal($hash->{id}, 4) });
 
-returns a function that selects the specified key from a hash.
+This function uses the C<equal> function that can compare complex data-structures.
 
-    sub key($name) { sub($hash) { return $hash->{$name} } }
+    my $result = $array->find_windowed(3, key_equal(id => [1,2,3]));
+
+=head2 is_num, is_str, is_array, is_hash, is_seq, is_opt, is_result, is_ref, is_regex, is_sub, is_type
+
+Functions to check if a value is of a certain type.
+
+    my $bool = is_num(1);
+    my $bool = is_num([]);
+    my $bool = is_array({});
+    my $bool = is_hash({});
+    my $bool = is_regex(qr/\d+/);
 
 =head2 call($method, @args) : $f
 
@@ -184,26 +368,13 @@ returns a function that calls C<$method> on an object with C<@args> arguments.
     #     [8,9,10],
     # ]
 
-=head2 assign
+=head2 by_num, by_str, by_stri
 
-This allows you to easily create a new scope where you can defined
-temporarily variables. The last expression of C<assign { ... }> is
-returned.
+Returns a comparison function used by the sort() methods/functions in Sq.
 
-    my $value = assign {
-        my $x = ...  # code to compute $x
-        my $y = ...  # code to compute $y
-        $x + $y;
-    };
-
-Same as
-
-    my $value;
-    {
-        my $x  = ...  # code to compute $x
-        my $y  = ...  # code to compute $y
-        $value = $x + $y;
-    }
+    $sorted = $array->sort(by_num);  # numerical
+    $sorted = $array->sort(by_str);  # alphabetical
+    $sorted = $array->sort(by_stri); # alphabetical, ignore case
 
 =head2 id($x) : $x
 
@@ -222,6 +393,146 @@ return the first element of an array
 return the second element of an array
 
     sub snd($array) { return $array->[1] }
+
+=head2 record(@fields)
+
+Creates a function that then can be used to create a Hash by only expecting the
+values of the hash.
+
+    my $person  = record(qw/id name/);
+
+    my $personA = $person->(1, "Anny");
+    my $personB = $person->(2, "Lilly");
+
+=head2 fn($name, $sub)
+
+Installs a subroutine reference as $name;
+
+    fn 'person', record(qw/id name/);
+    fn person => record(qw/id name/);
+
+    my $personA = person(1, "Anny");
+    my $personB = person(2, "Lilly");
+
+=head2 static
+
+TODO: Explain static
+
+=head2 type
+
+Creates a type
+
+TODO: Describe
+
+=head2 multi($name, @type_function)
+
+Creates a multi-dispatch function C<$name> that uses the C<< type => subroutine >>
+mapping for dispatch.
+
+    multi double => (
+        type ['num'] => sub($num) {
+            # when
+        },
+        type ['str'] => sub($str) {
+        },
+    );
+
+=head2 dump($any) / dumps($any)
+
+dump() dumps value to STDERR in a readable format. Usually in a way that you
+can Copy/paste to recreate the same data-structure again. But still consider
+that this function is not yet safe as a tool for saving data-structure. It's
+a tool for debugging. Use JSON, XML or whatever for writing/reading data.
+
+While dump() directly prints to STDERR, dumps() just creates a string.
+
+=head2 copy
+
+TODO: Not implemented yet.
+
+Will create a full deep copy of a data-structure
+
+=head2 union
+
+Creates an Discriminated Union. See Tests so far.
+
+TODO: Explain
+
+=head2 with_dispatch(@type_function)
+
+Usually used with C<static>. For example used in C<Sq::Fmt>
+
+    static table => with_dispatch(
+        type [tuple => $table_aoa] => sub ($args) {
+            ...
+        },
+        type [tuple => $table_aoh] => sub($args) {
+            ...
+        },
+    );
+
+The above creates a function named C<table> that has two dispatches. One when
+you pass it an Array-of-Array and when you pass it an Array-of-Hash.
+
+C<with_dispatch> on itself just creates a function with the dispatch.
+
+=head2 type_cond(@type_function)
+
+Very similar to C<with_dispatch>. The function created by C<with_dispatch>
+expects many arguments. The function returned by C<type_cond> on the other hand
+only expects a single argument.
+
+TODO: Add some Usage
+
+=head2 lazy { ... }
+
+Returns a function that is only evaluated once. When the function is never called,
+then nothing is ever evaluated.
+
+    my $value = lazy {
+        sleep 10;
+        return 5;
+    };
+
+    if ( $compute ) {
+        # Both styles are offically supported
+        my $result = $value->force();
+        my $result = $value->();
+    }
+
+    # if $compute is false. Then the "sleep 10" is never called and computation
+    # time is saved.
+
+C<lazy> is a subroutine-reference that can be called multiple times. But once
+the function is called it's result is saved and from then one the value never
+changes.
+
+For the above that means the C<sleep 10> is only ever called a single time, no
+matter how often you call the function. This means you can put heavy computational
+logic in it without every knowing if or how often the function is called.
+
+The code only executes a single time, or never. It's like a subroutine with a
+cache. Because it is a function, you also can pass a lazy wherever a subroutine
+is expected.
+
+There is no way to reset the function forcing it re-evaluate the code again.
+
+=head2 new()
+
+There is a new() function that allows some code to look object-oriented,
+even if that isn't the case. For example you can write.
+
+    my $array = new Array => (1,2,3);
+    my $hash  = new Hash  => (a => 1, b => 2);
+
+This was just for testing. Because code is longer and more bothersome to write
+compared to
+
+    my $array = array(1,2,3);
+    my $array = sq [1,2,3];
+
+I never use it in Sq itself and don't see any point in using it. But it is still
+reserved, but maybe also get deleted.
 
 =head1 AUTOMATICALLY LOADED MODULES
 
