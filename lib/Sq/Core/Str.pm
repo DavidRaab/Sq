@@ -89,9 +89,14 @@ static map => sub($str, $f) {
     return join "", (map { $f->($_) } (split //, $str));
 };
 
-static keep => sub($str, $f) {
-    return join "", grep { $f->($_) } (split //, $str);
-};
+static keep => with_dispatch(
+    type [tuple => ['str'], ['sub']] => sub($str, $f) {
+        return join "", grep { $f->($_) } (split //, $str);
+    },
+    type [tuple => ['str'], ['regex']] => sub($str, $regex) {
+        return join "", grep { $_ =~ $regex } (split //, $str);
+    },
+);
 
 static remove => sub($str, $f) {
     return join "", grep { $f->($_) == 0 } (split //, $str);
