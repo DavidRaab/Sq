@@ -10,6 +10,7 @@ my  $COLOR_RESET    = "\e[m";
 our $COLOR_STRING   = "\e[38;5;2m"; # green
 our $COLOR_NUM      = "\e[38;5;1m"; # red
 our $COLOR_HASH_KEY = "\e[38;5;4m"; # blue
+our $COLOR_REGEX    = "\e[38;5;3m"; # yellow
 our $COLOR_SPECIAL  = "\e[38;5;3m"; # yellow
 
 # Dumping functions for types
@@ -139,6 +140,12 @@ sub string {
          : sprintf "\"%s\"", quote($_[0]);
 }
 
+sub regexp {
+    return $COLOR
+         ? sprintf "${COLOR_REGEX}qr/%s/$COLOR_RESET", $_[0]
+         : sprintf "%s", $_[0];
+}
+
 # Dispatch Table for types
 my $dispatch = {
     '_UNDEF'             => sub { 'undef'                        },
@@ -158,6 +165,7 @@ my $dispatch = {
     'Path::Tiny'         => sub { 'path(' . string(quote($_[0]->stringify)) .')' },
     'Queue'              => \&queue,
     'Result'             => \&result,
+    'Regexp'             => \&regexp,
     'Seq'                => \&seq,
 };
 
