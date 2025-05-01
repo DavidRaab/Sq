@@ -150,15 +150,15 @@ my $dispatch = {
     'Sq::Core::DU::Case' => \&du_case,
     'ARRAY'              => \&array,
     'Array'              => \&array,
+    'Benchmark'          => \&benchmark,
     'DateTime'           => \&datetime,
-    'Queue'              => \&queue,
     'HASH'               => \&hash,
     'Hash'               => \&hash,
     'Option'             => \&option,
-    'Seq'                => \&seq,
-    'Result'             => \&result,
-    'Benchmark'          => \&benchmark,
     'Path::Tiny'         => sub { 'path(' . string(quote($_[0]->stringify)) .')' },
+    'Queue'              => \&queue,
+    'Result'             => \&result,
+    'Seq'                => \&seq,
 };
 
 sub quote($str) {
