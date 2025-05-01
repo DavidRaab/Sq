@@ -88,13 +88,12 @@ in this package as methods on an array.
 
 Variables that start with C<$f_> are functions.
 
-    $f     # a function
-    $f_num # is a function supposed to return a number.
-    $f_str # must return a string
-    $f_map # can return any value of any type
-    $f_opt # must return an option
-    $f_key # must return a key that usually is used in a hash. So it must be a string
-
+    $f         # a function
+    $f_num     # must return a number
+    $f_str     # must return a string
+    $f_map     # can return any value of any type
+    $f_opt     # must return an option
+    $f_key     # must return a key that is used as a key in a hash. So it must be a string.
     $predicate # A function that either returns 0 or 1
 
     # CONSTRUCTORS
