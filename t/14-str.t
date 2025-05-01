@@ -70,4 +70,9 @@ is(Str->map("abc", Str->ord),                 "979899", 'map 2');
 is(Str->keep  ("0123456789", sub($char) { $char % 2 == 0 }), "02468", 'keep');
 is(Str->remove("0123456789", sub($char) { $char % 2 == 0 }), "13579", 'remove');
 
+is(
+    Str->keep("foo 1&23-asd", sub($char) { $char =~ m/(?: [a-zA-Z0-9] | \s | - ) /x }),
+    Str->keep("foo 1&23-asd", qr/(?: [a-zA-Z0-9] | \s | - ) /x),
+    'keep with a regex');
+
 done_testing;
