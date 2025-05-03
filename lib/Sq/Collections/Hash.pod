@@ -11,6 +11,57 @@ __END__
 
 Sq::Collection::Hash - Hash functions
 
+=head1 OVERVIEW
+
+    # Constructors
+    Hash->empty     ()
+    Hash->new       (@args)
+    Hash->bless     ($hash)
+    Hash->locked    ($hash)
+    Hash->init      ($amount, $f)
+    Hash->from_array($array, $f)
+
+    # Methods
+    append      ($hashA, $hashB)
+    bind        ($hash, $f)
+    concat      (@hashes)
+    copy        ($hash)
+    diff        ($hashA, $hashB)
+    extract     ($hash, @keys)
+    find        ($hash, $predicate)
+    fold        ($hash, $state, $f)
+    fold_back   ($hash, $state, $f)
+    get         ($hash, $key)
+    has_keys    ($hash, @keys)
+    intersect   ($hashA, $hashB, $f)
+    is_empty    ($hash)
+    is_subset_of($hash, $other)
+    keep        ($hash, $predicate)
+    keys        ($hash)
+    length      ($hash)
+    map         ($hash, $f)
+    pick        ($hash, $f_opt)
+    remove      ($hash, $predicate)
+    slice       ($hash, @keys)
+    to_array    ($hash, $f)
+    union       ($hashA, $hashB, $f)
+    values      ($hash)
+    with        ($hash, @keys)
+    withf       ($hash, %kfs)
+    with_default($hash, %def)
+
+    # Side-Effect
+    iter     ($hash, $f)
+    iter_sort($hash, $compare, $f)
+    lock     ($hash, @keys)
+    on       ($hash, %kfs)
+
+    # Mutations
+    change($hash, %kfs)
+    delete($hash, @keys)
+    push  ($hash, $key, @values)
+    set   ($hash, @kvs)
+
 =head1 DESCRIPTION
 
 An Sq Hash is just a Perl Hash blessed in the C<Hash> package. You can create

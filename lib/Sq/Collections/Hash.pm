@@ -182,7 +182,7 @@ sub intersect($hash, $other, $f) {
     return CORE::bless(\%new, 'Hash');
 }
 
-# Hash<'a,'b> -> Hash<'a,'b> -> Hash<'a,'b>
+# TODO: Should work similar to Array->diff
 sub diff($hash, $other) {
     my %new;
     for my ($key,$value) ( %$hash ) {
@@ -193,6 +193,8 @@ sub diff($hash, $other) {
     return CORE::bless(\%new, 'Hash');
 }
 
+# TODO: Array->concat is a constructor, this is a method. This is not consistent
+#       Either Array->concat or this one needs to change.
 sub concat(@hashes) {
     my %new;
     for my $hash ( @hashes ) {
