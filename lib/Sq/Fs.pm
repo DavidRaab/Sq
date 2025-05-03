@@ -339,4 +339,21 @@ static sha512 => sub(@paths) {
     return Ok($sha->hexdigest);
 };
 
+static search_upwards => sub($entry) {
+    my $current = Path::Tiny->cwd;
+
+    CHECK:
+    my $fs = $current->child($entry);
+    if ( -e $fs ) {
+        return Some($fs);
+    }
+    elsif ( $current eq '/' ) {
+        return None;
+    }
+    else {
+        $current = $current->parent;
+        goto CHECK;
+    }
+};
+
 1;
