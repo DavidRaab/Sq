@@ -66,16 +66,19 @@ No functions yet.
 
 =head2 Sq->fs
 
-    Sq->fs->read_text
-    Sq->fs->read_text_gz
-    Sq->fs->write_text
+    Sq->fs->children     (@path)                # all folder entries as a sequence
+    Sq->fs->read_text    (@path)                # sequence of file opened as UTF-8
+    Sq->fs->read_text_gz (@path)                # opens gzip file as UTF-8 text
+    Sq->fs->write_text   ($file, $content)      # writes $content as $file
+    Sq->fs->write_text   ($file, $array_of_str) # writes array of strings as file
+    Sq->fs->write_text   ($file, $seq)          # writes sequence as file
     Sq->fs->write_text_gz
     Sq->fs->read_raw
     Sq->fs->compare_text
     Sq->fs->read_bytes
     Sq->fs->make_link
     Sq->fs->recurse
-    Sq->fs->children
+    Sq->fs->search_upwards
     Sq->fs->sha512
 
 =head2 Sq->math
@@ -86,45 +89,46 @@ No functions yet.
 
 =head2 Sq->fmt
 
-    Sq->fmt->table
-    Sq->fmt->html
+    Sq->fmt->table(...) # Generates a table on console
+    Sq->fmt->html(...)  # Generates HTML from a data-structure
 
 =head2 Sq->bench
 
-    Sq->bench->it
-    Sq->bench->compare
+    Sq->bench->it     ($f)           # Measures execution time of $f
+    Sq->bench->compare($time, $subs) # Calls Benchmark::cmpthese
 
 =head2 Sq->rand
 
-    Sq->rand->int
-    Sq->rand->num
-    Sq->rand->str
+    Sq->rand->int($min, $max)         # sequence of random integer from $min to $max
+    Sq->rand->num($min, $max)         # sequence of random number from $min to $max
+    Sq->rand->str($min, $max)         # sequence of random strings of length $min to $max
+    Sq->rand->str($min, $max, $chars) # sequence of random strings of length $min to $max that uses characters from $chars
 
 =head2 Str
 
 All functions are B<static>
 
-    Str->length
-    Str->lc
-    Str->uc
     Str->chomp
     Str->chop
-    Str->reverse
-    Str->ord
-    Str->chr
-    Str->hex
-    Str->trim
-    Str->collapse
-    Str->nospace
-    Str->escape_html
-    Str->repeat
-    Str->starts_with
-    Str->ends_with
-    Str->contains
     Str->chunk
-    Str->map
+    Str->collapse
+    Str->contains
+    Str->chr
+    Str->ends_with
+    Str->escape_html
+    Str->hex
     Str->keep
+    Str->lc
+    Str->length
+    Str->map
+    Str->nospace
+    Str->ord
     Str->remove
+    Str->repeat
+    Str->reverse
+    Str->starts_with
+    Str->trim
+    Str->uc
 
 =head2 Static Functions
 
