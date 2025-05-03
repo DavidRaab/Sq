@@ -191,4 +191,6 @@ is(
         'gz written file same as string');
 }
 
+ok(Sq->fs->search_upwards('README.md'), 'Must find README.md');
+
 done_testing;
