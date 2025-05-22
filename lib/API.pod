@@ -88,8 +88,8 @@ No functions yet.
 
 =head2 Sq->math
 
-    Sq->math->is_prime
     Sq->math->fac
+    Sq->math->is_prime
     Sq->math->permute_count_up
 
 =head2 Sq->fmt
