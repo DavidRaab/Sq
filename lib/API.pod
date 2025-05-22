@@ -348,9 +348,75 @@ TODO
 
 =head1 Option
 
-TODO
+    # Constructors
+    my $opt = Some(1);
+    my $opt = Some(1,2,3);
+    my $opt = None();
+
+    # Methods
+    bind        ($opt,  $f)
+    bind2       ($opt,  $optA, $optB, $f)
+    bind3       ($opt,  $optA, $optB, $optC, $f)
+    bind4       ($opt,  $optA, $optB, $optC, $optD, $f)
+    bind_v      (@opts, $f)
+    check       ($opt, $predicate)
+    fold        ($opt, $state, $f)
+    fold_back   ($opt, $state, $f)
+    get         ($opt)
+    is_some     ($any)
+    is_none     ($any)
+    iter        ($opt, $f)
+    match       ($opt,  Some => sub {}, None => sub {})
+    map         ($opt,  $f)
+    map2        ($optA, $optB, $f)
+    map3        ($optA, $optB, $optC, $f)
+    map4        ($optA, $optB, $optC, $optD, $f)
+    map_v       (@opts, $f)
+    or          ($opt,  @defaults)
+    or_with     ($opt,  $f_x)
+    or_else     ($opt,  $default_opt)
+    or_else_with($opt,  $f_opt)
+    single      ($opt)
+    to_array    ($opt)
+    to_seq      ($opt)
+    validate    ($opt, $predicate)
+
+    # Module Functions
+    my ($bool, @values) = Option->extract(@any)
 
 =head1 Result
 
-TODO
+    # Constructors
+    my $res = Ok(1);
+    my $res = Err(1);
 
+    # Methods
+    fold        ($res, $state, $f_state)
+    get         ($res)
+    is_ok       ($any)
+    is_err      ($any)
+    iter        ($res, $f)
+    map         ($res, $f)
+    map2        ($resA, $resB, $f)
+    map3        ($resA, $resB, $resC, $f)
+    map4        ($resA, $resB, $resC, $resD, $f)
+    mapErr      ($res, $f)
+    match       ($res, Ok => sub {}, Err => sub {})
+    or          ($res, $default)
+    or_with     ($res, $f)
+    or_else     ($res, $defalut_result)
+    or_else_with($res, $f_result)
+    to_option   ($res)
+    to_array    ($res)
+    value       ($res)
+
+=head1 Lazy
+
+Lazy is like a normal anonymous subroutine function that evaluates it's body
+only once and caches it's result. You can pass a lazy wherever a normal subroutine
+is expected.
+
+    my $sub   = lazy { ... };
+
+    my $value = $sub->force();
+    my $value = $sub->();
