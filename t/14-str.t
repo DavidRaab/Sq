@@ -75,4 +75,12 @@ is(
     Str->keep("foo 1&23-asd", qr/(?: [a-zA-Z0-9] | \s | - ) /x),
     'keep with a regex');
 
+# split
+{
+    my $str    = "abc def ghi jkl mno p";
+    my $threes = Str->split(qr/\s+/, $str);
+    check_isa($threes, 'Array', 'split returns Sq Array');
+    is($threes, [qw/abc def ghi jkl mno p/], 'content from split');
+}
+
 done_testing;

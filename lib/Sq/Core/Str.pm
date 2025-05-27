@@ -102,4 +102,8 @@ static remove => sub($str, $f) {
     return join "", grep { $f->($_) == 0 } (split //, $str);
 };
 
+static split => sub($regex, $str) {
+    return sq [ split $regex, $str ];
+};
+
 1;
