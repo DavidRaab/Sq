@@ -139,7 +139,9 @@ All functions are B<static>
 
 TODO: Describe what static means.
 
-=head1 ARRAY
+=head1 Data Structures
+
+=head2 ARRAY
 
 Variables that start with C<$f_> are functions.
 
@@ -291,7 +293,7 @@ Variables that start with C<$f_> are functions.
     iteri    ($array, $f)
     iter2d   ($aoa,   $f)
 
-=head1 HASH
+=head2 HASH
 
     # Constructors
     Hash->empty     ()
@@ -342,11 +344,11 @@ Variables that start with C<$f_> are functions.
     push  ($hash, $key, @values)
     set   ($hash, @kvs)
 
-=head1 Seq
+=head2 Seq
 
 TODO
 
-=head1 Option
+=head2 Option
 
     # Constructors
     my $opt = Some(1);
@@ -384,7 +386,7 @@ TODO
     # Module Functions
     my ($bool, @values) = Option->extract(@any)
 
-=head1 Result
+=head2 Result
 
     # Constructors
     my $res = Ok(1);
@@ -420,3 +422,126 @@ is expected.
 
     my $value = $sub->force();
     my $value = $sub->();
+
+=head1 Sq::Parser
+
+    # Running a Parser
+    p_run  ($parser, $str)
+    p_valid($parser, $str)
+
+    # Building Parsers
+    p_str       (@strings)            # expects one of the strings to be succesfull
+    p_strc      (@strings)            # like p_str but also keeps what was matches as the result
+    p_match     ($regex)              # matches a regex
+    p_matchf    ($regex, $f_xs)       # matches regex, and does transformation
+    p_matchf_opt($regex, $f_opt_xs)   # like p_match but expexts an option for succeess
+
+    # change result of Parser
+    p_map       ($f_map, @parsers)    # maps multiple parsers into a new value
+    p_keep      ($parser, $predicate) # decides if result of $parser should be keept
+    p_choose    ($parser, $f_opt)     # like p_map but expects an optional and the parsing can thus fail
+    p_join      ($sep, $parser)       # all result of $parser are concatenated
+    p_split     ($regex, $parser)     # splits result of $parser into multiple values
+    p_bind      ($parser, $f_parser)  # monadic bind
+
+    # Combining Parser
+    p_and       (@parsers)            # every parser must be sucessfull
+    p_or        (@parsers)            # only one must be succesfull
+    p_not       ($parser)             # sucessfull if $parser fails
+    p_maybe     (@parsers)            # all @parsers must be present, or not
+    p_many      (@parsers)            # matches @parsers at least one, or many times
+    p_many0     (@parsers)            # matches @parsers zero or many times
+    p_qty       ($min, $max, $parser) # matches $parser $min up to $max times
+    p_repeat    ($amount, $parser)    # repeats $parser $amount times
+    p_ignore    ($parser)             # $parser must match, but capture will be ignored
+
+    # Special
+    p_empty     ()                    # empty parser
+    p_fail      ()                    # always fails
+    p_return    (@values)             # parser that returns values as-is
+    p_delay     ($f_parser)           # useful for building recursive parsers
+
+    # This function expects a data-structure. The parser is built from the
+    # data-structure. Small example. Instead of:
+    #
+    #   my $abc = p_str("a", "b", "c")
+    #
+    # you can write
+    #
+    #   my $abc = parser [str => "a", "b", "c"]
+    #
+    parser($array)
+
+=head1 Sq::Type
+
+Type-System
+
+TODO
+
+=head1 Sq::Gen
+
+Random Data Generation Tool
+
+TODO
+
+=head1 Sq::Reflection
+
+Reflection for Sq functionality.
+
+    get_func($name)           # get function-reference by name, or throws EXCEPTION
+    set_func($name, $f)       # installs anonymous function $f as $name
+
+    funcs_of($package)        # returns function-reference from $package
+    has_func($package, $name) # Checks if $package has a function $name
+
+    set_static($full, $f)     # Installs $f as a static function with name $full
+    is_static($func)          # ask if $func is a static function
+    statics()                 # returns an array of all static functions
+
+    signatures()              # Returns an array of all function with added signatures
+
+=head1 Sq::Signature
+
+Adds type-checking to functions with the help of Sq::Type
+
+    Sq::Signature::sigs_added() # returns an array of functions added with a signature
+
+    sig ($func_name, @types)
+    sigt($func_name, $in_type, $out_type)
+
+=head1 Sq::Test
+
+The whole Testing of Sq itself is done with Sq::Type. I started using Test2
+and later replaced it. The testing system itself is a lot faster compared to
+Test2 because of very limited functionality, and also can easily test Sq
+Types itself.
+
+When I profiled Sq (by running the test-sytem) it often came out that over 90%
+of the time was just spent in Test2. After my own rewrite this was gone.
+
+Consider that all functionality and over 2500+ tests are written with just this
+limited functionality. You very likely don't need a lot more complex testing
+system.
+
+    # Functions you should use 90%+ of the time
+    ok ($bool, $message)           # Must be a valid value
+    nok($bool, $message)           # Must be an invalid value
+    is ($got, $expected, $message) # $got must be the same as $expected. Sq::Equality equal() is used!
+
+    # Special
+    check    ($got, $f_expected, $message)
+    check_isa($any, $class, $message)
+    one_of   ($got, $expects, $message)
+
+    # Exception Testing
+    dies { ... }
+    like ($str, $regex, $message)
+
+    # Calling after all tests finished
+    done_testing()
+
+ok() and nok() can expects three different things as valid/invalid.
+
+    numbers: it only explicitly expects 0 or 1 as boolean. It fails on returning undef, empty string
+    option:  An optional value that is Some() is considered valid
+    result:  A Result value that is Ok() is considered valid
