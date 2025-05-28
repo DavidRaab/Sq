@@ -111,7 +111,8 @@ No functions yet.
 
 =head2 Str
 
-All functions are B<static>
+All functions are B<static>. See B<Sq::Manual::Concepts::Statics> for a description
+of what static means.
 
     Str->chomp
     Str->chop
@@ -134,10 +135,6 @@ All functions are B<static>
     Str->starts_with
     Str->trim
     Str->uc
-
-=head2 Static Functions
-
-TODO: Describe what static means.
 
 =head1 Data Structures
 
@@ -488,16 +485,20 @@ TODO
 
 Reflection for Sq functionality.
 
-    get_func($name)           # get function-reference by name, or throws EXCEPTION
-    set_func($name, $f)       # installs anonymous function $f as $name
+    # getting or installing functions. $name must be the full name including the Package.
+    get_func($name)           # get function-reference by $name, or throws EXCEPTION
+    set_func($name, $f)       # installs/overwrites anonymous function $f as $name
 
+    # Package information
     funcs_of($package)        # returns function-reference from $package
     has_func($package, $name) # Checks if $package has a function $name
 
-    set_static($full, $f)     # Installs $f as a static function with name $full
+    # Statics
+    set_static($name, $f)     # Installs $f as a static function with name $name
     is_static($func)          # ask if $func is a static function
     statics()                 # returns an array of all static functions
 
+    # Quering information
     signatures()              # Returns an array of all function with added signatures
 
 =head1 Sq::Signature
