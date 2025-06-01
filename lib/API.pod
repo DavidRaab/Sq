@@ -135,6 +135,7 @@ of what static means.
     Str->starts_with
     Str->trim
     Str->uc
+    Str->split
 
 =head1 Data Structures
 
