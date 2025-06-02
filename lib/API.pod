@@ -132,10 +132,11 @@ of what static means.
     Str->remove
     Str->repeat
     Str->reverse
+    Str->split
     Str->starts_with
     Str->trim
     Str->uc
-    Str->split
+    Str->is_empty
 
 =head1 Data Structures
 
