@@ -83,4 +83,11 @@ is(
     is($threes, [qw/abc def ghi jkl mno p/], 'content from split');
 }
 
+# is_empty
+ok(Str->is_empty(undef), 'is_empty 0');
+ok(Str->is_empty(""),    'is_empty 1');
+ok(Str->is_empty(" "),   'is_empty 2');
+ok(Str->is_empty("  "),  'is_empty 3');
+nok(Str->is_empty(" a"), 'is_empty 4');
+
 done_testing;
