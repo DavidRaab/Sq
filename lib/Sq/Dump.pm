@@ -7,11 +7,12 @@ our $COLOR          = 1;
 
 # Color Values for dumping
 my  $COLOR_RESET    = "\e[m";
-our $COLOR_STRING   = "\e[38;5;2m"; # green
-our $COLOR_NUM      = "\e[38;5;1m"; # red
-our $COLOR_HASH_KEY = "\e[38;5;4m"; # blue
-our $COLOR_REGEX    = "\e[38;5;3m"; # yellow
-our $COLOR_SPECIAL  = "\e[38;5;3m"; # yellow
+our $COLOR_STRING   = "\e[38;5;2m";  # green
+our $COLOR_NUM      = "\e[38;5;1m";  # red
+our $COLOR_HASH_KEY = "\e[38;5;4m";  # blue
+our $COLOR_REGEX    = "\e[38;5;3m";  # yellow
+our $COLOR_DU       = "\e[38;5;14m"; # türkis
+our $COLOR_SPECIAL  = "\e[38;5;3m";  # yellow
 
 # Dumping functions for types
 sub array($array, $depth=0) {
@@ -117,7 +118,9 @@ sub du($union, $depth=0) {
 }
 
 sub du_case($union, $depth=0) {
-    return sprintf('$union->case(%s => %s)', $union->[2], to_string($union->[3], $depth+2))
+    return $COLOR
+        ? sprintf('$union->case(%s => %s)', $union->[2], to_string($union->[3], $depth+2))
+        : sprintf("${COLOR_DU}%s$COLOR_RESET(%s)", $union->[2], to_string($union->[3], $depth+2))
 }
 
 sub datetime($dt, $depth=0) {
