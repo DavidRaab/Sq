@@ -8,19 +8,20 @@ use Sq::Parser qw(parser p_run);
 # Data-Structure for parsed markdown
 my $markdown;
 $markdown = union(
-    Text       => ['str'],
-    H1         => ['str'],
-    H2         => ['str'],
-    H3         => ['str'],
-    H4         => ['str'],
-    H5         => ['str'],
-    H6         => ['str'],
-    Code       => ['str'],
-    CodeBlock  => [tuple => ['str'], ['str']], # language text
-    Bold       => ['str'],
-    Italic     => ['str'],
-    Block      => [array => [of => [runion => sub { $markdown }]]],
-    Markdown   => [array => [of => [runion => sub { $markdown }]]],
+    Text        => ['str'],
+    H1          => ['str'],
+    H2          => ['str'],
+    H3          => ['str'],
+    H4          => ['str'],
+    H5          => ['str'],
+    H6          => ['str'],
+    Code        => ['str'],
+    CodeBlock   => [tuple => ['str'], ['str']], # language text
+    Bold        => ['str'],
+    Italic      => ['str'],
+    OrderedList => [array => [of => [runion => sub { $markdown }]]],
+    Block       => [array => [of => [runion => sub { $markdown }]]],
+    Markdown    => [array => [of => [runion => sub { $markdown }]]],
 );
 $markdown->install;
 
@@ -28,6 +29,14 @@ $markdown->install;
 sub parse_markdown($str) {
     state $parser = assign {
         my $special = "*`";
+
+        # OrderedList
+        my $ol = parser
+            [many =>
+                [map => sub(@matches) { join " ", @matches },
+                    [match => qr/^ \d+ \. \s+ (\N+) (?:\n|\z)/xms],
+                    [many0 => [match => qr/^ \s+ (\N+) (?:\n|\z)/xms]],
+                ]];
 
         parser [many => [or =>
             # header
@@ -53,6 +62,10 @@ sub parse_markdown($str) {
             [matchf => qr/` ([^`]+) `/x, sub($str) {
                 Code($str)
             }],
+            # Ordered List
+            [map => sub(@extract) {
+                OrderedList([map { parse_markdown($_) } @extract]);
+            }, $ol],
             # anything else
             [matchf => qr/([^$special]+)/, sub($str) {
                 Text($str)
@@ -60,36 +73,52 @@ sub parse_markdown($str) {
         ]];
     };
 
-    # first we break the whole string into blocks.
-    my $blocks =
-        Str->split(qr/\n{2,}/, $str)->map(sub($block) {
-            p_run($parser, $block)->map(\&Block);
-        });
-    # dump($blocks);
+    # the whole string is separated into blocks
+    my $blocks = Str->split(qr/\n{2,}/, $str);
 
-    # We return a Markdown document
-    $blocks->all_some->match(
-        Some => sub($blocks) { Markdown($blocks) },
-        None => sub { die "Markdown could not be parsed" },
-    );
+    # no block -- empty string
+    if ( @$blocks == 0 ) {
+        return Markdown([]);
+    }
+    # when there is only one block
+    elsif ( @$blocks == 1 ) {
+        return p_run($parser, $blocks->[0])->match(
+            Some => sub($parsed) { Markdown($parsed)                  },
+            None => sub          { die "Markdown could not be parsed" },
+        );
+    }
+    # when we have more than one block
+    else {
+        my $parsed = $blocks->map(sub($block) {
+            p_run($parser, $block)->match(
+                Some => sub($parsed) { Block($parsed)                     },
+                None => sub          { die "Markdown could not be parsed" },
+            )
+        });
+        return Markdown($parsed);
+    }
 }
 
 # generate HTML from Markdown data-structure
 sub markdown2html($md) {
     $md->match(
-        Text       => sub($str)   { [HTML   => Str->escape_html($str)] },
-        H1         => sub($str)   { [h1     => $str]       },
-        H2         => sub($str)   { [h2     => $str]       },
-        H3         => sub($str)   { [h3     => $str]       },
-        H4         => sub($str)   { [h4     => $str]       },
-        H5         => sub($str)   { [h5     => $str]       },
-        H6         => sub($str)   { [h6     => $str]       },
-        Code       => sub($code)  { [code   => $code]      },
-        CodeBlock  => sub($args)  { [code   => $args->[1]] }, # TODO
-        Bold       => sub($str)   { [strong => $str]       },
-        Italic     => sub($str)   { [em     => $str]       },
-        Block      => sub($array) { [p => map { markdown2html($_) } @$array] },
-        Markdown   => sub($array) { [p => map { markdown2html($_) } @$array] },
+        Text        => sub($str)   { [HTML   => Str->escape_html($str)] },
+        H1          => sub($str)   { [h1     => $str]       },
+        H2          => sub($str)   { [h2     => $str]       },
+        H3          => sub($str)   { [h3     => $str]       },
+        H4          => sub($str)   { [h4     => $str]       },
+        H5          => sub($str)   { [h5     => $str]       },
+        H6          => sub($str)   { [h6     => $str]       },
+        Code        => sub($code)  { [code   => $code]      },
+        CodeBlock   => sub($args)  { [code   => $args->[1]] }, # TODO
+        Bold        => sub($str)   { [strong => $str]       },
+        Italic      => sub($str)   { [em     => $str]       },
+        OrderedList => sub($array) { [ol     => map { [li => markdown2html($_)] } @$array ] },
+        Block       => sub($array) { [p      => map { markdown2html($_) } @$array] },
+        Markdown    => sub($array) {
+            state $html = Sq->fmt->html;
+            return join " ", map { $html->(markdown2html($_))->[1] } @$array;
+        },
     )
 }
 
@@ -101,6 +130,6 @@ my $content = Sq->fs->read_text('markdown.md')->join("\n");
 my $md      = parse_markdown($content);
 dump($md);
 # transform data-structure to HTML
-my $body    = Sq->fmt->html(markdown2html($md));
+my $html    = markdown2html($md);
 # print HTML
-say $body->[1];
+say $html;
