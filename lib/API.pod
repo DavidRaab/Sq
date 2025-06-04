@@ -13,25 +13,32 @@ This contains an overview of all functions over the different packages
 
 =head1 DEFAULT IMPORTS
 
-    sq
-    call
-    key
-    key_equal
-    assign
-    seq
-    new
+All default imports are testest in t/00-core.t. This file also gives a good
+overview of the functionality of Sq itself.
 
-    is_num
-    is_str
-    is_array
-    is_hash
-    is_seq
-    is_opt
-    is_result
-    is_sub
-    is_regex
-    is_ref
-    is_type
+    # Compares if two values are the same or not.
+    equal($any1, $any2)
+
+    sq  ($any)            # Recursively adds blessing to Array/Hash Data-structure
+    call($method, @args)  # creates a function that calls $method with @args on an object
+    key ($id)             # creates a function that extracts field $id from a hash
+    key_equal             #
+    assign                # a new block of scope
+    seq { }               # creates a sequence
+    new($class,@args)     # special dispatch; used for testing; reserved
+
+    # functions for type-checking
+    is_num   ($any)
+    is_str   ($any)
+    is_array ($any)
+    is_hash  ($any)
+    is_seq   ($any)
+    is_opt   ($any)
+    is_result($any)
+    is_sub   ($any)
+    is_regex ($any)
+    is_ref   ($any)
+    is_type  ($any)
 
     fn
     multi
@@ -43,25 +50,26 @@ This contains an overview of all functions over the different packages
     snd
     copy
 
-    by_num
-    by_str
-    by_stri
+    # sorting/comparision functions
+    by_num ()
+    by_str ()
+    by_stri()
 
-    array
-    hash
     record
-
-    Some
-    None
-    Ok
-    Err
     lazy
-    equal
     dump
     dumps
-    type
     static
-    union
+
+    # Creation of data
+    array(@xs)  # array with blessing
+    hash (@kvs) # hash with blessing
+    Some        # Option
+    None        # Option
+    Ok          # Result
+    Err         # Result
+    type        # Sq::Type
+    union       # Discriminated Union: See: t/16-du.t
 
 =head1 MODULES
 
@@ -124,6 +132,7 @@ of what static means.
     Str->escape_html
     Str->hex
     Str->keep
+    Str->is_empty
     Str->lc
     Str->length
     Str->map
@@ -136,7 +145,6 @@ of what static means.
     Str->starts_with
     Str->trim
     Str->uc
-    Str->is_empty
 
 =head1 Data Structures
 
