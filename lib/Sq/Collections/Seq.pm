@@ -1326,6 +1326,30 @@ sub head($seq) {
     Carp::croak "Seq::head Sequence was empty";
 }
 
+sub average($seq) {
+    my $sum   = 0;
+    my $count = 0;
+    my $it  = $seq->();
+    my $x;
+    while ( defined($x = $it->()) ) {
+        $sum += $x;
+        $count++;
+    }
+    return $sum / $count;
+}
+
+sub average_by($seq, $f_map) {
+    my $sum   = 0;
+    my $count = 0;
+    my $it    = $seq->();
+    my $x;
+    while ( defined($x = $it->()) ) {
+        $sum += $f_map->($x);
+        $count++;
+    }
+    return $sum / $count;
+}
+
 # group_fold :
 #   Seq<'a>
 #   -> (unit -> 'State)

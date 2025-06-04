@@ -1601,5 +1601,24 @@ is(
     is($range->slice(-11,10),        [10],          'slice exact bounds 2');
 }
 
+# average
+is(Seq::average(seq {1 .. 10}), 5.5, 'average 1');
+is(seq {1 .. 10}->average,      5.5, 'average 2');
+is(
+    Seq->init(10, sub($idx) {
+        { id => $idx+1, num => $idx+1 }
+    })->average_by(key 'num'),
+    5.5,
+    'average_by 1');
+is(
+    Seq->init(10, sub($idx) {
+        { id => $idx,   num => $idx+1 }
+    })->average_by(key 'num'),
+
+    Seq->init(10, sub($idx) {
+        { id => $idx+1, num => $idx+1 }
+    })->map(key 'num')->average,
+
+    'average_by 2');
 
 done_testing;
