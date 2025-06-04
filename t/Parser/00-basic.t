@@ -89,9 +89,9 @@ sub result(@xs) { Some([@xs]) }
 # p_many, p_many0
 {
     # Regex: (\d+) (?: (\d+) , )*
-    my $int0 = p_and($int, p_many0(p_and(p_str(','), $int)));
+    my $int0 = p_and($int, p_many0(p_str(','), $int));
     # Regex: (\d+) (?: (\d+) , )+
-    my $int1 = p_and($int, p_many (p_and(p_str(','), $int)));
+    my $int1 = p_and($int, p_many (p_str(','), $int));
 
     is(p_run($int0, '123'),                          result(123), '$int0 list');
     is(p_run($int1, '123'),                                 None, '$int1 list');
