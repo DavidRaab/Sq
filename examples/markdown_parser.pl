@@ -62,10 +62,8 @@ sub parse_markdown($str) {
 
     # first we break the whole string into blocks.
     my $blocks =
-        Str->split(qr/\n{2,}/, $str)->map(sub($block){
-            p_run($parser, $block)->map(sub($parsed) {
-                Block($parsed);
-            });
+        Str->split(qr/\n{2,}/, $str)->map(sub($block) {
+            p_run($parser, $block)->map(\&Block);
         });
     # dump($blocks);
 
@@ -90,8 +88,8 @@ sub markdown2html($md) {
         CodeBlock  => sub($args)  { [code   => $args->[1]] }, # TODO
         Bold       => sub($str)   { [strong => $str]       },
         Italic     => sub($str)   { [em     => $str]       },
-        Block      => sub($array) { [p => Array::map($array, \&markdown2html)->expand] },
-        Markdown   => sub($array) { [p => Array::map($array, \&markdown2html)->expand] },
+        Block      => sub($array) { [p => map { markdown2html($_) } @$array] },
+        Markdown   => sub($array) { [p => map { markdown2html($_) } @$array] },
     )
 }
 
@@ -101,7 +99,7 @@ sub markdown2html($md) {
 my $content = Sq->fs->read_text('markdown.md')->join("\n");
 # parse as data-structure
 my $md      = parse_markdown($content);
-# dump($md);
+dump($md);
 # transform data-structure to HTML
 my $body    = Sq->fmt->html(markdown2html($md));
 # print HTML
