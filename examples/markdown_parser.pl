@@ -60,6 +60,10 @@ sub parse_markdown($str) {
             [matchf => qr/` ([^`]+) `/x, sub($str) {
                 Code($str)
             }],
+            # code indented
+            [map => sub(@matches) {
+                Code(join "\n", @matches);
+            }, [many => [match => qr/^ \s+ (\N+) (?:\n|\z)/xms]]],
             # Ordered List
             [map => sub(@extract) {
                 OrderedList([map { parse_markdown($_) } @extract]);
