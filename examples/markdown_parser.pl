@@ -31,12 +31,10 @@ sub parse_markdown($str) {
         my $special = "*`";
 
         # OrderedList
-        my $ol = parser
-            [many =>
-                [map => sub(@matches) { join " ", @matches },
-                    [match => qr/^ \d+ \. \s+ (\N+) (?:\n|\z)/xms],
-                    [many0 => [match => qr/^ \s+ (\N+) (?:\n|\z)/xms]],
-                ]];
+        my $ol = parser [many => [join => " ", [and =>
+            [match => qr/^ \d+ \. \s+ (\N+) (?:\n|\z)/xms],
+            [many0 => [match => qr/^ \s+ (\N+) (?:\n|\z)/xms]],
+        ]]];
 
         parser [many => [or =>
             # header
