@@ -2518,4 +2518,24 @@ is(
         'find last');
 }
 
+{
+    my $data = sq {
+        1 => "Anny",
+        2 => "Lilly",
+        3 => "Zola",
+    };
+
+    my $kv = sub($k,$v) { [$k,$v] };
+    one_of(
+        Array->from_hash($data, $kv),
+        array([1,'Anny'], [2,'Lilly'], [3, 'Zola'])->permute,
+        'from_hash 1');
+
+    # test if Hash::to_array is the same as Array::from_hash
+    one_of(
+        $data->to_array($kv),
+        array([1,'Anny'], [2,'Lilly'], [3, 'Zola'])->permute,
+        'to_array');
+}
+
 done_testing;
