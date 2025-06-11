@@ -276,6 +276,29 @@ sub to_array($hash, $f) {
     return CORE::bless(\@new, 'Array');
 }
 
+sub to_seq($hash, $f) {
+    CORE::bless(sub {
+        my $abort = 0;
+        my @keys  = CORE::keys %$hash;
+        my $last  = @keys;
+        my $idx   = 0;
+        my ($key, $x);
+        return sub {
+            return undef if $abort;
+            if ( $idx < $last ) {
+                $key = $keys[$idx++];
+                $x   = $f->($key, $hash->{$key});
+                return $x;
+            }
+            $abort = 1;
+            undef @keys;
+            undef $key;
+            undef $x;
+            return undef;
+        }
+    }, 'Seq');
+}
+
 sub with_default($hash, %def) {
     my %new = %$hash;
     for my ($key,$value) ( %def ) {

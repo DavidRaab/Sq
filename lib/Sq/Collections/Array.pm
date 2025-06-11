@@ -39,6 +39,14 @@ sub from_array($, $xs) {
     return CORE::bless($xs, 'Array');
 }
 
+sub from_hash($, $hash, $f) {
+    my @array;
+    for my ($k,$v) ( %$hash ) {
+        push @array, $f->($k,$v);
+    }
+    return CORE::bless(\@array, 'Array');
+}
+
 sub concat($, @arrays) {
     my @new;
     for my $array ( @arrays ) {
