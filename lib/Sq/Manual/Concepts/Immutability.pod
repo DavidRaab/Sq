@@ -14,21 +14,42 @@ I mean, even for a simple loop you need a way to change a value, or not?
 Later I understood the concept better. It's more about creating new things,
 creating new data instead of trying to change the current state.
 
-The whole point of immutability in itself is actually lesser important.
+The whole point of immutability in itself is actually lesser important. I
+realized that the more important aspect is that we don't change data after
+we think we are "done" building whatever we wanted to build.
+
+People new to immutability will often say: Isn't that too slow? The answer is
+yes and no, or *it depends*. It depends on what you do. When you try to built
+an immutable array by let's say whenever you add one element you do a whole
+copy of an array and then add one element, then yes, it can become very slow.
+
+When you add 10.000 values to an array and while doing so you created 9.999
+arrays and all of them was copies, it is very slow.
+
+That's why there exists special immutable data-structures. Very often there
+are (binary) trees and operation can be done in O(log N) time. But there is
+also another alternative that Perl users should be familar with.
+
+Just use an mutable data-structure, built something, and then *lock it*. Or
+just don't change it anymore after certain kind of operations.
 
 In fact, Perl developers should knew well. We have functions like C<map>,
 C<grep> and C<sort> built-in, and all of those create new arrays instead of
-manipulating an existing one. But the result is still mutable.
+manipulating an existing one. So we usually get a new array, a copy with
+modification done, and still we don't have an immutable data-structure
+or the whole array was re-created after every new element.
 
-And still, i never runned into real performance issues in Perl, even in that
-"slow" language. Sure, still depends sometimes what you are doing.
+Actually, this kind of working can even be faster at some places than using
+an immutable data-structure.
+
+When immutability stills seems strange to you, let's get into it.
 
 =head2 Easy example
 
 An easy example to understand Immutability is to understand
 
-    my $x = 10;
-    my $y = 5;
+    my $x      = 10;
+    my $y      = 5;
     my $result = $x + $y;
 
 Here we also wouldn't expect that adding C<$x + $y> changes C<$x> or C<$y>.
@@ -51,7 +72,7 @@ have decided to make this special it would just look like this.
 
 Nothing different to any other function call with a name.
 
-    my $result = fold($x, $y);
+    my $result = whatever($x, $y);
 
 =head2 Pure Functions
 
@@ -60,13 +81,19 @@ is condered B<Pure> when a function always returns the same values for the same
 input. And it never changes its input values, or does some other effect like
 printing, writing, usually everything that is considered as IO (Input-Output).
 
+Another way to think about B<Pure Functions> is that when you can cache the result
+of a function, and just use the result, and don't call the function again, and
+your program still works unaffected, then it is a B<Pure Function>.
+
 But it doesn't matter if the values it receives or returns are mutable.
 
 A function that get's a mutable array, but never changes that mutable array
-and returns something new, is a completely pure function.
+and returns something completely new, is also a pure function.
 
-Immutable data-structures forces you to write pure functions, but still doesn't
-mean you cannot do that with mutable data-structures.
+Immutable data-structures forces you to write pure functions, but that doesn't
+mean you must use immutable data-structures to create C<Pure Functions>. For
+example the built-in C<map>, C<grep> or C<sort> functions in Perl can be
+considered C<Pure Functions>.
 
 =head2 Cache / Memoize
 
