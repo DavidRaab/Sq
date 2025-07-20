@@ -3,7 +3,7 @@ use 5.036;
 use Sq;
 use Path::Tiny qw(path);
 use Sq::Exporter;
-our $SIGNATURE = 'Sq/Fs.pm';
+our $SIGNATURE = 'Sq/Sig/Fs.pm';
 our @EXPORT    = ();
 
 # Opens a file as UTF-8 text
