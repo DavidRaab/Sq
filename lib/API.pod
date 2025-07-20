@@ -75,7 +75,7 @@ overview of the functionality of Sq itself.
 
 =head2 Sq->io
 
-No functions yet.
+    Sq->io->youtube($url)   # returns all video information as a data-structure; needs yt-dlp installed
 
 =head2 Sq->fs
 
@@ -96,14 +96,14 @@ No functions yet.
 
 =head2 Sq->math
 
-    Sq->math->fac
-    Sq->math->is_prime
+    Sq->math->fac     ($int)
+    Sq->math->is_prime($number)
     Sq->math->permute_count_up
 
 =head2 Sq->fmt
 
     Sq->fmt->table(...) # Generates a table on console
-    Sq->fmt->html(...)  # Generates HTML from a data-structure
+    Sq->fmt->html (...) # Generates HTML from a data-structure
 
 =head2 Sq->bench
 
@@ -119,8 +119,8 @@ No functions yet.
 
 =head2 Str
 
-All functions are B<static>. See B<Sq::Manual::Concepts::Statics> for a description
-of what static means.
+All functions are B<static>. See B<Sq::Manual::Concepts::Statics> for a
+description of what static means.
 
     Str->chomp
     Str->chop
