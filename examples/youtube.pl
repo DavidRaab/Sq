@@ -21,7 +21,7 @@ my $videos  = $formats->map(sub($fmt) {
     $fmt->slice(@fields)
 });
 
-dump $formats;
+# dump $formats;
 
 Sq->fmt->table({
     header => \@fields,
