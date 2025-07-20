@@ -164,6 +164,7 @@ my $dispatch = {
     'DateTime'           => \&datetime,
     'HASH'               => \&hash,
     'Hash'               => \&hash,
+    'JSON::PP::Boolean'  => sub { ${ $_[0] } },
     'Option'             => \&option,
     'Path::Tiny'         => sub { 'path(' . string(quote($_[0]->stringify)) .')' },
     'Queue'              => \&queue,
