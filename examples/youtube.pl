@@ -13,18 +13,12 @@ use Sq -sig => 1;
 
 # $usage->die if $opt->help;
 
-my @fields  = qw/format_id format fps ext vcodec protocol quality vbr/;
+my $data = Sq->io->youtube($ARGV[0]);
 
-my $data    = Sq->io->youtube($ARGV[0]);
-my $formats = $data->{formats};
-my $videos  = $formats->map(sub($fmt) {
-    $fmt->slice(@fields)
-});
-
-# dump $formats;
+# dump $data->{formats};
 
 Sq->fmt->table({
-    header => \@fields,
-    data   => $videos,
+    header => [qw/format_id format fps ext vcodec protocol quality vbr/],
+    data   => $data->{formats},
     border => 0,
 });
