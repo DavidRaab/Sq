@@ -71,6 +71,8 @@ provides:
     file: lib/Sq/Core.pm
   Sq::Core::DU:
     file: lib/Sq/Core/DU.pm
+  Sq::Core::DU::Case:
+    file: lib/Sq/Core/DU.pm
   Sq::Core::Date:
     file: lib/Sq/Core/Date.pm
   Sq::Core::Lazy:
