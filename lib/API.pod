@@ -76,6 +76,7 @@ overview of the functionality of Sq itself.
 =head2 Sq->io
 
     Sq->io->youtube($url)   # returns all video information as a data-structure; needs yt-dlp installed
+    Sq->io->csv_read($file) # returns sequence of hashes from a CSV file
 
 =head2 Sq->fs
 

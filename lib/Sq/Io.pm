@@ -2,6 +2,7 @@ package Sq::Io;
 use 5.036;
 use Sq;
 use Sq::Exporter;
+
 our $SIGNATURE = 'Sq/Sig/Io.pm';
 our @EXPORT    = ();
 
@@ -15,6 +16,39 @@ static youtube => sub($url) {
     my $out  = qx/yt-dlp -J $url/;
     my $data = decode_json($out);
     return sq($data);
+};
+
+static csv_read => sub($file) {
+    require Text::CSV;
+    return Seq->from_sub(sub {
+        my $err = open my $fh, '<:encoding(UTF-8)', $file;
+        if ( !defined $err ) {
+            return sub { undef };
+        }
+        else {
+            my $csv = Text::CSV->new({
+                eol             => undef,
+                skip_empty_rows => 'skip',
+            });
+            eval {
+                $csv->header($fh, { sep_set => [ ";", ",", "|", "\t" ] });
+            };
+            if ( $@ ) {
+                close $fh;
+                return sub { undef };
+            }
+            else {
+                return sub {
+                    my $row = $csv->getline_hr($fh);
+                    if ( !defined $row ) {
+                        close $fh;
+                        return undef;
+                    }
+                    return bless($row, 'Hash');
+                };
+            }
+        }
+    });
 };
 
 1;
