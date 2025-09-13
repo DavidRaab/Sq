@@ -32,6 +32,7 @@ my $table_aoa = [hash =>
     ],
 ];
 
+# TODO: Support Seq as data
 static table => with_dispatch(
     type [tuple => $table_aoa] => sub ($args) {
         my $header = $args->{header} // 0;
