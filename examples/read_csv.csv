@@ -1,0 +1,9 @@
+Date;Operation;Balance;Comment
+2025-01-01;CURRENT;5000.00;
+2025-01-01;SUB;400;Rent
+2025-01-15;SUB;80.00;Electricity
+2025-01-20;SUB;299.99;Amazon Payment
+2025-01-25;SUB;49.99;Other Billing
+2025-01-31;ADD;5000;Loan
+2025-02-01;SUB;400;Rent
+
