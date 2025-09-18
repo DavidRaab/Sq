@@ -2,6 +2,54 @@
 
 Sq - A Language hosted in Perl
 
+Sq is a programing model that focus on procedural and functional programming
+and combines the best of both. It provides an `Array` and `Hash` package by
+default that extends Perl's built-in Arrays and Hashes for many functions so
+you don't need to write them yourself.
+
+`Seq` is a lazy sequence implementation that tries to be as compatible to `Array`
+as much as possible. Just being lazy evaluated. Think of it as an F# Seq, C# Linq
+or Java Streams implementation.
+
+Error handling is done by an `Option` or `Result` data-type. Exceptions are
+avoided as much as possible. Only with very very few exceptions.
+
+Sq provides an `equal` function implementation that by default can compare
+recursive data-types that can compare `Array`, `Hash`, `Seq`, `Option` and
+`Result` by default, and some more. This function is also used by the internal
+testing system `Sq::Test`.
+
+`Sq::Test` itself is used to already test `Sq` itself. It's limited functionality
+is a feature.
+
+With `dump` you get a function that by default can dump data. Usually data
+are dumped in a way that are human readable. Most of the time you can `dump`
+data copy and paste it, and put the result into a test.
+
+`Sq` doesn't try to eleminate dynamic-typing. Dynamic typing can have hughe
+benefits and make code easy if used well. But sometimes some types are helpful.
+With `Sq::Type` a function based type-system is implemented. Any function
+that returns a boolean can be turned into a type-check. This way types and
+restriction that aren't possible in a static typed language are possible.
+
+But typing in a dynamic-typed language has some overhead, as it is code that
+always must run on every invocation. With `Sq::Signature` a system is provided
+to add type-checking to function when needed, and remove them when not needed.
+So for example you can add type-checks in your test-suite and get better and
+faster errors when something doesn't work as you expected. At normal runtime
+you can remove the type-checks and your functions runs without any type-checks
+at full speed.
+
+`Sq` doesn't try to be low-level. It also provides common task. For example
+calling `my $csv = Sq->io->csv_read("file.csv")` opens up a CSV file and returns you a `Seq` that you can use with all possible functions.
+
+`Sq` provides a lazy loading mechanism of modules. For example at the current
+moment calling `Sq->io->csv_read()` will load `Text::CSV`. When you never call
+that function, `Text::CSV` is never loaded, this keeps the loading time of
+`Sq` very fast.
+
+Some more things are provided and will come, but this is just a short overview.
+
 # Parser
 
 Here is an example of the Parser to parse a number with suffix.
