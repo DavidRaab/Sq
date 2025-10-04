@@ -115,8 +115,12 @@ sub markdown2html($md) {
         CodeBlock   => sub($args)  { [code   => $args->[1]] }, # TODO
         Bold        => sub($str)   { [strong => $str]       },
         Italic      => sub($str)   { [em     => $str]       },
-        OrderedList => sub($array) { [ol     => map { [li => markdown2html($_)] } @$array ] },
-        Block       => sub($array) { [p      => map { markdown2html($_) } @$array] },
+        OrderedList => sub($array) {
+            # dump($array);
+            # [ol => Array::mapi($array, sub($str, $i) { [li => $i . markdown2html($_)] })]
+            [ol     => map { [li => markdown2html($_)] } @$array ]
+        },
+        Block       => sub($array) { [p => map { markdown2html($_) } @$array] },
         Markdown    => sub($array) {
             state $html = Sq->fmt->html;
             return join " ", map { $html->(markdown2html($_))->[1] } @$array;
