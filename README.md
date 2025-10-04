@@ -56,7 +56,7 @@ Here is an example of the Parser to parse a number with suffix.
 
 ```perl
 use Sq;
-use Sq::Parser;
+use Sq::Parser; # this imports all the "p_*" functions
 
 my $num = assign {
     my $to_num = sub($num,$suffix) {
@@ -86,7 +86,7 @@ is(p_run($num, "1 gb"),           Some([1073741824]), '1 gb');
 
 this is an exhausted example. `Sq::Parser` does not try to replace Regexes. Quite
 the opposite. It allows creating Parser with regexes in mind and for good
-performance you should try to cramp as much as possible into Perl's regeyes. So
+performance you should try to cramp as much as possible into Perl's regexes. So
 here is the above parser re-written using Perl Regexes.
 
 ```perl
@@ -111,6 +111,34 @@ is(p_run($num, "1 kb, 1gb"), Some([1024,1073741824]), '1 kb & 1gb');
 is(p_run($num, "1 Mb"),              Some([1048576]), '1 mb');
 is(p_run($num, "1 gb"),           Some([1073741824]), '1 gb');
 ```
+Maybe you will ask: What is the point of using Sq::Parser if most should
+anyway be done in Regexes? Regexes can do a lot in Perl, you also can write
+recursive regexes, extract data with it and run code at any certain point.
+It's powerful but those extra features are hard to use. For all the extra
+features you get a nearly not rememberable syntax anymore. Sq::Parser fixes
+this.
+
+For example everything in braces `()` is auto-extracted for you, you just
+pass a function like in `p_matchf` and write the function of what should be
+done. For example the Parser not only matches digits, it already transform
+the input into bytes.
+
+Now what i can do is for example save the above code, and just put it into
+a function. I make it callable as
+
+
+```perl
+# TODO: think about name
+my $num = $Sq->p->i_dont_know_name_yet();
+```
+
+I hope you see of what `Sq` will become. Next ideas are that i want to write
+a Command CLI Argument. The idea is that you can easily use the Parser and the
+type-system. And sure always provide the abstract things as part of the
+base system.
+
+Somehow Monolothics but, but just works better. YAGNI. When it is someday needed
+it will be implemented.
 
 # Data over Classes
 
