@@ -19,13 +19,15 @@ overview of the functionality of Sq itself.
     # Compares if two values are the same or not.
     equal($any1, $any2)
 
-    sq  ($any)            # Recursively adds blessing to Array/Hash Data-structure
-    call($method, @args)  # creates a function that calls $method with @args on an object
-    key ($id)             # creates a function that extracts field $id from a hash
-    key_equal             #
-    assign                # a new block of scope
-    seq { }               # creates a sequence
-    new($class,@args)     # special dispatch; used for testing; reserved
+    sq  ($any)              # Recursively adds blessing to Array/Hash Data-structure
+    call($method, @args)    # creates a function that calls $method with @args on an object
+    key ($id)               # creates a function that extracts field $id from a hash
+    key_equal($key, $value) # creates a function that checks if passed value is equal to $value
+    assign { }              # a new block of scope
+    seq    { 1, 2, 3 }      # (easy) way to create a sequence of values
+    new($class,@args)       # special dispatch; used for testing; reserved;
+                            # not really used in Sq itself. More an interesting
+                            # syntax playground to think about.
 
     # functions for type-checking
     is_num   ($any)
@@ -45,20 +47,20 @@ overview of the functionality of Sq itself.
     with_dispatch
     type_cond
 
-    id
-    fst
-    snd
-    copy
+    id($any)    -> $any          # returning $any as-is
+    fst($array) -> $x            # $array->[0]
+    snd($array) -> $x            # $array->[1]
+    copy($any)  -> $copy_of_any  # not yet implemented
 
     # sorting/comparision functions
     by_num ()
     by_str ()
     by_stri()
 
-    record
-    lazy
-    dump
-    dumps
+    record(@hash_keys) -> sub(@hash_values) -> $hash
+    lazy  ()
+    dump  ($any) -> void     # Dumps $any to STDERR
+    dumps ($any) -> $string  # Return dump($any) as string, instead of printing
     static
 
     # Creation of data
