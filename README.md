@@ -167,11 +167,15 @@ my $tracks = $album->{tracks}->length; # 9 - nine tracks
 # 2559 - shortest version
 my $album_runtime = $album->get('tracks')->map(call 'sum_by', key 'duration')->or(0);
 
-# 2559 - expanded the "call" function
+# call($method, @args) -> sub($obj)
+# call() creates a function that when passed an $obj it will call $obj->$method(@args)
+# 2559 - call expanded
 my $album_runtime = $album->get('tracks')->map(sub ($tracks) {
     $tracks->sum_by(key 'duration');
 })->or(0);
 
+# key($key) -> sub($hash)
+# key() creates a function that when passed a $hash returns the field of it
 # 2559 - expanded the "key" function
 my $album_runtime = $album->get('tracks')->map(sub ($tracks) {
     $tracks->sum_by(sub($hash) {
@@ -179,6 +183,8 @@ my $album_runtime = $album->get('tracks')->map(sub ($tracks) {
     });
 })->or(0);
 
+# except assign {} it is pure-perl.
+.
 # 2559 - Pure Perl version
 my $album_runtime = assign {
     my $sum    = 0;
@@ -191,6 +197,23 @@ my $album_runtime = assign {
     return $sum;
 };
 ```
+
+The shortest version of code is sometimes harder to understand, as it needs
+more time to understand, but it also makes your thinking more abstract. The
+shortest version for example is just "one-line". But just focus on reading
+the words, not the extra symbols, then you read:
+
+"tracks", "map", "sum_by", "key", "duration" "or" 0
+
+This translates to:
+
+On all "tracks", (map) change each item, create the sum by picking the
+(duration) of each hash. (or) return 0 when tracks is empty
+
+You must learn what the word "map" means, but more abstract concepts make
+thinks easier to understand. Otherwise by just reading the words you maybe
+can assume what the code does.
+
 
 # Default Equality
 
