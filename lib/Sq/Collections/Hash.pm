@@ -302,7 +302,7 @@ sub to_seq($hash, $f) {
 sub with_default($hash, %def) {
     my %new = %$hash;
     for my ($key,$value) ( %def ) {
-        if ( !exists $new{$key} ) {
+        if ( !defined $new{$key} ) {
             $new{$key} = $value;
         }
     }
