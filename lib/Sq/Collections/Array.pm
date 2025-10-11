@@ -1031,6 +1031,15 @@ sub contains($array, $any) {
     return 0;
 }
 
+sub one_of($array, @values) {
+    for my $x ( @$array ) {
+        for my $value ( @values ) {
+            return 1 if Sq::Equality::equal($x, $value);
+        }
+    }
+    return 0;
+}
+
 sub length($array) {
     return scalar @{ $array };
 }
