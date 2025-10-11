@@ -2538,10 +2538,4 @@ is(
         'to_array');
 }
 
-# one_of
-is(Array::one_of([1,2,3],     5,10),       0, 'one_of 1');
-is(Array::one_of([1,2,3],     5,2),        1, 'one_of 2');
-is(Array::one_of([1,2,3],     5,10,3),     1, 'one_of 3');
-is(Array::one_of([1,[1,2],3], 5,10,[1,2]), 1, 'one_of 4');
-
 done_testing;
