@@ -954,6 +954,14 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
             ],
         },
         'title is overwritten');
+
+    # with_default() checks for defined values. So keys that exists in a hash
+    # but are undef are still overwritten. This is usually what i want. Undef
+    # values are garbage
+    is(
+        Hash::with_default({name => "Hulu", Price => undef}, name => "Foo", Price => 10),
+        {name => "Hulu", Price => 10},
+        'with_default checks for defined values');
 }
 
 {
