@@ -299,6 +299,19 @@ sub to_seq($hash, $f) {
     }, 'Seq');
 }
 
+# TODO: use copy()
+# TODO: assume i use with_default to set a key to a number.
+#       $hash->with_default(price => 10);
+#
+#       Then i assume that price will be 10, in the case of undef, or even
+#       an empty string. This for example happens when something is read from
+#       a file. Like reading a CSV file. Instead of undef we get empty strings
+#       when a field is not provided.
+#
+#       This leads to the general idea if with_default() should override values
+#       in a hash, when those values have not the same type? When i describe
+#       a with_default() and a key should be an Array, i always can assume
+#       after an with_default() call that it will be an Array.
 sub with_default($hash, %def) {
     my %new = %$hash;
     for my ($key,$value) ( %def ) {
