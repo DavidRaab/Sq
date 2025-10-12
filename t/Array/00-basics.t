@@ -1817,6 +1817,7 @@ is(
     nok($data->contains([1,2,3,4]),                  'array 2');
      ok($data->contains(qr/\A\w+ \s* : \s* \w+\z/x), 'regexp 1');
     nok($data->contains(qr/\A\z/),                   'regexp 2');
+     ok($data->contains(1,2,[1,2,3]),                'contains with many');
 }
 
 {

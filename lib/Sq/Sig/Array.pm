@@ -178,7 +178,7 @@ sig('Array::all',        $array, $sub,                 t_bool);
 sig('Array::none',       $array, $sub,                 t_bool);
 sig('Array::pick',       $array, $sub,                 $opt);
 sig('Array::to_seq',     $array,                       t_seq);
-sig('Array::contains',   $array, $any,                 t_bool);
+sigt('Array::contains',  t_tuplev($array, $array),     t_bool);
 sig('Array::fold_rec',   $array, $sub, $sub,           $any);
 sig('Array::map_array',  $array, $sub, $sub,           $any);
 sig('Array::head',       t_array(t_min 1),             $any);
