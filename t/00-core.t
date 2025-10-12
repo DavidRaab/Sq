@@ -437,4 +437,20 @@ is(
 # my $array_init1 = Array('init', 3, sub($idx) { $idx });
 # my $array_init2 = Array init => 3, sub($idx) { $idx };
 
+is(get_type(123),          'Num',   'get_type 1');
+is(get_type("123"),        'Num',   'get_type 2');
+is(get_type(123.3),        'Num',   'get_type 3');
+is(get_type("123."),       'Num',   'get_type 4');
+is(get_type([]),           'Array', 'get_type 5');
+is(get_type(Array->empty), 'Array', 'get_type 6');
+is(get_type(Array::map([1,2,3], sub($x) { $x * 2 })), 'Array', 'get_type 7');
+is(get_type({}),           'Hash',   'get_type 8');
+is(get_type(Hash->empty),  'Hash',   'get_type 9');
+is(get_type(Some(1)),      'Option', 'get_type 10');
+is(get_type(None),         'Option', 'get_type 11');
+is(get_type(sub{}),        'Sub',    'get_type 12');
+is(get_type(qr/\d+/),      'Regex',  'get_type 13');
+is(get_type(Ok(1)),        'Result', 'get_type 14');
+is(get_type(Err(1)),       'Result', 'get_type 15');
+
 done_testing;

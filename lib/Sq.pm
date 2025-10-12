@@ -13,7 +13,7 @@ our $LOAD_SIGNATURE = 0;
 # All functions that are Exported
 our @EXPORT = (
     qw(sq call key key_equal assign seq new),
-    qw(is_num is_str is_array is_hash is_seq is_opt is_result is_sub is_regex is_ref),
+    qw(is_num is_str is_array is_hash is_seq is_opt is_result is_sub is_regex is_ref get_type),
     qw(fn multi with_dispatch type_cond),
     qw(id fst snd copy),
     qw(by_num by_str by_stri),
@@ -252,6 +252,19 @@ sub is_result :prototype($)  { return ref $_[0] eq 'Result' ? 1 : 0 }
 sub is_ref    :prototype($$) { return ref $_[1] eq $_[0]    ? 1 : 0 }
 sub is_regex  :prototype($)  { return ref $_[0] eq 'Regexp' ? 1 : 0 }
 sub is_sub    :prototype($)  { return ref $_[0] eq 'CODE'   ? 1 : 0 }
+
+sub get_type($any) {
+    my $ref = ref $any;
+    if ( $ref eq '' ) {
+        return 'Num' if is_num($any);
+        return 'Str';
+    }
+    return 'Array' if $ref eq 'Array' || $ref eq 'ARRAY';
+    return 'Hash'  if $ref eq 'Hash'  || $ref eq 'HASH';
+    return 'Sub'   if $ref eq 'CODE';
+    return 'Regex' if $ref eq 'Regexp';
+    return $ref;
+}
 
 ### Comparision Functions
 
