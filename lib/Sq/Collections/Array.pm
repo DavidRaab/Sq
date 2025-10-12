@@ -391,6 +391,9 @@ sub keep($array, $predicate) {
 }
 
 # TODO: Should keep_some work with an array of different types?
+#       Don't know exactly what i meant by this question. I assume the question
+#       was if the array could contain more than just Options and it still
+#       only keeps Options that are Some value, and throws every other value away
 sub keep_some($array_of_opt) {
     my @new;
     for my $opt ( @$array_of_opt ) {
