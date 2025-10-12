@@ -13,7 +13,22 @@ my ($opt, $usage) = describe_options(
 
 $usage->die if $opt->help;
 
-my $data = Sq->io->csv_read($opt->file)->sort_by(by_str, key 'date');
+# Every CSV Entry should be like this
+my $csv_entry = type [hash => [keys =>
+    date      => ['str'],
+    operation => [enum => 'ADD', 'SUB', 'CURRENT'],
+    balance   => ['num'],
+    comment   => ['str'],
+]];
+
+# Reads CSV file. Uses a default for balance and comment. Only keeps entries
+# of the above defined type.
+my $data =
+    Sq->io->csv_read($opt->file)
+    ->map(call with_default => balance => 0, comment => "")
+    ->keep_type($csv_entry)
+    ->sort_by(by_str, key 'date');
+
 # TODO: table should support sequence
 # Sq->fmt->table({
 #     header => [qw/date balance comment/],

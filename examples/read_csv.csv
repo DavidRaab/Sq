@@ -6,4 +6,5 @@ Date;Operation;Balance;Comment
 2025-01-25;SUB;49.99;Other Billing
 2025-01-31;ADD;5000;Loan
 2025-02-01;SUB;400;Rent
-
+2025-02-02;WHATEVER;;WRONG ENTRY
+2025-02-03;SUB;;Missing Balance
