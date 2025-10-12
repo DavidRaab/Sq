@@ -1017,16 +1017,13 @@ sub reduce($array, $f) {
     return Option::Some($init);
 }
 
-# TODO: Make $any to @any
 sub contains($array, @any) {
-    for my $any ( @any ) {
-        if ( Sq::is_regex($any) ) {
-            for my $x ( @$array ) {
+    for my $x ( @$array ) {
+        for my $any ( @any ) {
+            if ( Sq::is_regex($any) ) {
                 return 1 if $x =~ $any;
             }
-        }
-        else {
-            for my $x ( @$array ) {
+            else {
                 return 1 if Sq::Equality::equal($x, $any);
             }
         }
