@@ -1310,6 +1310,11 @@ sub do_every($seq, $count, $f) {
     }, 'Seq');
 }
 
+sub dump($seq) {
+    Sq::Dump::dump($seq);
+    return $seq;
+}
+
 #----------------------------------------------------------------------#
 # CONVERTER                                                            #
 #         Those are functions converting Seq to none Seq types         #

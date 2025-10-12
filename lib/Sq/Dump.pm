@@ -1,5 +1,6 @@
 package Sq::Dump;
 use 5.036;
+use subs 'dump';
 
 our $SEQ_AMOUNT     = 50;
 our $INLINE         = 200;
@@ -237,13 +238,13 @@ sub add_dump($type, $func) {
 }
 
 # Add dumping to other packages
-no warnings 'once';
+# no warnings 'once';
 *{Array::dumps}             = \&dumps;
 *{Array::dump}              = \&dump;
 *{Hash::dumps}              = \&dumps;
 *{Hash::dump}               = \&dump;
 *{Seq::dumps}               = \&dumps;
-*{Seq::dump}                = \&dump;
+# *{Seq::dump}                = sub($x) { __PACKAGE__::dump($x); return $x };
 *{Option::dumps}            = \&dumps;
 *{Option::dump}             = \&dump;
 *{Result::dumps}            = \&dumps;
