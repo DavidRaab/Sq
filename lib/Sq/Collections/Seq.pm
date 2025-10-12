@@ -1,7 +1,7 @@
 package Sq::Collections::Seq;
 package Seq;
 use 5.036;
-use subs 'bind', 'join', 'select', 'last', 'sort', 'map', 'length', 'dump';
+use subs 'bind', 'join', 'select', 'last', 'sort', 'map', 'length';
 
 # TODO:
 #       Find another name for 'from_list'
@@ -1379,11 +1379,6 @@ sub do_every($seq, $count, $f) {
             undef $it;
         }
     }, 'Seq');
-}
-
-sub dump($seq) {
-    Sq::Dump::dump($seq);
-    return $seq;
 }
 
 #----------------------------------------------------------------------#

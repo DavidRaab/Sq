@@ -227,7 +227,7 @@ sub dumps($any) {
 
 sub dump($any) {
     warn to_string($any, 0), "\n";
-    return;
+    return $any;
 }
 
 sub add_dump($type, $func) {
@@ -244,7 +244,7 @@ sub add_dump($type, $func) {
 *{Hash::dumps}              = \&dumps;
 *{Hash::dump}               = \&dump;
 *{Seq::dumps}               = \&dumps;
-# *{Seq::dump}                = sub($x) { __PACKAGE__::dump($x); return $x };
+*{Seq::dump}                = \&dump;
 *{Option::dumps}            = \&dumps;
 *{Option::dump}             = \&dump;
 *{Result::dumps}            = \&dumps;
