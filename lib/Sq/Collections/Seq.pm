@@ -1,7 +1,7 @@
 package Sq::Collections::Seq;
 package Seq;
 use 5.036;
-use subs 'bind', 'join', 'select', 'last', 'sort', 'map', 'length';
+use subs 'bind', 'join', 'select', 'last', 'sort', 'map', 'length', 'dump';
 
 # TODO:
 #       Find another name for 'from_list'
@@ -656,6 +656,77 @@ sub keep($seq, $predicate) {
             return undef if $abort;
             while ( defined($x = $it->()) ) {
                 return $x if $predicate->($x);
+            }
+            $abort = 1;
+            undef $it;
+        }
+    }, 'Seq');
+}
+
+sub keep_some($seq_of_opt) {
+    return bless(sub {
+        my $abort = 0;
+        my $it    = $seq_of_opt->();
+        my $x;
+        my @xs;
+        return sub {
+            return undef if $abort;
+            START:
+            return shift @xs if @xs;
+            while ( defined($x = $it->()) ) {
+                if ( ref $x eq 'Option' && @$x >= 1 ) {
+                    return $x->[0] if @$x == 1;
+                    # When option contains multiple values, we need to save them
+                    # and return those values one at a time until depleted
+                    if ( @$x > 1 ) {
+                        @xs = @$x;
+                        goto START;
+                    }
+                }
+            }
+            $abort = 1;
+            undef $it;
+        };
+    }, 'Seq');
+}
+
+sub keep_some_by($seq_of_opt, $f) {
+    return bless(sub {
+        my $abort = 0;
+        my $it    = $seq_of_opt->();
+        my $x;
+        my @xs;
+        return sub {
+            return undef if $abort;
+            START:
+            return shift @xs if @xs;
+            while ( defined($x = $it->()) ) {
+                $x = $f->($x);
+                if ( ref $x eq 'Option' && @$x >= 1 ) {
+                    return $x->[0] if @$x == 1;
+                    # When option contains multiple values, we need to save them
+                    # and return those values one at a time until depleted
+                    if ( @$x > 1 ) {
+                        @xs = @$x;
+                        goto START;
+                    }
+                }
+            }
+            $abort = 1;
+            undef $it;
+        };
+    }, 'Seq');
+}
+
+sub keep_type($seq, $type) {
+    return bless(sub {
+        my $abort = 0;
+        my $it    = $seq->();
+        my $x;
+        return sub {
+            return undef if $abort;
+            while ( defined($x = $it->()) ) {
+                return $x if Sq::Type::t_valid($type, $x);
             }
             $abort = 1;
             undef $it;

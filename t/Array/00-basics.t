@@ -2539,4 +2539,22 @@ is(
         'to_array');
 }
 
+# keep_some behaviour testing when Some contains multiple values
+{
+    is(
+        Array::keep_some([Some(1,2,3), Some(4,5,6)]),
+        [1,2,3,4,5,6],
+        'keep_some multi 1');
+
+    is(
+        Array::keep_some([Some([1,2,3]), Some([4,5,6])]),
+        [[1,2,3],[4,5,6]],
+        'keep_some multi 2');
+
+    is(
+        Array::keep_some([Some([1,2,3]), Some([4,5,6])])->merge,
+        [1,2,3,4,5,6],
+        'keep_some multi 3');
+}
+
 done_testing;

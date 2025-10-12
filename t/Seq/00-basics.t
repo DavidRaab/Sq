@@ -1641,4 +1641,22 @@ is(
         'to_seq');
 }
 
+# keep_some behaviour testing when Some contains multiple values
+{
+    is(
+        Seq::keep_some(seq { Some(1,2,3), Some(4,5,6) }),
+        seq { 1,2,3,4,5,6 },
+        'keep_some multi 1');
+
+    is(
+        Seq::keep_some(seq { Some([1,2,3]), Some([4,5,6]) }),
+        seq { [1,2,3], [4,5,6] },
+        'keep_some multi 2');
+
+    is(
+        Seq::keep_some(seq { Some([1,2,3]), Some([4,5,6]) })->merge,
+        seq { 1,2,3,4,5,6 },
+        'keep_some multi 3');
+}
+
 done_testing;
