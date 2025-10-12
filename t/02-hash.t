@@ -962,6 +962,37 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
         Hash::with_default({name => "Hulu", Price => undef}, name => "Foo", Price => 10),
         {name => "Hulu", Price => 10},
         'with_default checks for defined values');
+
+    is(
+        Hash::with_default({name => "Hulu", Price => ""}, name => "Foo", Price => 10),
+        {name => "Hulu", Price => 10},
+        'with_default now also check types 1');
+
+    is(
+        Hash::with_default({name => "Hulu", Price => "Nope"}, name => "Foo", Price => 10),
+        {name => "Hulu", Price => 10},
+        'with_default now also check types 2');
+
+    is(
+        Hash::with_default(
+            { name => "Hulu", Tracks => ""},
+            name => "Foo", Tracks => []),
+        {name => "Hulu", Tracks => []},
+        'with_default now also check types 3');
+
+    is(
+        Hash::with_default(
+            { name => "Hulu", Tracks => {}},
+            name => "Foo", Tracks => []),
+        {name => "Hulu", Tracks => []},
+        'with_default now also check types 4');
+
+    is(
+        Hash::with_default(
+            { name => "Hulu", Tracks => [{no => 1, name => "Yup"}]},
+            name => "Foo", Tracks => []),
+        {name => "Hulu", Tracks => [{no => 1, name => "Yup"}]},
+        'with_default now also check types 5');
 }
 
 {

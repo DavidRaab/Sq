@@ -299,24 +299,23 @@ sub to_seq($hash, $f) {
     }, 'Seq');
 }
 
-# TODO: use copy()
-# TODO: assume i use with_default to set a key to a number.
-#       $hash->with_default(price => 10);
-#
-#       Then i assume that price will be 10, in the case of undef, or even
-#       an empty string. This for example happens when something is read from
-#       a file. Like reading a CSV file. Instead of undef we get empty strings
-#       when a field is not provided.
-#
-#       This leads to the general idea if with_default() should override values
-#       in a hash, when those values have not the same type? When i describe
-#       a with_default() and a key should be an Array, i always can assume
-#       after an with_default() call that it will be an Array.
+# TODO: use copy() to copy values from %def - currently references are shared
+# TODO: Add blessings to unblessed references like Array/Hash, but will be
+#       solved when copy() is implemented.
 sub with_default($hash, %def) {
     my %new = %$hash;
+    my $src_value;
     for my ($key,$value) ( %def ) {
-        if ( !defined $new{$key} ) {
+        $src_value = $new{$key};
+        if ( !defined $src_value ) {
             $new{$key} = $value;
+        }
+        else {
+            # when value in $hash is not of same type as provided in %def,
+            # than the value in %def will always be used
+            if ( Sq::get_type($src_value) ne Sq::get_type($value) ) {
+                $new{$key} = $value;
+            }
         }
     }
     return CORE::bless(\%new, 'Hash');
