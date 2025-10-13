@@ -7,7 +7,7 @@ use Getopt::Long::Descriptive;
 
 my ($opt, $usage) = describe_options(
     'Usage: %c %o',
-    ['file|f=s', 'filename to read', {default      => 'read_csv.csv'}],
+    ['file|f=s', 'filename to read', {default      => 'csv/read_csv.csv'}],
     ['help|h', 'Print this message', {shortcircuit => 1}],
 );
 
