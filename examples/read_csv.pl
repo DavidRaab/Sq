@@ -25,37 +25,35 @@ my $csv_entry = type [hash => [keys =>
 # of the above defined type.
 my $data =
     Sq->io->csv_read($opt->file)
-    ->map(call with_default => balance => 0, comment => "")
+    ->map(call with_default => balance => 0, comment => "", current => 0)
     ->keep_type($csv_entry)
     ->sort_by(by_str, key 'date');
 
-# TODO: table should support sequence
-# Sq->fmt->table({
-#     header => [qw/date balance comment/],
-#     data   => $data->to_array,
-#     border => 0,
-# });
-# dump($data);
 
-my ($current, $balance, $op, $comment) = (0, 0, "", "");
-$data->iter(sub($row){
-    printf "%s ", $row->{date};
-    $balance = $row->{balance} // 0;
-    $op      = $row->{operation};
-    $comment = $row->{comment} // "";
+# Compute current and add it to the rows
+my $previous_current = 0;
+$data->iter(sub($row) {
+    my $op      = $row->{operation};
+    my $balance = $row->{balance};
+
     if ( $op eq 'CURRENT' ) {
-        $current = $balance;
-        printf "%8.2f %s\n", $current, $comment;
+        $previous_current = $balance;
+        $row->{balance} = sprintf "%+10.02f", $row->{balance};
     }
     elsif ( $op eq 'SUB' ) {
-        $current -= $balance;
-        printf "%8.2f %8.2f %s\n", $current, -$balance, $comment;
-    }
-    elsif ( $op eq 'ADD' ) {
-        $current += $balance;
-        printf "%8.2f %+8.2f %s\n", $current, $balance, $comment;
+        $previous_current -= $balance;
+        $row->{balance} = sprintf "%+10.02f", -$row->{balance};
     }
     else {
-        die sprintf("Operation '%s' not implemented.", $op);
+        $row->{balance} = sprintf "%+10.02f", $row->{balance};
     }
+
+    $row->{current} = $previous_current;
+});
+
+# TODO: table should support sequence
+Sq->fmt->table({
+    header => [qw/date current balance comment/],
+    data   => $data->to_array,
+    border => 0,
 });
