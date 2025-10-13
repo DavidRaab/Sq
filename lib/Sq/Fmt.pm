@@ -49,7 +49,7 @@ static table => with_dispatch(
         my $cols = assign {
             my $sizes = $header ? [$header, @$aoa] : $aoa;
             Array::transpose_map($sizes, sub ($str,$,$) { length $str })
-                ->map(call 'max', 0);
+                   ->map(call 'max', 0);
         };
 
         # local $Sq::Dump::INLINE = 0;
