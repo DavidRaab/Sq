@@ -29,6 +29,7 @@ my $data =
     ->keep_type($csv_entry)
     ->sort_by(by_str, key 'date');
 
+# dump($data);
 
 # Compute current and add it to the rows
 my $previous_current = 0;
