@@ -52,23 +52,25 @@ say "\nAverage FPS for every Benchmark Second.";
 printf "%s\n",
     # this builds an hash where the key is the time rounded to integer, and
     # the values is an array of all the frames in that second
-    $data->group_by(sub($row) { int $row->{time} })->map(sub($k,$v) {
-        return $k, $v->length;
-    })
-    # the hash is converted to an array. by passing the array() function we
+    $data->group_by(sub($row) { int $row->{time} })
+    # then the value (array) is replaced by its length. So we get a Hash with
+    # time => frame-amount
+    ->map(sub($k,$v) { return $k, $v->length })
+    # the hash is than converted to an array. By passing the array() function we
     # build an array of [key,$value]
     ->to_array(\&array)
     # we sort the array by the index 0. this is the integer time
     ->sort_by(by_num, idx 0)
     # then we only select the second elements of the inner array. so we basically
-    # drop the integer time
+    # drop the integer time. now we just have an array of fps for every benchmark
+    # second.
     ->snds
-    # for presenting we only want 10 items to show on one line. This creates an
-    # array of array
+    # for presenting we only want 10 items to show on one line. With chunked always
+    # upto 10 elements are put into a chunk. now we have an Array of Arrays.
     ->chunked(10)
-    # the inner array is string joined: Now we have array of strings-
+    # the inner array is string joined: Now we have array of strings.
     ->map(call join => " ")
-    # then the array is joined
+    # then the array is joined, getting a single string, that is printed.
     ->join("\n");
 
 say "\nDoing the above inspection, it showed that there was always 60 fps. I wondered";
