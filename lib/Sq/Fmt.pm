@@ -33,6 +33,10 @@ my $table_aoa = [hash =>
 ];
 
 # TODO: Support Seq as data
+# TODO: Add Title
+# TODO: Add configurable spacing between cells
+# TODO: MultiLine Cells
+# TODO: Add Layout Scheme (which symbol used for table and presets)
 static table => with_dispatch(
     type [tuple => $table_aoa] => sub ($args) {
         my $header = $args->{header} // 0;
