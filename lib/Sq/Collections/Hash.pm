@@ -321,6 +321,7 @@ sub with_default($hash, %def) {
     return CORE::bless(\%new, 'Hash');
 }
 
+# TODO: Add Tests
 sub rename_keys($hash, %old_new) {
     my %new;
     for my ($k,$v) ( %$hash ) {
