@@ -321,6 +321,20 @@ sub with_default($hash, %def) {
     return CORE::bless(\%new, 'Hash');
 }
 
+sub rename_keys($hash, %old_new) {
+    my %new;
+    for my ($k,$v) ( %$hash ) {
+        my $new_key = $old_new{$k};
+        if ( defined $new_key ) {
+            $new{$new_key} = $v;
+        }
+        else {
+            $new{$k} = $v;
+        }
+    }
+    return CORE::bless(\%new, 'Hash');
+}
+
 #
 # SIDE-EFFECTS
 #
