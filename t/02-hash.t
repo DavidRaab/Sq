@@ -1011,4 +1011,37 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
         'remove');
 }
 
+is(
+    Hash::rename_keys({foo => 1, bar => 2, baz => 3}, foo => 'what'),
+    {what => 1, bar => 2, baz => 3},
+    'rename_keys 1');
+
+is(
+    hash(foo => 1, bar => 2, baz => 3)->rename_keys(foo => 'what'),
+    {what => 1, bar => 2, baz => 3},
+    'rename_keys 2');
+
+is(
+    Hash::rename_keys({foo => 1, bar => 2, baz => 3}, grub => 'what'),
+    {foo => 1, bar => 2, baz => 3},
+    'rename_keys 3');
+
+is(
+    Hash::rename_keys({foo => 1, bar => 2, baz => 3}, foo => "bar", bar => "foo"),
+    {bar => 1, foo => 2, baz => 3},
+    'rename_keys 4');
+
+is(
+    Hash::rename_keys({foo => 1, bar => 2, baz => 3}, foo => undef),
+    {foo => 1, bar => 2, baz => 3},
+    'rename_keys 5');
+
+one_of(
+    Hash::rename_keys({foo => 1, bar => 2, baz => 3}, foo => "bar"),
+    [
+        {bar => 1, baz => 3},
+        {bar => 2, baz => 3},
+    ],
+    'rename_keys 6');
+
 done_testing;
