@@ -20,7 +20,7 @@ my $data = $persons->cartesian($tags)->keep(sub($args) {
     #       Like in SQL you get a "flat" structure. For every possible match you
     #       get a single line. The fold_mut call builds a document-like structure
     #       out of it. So all "tags" are combined into an Array.
-    ->fold_mut(Hash->empty, sub($row, $state) {
+    ->fold_mut(hash, sub($row, $state) {
         my ($p,$t) = @$row;
         $state->get($p->{id})->match(
             None => sub {
