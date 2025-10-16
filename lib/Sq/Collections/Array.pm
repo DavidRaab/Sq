@@ -344,6 +344,43 @@ sub chunked_size($array, $max_size, $f_size) {
     return CORE::bless(\@new, 'Array');
 }
 
+sub combine($array_of_hash, $unique_key, @fields) {
+    my %to_array = map { $_ => 1 } @fields;
+    my %new;
+    for my $hash ( @$array_of_hash ) {
+        my $unique_value = $hash->{$unique_key};
+        if ( defined $unique_value ) {
+            my $value = $new{$unique_value};
+            # add to existing hash
+            if ( defined $value ) {
+                for my ($k,$v) ( %$hash ) {
+                    if ( $to_array{$k} ) {
+                        Hash::push($value, $k, $v);
+                    }
+                    else {
+                        $value->{$k} = $v;
+                    }
+                }
+            }
+            # create initial hash
+            else {
+                my $entry = CORE::bless({}, 'Hash');
+                for my ($k,$v) ( %$hash ) {
+                    if ( $to_array{$k} ) {
+                        # TODO: use copy() for $v
+                        Hash::push($entry, $k, $v);
+                    }
+                    else {
+                        $entry->{$k} = $v;
+                    }
+                }
+                $new{$unique_value} = $entry;
+            }
+        }
+    }
+    CORE::bless(\%new, 'Hash');
+}
+
 sub columns($array, $amount) {
     my @new;
     my $max = @$array / $amount;

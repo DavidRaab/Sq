@@ -2557,4 +2557,89 @@ is(
         'keep_some multi 3');
 }
 
+# combine
+{
+    my $data = sq [
+        {id => 1, name => "Zelda",       tag => "Action-Adventure"},
+        {id => 1, name => "Zelda",       tag => "Link"},
+        {id => 1, name => "Zelda",       tag => "Ganon"},
+        {id => 2, name => "Mario 64",    tag => "Mario"},
+        {id => 2, name => "Mario 64",    tag => "Jump N Run"},
+        {id => 3, name => "Doom 64",     tag => "Ego-Shooter"},
+        {         name => "Turok",       tag => "Ego-Shooter"},
+        {id => 4, name => "Blast Corps", tag => "Rare"},
+        {id => 4, name => "Blast Corps", tag => "Destruction"},
+    ];
+
+    is(
+        $data->combine('id', 'tag'),
+        {
+            1 => {
+                id   => 1,
+                name => "Zelda",
+                tag  => ["Action-Adventure", "Link", "Ganon"],
+            },
+            2 => {
+                id   => 2,
+                name => "Mario 64",
+                tag  => ["Mario", "Jump N Run"],
+            },
+            3 => {
+                id   => 3,
+                name => "Doom 64",
+                tag  => ["Ego-Shooter"],
+            },
+            4 => {
+                id   => 4,
+                name => "Blast Corps",
+                tag  => ["Rare", "Destruction"],
+            },
+        },
+        'combine 1');
+}
+
+{
+    my $data = sq [
+        {id => 1, name => "Zelda",       tag => "Action-Adventure", comment => "A"},
+        {id => 1, name => "Zelda",       tag => "Link",             comment => "B"},
+        {id => 1, name => "Zelda",       tag => "Ganon",            comment => "C"},
+        {id => 2, name => "Mario 64",    tag => "Mario",            comment => "D"},
+        {id => 2, name => "Mario 64",    tag => "Jump N Run",       comment => "E"},
+        {id => 3, name => "Doom 64",     tag => "Ego-Shooter",      comment => "F"},
+        {         name => "Turok",       tag => "Ego-Shooter",      comment => "G"},
+        {id => 4, name => "Blast Corps", tag => "Rare",             comment => "H"},
+        {id => 4, name => "Blast Corps", tag => "Destruction",      comment => "I"},
+    ];
+
+    is(
+        $data->combine(id => qw/tag comment/),
+        {
+            1 => {
+                id      => 1,
+                name    => "Zelda",
+                tag     => ["Action-Adventure", "Link", "Ganon"],
+                comment => [qw/A B C/],
+            },
+            2 => {
+                id      => 2,
+                name    => "Mario 64",
+                tag     => ["Mario", "Jump N Run"],
+                comment => [qw/D E/],
+            },
+            3 => {
+                id      => 3,
+                name    => "Doom 64",
+                tag     => ["Ego-Shooter"],
+                comment => ['F'],
+            },
+            4 => {
+                id      => 4,
+                name    => "Blast Corps",
+                tag     => ["Rare", "Destruction"],
+                comment => [qw/H I/],
+            },
+        },
+        'combine 1');
+}
+
 done_testing;
