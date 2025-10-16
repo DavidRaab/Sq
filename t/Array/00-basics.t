@@ -2639,7 +2639,7 @@ is(
                 comment => [qw/H I/],
             },
         },
-        'combine 1');
+        'combine 2');
 }
 
 done_testing;

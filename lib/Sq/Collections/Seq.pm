@@ -1134,6 +1134,46 @@ sub chunked($seq, $size) {
     }, 'Seq');
 }
 
+sub combine($seq_of_hash, $unique_key, @fields) {
+    my %to_array = map { $_ => 1 } @fields;
+    my %new;
+
+    my $it = $seq_of_hash->();
+    my $hash;
+    while ( defined($hash = $it->()) ) {
+        my $unique_value = $hash->{$unique_key};
+        if ( defined $unique_value ) {
+            my $value = $new{$unique_value};
+            # add to existing hash
+            if ( defined $value ) {
+                for my ($k,$v) ( %$hash ) {
+                    if ( $to_array{$k} ) {
+                        Hash::push($value, $k, $v);
+                    }
+                    else {
+                        $value->{$k} = $v;
+                    }
+                }
+            }
+            # create initial hash
+            else {
+                my $entry = CORE::bless({}, 'Hash');
+                for my ($k,$v) ( %$hash ) {
+                    if ( $to_array{$k} ) {
+                        # TODO: use copy() for $v
+                        Hash::push($entry, $k, $v);
+                    }
+                    else {
+                        $entry->{$k} = $v;
+                    }
+                }
+                $new{$unique_value} = $entry;
+            }
+        }
+    }
+    CORE::bless(\%new, 'Hash');
+}
+
 # intersperse : Seq<'a> -> 'a -> Seq<'a>
 sub intersperse($seq, $sep) {
     from_sub(Seq => sub() {
