@@ -7,35 +7,39 @@ use Sq -sig => 1;
 my $persons = Sq->io->csv_read("csv/persons.csv");
 my $tags    = Sq->io->csv_read("csv/tags.csv");
 
-# This creates the Cartesian Product. Basically like SQL, it just creates
-# a N:M mapping of every possible combination. The keep() call only keeps
-# those entries where id is the same as the person_id in tags. It's like
-# a "WHERE p.id = t.person_is" in SQL.
-my $data = $persons->cartesian($tags)->keep(sub($args) {
-        my ($p, $t) = @$args;
-        $p->{id} == $t->{person_id}
-    })
-    # TODO: This will be a common operation. Should be put into its own function
+# TODO: I still don't like it, even if it improved somehow. The choose() is
+#       still too much clutter.
+my $data =
+    # This creates the Cartesian Product. Basically like SQL, it just creates
+    # a N:M mapping of every possible combination.
+    $persons->cartesian($tags)
+    # choose is similar to keep(). Only those entries that return Some() are picked,
+    # None are skipped. But this way, you also can change or return different values.
+    # choose is like a keep()->map() in one operation.
     #
-    #       Like in SQL you get a "flat" structure. For every possible match you
-    #       get a single line. The fold_mut call builds a document-like structure
-    #       out of it. So all "tags" are combined into an Array.
-    ->fold_mut(hash, sub($row, $state) {
-        my ($p,$t) = @$row;
-        $state->get($p->{id})->match(
-            None => sub {
-                $state->{$p->{id}} = sq {
-                    name => $p->{name},
-                    tags => [$t->{tag}],
-                };
-            },
-            Some => sub($person) {
-                $person->push(tags => $t->{tag});
-            },
-        );
-    });
+    # Here we only pick those combination where "person.id" is the same as "tag.person_id"
+    # then we combine both hashes into one single hash, but we change some keys of
+    # the second, so the second hash don't overrides the ones in the first hash.
+    # Very similar to SQL.
+    #
+    # SELECT p.id, p.name, t.id AS tid, t.person_id, t.tag AS tags
+    # FROM   persons p, tags t
+    # WHERE  p.id = t.person_id
+    ->choose(sub($args) {
+        my ($p, $t) = @$args;
+        if ( $p->{id} == $t->{person_id} ) {
+            return Some(Hash::append(
+                $p,
+                $t->rename_keys(id => 'tid', tag => 'tags')
+            ));
+        }
+        return None;
+    })
+    ->combine(id => 'tags');
 
 # dump($data);
+#
+# TODO: DS changed
 # {
 #   0 => { name => "Cherry", tags => [ "hot", "beautiful" ]      },
 #   1 => { name => "Anny",   tags => [ "babe", "red", "french" ] },
@@ -49,9 +53,7 @@ my $data_table =
         return $k, $v->withf(tags => sub($tags) { $tags->join(",") });
     })
     # than transforms into array of hashes
-    ->to_array(sub($k,$v) {
-        sq { id => $k, %$v }
-    })
+    ->to_array(sub($k,$v) { $v })
     # and sorts it by user id
     ->sort_by(by_num, key 'id');
 
