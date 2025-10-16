@@ -200,9 +200,20 @@ sub key_equal($key, $value) {
 
 # creates a function that selects a specific index of an array
 sub idx($index) {
-    return sub($array) {
-        return $array->[$index];
-    }
+    state %cache = {
+        0 => sub($array) { $array->[0] },
+        1 => sub($array) { $array->[1] },
+        2 => sub($array) { $array->[2] },
+    };
+
+    # return cached sub
+    my $func = $cache{$index};
+    return $func if defined $func;
+
+    # otherwise create/store new sub
+    $func = sub($array) { $array->[$index] };
+    $cache{$index} = $func;
+    return $func;
 }
 
 # returns a function that calls $method with its arguments on an object
