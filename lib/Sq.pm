@@ -201,7 +201,6 @@ sub key_equal($key, $value) {
     };
 }
 
-# TODO: Add Tests
 # creates a function that selects a specific index of an array
 sub idx($index) {
     return sub($array) {

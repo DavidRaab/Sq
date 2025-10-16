@@ -453,4 +453,15 @@ is(get_type(qr/\d+/),      'Regex',  'get_type 13');
 is(get_type(Ok(1)),        'Result', 'get_type 14');
 is(get_type(Err(1)),       'Result', 'get_type 15');
 
+{
+    # Generating Random Array of tuples
+    my $zip  = Array::zip(
+        (gen_run gen [repeat => 10, [str => 5,10 ]]),
+        (gen_run gen [repeat => 10, [int => 0,100]]),
+    );
+
+    is($zip->fsts, $zip->map(idx 0), 'idx 0');
+    is($zip->snds, $zip->map(idx 1), 'idx 1');
+}
+
 done_testing;
