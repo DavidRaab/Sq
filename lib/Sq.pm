@@ -195,10 +195,7 @@ sub key :prototype($) {
 }
 
 sub key_equal($key, $value) {
-    return sub($hash) {
-        return 1 if Sq::Equality::equal($hash->{$key}, $value);
-        return 0;
-    };
+    return sub($hash) { Sq::Equality::equal($hash->{$key}, $value) };
 }
 
 # creates a function that selects a specific index of an array
