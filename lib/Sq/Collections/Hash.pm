@@ -378,6 +378,7 @@ sub set($hash, @kvs) {
     return;
 }
 
+# MUT - Like withf, changes the value of a key by function if exists.
 sub change($hash, %kfs) {
     for my ($key,$f) ( %kfs ) {
         my $value = $hash->{$key};
@@ -386,6 +387,8 @@ sub change($hash, %kfs) {
     return;
 }
 
+# MUT - Adds @values to $key that is expected to be an Array.
+#       If not an array, then it will be upgraded to an array.
 sub push($hash, $key, @values) {
     my $v = $hash->{$key};
     if ( defined $v ) {
@@ -411,6 +414,7 @@ sub push($hash, $key, @values) {
     return;
 }
 
+# MUT - Deleted some keys from a hash
 sub delete($hash, @keys) {
     for my $key ( @keys ) {
         CORE::delete $hash->{$key};
