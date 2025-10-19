@@ -218,10 +218,6 @@ sub get($hash, $key) {
     return Option::Some($value);
 }
 
-sub copy($hash) {
-    return CORE::bless({%$hash}, 'Hash');
-}
-
 # Hash<'a> -> ListContext<string> -> Array<Option<'a>>
 sub extract($hash, @keys) {
     my $array = CORE::bless([], 'Array');

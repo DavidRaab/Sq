@@ -298,11 +298,6 @@ sub concat($, @seqs) {
 #          functions operating on Seq and returning another Seq              #
 #----------------------------------------------------------------------------#
 
-# noop, only there for API compatibility
-sub copy($seq) {
-    return $seq;
-}
-
 # append : Seq<'a> -> Seq<'a> -> Seq<'a>
 sub append($seqA, $seqB) {
     bless(sub {

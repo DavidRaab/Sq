@@ -55,7 +55,7 @@ overview of the functionality of Sq itself.
     id($any)    -> $any          # returning $any as-is
     fst($array) -> $x            # $array->[0]
     snd($array) -> $x            # $array->[1]
-    copy($any)  -> $copy_of_any  # not yet implemented
+    copy($any)  -> $copy_of_any  # Deep Copy of a Data-Structure
 
     # sorting/comparision functions
     by_num ()
@@ -203,6 +203,7 @@ Variables that start with C<$f_> are functions.
     chunked          ($array, $size)
     chunked_size     ($array, $max_size, $f_size)
     columns          ($array, $amount)
+    combine          ($array_of_hash, $unique_key, @fields)
     contains         ($array, $any)
     count            ($array)
     count_by         ($array, $f_key)

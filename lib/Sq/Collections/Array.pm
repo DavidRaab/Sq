@@ -153,15 +153,6 @@ sub range($, $start, $stop) {
 #           functions operating on Array and returning another Array          #
 #-----------------------------------------------------------------------------#
 
-sub copy($array) {
-    my @new;
-    for my $x ( @$array ) {
-        last if not defined $x;
-        push @new, $x;
-    }
-    return CORE::bless(\@new, 'Array');
-}
-
 sub bind($array, $f) {
     my @new;
     for my $x ( @$array ) {

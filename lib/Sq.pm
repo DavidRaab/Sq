@@ -31,6 +31,7 @@ our @EXPORT = (
     is_type => sub { \&Sq::Type::t_valid      },
     static  => sub { \&Sq::Reflection::static },
     union   => sub { \&Sq::Core::DU::union    },
+    copy    => sub { \&Sq::Copy::copy         },
 );
 my $export_funcs;
 my $first_load = 1;
@@ -120,6 +121,7 @@ use Sq::Collections::Heap;
 # Load other basic functionality
 use Sq::Dump;
 use Sq::Equality;
+use Sq::Copy;
 
 # Access to submodules
 sub io($) {
@@ -478,8 +480,5 @@ sub fn($name,$sub) {
     my $full = caller . '::' . $name;
     Sq::Reflection::set_func($full,$sub);
 }
-
-# TODO: Not yet implemented
-sub copy($any) { ... }
 
 1;
