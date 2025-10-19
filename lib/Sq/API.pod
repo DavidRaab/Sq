@@ -20,9 +20,10 @@ overview of the functionality of Sq itself.
     equal($any1, $any2)
 
     sq  ($any)              # Recursively adds blessing to Array/Hash Data-structure
-    call($method, @args)    # creates a function that calls $method with @args on an object
-    key ($id)               # creates a function that extracts field $id from a hash
-    key_equal($key, $value) # creates a function that checks if passed value is equal to $value
+    call($method, @args)    # same as: sub($obj)   { $obj->$method(@args)        }
+    key ($id)               # same as: sub($hash)  { $hash->{$id}                }
+    key_equal($key, $value) # same as: sub($hash)  { equal($hash->{$id}, $value) }
+    idx($index)             # same as: sub($array) { $array->[$index]            }
     assign { }              # a new block of scope
     seq    { 1, 2, 3 }      # (easy) way to create a sequence of values
     new($class,@args)       # special dispatch; used for testing; reserved;
@@ -30,22 +31,26 @@ overview of the functionality of Sq itself.
                             # syntax playground to think about.
 
     # functions for type-checking
-    is_num   ($any)
-    is_str   ($any)
-    is_array ($any)
-    is_hash  ($any)
-    is_seq   ($any)
-    is_opt   ($any)
-    is_result($any)
-    is_sub   ($any)
-    is_regex ($any)
-    is_ref   ($any)
-    is_type  ($any)
+    get_type ($any) -> Str   # Returns Type as String: Str, Num, Array, Hash, Sub, Regex, (or what "ref" returns)
+    is_num   ($any) -> $bool
+    is_str   ($any) -> $bool
+    is_array ($any) -> $bool
+    is_hash  ($any) -> $bool
+    is_seq   ($any) -> $bool
+    is_opt   ($any) -> $bool
+    is_result($any) -> $bool
+    is_sub   ($any) -> $bool
+    is_regex ($any) -> $bool
+    is_ref   ($any) -> $bool
+    is_type  ($any) -> $bool
 
-    fn
-    multi
-    with_dispatch
-    type_cond
+    fn($name, $sub)    # installs a sub-reference as $name in current package
+    multi($name, @tf)  # creates function with multi-dispatch based on type
+    with_dispatch(@tf) # returns function with multi-dispatch based on type
+    type_cond(@tf)     # similar to with_dispatch() but the function that is
+                       # returned only expects one input argument. Because of
+                       # this the type don't start as an array. This makes some
+                       # type definition shorter.
 
     id($any)    -> $any          # returning $any as-is
     fst($array) -> $x            # $array->[0]
@@ -61,15 +66,15 @@ overview of the functionality of Sq itself.
     lazy  ()
     dump  ($any) -> void     # Dumps $any to STDERR
     dumps ($any) -> $string  # Return dump($any) as string, instead of printing
-    static
+    static                   # See: Sq::Manual::Concepts::Statics
 
     # Creation of data
     array(@xs)  # array with blessing
     hash (@kvs) # hash with blessing
-    Some        # Option
-    None        # Option
-    Ok          # Result
-    Err         # Result
+    Some (@xs)  # Option
+    None ()     # Option
+    Ok   ($any) # Result
+    Err  ($any) # Result
     type        # Sq::Type
     union       # Discriminated Union: See: t/16-du.t
 
@@ -82,20 +87,22 @@ overview of the functionality of Sq itself.
 
 =head2 Sq->fs
 
-    Sq->fs->children     (@path)                # all folder entries as a sequence
-    Sq->fs->read_text    (@path)                # sequence of file opened as UTF-8
-    Sq->fs->read_text_gz (@path)                # opens gzip file as UTF-8 text
-    Sq->fs->write_text   ($file, $content)      # writes $content as $file
-    Sq->fs->write_text   ($file, $array_of_str) # writes array of strings as file
-    Sq->fs->write_text   ($file, $seq)          # writes sequence as file
-    Sq->fs->write_text_gz
-    Sq->fs->read_raw
-    Sq->fs->compare_text
-    Sq->fs->read_bytes
-    Sq->fs->make_link
-    Sq->fs->recurse
-    Sq->fs->search_upwards
-    Sq->fs->sha512
+    Sq->fs->children      (@path)                     # all folder entries as a sequence
+    Sq->fs->read_text     (@path)                     # sequence of file opened as UTF-8
+    Sq->fs->read_text_gz  (@path)                     # opens gzip file as UTF-8 text
+    Sq->fs->write_text    ($file, $content)           # writes $content as $file
+    Sq->fs->write_text    ($file, $array_of_str)      # writes array of strings as file
+    Sq->fs->write_text    ($file, $seq)               # writes sequence as file
+    Sq->fs->write_text_gz ($file, $content)           # writes string as gziped compressed file
+    Sq->fs->write_text_gz ($file, $array_of_str)      # writes array of string as gziped compressed file
+    Sq->fs->write_text_gz ($file, $seq)               # writes sequence as gziped compressed file
+    Sq->fs->read_raw      ($size, @path)              # reads binary file in $size chunks
+    Sq->fs->compare_text  ($file1, $file2)            # checks if two files are the same
+    Sq->fs->read_bytes    ($size, @path)              # reads $size bytes from file
+    Sq->fs->make_link     ($source, $destination)     # creates relative symbolic-link from $source to $destination
+    Sq->fs->recurse       (@path)  -> Seq($path)      # sequence of all files recursively from directory
+    Sq->fs->search_upwards($entry) -> Result($path)   # checks if $entry is in current directory, otherwise goes up until root
+    Sq->fs->sha512        (@path)  -> Result($sha512) # return SHA512 of file
 
 =head2 Sq->math
 
