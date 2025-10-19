@@ -295,22 +295,19 @@ sub to_seq($hash, $f) {
     }, 'Seq');
 }
 
-# TODO: use copy() to copy values from %def - currently references are shared
-# TODO: Add blessings to unblessed references like Array/Hash, but will be
-#       solved when copy() is implemented.
 sub with_default($hash, %def) {
     my %new = %$hash;
     my $src_value;
     for my ($key,$value) ( %def ) {
         $src_value = $new{$key};
         if ( !defined $src_value ) {
-            $new{$key} = $value;
+            $new{$key} = Sq::Copy::copy($value);
         }
         else {
             # when value in $hash is not of same type as provided in %def,
             # than the value in %def will always be used
             if ( Sq::get_type($src_value) ne Sq::get_type($value) ) {
-                $new{$key} = $value;
+                $new{$key} = Sq::Copy::copy($value);
             }
         }
     }

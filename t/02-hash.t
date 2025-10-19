@@ -906,18 +906,31 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
         title => "Greatest Hits",
     };
 
-    # TODO: Consider that it doesn't make a copy of tracks for example,
-    #       so re-using the same hash somewhere instead of directly inlining
-    #       the hash in the function will create shared data over multiple values
-    #       But i anyway plan to implement a global copy().
+    # Shared tracks to check if values are copied
+    my @tracks = (
+        { id => 1, duration => 10 },
+    );
+
     my $album = $data->with_default(
         title  => "Unkown",
         desc   => "",
         artist => "Nobody",
-        tracks => [
-            { id => 1, duration => 10 },
-        ],
+        tracks => \@tracks,
     );
+
+    # Mutate Tracks
+    push @tracks, { id => 2, duration => 10 };
+
+    # $album stays unchanged
+    is(
+        $album->{tracks},
+        [{ id => 1, duration => 10}],
+        'because tracks is a copy, must be unchanged');
+
+    is(
+        $album->{tracks}->sum_by(key 'duration'),
+        10,
+        'check if blessing was added to pure array');
 
     is($data, { title => "Greatest Hits" }, '$data unchanged');
     is(
