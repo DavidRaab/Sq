@@ -3,6 +3,7 @@ use 5.036;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Sq -sig => 1;
+use Sq::Type;
 use Getopt::Long::Descriptive;
 
 my ($opt, $usage) = describe_options(
@@ -15,8 +16,8 @@ $usage->die if $opt->help;
 
 # Every CSV Entry should be like this
 my $csv_entry = type [hash => [keys =>
-    date      => ['str'],
-    operation => [enum => 'ADD', 'SUB', 'CURRENT'],
+    date      => [parser => Sq->p->date_ymd],
+    operation => [enum   => 'ADD', 'SUB', 'CURRENT'],
     balance   => ['num'],
     comment   => ['str'],
 ]];

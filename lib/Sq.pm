@@ -164,6 +164,13 @@ sub rand($) {
     }
     return 'Sq::Rand';
 }
+sub p($) {
+    if ( !exists $INC{'Sq/P.pm'} ) {
+        require Sq::P;
+        Sq::P->load_signature();
+    }
+    return 'Sq::P';
+}
 
 # Str Module
 sub Str :prototype() {
