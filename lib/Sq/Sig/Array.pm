@@ -119,7 +119,6 @@ sig('Array::itern',     $array, $pint, $sub, t_void);
 sig('Array::iteri',     $array, $sub,        t_void);
 sig('Array::iter2d',    $aoa,   $sub,        t_void);
 sig('Array::iter_sort', $array, $sub, $sub,  t_void);
-sig('Array::dispatch',  $array, $sub, $hash, t_void);
 
 
 ### CONVERTER

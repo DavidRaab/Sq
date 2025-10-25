@@ -500,22 +500,13 @@ is(get_type(Err(1)),       'Result', 'get_type 15');
 
     is($current, 4, 'dispatch');
 
-    # dispatch() with one argument call creates a function that expects
-    # the value to dispatch, and any amount of additional values passed to the
-    # sub-refs.
-    # The advantage of this is that the hash passed to dispatch is internally stored
-    # so it doesn't need to be rebuild every time the function is called. This usually
-    # boost performance, when it matters. For example you can create a "state"
-    # variable in a function. So the whole function is only ever created a single
-    # time instead of being created on every function call.
-    my $dispatch = dispatch({
+    # dispatch() with two arguments creates a function that expects an element $x.
+    # Then the first argument to dispatch() is a sub-ref that select the key to dispatch
+    # The second argument is the dispatch table itself that just gets the $x passed.
+    $operations->iter(dispatch(key 'op', {
         INCR => sub($x) { $current += $x->{value} },
         DECR => sub($x) { $current -= $x->{value} },
-    });
-    for my $op ( @$operations ) {
-        $dispatch->($op->{op}, $op);
-    }
-    is($current, 8, 'dispatch with one argument');
+    }));
 
     like(
         dies {
@@ -527,27 +518,31 @@ is(get_type(Err(1)),       'Result', 'get_type 15');
         qr/\Adispatch:/,
         'dispatch with non existing key throws exception');
 
-    # ----
+    # dispatch() in two argument version can also be used in Array::map
+    my $data = sq [
+        { op => "join", args => [1,2,3,4,5] },
+        { op => "sum",  args => [1,2,3,4,5] },
+    ];
+    is(
+        $data->map(dispatch(key 'op', {
+            join => sub($x) { $x->{args}->join },
+            sum  => sub($x) { $x->{args}->sum  },
+        })),
+        ["12345", 15],
+        'dispatch with Array::map on hash');
 
-    # Or just use Array::dispatch
-    $operations->dispatch(key 'op', {
-        INCR => sub($x) { $current += $x->{value} },
-        DECR => sub($x) { $current -= $x->{value} },
-    });
-    is($current, 12, 'Array::dispatch');
-
-    # create an error with Array::dispatch
-    $operations->push({ op => 'SET', value => 10 });
-    like(
-        dies {
-            Array::dispatch($operations, key 'op', {
-                INCR => sub($x) { $current += $x->{value} },
-                DECR => sub($x) { $current -= $x->{value} },
-            });
-        },
-        qr/\AArray::dispatch/,
-        'Array::dispatch with unknown key');
-    $operations->pop;
+    # array of array
+    my $data2 = sq [
+        ["join", 1,2,3,4,5],
+        ["sum",  1,2,3,4,5],
+    ];
+    is(
+        $data2->map(dispatch(idx 0, {
+            join => sub($x) { $x->skip(1)->join       },
+            sum  => sub($x) { Array::sum($x->skip(1)) },
+        })),
+        ["12345", 15],
+        'dispatch with Array::map on array');
 }
 
 # Pattern Matching - Draft

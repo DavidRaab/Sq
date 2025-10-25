@@ -497,7 +497,6 @@ sub fn($name,$sub) {
     Sq::Reflection::set_func($full,$sub);
 }
 
-
 # Helper for string dipatch table. It just dispatches a string on a hash and
 # calls the apropiate function. It throws an exception when the hash has no
 # dispatch defined. That's usually what you want when you care for correct code,
@@ -507,32 +506,33 @@ sub dispatch {
     if ( @_ == 0 ) {
         Carp::croak "dispatch: No arguments.\n";
     }
-    elsif ( @_ == 1 ) {
-        my ($case_sub) = @_;
-        Carp::croak "dispatch: Must be hash in one-argument call" if !is_hash($case_sub);
-        return sub($str,@args) {
-            Carp::croak "dispatch: First argument must be a string" if !is_str($str);
-            my $func = $case_sub->{$str};
+    elsif ( @_ == 2 ) {
+        my ($f_key, $case_sub) = @_;
+        Carp::croak "dispatch: First argument must be sub in two-argument call" if !is_sub($f_key);
+        Carp::croak "dispatch: Must be hash in two-argument call"               if !is_hash($case_sub);
+        return sub($x) {
+            my $key  = $f_key->($x);
+            my $func = $case_sub->{$key};
             if ( defined $func ) {
-                return $func->(@args);
+                return $func->($x);
             }
             else {
-                Carp::croak "dispatch: '$str' not provided as a case.\n";
+                Carp::croak "dispatch: '$key' not provided as a case.\n";
             }
         }
     }
     elsif ( @_ < 5 ) {
-        Carp::croak "dispatch: dispatch with only one dispatch makes no sense!.\n";
+        Carp::croak "dispatch: Expects two or at least five arguments!\n";
     }
     else {
-        my ($str, %case_sub) = @_;
-        Carp::croak "dispatch: Expects a Str as first argument" if !is_str($str);
-        my $func = $case_sub{$str};
+        my ($key, %case_sub) = @_;
+        Carp::croak "dispatch: Expects a Str as first argument" if !is_str($key);
+        my $func = $case_sub{$key};
         if ( defined $func ) {
             return $func->();
         }
         else {
-            Carp::croak "dispatch: '$str' not provided as a case.\n";
+            Carp::croak "dispatch: '$key' not provided as a case.\n";
         }
     }
 }

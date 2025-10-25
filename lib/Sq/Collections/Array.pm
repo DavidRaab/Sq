@@ -981,20 +981,6 @@ sub iter_sort($array, $cmp, $f) {
     return;
 }
 
-sub dispatch($array, $by, $dispatch) {
-    for my $x ( @$array ) {
-        my $key  = $by->($x);
-        my $func = $dispatch->{$key};
-        if ( defined $func ) {
-            $func->($x);
-        }
-        else {
-            Carp::croak "Array::dispatch: No dispatch defined for '$key'";
-        };
-    }
-    return;
-}
-
 sub iteri($array, $f) {
     for (my $i=0; $i < @$array; $i++) {
         $f->($array->[$i], $i);
