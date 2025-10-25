@@ -14,8 +14,8 @@ our $LOAD_SIGNATURE = 0;
 our @EXPORT = (
     qw(sq call key idx key_equal assign seq new),
     qw(is_num is_str is_array is_hash is_seq is_opt is_result is_sub is_regex is_ref get_type),
-    qw(fn multi with_dispatch type_cond),
-    qw(id fst snd copy),
+    qw(fn match multi dispatch with_dispatch type_cond),
+    qw(id fst snd),
     qw(by_num by_str by_stri),
     qw(array hash record),
     qw(Str),
@@ -427,6 +427,9 @@ sub new($what, @args) {
     }
 }
 
+# TYPE -> Function
+# Returns a function that expects multiple arguments and passes all arguments
+# to the function an an array-ref
 sub with_dispatch(@tf) {
     return sub {
         my $it = List::MoreUtils::natatime 2, @tf;
@@ -441,6 +444,12 @@ sub with_dispatch(@tf) {
     };
 }
 
+# TYPE -> Function
+# Similar to with_dispatch() but returns a function that expects only a single
+# argument. Thus it only passes one argument to the function instead of an
+# array-ref. This changes what you provide as TYPE. When you use with_dispatch()
+# you usually start with "tuple, tuplev, array". with type_cond() you directly
+# pass the TYPE of the first argument.
 sub type_cond(@tf) {
     return sub($any) {
         my $it = List::MoreUtils::natatime 2, @tf;
@@ -480,5 +489,40 @@ sub fn($name,$sub) {
     my $full = caller . '::' . $name;
     Sq::Reflection::set_func($full,$sub);
 }
+
+
+# Helper for string dipatch table. It just dispatches a string on a hash and
+# calls the apropiate function. It throws an exception when the hash has no
+# dispatch defined. That's usually what you want when you care for correct code,
+# and i don't have the patience to always do the if checking and error-throwing
+# myself.
+sub dispatch($str, %case_sub) {
+    Carp::croak "dispatch() expects a Str as first argument" if !is_str($str);
+    my $func = $case_sub{$str};
+    if ( defined $func ) {
+        $func->();
+    }
+    else {
+        Carp::croak "dispatch: '$str' not provided as a case.\n";
+    }
+}
+
+# Reserved:
+#
+# i first wanted to implemented a fraction of Pattern Matching. But decided to
+# change the name to dispatch() as that it what it does at the moment. It
+# just does a dispatch on a dispatch-table. But by naming it dispatch() it can
+# be a stable function. Otherwise i already can do everything what i expact
+# todo with match(). I can do it with type_cond() or with_dispatch() it expects
+# a TYPE, and the TYPE system i have built is complete enough todo any kind of
+# TYPE checking. But it isn't so "short". Maybe i implement a function that can
+# work with common type-definitions that are passed as a string. Those are not
+# so complete as what you can do with with_dispatch() or type_cond() but
+# contains 90% of what you usually do in a pattern-match. Then i name this
+# whole combination match(). But this is still in draft. Still i want to reserve
+# match() as a keyword. Maybe i also can do a method-redirect. For example when
+# a Discriminated Union is passed it just does a method-dispatch and so on.
+no warnings 'once';
+sub match($any, @case_sub) { ... }
 
 1;

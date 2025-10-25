@@ -464,4 +464,76 @@ is(get_type(Err(1)),       'Result', 'get_type 15');
     is($zip->snds, $zip->map(idx 1), 'idx 1');
 }
 
+# dispatch
+{
+    # $op is now a function that creates a hash.
+    my $op = record qw/op value/;
+    # EXAMPLE:
+    #   $op->("INCR", 1)  ->  { op => "INCR" => value => 1 }
+    my @operations = (
+        $op->(INCR => 1),
+        $op->(INCR => 2),
+        $op->(DECR => 3),
+        $op->(SET  => 10),
+        $op->(INCR => 5),
+    );
+
+    my $current = 0;
+    for my $op ( @operations ) {
+        # dispatch can be represented as a simple if/elsif/else, but writing
+        # this construct is sometimes more bothersome and more bloated. This is
+        # still shorter. It also does the else branch and throwing an error
+        # message for a non existing dispatch itself. Consider that dispatch()
+        # is slower and has an overhead. It builds a hash on every invocation and
+        # needs to call a function and so on. So in critical code, and when this
+        # construct becomes a performance problem you still can rewrite it as
+        # an if/elsif/else branch. Use it, or not. It's your choice.
+        dispatch($op->{op},
+            INCR => sub { $current += $op->{value} },
+            DECR => sub { $current -= $op->{value} },
+            SET  => sub { $current  = $op->{value} },
+        );
+    }
+
+    is($current, 15, 'dispatch');
+
+    # ----
+
+    like(
+        dies {
+            dispatch('WHAT',
+                INCR => sub { $current += $op->{value} },
+                DECR => sub { $current -= $op->{value} },
+                SET  => sub { $current  = $op->{value} },
+            );
+        },
+        qr/\Adispatch:/,
+        'dispatch with non existing key throws exception'
+    );
+}
+
+# Pattern Matching - Draft
+
+=pod
+
+{
+    match($any,
+        'Num'           => sub($any) {},
+        'Str'           => sub($any) {},
+        'Sub'           => sub($any) {},
+        'Regex'         => sub($any) {},
+        'Array[2]'      => sub($any) {},
+        'Array[1,5,7]'  => sub($any) {},
+        'Array[1-3]'    => sub($any) {},
+        'Array'         => sub($any) {},
+        'Seq'           => sub($any) {},
+        'Option'        => sub($any) {},
+        'Option[Seq]'   => sub($any) {},
+        'Option[Array]' => sub($any) {},
+        'Hash[id,name,"with space"]' => sub($any) {},
+    );
+}
+
+=cut
+
 done_testing;
