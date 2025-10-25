@@ -48,7 +48,7 @@ moment calling `Sq->io->csv_read()` will load `Text::CSV`. When you never call
 that function, `Text::CSV` is never loaded, this keeps the loading time of
 `Sq` very fast.
 
-Some more things are provided and will come, but this is just a short overview.
+Some more things are provided and will come, See the [API overview](lib/Sq/API.pod).
 
 # Parser
 
@@ -622,8 +622,6 @@ way.
 
 Anyway `Sq` is my take on programming in a procedural, LISP-like, dynamic-typed
 ML language.
-
-See the [API overview](lib/Sq/API.pod)
 
 # Implemented so Far
 
