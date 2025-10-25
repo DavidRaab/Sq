@@ -207,8 +207,14 @@ sub key_equal($key, $value) {
     return sub($hash) { Sq::Equality::equal($hash->{$key}, $value) };
 }
 
+# TODO: Is it useful to have a cache? Problem is when somebody uses "idx $idx" somewehre
+#       and $idx is from a big loop with many different values, then the cache goes bigger
+#       and bigger. I usually don't consider this a problem, because it usually
+#       doesn't make sense to use idx() this way.
+#
 # creates a function that selects a specific index of an array
-sub idx($index) {
+sub idx :prototype($) {
+    my ($index) = @_;
     state %cache = (
         -1 => sub($array) { $array->[-1] },
          0 => sub($array) { $array->[0]  },
