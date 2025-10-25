@@ -35,7 +35,7 @@ is(Array->range(1,1), [1],        'range is inclusive');
 is($rangeDesc, [reverse 1 .. 10], 'rangeDesc');
 is($range, $rangeDesc->rev,       'reverse of rangeDesc same as range');
 is($range->map($double),     [2,4,6,8,10,12,14,16,18,20], 'map');
-is($range->keep($is_even), [2,4,6,8,10],                 'keep');
+is($range->keep($is_even),   [2,4,6,8,10],               'keep');
 is($range->take(5),    [1..5], 'take 1');
 is($range->take(0),        [], 'take 2');
 is($range->length,         10, 'length');
