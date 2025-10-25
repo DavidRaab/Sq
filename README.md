@@ -623,6 +623,8 @@ way.
 Anyway `Sq` is my take on programming in a procedural, LISP-like, dynamic-typed
 ML language.
 
+See the [API overview](lib/Sq/API.pod)
+
 # Implemented so Far
 
 Some interesting things like a Type-System, Equality, Parser, Testing-System
