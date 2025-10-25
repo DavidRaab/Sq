@@ -80,7 +80,7 @@ sub add_copy($type, $func) {
 }
 
 # Add equal function to other packages
-# no warnings 'once';
+no warnings 'once';
 *Array::copy  = \&copy;
 *Hash::copy   = \&copy;
 *Seq::copy    = \&copy;
