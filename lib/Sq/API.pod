@@ -44,13 +44,16 @@ overview of the functionality of Sq itself.
     is_ref   ($any) -> $bool
     is_type  ($any) -> $bool
 
-    fn($name, $sub)    # installs a sub-reference as $name in current package
-    multi($name, @tf)  # creates function with multi-dispatch based on type
-    with_dispatch(@tf) # returns function with multi-dispatch based on type
-    type_cond(@tf)     # similar to with_dispatch() but the function that is
-                       # returned only expects one input argument. Because of
-                       # this the type don't start as an array. This makes some
-                       # type definition shorter.
+    fn($name, $sub)     # installs a sub-reference as $name in current package
+    multi($name, @tf)   # creates function with multi-dispatch based on type
+    with_dispatch(@tf)  # returns function with multi-dispatch based on type
+    type_cond(@tf)      # similar to with_dispatch() but the function that is
+                        # returned only expects one input argument. Because of
+                        # this the type don't start as an array. This makes some
+                        # type definition shorter.
+    dispatch($f_key,$hash) -> sub($x)              # creates a function that uses $f_key to create a key
+                                                   # that is used in $hash to select a function to dispatch to
+    dispatch($key, Key1 => SUB, Key2, => SUB, ...) # Uses $key to select the correct dispatch.
 
     id($any)    -> $any          # returning $any as-is
     fst($array) -> $x            # $array->[0]
