@@ -53,7 +53,7 @@ overview of the functionality of Sq itself.
                         # type definition shorter.
     dispatch($f_key,$hash) -> sub($x)              # creates a function that uses $f_key to create a key
                                                    # that is used in $hash to select a function to dispatch to
-    dispatch($key, Key1 => SUB, Key2, => SUB, ...) # Uses $key to select the correct dispatch.
+    dispatch($key, Key1 => SUB, Key2 => SUB, ...) # Uses $key to select the correct dispatch.
 
     id($any)    -> $any          # returning $any as-is
     fst($array) -> $x            # $array->[0]
