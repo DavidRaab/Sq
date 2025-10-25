@@ -32,26 +32,24 @@ my $data =
 
 # dump($data);
 
-# Compute current and add it to the rows
 my $previous_current = 0;
-$data->iter(sub($row) {
-    my $op      = $row->{operation};
-    my $balance = $row->{balance};
-
-    if ( $op eq 'CURRENT' ) {
-        $previous_current = $balance;
-        $row->{balance} = sprintf "%+10.02f", $row->{balance};
-    }
-    elsif ( $op eq 'SUB' ) {
-        $previous_current -= $balance;
-        $row->{balance} = sprintf "%+10.02f", -$row->{balance};
-    }
-    else {
-        $row->{balance} = sprintf "%+10.02f", $row->{balance};
-    }
-
-    $row->{current} = $previous_current;
-});
+$data->iter(dispatch(key 'operation', {
+    CURRENT => sub($row) {
+        $previous_current = $row->{balance};
+        $row->{balance}   = sprintf "%+10.02f", $row->{balance};
+        $row->{current}   = sprintf "%8.2f", $previous_current;
+    },
+    SUB => sub($row) {
+        $previous_current -= $row->{balance};
+        $row->{balance}    = sprintf "%+10.02f", -$row->{balance};
+        $row->{current}    = sprintf "%8.2f", $previous_current;
+    },
+    ADD => sub($row) {
+        $previous_current += $row->{balance};
+        $row->{balance}    = sprintf "%+10.02f", $row->{balance};
+        $row->{current}    = sprintf "%8.2f", $previous_current;
+    },
+}));
 
 # TODO: table should support sequence
 Sq->fmt->table({
