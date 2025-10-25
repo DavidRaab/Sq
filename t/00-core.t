@@ -454,14 +454,19 @@ is(get_type(Ok(1)),        'Result', 'get_type 14');
 is(get_type(Err(1)),       'Result', 'get_type 15');
 
 {
+    is(idx(0) ->([1,2,3]), 1, 'idx 0');
+    is(idx(1) ->([1,2,3]), 2, 'idx 1');
+    is(idx(2) ->([1,2,3]), 3, 'idx 2');
+    is(idx(-1)->([1,2,3]), 3, 'idx -1');
+
     # Generating Random Array of tuples
     my $zip  = Array::zip(
         (gen_run gen [repeat => 10, [str => 5,10 ]]),
         (gen_run gen [repeat => 10, [int => 0,100]]),
     );
 
-    is($zip->fsts, $zip->map(idx 0), 'idx 0');
-    is($zip->snds, $zip->map(idx 1), 'idx 1');
+    is($zip->fsts, $zip->map(idx 0), 'idx fsts');
+    is($zip->snds, $zip->map(idx 1), 'idx snds');
 }
 
 # dispatch

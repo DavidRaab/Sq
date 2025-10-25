@@ -209,11 +209,12 @@ sub key_equal($key, $value) {
 
 # creates a function that selects a specific index of an array
 sub idx($index) {
-    state %cache = {
-        0 => sub($array) { $array->[0] },
-        1 => sub($array) { $array->[1] },
-        2 => sub($array) { $array->[2] },
-    };
+    state %cache = (
+        -1 => sub($array) { $array->[-1] },
+         0 => sub($array) { $array->[0]  },
+         1 => sub($array) { $array->[1]  },
+         2 => sub($array) { $array->[2]  },
+    );
 
     # return cached sub
     my $func = $cache{$index};
