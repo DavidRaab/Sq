@@ -37,6 +37,7 @@ my $table_aoa = [hash =>
 # TODO: Add configurable spacing between cells
 # TODO: MultiLine Cells
 # TODO: Add Layout Scheme (which symbol used for table and presets)
+# TODO: Add ability to configure cells (like number format)
 static table => with_dispatch(
     type [tuple => $table_aoa] => sub ($args) {
         my $header = $args->{header} // 0;
