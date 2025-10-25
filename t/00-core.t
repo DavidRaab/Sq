@@ -492,10 +492,10 @@ is(get_type(Err(1)),       'Result', 'get_type 15');
         # needs to call a function and so on. So in critical code, and when this
         # construct becomes a performance problem you still can rewrite it as
         # an if/elsif/else branch. Use it, or not. It's your choice.
-        dispatch($op->{op}, {
+        dispatch($op->{op},
             INCR => sub { $current += $op->{value} },
             DECR => sub { $current -= $op->{value} },
-        });
+        );
     }
 
     is($current, 4, 'dispatch');
@@ -519,10 +519,10 @@ is(get_type(Err(1)),       'Result', 'get_type 15');
 
     like(
         dies {
-            dispatch('WHAT', {
+            dispatch('WHAT',
                 INCR => sub { 1 },
                 DECR => sub { 1 },
-            });
+            );
         },
         qr/\Adispatch:/,
         'dispatch with non existing key throws exception');
