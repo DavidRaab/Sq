@@ -203,6 +203,8 @@ sub done_testing() {
     print "1..$count\n";
 }
 
+# TODO: Make it it's own test function, instead of being used with like()
+#       I made it this way because Test2 did it this way. But this is utterly crap.
 sub dies :prototype(&) {
     my ($fn) = @_;
     local $@;
@@ -210,9 +212,20 @@ sub dies :prototype(&) {
     return $@ eq "" ? undef : $@;
 }
 
+# TODO: Remove Hint when dies {} changed.
 sub like($str, $regex, $message) {
     $count++;
-    if ( $str =~ $regex ) {
+    if ( !defined $str ) {
+        print "not ok $count - $message\n";
+        my ( $pkg, $file, $line ) = caller;
+        my $place = sprintf "at %s: %d", $file, $line;
+        warn "\n",
+             "# Got:      undef\n",
+             "# Expected: $regex\n",
+             "# Hint:     When used with dies {} then code didn't fail.\n",
+             "# not ok $count - $message $place\n";
+    }
+    elsif ( $str =~ $regex ) {
         print "ok $count - $message\n";
     }
     else {

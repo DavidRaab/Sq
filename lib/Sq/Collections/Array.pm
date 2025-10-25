@@ -955,7 +955,7 @@ sub transpose_map($aoa, $f) {
 #-----------------------------------------------------------------------------#
 # SIDE-EFFECTS                                                                #
 #    functions that have side-effects or produce side-effects. Those are      #
-#    immediately executed, usually consuming all elements of Seq at once.     #
+#    immediately executed                                                     #
 #-----------------------------------------------------------------------------#
 
 sub iter($array, $f) {
@@ -977,6 +977,20 @@ sub iter_sort($array, $cmp, $f) {
     local ($a,$b);
     for my $x ( sort { $cmp->($a,$b) } @$array ) {
         $f->($x);
+    }
+    return;
+}
+
+sub dispatch($array, $by, $dispatch) {
+    for my $x ( @$array ) {
+        my $key  = $by->($x);
+        my $func = $dispatch->{$key};
+        if ( defined $func ) {
+            $func->($x);
+        }
+        else {
+            Carp::croak "Array::dispatch: No dispatch defined for '$key'";
+        };
     }
     return;
 }

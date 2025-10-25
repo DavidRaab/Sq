@@ -475,16 +475,15 @@ is(get_type(Err(1)),       'Result', 'get_type 15');
     my $op = record qw/op value/;
     # EXAMPLE:
     #   $op->("INCR", 1)  ->  { op => "INCR" => value => 1 }
-    my @operations = (
+    my $operations = sq [
         $op->(INCR => 1),
         $op->(INCR => 2),
-        $op->(DECR => 3),
-        $op->(SET  => 10),
+        $op->(DECR => 4),
         $op->(INCR => 5),
-    );
+    ];
 
     my $current = 0;
-    for my $op ( @operations ) {
+    for my $op ( @$operations ) {
         # dispatch can be represented as a simple if/elsif/else, but writing
         # this construct is sometimes more bothersome and more bloated. This is
         # still shorter. It also does the else branch and throwing an error
@@ -493,28 +492,62 @@ is(get_type(Err(1)),       'Result', 'get_type 15');
         # needs to call a function and so on. So in critical code, and when this
         # construct becomes a performance problem you still can rewrite it as
         # an if/elsif/else branch. Use it, or not. It's your choice.
-        dispatch($op->{op},
+        dispatch($op->{op}, {
             INCR => sub { $current += $op->{value} },
             DECR => sub { $current -= $op->{value} },
-            SET  => sub { $current  = $op->{value} },
-        );
+        });
     }
 
-    is($current, 15, 'dispatch');
+    is($current, 4, 'dispatch');
 
-    # ----
+    # dispatch() with one argument call creates a function that expects
+    # the value to dispatch, and any amount of additional values passed to the
+    # sub-refs.
+    # The advantage of this is that the hash passed to dispatch is internally stored
+    # so it doesn't need to be rebuild every time the function is called. This usually
+    # boost performance, when it matters. For example you can create a "state"
+    # variable in a function. So the whole function is only ever created a single
+    # time instead of being created on every function call.
+    my $dispatch = dispatch({
+        INCR => sub($x) { $current += $x->{value} },
+        DECR => sub($x) { $current -= $x->{value} },
+    });
+    for my $op ( @$operations ) {
+        $dispatch->($op->{op}, $op);
+    }
+    is($current, 8, 'dispatch with one argument');
 
     like(
         dies {
-            dispatch('WHAT',
-                INCR => sub { $current += $op->{value} },
-                DECR => sub { $current -= $op->{value} },
-                SET  => sub { $current  = $op->{value} },
-            );
+            dispatch('WHAT', {
+                INCR => sub { 1 },
+                DECR => sub { 1 },
+            });
         },
         qr/\Adispatch:/,
-        'dispatch with non existing key throws exception'
-    );
+        'dispatch with non existing key throws exception');
+
+    # ----
+
+    # Or just use Array::dispatch
+    $operations->dispatch(key 'op', {
+        INCR => sub($x) { $current += $x->{value} },
+        DECR => sub($x) { $current -= $x->{value} },
+    });
+    is($current, 12, 'Array::dispatch');
+
+    # create an error with Array::dispatch
+    $operations->push({ op => 'SET', value => 10 });
+    like(
+        dies {
+            Array::dispatch($operations, key 'op', {
+                INCR => sub($x) { $current += $x->{value} },
+                DECR => sub($x) { $current -= $x->{value} },
+            });
+        },
+        qr/\AArray::dispatch/,
+        'Array::dispatch with unknown key');
+    $operations->pop;
 }
 
 # Pattern Matching - Draft

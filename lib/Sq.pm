@@ -497,14 +497,34 @@ sub fn($name,$sub) {
 # dispatch defined. That's usually what you want when you care for correct code,
 # and i don't have the patience to always do the if checking and error-throwing
 # myself.
-sub dispatch($str, %case_sub) {
-    Carp::croak "dispatch() expects a Str as first argument" if !is_str($str);
-    my $func = $case_sub{$str};
-    if ( defined $func ) {
-        $func->();
+sub dispatch {
+    if ( @_ == 1 ) {
+        my ($case_sub) = @_;
+        Carp::croak "dispatch: Must be hash in one-argument call" if !is_hash($case_sub);
+        return sub($str,@args) {
+            Carp::croak "dispatch: First argument must be a string" if !is_str($str);
+            my $func = $case_sub->{$str};
+            if ( defined $func ) {
+                return $func->(@args);
+            }
+            else {
+                Carp::croak "dispatch: '$str' not provided as a case.\n";
+            }
+        }
+    }
+    elsif ( @_ == 2 ) {
+        my ($str, $case_sub) = @_;
+        Carp::croak "dispatch: Expects a Str as first argument" if !is_str($str);
+        my $func = $case_sub->{$str};
+        if ( defined $func ) {
+            return $func->();
+        }
+        else {
+            Carp::croak "dispatch: '$str' not provided as a case.\n";
+        }
     }
     else {
-        Carp::croak "dispatch: '$str' not provided as a case.\n";
+        Carp::croak "dispatch: Need 1 or 2 arguments.";
     }
 }
 
