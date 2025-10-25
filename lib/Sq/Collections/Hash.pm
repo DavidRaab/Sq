@@ -303,12 +303,10 @@ sub with_default($hash, %def) {
         if ( !defined $src_value ) {
             $new{$key} = Sq::Copy::copy($value);
         }
-        else {
-            # when value in $hash is not of same type as provided in %def,
-            # than the value in %def will always be used
-            if ( Sq::get_type($src_value) ne Sq::get_type($value) ) {
-                $new{$key} = Sq::Copy::copy($value);
-            }
+        # when value in $hash is not of same type as provided in %def,
+        # than the value in %def will always be used
+        elsif ( Sq::get_type($src_value) ne Sq::get_type($value) ) {
+            $new{$key} = Sq::Copy::copy($value);
         }
     }
     return CORE::bless(\%new, 'Hash');
