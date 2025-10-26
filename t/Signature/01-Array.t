@@ -32,4 +32,51 @@ dies { Array::head([])                     } qr/\AArray::head/,   'head';
 dies { Array::tail([])                     } qr/\AArray::tail/,   'tail';
 dies { sq(["12-12", "10-10", []])->rxm(qr/\A(\d\d)-(\d\d)\z/) } qr/\AArray::/, 'rxm';
 
+# Some Option Tests
+
+dies {
+    Some(10)->match(
+        some => sub($x) { $x + 1 },
+        none => sub()   { 0      },
+    );
+}
+qr/\AOption::match/,
+'Option::match 1';
+
+dies {
+    Some(10)->match(
+        Some => sub($x) { $x + 1 },
+        none => sub()   { 0      },
+    );
+}
+qr/\AOption::match/,
+'Option::match 2';
+
+dies {
+    Some(10)->match(
+        some => sub($x) { $x + 1 },
+        None => sub()   { 0      },
+    );
+}
+qr/\AOption::match/,
+'Option::match 3';
+
+dies {
+    Some(10)->match(
+        Some => "",
+        None => sub()   { 0      },
+    );
+}
+qr/\AOption::match/,
+'Option::match 4';
+
+dies {
+    Some(10)->match(
+        Some => sub($x) { $x + 1 },
+        None => "",
+    );
+}
+qr/\AOption::match/,
+'Option::match 5';
+
 done_testing;
