@@ -39,8 +39,10 @@ sub ok($bool, $message) {
             print "ok $count - $message\n"
         }
         else {
+            my $got = quote($bool);
             print "not ok $count - $message\n";
             warn  "# Expected 1, Some() or Ok()\n";
+            warn  "# Got: $got\n",
             warn  "# not ok $count - $message\n";
         }
         return;
@@ -52,9 +54,11 @@ sub ok($bool, $message) {
                 print "ok $count - $message\n"
             }
             else {
+                my $got = quote($bool);
                 print "not ok $count - $message\n";
-                warn  "# Expected 1, Some() or Ok()\n";
-                warn  "# not ok $count - $message\n";
+                warn  "# Expected 1, Some() or Ok()\n",
+                      "# Got: $got\n",
+                      "# not ok $count - $message\n";
             }
             return;
         }
@@ -63,12 +67,11 @@ sub ok($bool, $message) {
                 print "ok $count - $message\n"
             }
             else {
+                my $got = quote($bool->[1]);
                 print "not ok $count - $message\n";
-                warn  "# Expected 1, Some() or Ok()\n";
-                warn  "# not ok $count - $message\n";
-                my $msg = dumps($bool->[1]);
-                $msg =~ s/^/# /mg;
-                warn $msg, "\n";
+                warn  "# Expected 1, Some() or Ok()\n",
+                      "# Got: $got\n",
+                      "# not ok $count - $message\n";
             }
             return;
         }
