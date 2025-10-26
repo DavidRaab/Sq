@@ -59,13 +59,13 @@ use Sq::Gen;
         [format => "%04d", [int => 0,3000]]];
 
     my $dates_dot   = gen_repeat(100, gen_join('.', $date));
-    my $dates_slash = gen_repeat(100, gen_join('-', $date));
+    my $dates_minus = gen_repeat(100, gen_join('-', $date));
 
     gen_run($dates_dot)->iter(sub($date) {
         ok(p_run(Sq->p->date_dmy, $date), "is '$date' valid");
     });
 
-    gen_run($dates_slash)->iter(sub($date) {
+    gen_run($dates_minus)->iter(sub($date) {
         ok(p_run(Sq->p->date_dmy('-'), $date), "is '$date' valid");
     });
 }
