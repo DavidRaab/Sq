@@ -159,10 +159,11 @@ sub gen_format($format, $gen) {
 
 ### NUMBERS
 
+# Generetas a random integer between $min and $max inclusive.
 sub gen_int($min, $max) {
     return sub() {
         my $diff = $max - $min;
-        return int( $min + rand($diff) );
+        return int( $min + rand($diff) + 0.5 );
     }
 }
 
