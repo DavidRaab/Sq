@@ -122,7 +122,7 @@ sub gen_str($min, $max) {
         state $chars = @chars;
         my $str;
         my $diff   = $max - $min;
-        my $amount = $min + (rand($diff));
+        my $amount = $min + (rand($diff + 1));
         for ( 1 .. $amount ) {
             $str .= $chars[rand($chars)];
         }
@@ -136,7 +136,7 @@ sub gen_str_from($min, $max, @chars) {
         my $chars = @chars;
         my $str;
         my $diff   = $max - $min;
-        my $amount = $min + (rand($diff));
+        my $amount = $min + (rand($diff + 1));
         for ( 1 .. $amount ) {
             $str .= $chars[rand($chars)];
         }
@@ -163,7 +163,7 @@ sub gen_format($format, $gen) {
 sub gen_int($min, $max) {
     return sub() {
         my $diff = $max - $min;
-        return int( $min + rand($diff) + 0.5 );
+        return int( $min + rand($diff + 1));
     }
 }
 

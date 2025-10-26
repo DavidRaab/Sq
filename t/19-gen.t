@@ -52,4 +52,22 @@ use Sq::Gen;
     # based testing in Haskell or F# and watch some Youtube videos about it.
 }
 
+# test if min/max are inclusive
+{
+    my $strs = gen [repeat => 100, [str => 1,3]];
+    ok(
+        gen_run($strs)->count_by(Str->length)->has_keys(1,2,3),
+        '$strs has string length of 1-3');
+
+    my $ints = gen [repeat => 100, [int => 1,3]];
+    ok(
+        gen_run($ints)->count->has_keys(1,2,3),
+        '$ints contains 1-3');
+
+    my $str = gen_run(gen [join => "", [repeat => 5, ['sha512']]]);
+    ok(
+        Str->to_array($str)->count->has_keys(0 .. 9,  'a'..'f'),
+        'contains all characters');
+}
+
 done_testing;
