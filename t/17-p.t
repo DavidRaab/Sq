@@ -51,12 +51,12 @@ use Sq::Gen;
 
 # Random dates testing
 {
-    my $date =
-        gen_and(
-            gen_format("%02d", gen_int(1,28)),
-            gen_format("%02d", gen_int(1,12)),
-            gen_format("%04d", gen_int(0,3000)),
-        );
+    # gen() allows defining the Combinators as a data-structure that is then
+    # converted/mapped to the function calls.
+    my $date = gen [and =>
+        [format => "%02d", [int => 1,28 ]],
+        [format => "%02d", [int => 1,12 ]],
+        [format => "%04d", [int => 0,3000]]];
 
     my $dates_dot   = gen_repeat(100, gen_join('.', $date));
     my $dates_slash = gen_repeat(100, gen_join('-', $date));
