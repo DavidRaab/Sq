@@ -106,9 +106,14 @@ static split => sub($regex, $str) {
     return sq [ split $regex, $str ];
 };
 
+static to_array => sub($str) {
+    return sq [ split //, $str];
+};
+
 static is_empty => sub($str) {
     return 1 if !defined $str;
     return $str =~ m/\A\s*\z/ ? 1 : 0;
 };
+
 
 1;

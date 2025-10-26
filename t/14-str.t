@@ -89,4 +89,7 @@ ok(Str->is_empty(" "),   'is_empty 2');
 ok(Str->is_empty("  "),  'is_empty 3');
 nok(Str->is_empty(" a"), 'is_empty 4');
 
+is(Str->to_array(""),       [qw//],            "to_array 1");
+is(Str->to_array("abcdef"), [qw/a b c d e f/], "to_array 2");
+
 done_testing;
