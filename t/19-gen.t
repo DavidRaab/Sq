@@ -6,7 +6,6 @@ use Sq -sig => 1;
 use Sq::Test;
 use Sq::Type qw(t_run);
 use Sq::Gen;
-use Sq::Parser qw(p_run);
 
 {
     # Example: ["12","06","1450"]
@@ -51,12 +50,6 @@ use Sq::Parser qw(p_run);
     # being complete in Sq. In a proper test system the testing system shrinks
     # and tries to generate a minimal test when a random test fails. See Property
     # based testing in Haskell or F# and watch some Youtube videos about it.
-
-    # Here are another 100 tests that test the Parser
-    my $str_dates = gen_repeat(100, gen_join('.', $dmy));
-    gen_run($str_dates)->iter(sub($date) {
-        ok(p_run(Sq->p->date_dmy, $date), "is '$date' valid");
-    });
 }
 
 done_testing;

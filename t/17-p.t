@@ -3,10 +3,9 @@ use 5.036;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Sq -sig => 1;
-use Sq::Parser qw(p_run);
 use Sq::Test;
-
-# TODO: Generate some random dates with Sq::Gen for testing
+use Sq::Parser qw(p_run);
+use Sq::Gen;
 
 # date_ymd
 {
@@ -50,18 +49,25 @@ use Sq::Test;
         'date_dmy 00 for day is invalid');
 }
 
-# randomly generate some dates and test them
+# Random dates testing
 {
-    # The type that represents a valid date at the moment. It is not exact
-    # as the day can be between 1-31 for every month, but this is okay, and
-    # better than allowing any range.
-    my $is_date = type [
-        [tuple =>
-            [int => [range => 1,31]],
-            [int => [range => 1,12]],
-            [int => [range => 0,9999]]]];
+    my $date =
+        gen_and(
+            gen_format("%02d", gen_int(1,28)),
+            gen_format("%02d", gen_int(1,12)),
+            gen_format("%04d", gen_int(0,3000)),
+        );
 
+    my $dates_dot   = gen_repeat(100, gen_join('.', $date));
+    my $dates_slash = gen_repeat(100, gen_join('-', $date));
 
+    gen_run($dates_dot)->iter(sub($date) {
+        ok(p_run(Sq->p->date_dmy, $date), "is '$date' valid");
+    });
+
+    gen_run($dates_slash)->iter(sub($date) {
+        ok(p_run(Sq->p->date_dmy('-'), $date), "is '$date' valid");
+    });
 }
 
 done_testing;
