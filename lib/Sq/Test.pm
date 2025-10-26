@@ -23,7 +23,7 @@ my $count = 0;
 sub quote($any) {
     my $dump = dumps($any);
     # add # to beginning of every starting line
-    $dump =~ s/^/+ /mg;
+    $dump =~ s/^/# /mg;
     # but remove leading "#" on starting string
     $dump =~ s/\A#\s*//;
     return $dump;
