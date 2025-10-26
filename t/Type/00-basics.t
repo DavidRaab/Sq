@@ -149,11 +149,9 @@ ok(!t_valid($is_album2, $album_wrong2), 'album.tracks not an array');
     ok( t_valid(t_hash, {}, {}), 'is hash');
     ok(!t_valid(t_hash, {}, []), 'not all hash');
 
-    like(
-        dies { t_assert(t_hash, []) },
-        qr/\AType Error/,
-        't_assert throws exception'
-    );
+    dies { t_assert(t_hash, []) }
+    qr/\AType Error/,
+    't_assert throws exception';
 }
 
 # t_num

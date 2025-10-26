@@ -114,29 +114,24 @@ is(
     {X => 2, Y => 2},
     'adding points');
 
-like(
-    dies { add_points({X=>1}, {X=>1,Y=>1}) },
-    qr/\AType Error/,
-    'throws error 1');
+dies { add_points({X=>1}, {X=>1,Y=>1}) }
+qr/\AType Error/,
+'throws error 1';
 
-like(
-    dies { add_points({X=>1,Y=>1}, {X=>1}) },
-    qr/\AType Error/,
-    'throws error 2');
+dies { add_points({X=>1,Y=>1}, {X=>1}) }
+qr/\AType Error/,
+'throws error 2';
 
-like(
-    dies { add_points({}, {}) },
-    qr/\AType Error/,
-    'throws error 3');
+dies { add_points({}, {}) }
+qr/\AType Error/,
+'throws error 3';
 
-like(
-    dies { add_points([], []) },
-    qr/\AType Error/,
-    'throws error 4');
+dies { add_points([], []) }
+qr/\AType Error/,
+'throws error 4';
 
-like(
-    dies { add_points("", "") },
-    qr/\AType Error/,
-    'throws error 5');
+dies { add_points("", "") }
+qr/\AType Error/,
+'throws error 5';
 
 done_testing;

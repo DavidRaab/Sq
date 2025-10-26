@@ -39,16 +39,14 @@ for my $case ( @cases ) {
 # dump(\@cases);
 
 # "FILE" not valid case
-like(
-    dies { $fs->case(FILE => path('/etc/fstab')) },
-    qr/\ACase 'FILE' invalid/,
-    'wrong case dies');
+dies { $fs->case(FILE => path('/etc/fstab')) }
+qr/\ACase 'FILE' invalid/,
+'wrong case dies';
 
 # string not allowed for "File"
-like(
-    dies { $fs->case(File => '/etc/fstab') },
-    qr/\AData for case 'File' invalid/,
-    'wrong type for case dies');
+dies { $fs->case(File => '/etc/fstab') }
+qr/\AData for case 'File' invalid/,
+'wrong type for case dies';
 
 # match
 {
@@ -68,15 +66,14 @@ like(
 }
 
 # match() with 'file' instead of 'File' as case.
-like(
-    dies {
-        $cases[0]->match(
-            file   => sub { }, # wrong
-            Folder => sub { },
-        );
-    },
-    qr/\ACase 'File' not handled/,
-    'wrong case names in match()');
+dies {
+    $cases[0]->match(
+        file   => sub { }, # wrong
+        Folder => sub { },
+    );
+}
+qr/\ACase 'File' not handled/,
+'wrong case names in match()';
 
 # Comparison of type definition
 {

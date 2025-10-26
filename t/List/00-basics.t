@@ -332,10 +332,9 @@ is(List->range_step(1,1,1)->to_array, [1], 'range_step with 1,1,1');
 #     [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
 #     'range_step with 0,0.1,1');
 
-like(
-    dies { List->range_step(0,0,1)->to_array },
-    qr/^\$step is 0/,
-    'range_step dies with step size of zero');
+dies { List->range_step(0,0,1)->to_array }
+qr/^\$step is 0/,
+'range_step dies with step size of zero';
 
 is(
     $range->map($square)->filter($is_even)->to_array,

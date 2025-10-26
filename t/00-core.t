@@ -355,11 +355,12 @@ is(
     my $prime = Sq->math->is_prime;
     is(ref $prime, 'CODE', 'is function');
     is($prime->(2), 1, 'is_prime 1');
-    like(
-        dies { $prime->("foo") },
+
+    dies { $prime->("foo") }
         qr/\ASq::Math::is_prime:/,
-        'type check active');
-    is(Sq->math->is_prime(2), 1, 'is_prime 2')
+        'type check active';
+
+    is(Sq->math->is_prime(2), 1, 'is_prime 2');
 }
 
 # array/hash
@@ -508,15 +509,14 @@ is(get_type(Err(1)),       'Result', 'get_type 15');
         DECR => sub($x) { $current -= $x->{value} },
     }));
 
-    like(
-        dies {
-            dispatch('WHAT',
-                INCR => sub { 1 },
-                DECR => sub { 1 },
-            );
-        },
-        qr/\Adispatch:/,
-        'dispatch with non existing key throws exception');
+    dies {
+        dispatch('WHAT',
+            INCR => sub { 1 },
+            DECR => sub { 1 },
+        );
+    }
+    qr/\Adispatch:/,
+    'dispatch with non existing key throws exception';
 
     # dispatch() in two argument version can also be used in Array::map
     my $data = sq [

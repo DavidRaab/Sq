@@ -253,10 +253,10 @@ use Sq::Test;
 # get
 {
     is(Some(10)->get, 10, 'get');
-    like(
-        dies { None->get },
-        qr/\ACannot extract value of None/,
-        'get of None');
+
+    dies { None->get }
+    qr/\ACannot extract value of None/,
+    'get of None';
 }
 
 # all_some & keep_some

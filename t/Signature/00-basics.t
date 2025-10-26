@@ -34,30 +34,25 @@ sig('main::add_point' => $is_point, $is_point, $is_point);
 
 is(add_point($unit, $unit), {X => 2, Y => 2}, 'still works');
 
-like(
-    dies { add_point($unit, {}) },
-    qr/\Amain::/,
-    'throws exception 1');
+dies { add_point($unit, {}) }
+qr/\Amain::/,
+'throws exception 1';
 
-like(
-    dies { add_point({}, $unit) },
-    qr/\Amain::/,
-    'throws exception 2');
+dies { add_point({}, $unit) }
+qr/\Amain::/,
+'throws exception 2';
 
-like(
-    dies { add_point({X => 1}, $unit) },
-    qr/\Amain::/,
-    'throws exception 3');
+dies { add_point({X => 1}, $unit) }
+qr/\Amain::/,
+'throws exception 3';
 
-like(
-    dies { add_point($unit, {X => 1}) },
-    qr/\Amain::/,
-    'throws exception 4');
+dies { add_point($unit, {X => 1}) }
+qr/\Amain::/,
+'throws exception 4';
 
-like(
-    dies { add_point($unit, $unit, $unit) },
-    qr/main::/,
-    'too many arguments');
+dies { add_point($unit, $unit, $unit) }
+qr/main::/,
+'too many arguments';
 
 # expect a function that should add numbers but returns hash instead
 sub add($x, $y) {
@@ -65,19 +60,17 @@ sub add($x, $y) {
 }
 sig('main::add', t_int, t_int, t_int);
 
-like(
-    dies { add(1,3) },
-    qr/\Amain::/,
-    'check return value');
+dies { add(1,3) }
+qr/\Amain::/,
+'check return value';
 
 # test void
 sub whatever() { return 1 }
 sig('main::whatever', t_void);
 
-like(
-    dies { whatever() },
-    qr/Not void/,
-    'fails because returns something');
+dies { whatever() }
+qr/Not void/,
+'fails because returns something';
 
 
 # Examples in README
@@ -86,15 +79,14 @@ sub what($int, $str, $array_of_nums) {
 }
 sig('main::what', t_int, t_str, t_array(t_of t_num), t_hash);
 
-like(
-    dies { sig('main::what', t_int, t_void) },
-    qr/\Amain::what: Signature already added/,
-    'adding signature again fails');
+dies { sig('main::what', t_int, t_void) }
+qr/\Amain::what: Signature already added/,
+'adding signature again fails';
 
-like( dies { what("foo", "foo", [1,2,3]) }, qr/\Amain::what/, 'what fails 1'); # fails
-like( dies { what(  123, "foo", ["foo"]) }, qr/\Amain::what/, 'what fails 2'); # fails
-like( dies { what(  123,    [], [1,2,3]) }, qr/\Amain::what/, 'what fails 3'); # fails
-like( dies { what(123.3, 123.3,      []) }, qr/\Amain::what/, 'what fails 4'); # fails
+dies { what("foo", "foo", [1,2,3]) } qr/\Amain::what/, 'what fails 1'; # fails
+dies { what(  123, "foo", ["foo"]) } qr/\Amain::what/, 'what fails 2'; # fails
+dies { what(  123,    [], [1,2,3]) } qr/\Amain::what/, 'what fails 3'; # fails
+dies { what(123.3, 123.3,      []) } qr/\Amain::what/, 'what fails 4'; # fails
 
 is( what(123,   123,      []), {}, 'what ok 1');
 is( what(123, "foo",      []), {}, 'what ok 2');
@@ -103,10 +95,10 @@ is( what(123, "foo", [1,2,3]), {}, 'what ok 3');
 # check static implementation
 {
     my $is_prime = Sq->math->is_prime;
-    like(
-        dies { $is_prime->("foo") },
-        qr/\ASq::Math::is_prime:/,
-        'type-check on returning function');
+
+    dies { $is_prime->("foo") }
+    qr/\ASq::Math::is_prime:/,
+    'type-check on returning function';
 }
 
 done_testing;

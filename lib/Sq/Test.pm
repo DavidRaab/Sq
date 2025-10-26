@@ -14,7 +14,20 @@ BEGIN {
     printf "# Seeded srand with seed '%s' from local date.\n", $srand;
 }
 
+# Global (package) variable that keeps track of the current amount of tests so far
 my $count = 0;
+
+# Helper function that takes any variable and makes a string out of it, and add
+# comment tags "#" in front of every line, so it can be used in the warning
+# in the TAP (Test Anything Protocol)
+sub quote($any) {
+    my $dump = dumps($any);
+    # add # to beginning of every starting line
+    $dump =~ s/^/+ /mg;
+    # but remove leading "#" on starting string
+    $dump =~ s/\A#\s*//;
+    return $dump;
+}
 
 # Expects a valid value. A valid value is every number not "0", a not
 # empty string. And every Some($value) value and every Ok($value).
@@ -134,9 +147,7 @@ sub check :prototype($$$) {
     else {
         print "not ok $count - $message\n";
         # warning
-        my $dump = dumps($got);
-        $dump =~ s/^/# /mg;
-        $dump =~ s/\A#\s*//;
+        my $dump = quote($got);
         my ( $pkg, $file, $line ) = caller;
         my $place = sprintf "at %s: %d", $file, $line;
         warn "\n",
@@ -153,14 +164,8 @@ sub is :prototype($$$) {
     }
     else {
         print "not ok $count - $message\n";
-        my $dump_1 = dumps($got);
-        my $dump_2 = dumps($expected);
-        # add # to beginning of every starting line
-        $dump_1 =~ s/^/# /mg;
-        $dump_2 =~ s/^/# /mg;
-        # but remove leading "#" on starting string
-        $dump_1 =~ s/\A#\s*//;
-        $dump_2 =~ s/\A#\s*//;
+        my $dump_1 = quote($got);
+        my $dump_2 = quote($expected);
         # warning
         my ( $pkg, $file, $line ) = caller;
         my $place = sprintf "at %s: %d", $file, $line;
@@ -181,14 +186,8 @@ sub one_of :prototype($$$) {
     }
     else {
         print "not ok $count - $message\n";
-        my $dump_g = dumps($got);
-        my $dump_e = dumps($expects);
-        # add # to beginning of every starting line
-        $dump_g =~ s/^/# /mg;
-        $dump_e =~ s/^/# /mg;
-        # but remove leading "#" on starting string
-        $dump_g =~ s/\A#\s*//;
-        $dump_e =~ s/\A#\s*//;
+        my $dump_g = quote($got);
+        my $dump_e = quote($expects);
         # warning
         my ( $pkg, $file, $line ) = caller;
         my $place = sprintf "at %s: %d", $file, $line;
@@ -203,16 +202,43 @@ sub done_testing() {
     print "1..$count\n";
 }
 
-# TODO: Make it it's own test function, instead of being used with like()
-#       I made it this way because Test2 did it this way. But this is utterly crap.
-sub dies :prototype(&) {
-    my ($fn) = @_;
+sub dies :prototype(&$$) {
+    my ($fn, $regex, $message) = @_;
+    $count++;
     local $@;
     eval { $fn->() };
-    return $@ eq "" ? undef : $@;
+    # when exception thrown
+    if ( $@ ) {
+        # when error is what was expected
+        if ( $@ =~ $regex ) {
+            print "ok $count - $message\n";
+            return;
+        }
+        # when exception, but error is not what we expected
+        else {
+            print "not ok $count - $message\n";
+            my ( $pkg, $file, $line ) = caller;
+            my $place = sprintf "at %s: %d", $file, $line;
+            my $got   = quote($@);
+            warn "\n",
+                "# Got:      $got\n",
+                "# Expected: $regex\n",
+                "# not ok $count - $message $place\n";
+            return;
+        }
+    }
+    # when no exception at all
+    else {
+        print "not ok $count - $message\n";
+        my ( $pkg, $file, $line ) = caller;
+        my $place = sprintf "at %s: %d", $file, $line;
+        warn "\n",
+             "# Expected exception but code didn't throw!\n",
+             "# not ok $count - $message $place\n";
+        return;
+    }
 }
 
-# TODO: Remove Hint when dies {} changed.
 sub like($str, $regex, $message) {
     $count++;
     if ( !defined $str ) {
@@ -222,7 +248,6 @@ sub like($str, $regex, $message) {
         warn "\n",
              "# Got:      undef\n",
              "# Expected: $regex\n",
-             "# Hint:     When used with dies {} then code didn't fail.\n",
              "# not ok $count - $message $place\n";
     }
     elsif ( $str =~ $regex ) {
@@ -252,14 +277,17 @@ sub check_isa($any, $class, $message) {
         print "not ok $count - $message\n";
         my $type = blessed $any;
         if ( defined $type ) {
-            warn "# Got:      $type\n",
+            warn "# Got two objects, but classes didn't match\n",
+                 "# Got:      $type\n",
                  "# Expected: $class\n",
                  "# not ok $count - $message\n";
         }
         else {
             my ( $pkg, $file, $line ) = caller;
             my $place = sprintf "at %s: %d", $file, $line;
-            warn "# Expected an object of $class, got unblessed value\n";
+            warn "# Expected two objects, but got unblessed value\n",
+                 "# Got:      unblessed\n",
+                 "# Expected: $class\n",
                  "# not ok $count - $message $place\n",
         }
     }

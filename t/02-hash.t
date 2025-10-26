@@ -848,17 +848,15 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 
     my $orig = $h->copy;
 
-    like(
-        dies { $h->{age} = 12 },
-        qr/\AAttempt to access disallowed key/,
-        'setting new key dies after lock');
+    dies { $h->{age} = 12 }
+    qr/\AAttempt to access disallowed key/,
+    'setting new key dies after lock';
 
     is($h, $orig, 'still the same');
 
-    like(
-        dies { my $age = $h->{age} },
-        qr/\AAttempt to access disallowed key/,
-        'reading a not allowed key');
+    dies { my $age = $h->{age} }
+    qr/\AAttempt to access disallowed key/,
+    'reading a not allowed key';
 
     $h->{name} = 'Marie';
     is($h, {name => "Marie", birthday => '1970-01-01' }, 'but mutation is allowed');

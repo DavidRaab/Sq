@@ -33,10 +33,9 @@ package main;
 # runs as far as possible to identify the cause of the problem.
 fn has_func => \&Sq::Reflection::has_func;
 
-like(
-    dies { Test->import() },
-    qr/\Afunction 'test' does not exists/,
-    'error on test');
+dies { Test->import() }
+qr/\Afunction 'test' does not exists/,
+'error on test';
 
 nok(has_func('Test', 'foo'),   'has_func 1');
  ok(has_func('Test', 'hello'), 'has_func 2');
@@ -50,15 +49,13 @@ nok(has_func('main', 'world'), 'has_func 5');
 
 is(hello(), 'Hello', 'hello correct');
 
-like(
-    dies { Test->import('whatever') },
-    qr/\Afunction 'whatever' is not in \@EXPORT/,
-    'import not defined');
+dies { Test->import('whatever') }
+qr/\Afunction 'whatever' is not in \@EXPORT/,
+'import not defined';
 
-like(
-    dies { Test->import('test') },
-    qr/\Afunction 'test' does not exists/,
-    'function not in @EXPORT fails');
+dies { Test->import('test') }
+qr/\Afunction 'test' does not exists/,
+'function not in @EXPORT fails';
 
 # check if foo() and bar() is imported
 nok(has_func('main', 'foo'), 'foo not yet imported');
