@@ -18,6 +18,7 @@ my $examples =
     Sq->fs
     ->children('examples')
     ->keep    (call 'is_file')
+    ->keep    (sub($str) { Str->ends_with($str, '.pl') })
     ->sort    (by_str)
     ->choose  (sub($file) {
         my $name = $file->basename;

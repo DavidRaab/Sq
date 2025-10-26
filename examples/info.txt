@@ -20,3 +20,14 @@ funcs_wo_sig.pl       Reflection: Shows functions in Sq that don't have a Signat
 same_basename.pl      Fs: Show files with same basename
 funcs_statics.pl      Reflection: Shows all static functions
 permute.pl            Seq: Example using Seq::permute()
+csv_basic.pl          CSV: Basic Example to read CSV File
+csv_borderlands3.pl   CSV: Extened Example that uses Borderlands 3 Benchmark Data
+csv_tables.pl         CSV: Uses multiple CSV Files like an SQL Table
+cartesian.pl          Cartesian Product over multiple Arrays at once
+permute_10_read.pl    Permutation over 10 keys, read from a gziped file. Plays with caching a sequence.
+permute_10_write.pl   Generates permutation of 10 keys in a file that is read by "permute_10_read.pl"
+permute_cache.pl      Caching of permutation over 10 keys. Either use Seq::cache or just Array::permute
+qsort.pl              Haskells famous QuickSort implementation on a Lazy sequence
+qsort_cache.pl        Same as qsort.pl but uses ->cache on the sequences to speed things up
+table.pl              Uses Sq->fmt->table to print a Table
+youtube.pl            Uses Sq->io->youtube() to fetch infos from Youtube. Requires "yt-dlp"
