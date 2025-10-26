@@ -10,21 +10,34 @@ our @EXPORT    = ();
 static read_text => sub(@path) {
     my $file = path(@path);
     return Seq->from_sub(sub {
-        my $err = open my $fh, '<:encoding(UTF-8)', $file;
-        if ( !defined $err ) {
-            return sub { undef }
+        if ( -f $file ) {
+            my $err = open my $fh, '<', $file;
+            if ( !defined $err ) {
+                return sub { undef }
+            }
+            else {
+                my $line;
+                return sub {
+                    $line = <$fh>;
+                    if ( defined $line ) {
+                        if ( utf8::decode($line) ) {
+                            chomp $line;
+                            return $line;
+                        }
+                        else {
+                            warn "read_text: '$file' does not contain valid utf-8. Abort reading from file.\n";
+                            close $fh;
+                            undef $fh;
+                            return undef;
+                        }
+                    }
+                    close $fh;
+                    undef $fh;
+                };
+            }
         }
         else {
-            my $line;
-            return sub {
-                $line = <$fh>;
-                if ( defined $line ) {
-                    chomp $line;
-                    return $line;
-                }
-                close $fh;
-                undef $fh;
-            };
+            return sub { undef };
         }
     });
 };
