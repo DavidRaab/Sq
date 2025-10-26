@@ -334,8 +334,8 @@ sub t_length($min, $max) {
 
         if ( $type eq 'Array' || $type eq 'ARRAY' ) {
             my $length = @$any;
-            return "length: Not enough elements" if $length < $min;
-            return "length: Too many elements"   if $length > $max;
+            return "length: Expected: $min-$max Got: $length" if $length < $min;
+            return "length: Expected: $min-$max Got: $length" if $length > $max;
             return $valid;
         }
         elsif ( $type eq 'Hash' || $type eq 'HASH' ) {
@@ -426,11 +426,12 @@ sub t_max($max) {
     }
 }
 
+# range check is inclusive
 sub t_range($min, $max) {
     return sub($num) {
         if ( is_num($num) ) {
             return $valid if $num >= $min && $num <= $max;
-            return "range: $num not between ($min,$max)";
+            return "range: Expected: $min-$max Got: $num";
         }
         return "range: not a number";
     }
