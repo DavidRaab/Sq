@@ -1831,9 +1831,18 @@ sub to_hash($seq, $f_map) {
     return $hash;
 }
 
+# TODO: Change function name. Should be group_*
+#
 # Build a hash by applying a mapping function to a value to create a
 # key/value pair. The value of the hash is always an array providing
-# all values for the same key
+# all values for the same key.
+#
+# This is similar to group_by(). But group_by() only expects a function that
+# generates a key for a value. And the value of a seq is used unchanged.
+# This function allows to generate a whole new key/value that is used.
+# You could get the same behaviour without this function by.
+#
+# $seq->group_by(...)->map(...)
 #
 # to_hash_of_array: Seq<'a> -> ('a -> 'Key) -> Hash<'Key, Array<'a>>
 sub to_hash_of_array($seq, $f_map) {
