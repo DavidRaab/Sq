@@ -81,6 +81,7 @@ sub import {
         }
     }
 
+    # TODO: This changed
     # Load signature if requested
     if ( $LOAD_SIGNATURE ) {
         require Sq::Sig;
