@@ -110,6 +110,9 @@
       "Sq::Concurrency::Threads" : {
          "file" : "lib/Sq/Concurrency/Threads.pm"
       },
+      "Sq::Copy" : {
+         "file" : "lib/Sq/Copy.pm"
+      },
       "Sq::Core" : {
          "file" : "lib/Sq/Core.pm"
       },
@@ -173,6 +176,9 @@
       "Sq::Math" : {
          "file" : "lib/Sq/Math.pm"
       },
+      "Sq::P" : {
+         "file" : "lib/Sq/P.pm"
+      },
       "Sq::Parser" : {
          "file" : "lib/Sq/Parser.pm"
       },
@@ -190,9 +196,6 @@
       },
       "Sq::Reflection" : {
          "file" : "lib/Sq/Reflection.pm"
-      },
-      "Sq::Sig" : {
-         "file" : "lib/Sq/Sig.pm"
       },
       "Sq::Sig::Array" : {
          "file" : "lib/Sq/Sig/Array.pm"
@@ -223,6 +226,9 @@
       },
       "Sq::Sig::Math" : {
          "file" : "lib/Sq/Sig/Math.pm"
+      },
+      "Sq::Sig::P" : {
+         "file" : "lib/Sq/Sig/P.pm"
       },
       "Sq::Sig::Parser" : {
          "file" : "lib/Sq/Sig/Parser.pm"

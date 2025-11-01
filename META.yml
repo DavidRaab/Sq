@@ -67,6 +67,8 @@ provides:
     file: lib/Sq/Concurrency/Mailbox.pm
   Sq::Concurrency::Threads:
     file: lib/Sq/Concurrency/Threads.pm
+  Sq::Copy:
+    file: lib/Sq/Copy.pm
   Sq::Core:
     file: lib/Sq/Core.pm
   Sq::Core::DU:
@@ -109,6 +111,8 @@ provides:
     file: lib/Sq/Language.pm
   Sq::Math:
     file: lib/Sq/Math.pm
+  Sq::P:
+    file: lib/Sq/P.pm
   Sq::Parser:
     file: lib/Sq/Parser.pm
   Sq::Parser::HTML:
@@ -121,8 +125,6 @@ provides:
     file: lib/Sq/Rand.pm
   Sq::Reflection:
     file: lib/Sq/Reflection.pm
-  Sq::Sig:
-    file: lib/Sq/Sig.pm
   Sq::Sig::Array:
     file: lib/Sq/Sig/Array.pm
   Sq::Sig::Core:
@@ -143,6 +145,8 @@ provides:
     file: lib/Sq/Sig/List.pm
   Sq::Sig::Math:
     file: lib/Sq/Sig/Math.pm
+  Sq::Sig::P:
+    file: lib/Sq/Sig/P.pm
   Sq::Sig::Parser:
     file: lib/Sq/Sig/Parser.pm
   Sq::Sig::Queue:
