@@ -97,8 +97,14 @@ sig('Seq::group_by',   $seq, $sub,               $hoa);
 sig('Seq::fold',       $seq, $any, $sub,         $any);
 sig('Seq::fold_mut',   $seq, $any, $sub,         $any);
 sig('Seq::reduce',     $seq, $sub,               $opt);
-sig('Seq::first',      $seq,                     $opt);
-sig('Seq::last',       $seq,                     $opt);
+sigt('Seq::first',
+    t_or(t_tuple($seq), t_tuple($seq, $any)),
+    t_or($opt, $any)
+);
+sigt('Seq::last',
+    t_or(t_tuple($seq), t_tuple($seq, $any)),
+    t_or($opt, $any)
+);
 sig('Seq::contains',   $seq, $any,             t_bool);
 sigt('Seq::to_array',
     t_or(
@@ -113,6 +119,7 @@ sigt('Seq::index',
         t_tuple($seq, t_int, $any),
     ),
     $any);
+sig('Seq::to_arrays',  $any, $any);
 sig('Seq::to_seq',     $seq, $seq);
 #sig('Seq::expand',    $seq, ...);
 sig('Seq::length',     $seq,                       t_int);

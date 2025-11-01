@@ -1574,16 +1574,23 @@ sub reduce($seq, $reducer) {
 }
 
 # first : Seq<'a> -> Option<'a>
-sub first($seq) {
-    return Option::Some($seq->()());
+sub first($seq, $default=undef) {
+    my $x = $seq->()();
+    if ( defined $default ) {
+        return defined $x ? $x : $default;
+    }
+    return Option::Some($x);
 }
 
 # last : Seq<'a> -> Option<'a>
-sub last($seq) {
+sub last($seq, $default=undef) {
     my $it = $seq->();
     my ($last, $x);
     while ( defined($x = $it->()) ) {
         $last = $x;
+    }
+    if ( defined $default ) {
+        return defined $last ? $last : $default;
     }
     return Option::Some($last);
 }

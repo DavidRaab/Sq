@@ -383,11 +383,13 @@ is(Seq->new(1)->reduce($add)->or(0),     1, 'reduce on single element');
 
 is(Seq->empty->first,       None, 'first on empty');
 is(Seq->empty->first->or(0),   0, 'first on empty with option::or');
+is(Seq->empty->first(0),       0, 'first on empty with default value');
 is($range->first,        Some(1), 'first on non empty');
 is($range->first->or(0),       1, 'first on non empty with option::or');
 
 is(Seq->empty->last,         None, 'last on empty');
 is(Seq->empty->last->or(0),     0, 'last on empty with option:or');
+is(Seq->empty->last(0),         0, 'last on empty with default value');
 is($range->last ,        Some(10), 'last on non empty');
 is($range->last->or(0),        10, 'last on non empty with option::or');
 
