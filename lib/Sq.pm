@@ -84,7 +84,11 @@ sub import {
     # TODO: This changed
     # Load signature if requested
     if ( $LOAD_SIGNATURE ) {
-        require Sq::Sig;
+        require Sq::Sig::Core;
+        require Sq::Sig::Array;
+        require Sq::Sig::Hash;
+        require Sq::Sig::Seq;
+        require Sq::Sig::Heap;
     }
 
     # Export only requested

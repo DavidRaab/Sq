@@ -1,6 +1,5 @@
 package Sq::Sig::Str;
 use 5.036;
-use Sq;
 use Sq::Type;
 use Sq::Signature;
 

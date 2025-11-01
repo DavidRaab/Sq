@@ -1,6 +1,5 @@
 package Sq::Signature;
 use 5.036;
-use Sq;
 use Sq::Reflection qw(get_func set_func set_static is_static);
 use Sq::Type qw(t_tuple);
 use Sq::Exporter;
