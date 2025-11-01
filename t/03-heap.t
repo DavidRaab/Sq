@@ -135,4 +135,31 @@ for my $i ( 1 .. 10 ) {
         "random string test $i");
 }
 
+# manual traversing of the whole Heap
+{
+    # new() expects a compare function
+    my $heap = Heap->new(sub($x,$y) { $x <=> $y });
+
+    # you also can use add() with multiple args
+    for my $x ( 1,3,10,2,100,5,9 ) {
+        $heap->add($x);
+    }
+
+    # add two additional elements.
+    $heap->add(0,50);
+
+    is(
+        $heap->remove(),
+        0,
+        'remove smallest element');
+
+    # here also remove_all could be used
+    my @sorted;
+    while ( defined(my $x = $heap->remove) ) {
+        push @sorted, $x;
+    }
+
+    is(\@sorted, [1,2,3,5,9,10,50,100], 'manual heap removal');
+}
+
 done_testing;
