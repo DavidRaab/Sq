@@ -710,8 +710,8 @@ sub t_runion($f_union) {
 }
 
 sub type :prototype($) {
-    my ( $array ) = @_;
     state $table = { map { s/\At_//r => \&$_ } grep { m/\At_/ } @EXPORT };
+    my ( $array ) = @_;
     return eval_data($table, $array);
 }
 
