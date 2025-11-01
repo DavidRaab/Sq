@@ -88,6 +88,7 @@ sub import {
         require Sq::Sig::Array;
         require Sq::Sig::Hash;
         require Sq::Sig::Seq;
+        require Sq::Sig::Queue;
         require Sq::Sig::Heap;
     }
 
