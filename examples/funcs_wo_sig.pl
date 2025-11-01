@@ -14,6 +14,8 @@ use Sq::Math;
 use Sq::Gen;
 use Sq::Bench;
 use Sq::Parser;
+use Sq::P;
+use Sq::Rand;
 
 # This script prints all functions in Sq, that have no type-check with
 # signature added.
