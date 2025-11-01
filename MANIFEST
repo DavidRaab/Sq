@@ -87,6 +87,13 @@ examples/bench_it.pl
 examples/cartesian.pl
 examples/choose.pl
 examples/colors.pl
+examples/csv/Borderlands3_Benchmark.csv
+examples/csv/csv_basic.csv
+examples/csv/persons.csv
+examples/csv/tags.csv
+examples/csv_basic.pl
+examples/csv_borderlands3.pl
+examples/csv_tables.pl
 examples/dump.pl
 examples/euler.pl
 examples/find_duplicates
@@ -140,6 +147,7 @@ lib/Sq/Concurrency/Async.pm
 lib/Sq/Concurrency/Fork.pm
 lib/Sq/Concurrency/Mailbox.pm
 lib/Sq/Concurrency/Threads.pm
+lib/Sq/Copy.pm
 lib/Sq/Core.pm
 lib/Sq/Core.pod
 lib/Sq/Core/Date.pm
@@ -184,6 +192,7 @@ lib/Sq/Manual/Design/Wrap.md
 lib/Sq/Manual/Design/Wrap.pod
 lib/Sq/Manual/Examples/CreatingSeqIterator.pod
 lib/Sq/Manual/FromSub.pod
+lib/Sq/Manual/Internal/Loading.md
 lib/Sq/Manual/MooseTraitVSSq.pod
 lib/Sq/Manual/Notes/2024-12-24-Realase-0.006.md
 lib/Sq/Manual/Notes/2024-12-26-CPAN-Release.md
@@ -198,6 +207,7 @@ lib/Sq/Manual/Type/00-Intro.pod
 lib/Sq/Manual/Type/01-Signature.pod
 lib/Sq/Manual/Type/02-Tuple.pod
 lib/Sq/Math.pm
+lib/Sq/P.pm
 lib/Sq/Parser.pm
 lib/Sq/Parser.pod
 lib/Sq/Parser/HTML.pm
@@ -206,7 +216,6 @@ lib/Sq/Parser/Markdown.pm
 lib/Sq/Rand.pm
 lib/Sq/Reflection.pm
 lib/Sq/Reflection.pod
-lib/Sq/Sig.pm
 lib/Sq/Sig/Array.pm
 lib/Sq/Sig/Core.pm
 lib/Sq/Sig/Fmt.pm
@@ -217,6 +226,7 @@ lib/Sq/Sig/Heap.pm
 lib/Sq/Sig/Io.pm
 lib/Sq/Sig/List.pm
 lib/Sq/Sig/Math.pm
+lib/Sq/Sig/P.pm
 lib/Sq/Sig/Parser.pm
 lib/Sq/Sig/Queue.pm
 lib/Sq/Sig/Seq.pm
@@ -282,6 +292,9 @@ t/13-fmt.t
 t/14-str.t
 t/15-rand.t
 t/16-du.t
+t/17-p.t
+t/18-copy.t
+t/19-gen.t
 t/Array/00-basics.t
 t/Array/03-fibonacci.t
 t/Array/06-min_max.t
@@ -319,12 +332,13 @@ t/Seq/09-cache.t
 t/Seq/10-option.t
 t/Seq/11-lazy.t
 t/Seq/11-regex.t
+t/Seq/12-type.t
 t/Seq/data/07-from_sub/text.txt
 t/Signature/00-basics.t
-t/Signature/01-Array.t
-t/Signature/02-option.t
+t/Signature/01-api.t
 t/Type/00-basics.t
 t/Type/01-user.t
 t/Type/02-option.t
 t/Type/03-intro.t
 t/Type/04-duplicates.t
+test_lines.pl
