@@ -13,8 +13,9 @@ my $builder = Module::Build->new(
         'Module::Build' => '0.4004',
     },
     requires => {
-        'Scalar::Util'    => '0',
         'Carp'            => '0',
+        'Scalar::Util'    => '0',
+        'Hash::Util'      => '0',
         'List::Util'      => '0',
         'List::MoreUtils' => '0',
     },
@@ -26,6 +27,7 @@ my $builder = Module::Build->new(
         'List::MoreUtils' => '0',
         'Digest::SHA'     => '0',
         'PerlIO::gzip'    => '0',
+        'JSON'            => '0',
     },
     add_to_cleanup => [ 'Sq-*' ],
 );
