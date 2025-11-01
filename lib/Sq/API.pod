@@ -125,10 +125,10 @@ overview of the functionality of Sq itself.
 
 =head2 Sq->rand
 
-    Sq->rand->int($min, $max)         # sequence of random integer from $min to $max
-    Sq->rand->num($min, $max)         # sequence of random number from $min to $max
-    Sq->rand->str($min, $max)         # sequence of random strings of length $min to $max
-    Sq->rand->str($min, $max, $chars) # sequence of random strings of length $min to $max that uses characters from $chars
+    Sq->rand->int($min, $max)             # sequence of random integer from $min to $max
+    Sq->rand->num($min, $max)             # sequence of random number from $min to $max
+    Sq->rand->str($min, $max)             # sequence of random strings of length $min-$max
+    Sq->rand->str($min, $max, $str_chars) # sequence of random strings of length $min-$max that uses characters from $str_chars
 
 =head2 Str
 
