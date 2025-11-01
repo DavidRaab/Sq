@@ -1070,12 +1070,24 @@ sub expand($array) {
     return @$array;
 }
 
-sub first($array) {
-    return Option::Some($array->[0]);
+sub first($array, $default=undef) {
+    if ( defined $default ) {
+        my $x = $array->[0];
+        return defined $x ? $x : $default;
+    }
+    else {
+        return Option::Some($array->[0]);
+    }
 }
 
-sub last($array) {
-    return Option::Some($array->[-1]);
+sub last($array, $default=undef) {
+    if ( defined $default ) {
+        my $x = $array->[0];
+        return defined $x ? $x : $default;
+    }
+    else {
+        return Option::Some($array->[-1]);
+    }
 }
 
 sub sum($array) {

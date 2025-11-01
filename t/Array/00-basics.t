@@ -473,11 +473,13 @@ is(Array->new(1)->reduce($add),  Some(1), 'reduce on single element');
 
 is(Array->empty->first,          None, 'first on empty');
 is(Array->empty->first->or(0),      0, 'first and optional');
+is(Array->empty->first(0),          0, 'first with default passed');
 is($range->first,             Some(1), 'first on non empty');
 is($range->first->or(0),            1, 'first on non empty and option::or');
 
 is(Array->empty->last,           None, 'last on empty');
 is(Array->empty->last->or(0),       0, 'last on empty with or');
+is(Array->empty->last(0),           0, 'last on empty and provided a default');
 is($range->last,             Some(10), 'last on non empty');
 is($range->last->or(0),            10, 'last on non empty with option::or');
 

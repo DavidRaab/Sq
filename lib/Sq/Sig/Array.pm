@@ -138,8 +138,28 @@ sigt('Array::index',
 sig('Array::reduce',     $array, $sub,                  $opt);
 sig('Array::length',     $array,                       $pint);
 #sig('Array::expand',   $array, ...);
-sig('Array::first',      $array,                       $opt);
-sig('Array::last',       $array,                       $opt);
+sigt('Array::first',
+    t_or(
+        t_tuple($array),      # either 1 arg, an array
+        t_tuple($array, $any) # or 2 args, array and anything else
+    ),
+    # TODO: This should improve. input should be mappable to output
+    #       this currently makes less sense, also could be just $any.
+    t_or(
+        t_opt, # either returns optional
+        $any   # or any
+    )
+);
+sigt('Array::last',
+    t_or(
+        t_tuple($array),      # either 1 arg, an array
+        t_tuple($array, $any) # or 2 args, array and anything else
+    ),
+    t_or(
+        t_opt, # either returns optional
+        $any   # or any
+    )
+);
 sig('Array::sum',        $anum,                        t_num);
 sig('Array::sum_by',     $array, $sub,                 t_num);
 sigt('Array::join',
@@ -150,7 +170,7 @@ sigt('Array::join',
 sig('Array::split',      $astr, t_regex,              t_array(t_of $astr));
 sigt('Array::min',
     t_or(t_tuple($anum), t_tuple($anum, $any)),
-    t_or(t_opt(t_num), t_num));
+    t_or(t_opt(t_num),   t_num));
 sigt('Array::min_str',
     t_or(t_tuple($astr), t_tuple($astr, $any)),
     t_or(t_opt(t_str), t_str));
