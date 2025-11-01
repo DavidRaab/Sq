@@ -1608,6 +1608,10 @@ sub to_array($seq, $count=undef) {
     return bless(\@new, 'Array');
 }
 
+# TODO: Theoretically not a Seq method/function. This is more a global
+#       function as it can take any type and does a conversion. It takes any
+#       data-structure and resolves every Seq in it to an array. So it is
+#       like a lazy-evaluation that forces an eager evaluation.
 sub to_arrays($any) {
     my $type = ref $any;
 
