@@ -62,7 +62,7 @@ package Project::Whatever;
 use 5.036;
 use Sq;
 use Sq::Exporter;
-our $SIGNATURE = 'Project/Sig/Whatever.pm';
+our $SIGNATURE = 'Project/Whatever/Sig/Whatever.pm';
 our @EXPORT    = (qw/a b c d e f/);
 ```
 
@@ -108,10 +108,10 @@ require Sq::Type;
 * `Sq::Core` contains. `Option`, `Result` and `Sq::Core::Lazy`
 * `Sq::Core::DU` contains the implementation of Discriminated Unions.
 
-The collections should be self-explanatory. The build the default data-structures
+The collections should be self-explanatory. They build the default data-structures
 of `Sq` itself. Consider that `Array` and `Hash` are not a re-impletation of
 an Array or Hash. The default Perl ones are used. Those defaults just get a
-blessing added so you can call functions not only on a procedural style.
+blessing added so you can call functions not only in a procedural style.
 
 ```perl
 my $array = Array::windowed(Array->init(100, sub($idx) { $idx + 1 }), 2);
@@ -142,18 +142,29 @@ No extra information is ever added to those Arrays or Hashes. This is done for
 compatibility. Any other Perl Module also should be able to accept those Arrays
 or Hashes created by `Sq` as long as it doesn't do any type-checking.
 
-because then it may be break. As then a blessed `Array` is passed instead of
+Because then cpde may break. As then a blessed `Array` is passed instead of
 being a unblessed reference of type `ARRAY`.
 
-# Forward / Back-Reference
+It's also good to know that all the function in the `Array` package itself
+are written that they don't expect a blessed `Array`, you can pass a Pure-Perl
+Array. This is also fine.
+
+```perl
+my $windowed = Array::windowed([1..100]);
+```
+
+All arrays returned by a method will be a blessed `Array`, so you can use
+method chaining on the returned Array.
+
+# Forward / Back-References on functions
 
 Sometimes in Array/Hash i use functionality like `equal()`. For example `Array::contains`
-can check if any value is sinde an array, and it uses the `equal()` function
+can check if any value is inside an array, it uses the `equal()` function
 that does a *value equal* with a recursive comparision.
 
 But `equal` is just loaded later with `Sq::Equality`. Also you cannot load `Sq`
 in `Sq::Array` because `Sq::Array` is loaded by `Sq` by default. This would otherwise
-lead to an inifity loop of trying to load modules.
+lead to an infinity loop of trying to load modules.
 
 That's the reason why any of those default modules must use a full function call
 like `Sq::Equality::equal()` when needed. Because the function lookup of those
@@ -622,15 +633,25 @@ If there is no direct way of dumping and no direct way of directly creating
 an object in it's final state (not through a bunch of method calls) then
 adding it for Equality or Dumping is maybe wrong!
 
+# Sq::Copy
+
+`Sq::Copy` implements the `copy` function to make a deep-datastructure copy.
+By default it understands strings and numbers, `Array`, `Hash`, `Seq`, `Option` and `Result`. Also `Path::Tiny` is supported.
+
+Like in `Sq::Equality` other data-types can be added.
+
+```perl
+Sq::Copy::add_copy('Whatever' => sub($obj) {
+    return # however a copy of Whatever is made;
+});
+```
+
 # Sq::Type
 
 `Sq` ships it's own type-system. There are a lot of Type-System modules out
-there. `Moose` implemented some types based on classes. You got `Type::Tiny`
-that extended on this. Even if i don't know what is *Tiny* on `Type::Tiny`.
-
-By default it ships over 40+ Perl packages/classes with the typical overhead
-that object-orientation offers. `Sq::Type` is a single file with around 700 lines
-of code.
+there, so why another one? Because `Sq::Type` is very leightweighted and is
+build to fit the needs of `Sq` itself. It also correctly works with the
+distinction of `ARRAY` and the blessed `Array`.
 
 `Sq::Type` is written in a Combinator Style. So it is completely based that a
 type is just a function! And you just combine those functions to build more
@@ -780,9 +801,24 @@ and it will only filter/keep those values that match your user definition!
 
 ## Types are Open
 
-Different to maybe some other type-systems a type is matched when all of the
-definitions are correct. When a data-type contains more data than the check,
-it will still be valid! For example you can define a point
+This Type-System is different to other Type-Systems in the sense that it
+does a check against the definition, a structual approach, not a type-system
+by name.
+
+As an example. When you define a class `Point` with `X` and `Y` then you define
+a type by it's name. If something is a `Point` or not is simply tested by checking
+if an object inherits from `Point` that's it. It's basically just a name check.
+
+If the values in the `Point` are correct or not, are not tested at all. In such
+a type-system something is assumed to be correct as long as it has the correct
+name or is inherited from it.
+
+Reality shows that this is actually not really true at all. State bugs with
+invalid data are common, otherwise we would have no bugs in object-oriented code.
+
+That a class itself can handle it's own state and is always valid is just wishful
+thinking far beyond reality. `Sq::Type` doesn't know anything about names. It
+does a structural apporach. Whenn you define a `Point` like this.
 
 ```perl
 my $is_point = type [hash =>
@@ -792,7 +828,115 @@ my $is_point = type [hash =>
 ```
 
 then any hash that at least contains an `X` and a `Y` and are numbers is considered
-a valid Point! This is a big feature that you should think about!
+a valid Point! Also the type is not *exclusive*. The above doesn't say that a hash
+only is allowed to have an `X` and an `Y`. When it has extra fields, it is still
+a valid Point, as long `X` and `Y` are numbers!
 
-A hash that has extra keys with `Z`, `Title`, `Health`, `State` and so on is
-also a Valid Point when it contains an `X` and `Y` that is a number!
+This is a feature you should think about. The idea is not to create *closed* types
+that only allow *X* and *Y*. Such a type-system fits dynamic-typing a lot better.
+
+You can for example write a function, and only expect fields of a hash, that you
+really need to access in this function! When a Hash would have extra fields like
+`Z`, `Title`, `Health`, `State` and so on, it wouldn't matter at all, as long
+this hash would have an `X` and `Y` and is a number it is a `Point`!
+
+Because of it's structural testing, bugs like invalid state actually becomes
+a lot harder to miss, or impossible.
+
+Let's say you would have a class instead of functions, and code like this.
+
+```perl
+my $p = Point->new(10,10);
+$p->whatever();
+```
+
+consider now that somehow the call to `->whatever()` somehow changes `X` and `Y`
+and make it invalid. For example `X` is overwritten as a number.
+
+When you then would pass `$p` to a function that expects `$is_point` and you
+check it with `t_valid`, it would return `false` and abort. The Hash has become
+invalid.
+
+Also consider that your checks can have any logic. You also for example can
+restrict numbers in a range. Let's assume you have some function that
+also works with Points, but every number should be in a range, have a Min/Max
+or something like that. Then you can do so.
+
+```perl
+my $is_point = type [hash =>
+    X => [num => [range => 0, 100]],
+    Y => [num => [range => 0, 100]],
+];
+```
+
+This also checks if the number is between 0 and 100.
+
+Also this way type-checking and setting/creating values are seperated, what can
+be very useful. For either creation of data, manipulation or just simply
+performance.
+
+For example you could have an Array of Hashes. You go through ever hash and
+do some computation on it. Maybe whatever you want to calculate needs mltiple
+loops. So you can do. Only after every step is completed, then you can do
+a type-check if the data are in a format you needed.
+
+It's not that you must check any intermediate state, or every intermediate
+state is checked at all. As an example, consider you build an `Album` to
+represent a *Music Album*. You can write a type like
+
+```perl
+my $is_album = type [hash =>
+    artist => ['str'],
+    title  => ['str'],
+    tracks => [array => of => [
+        [hash => keys => [
+            no       => [int => [min => 1]],
+            duration => [int => [min => 0]],
+            title    => ['str'],
+        ]]
+    ]],
+];
+```
+
+but, when your data is created, you just do how you work with a Hash. You still
+can do.
+
+```perl
+my $album = {};
+$album->{artist} = "Whatever";
+$album->{title}  = "Foo";
+for my $row ( $somehow->read->data->from->database ) {
+    push @{ $album->{tracks} }, $row;
+}
+```
+
+here you can see how `$album` is built step by step. It's fine. It is just a
+Hash. Not on every adding/invocation everything is checked. There is no need to.
+
+Just do the check after you completely build everything. In a Class that is
+immutable (or not) you usually have to create all kind of default values. Empty
+values, or allow `undef`, and handle `undef` where it is allowed. Maybe even other
+stuff. That's also the reason why that whole *Class does it's internal valid state stuff*
+is also not working in practice!
+
+The differentation between building and checking for a type also allows *corrections*
+to be made. Did you ever read data from a database, CSV-File or other kind of stuff,
+and maybe a value wasn't as expected?
+
+You have two different date formats? In your programs type, you expect the track
+numbers to start with 1, but your data in your database starts with `0`? No Problem
+just go to the tracks and add `+1` to every `no` field first!
+
+Just because you expect some data in a certain type/format, doesn't mean the data
+are served to you in that format!
+
+You want `DateTime` objects? But you got JSON? Yeah, then you first must convert
+your strings to `DateTime` objects, and so on.
+
+You define the `type` you want, but not all intermediate types. You also don't
+must build your final type in one big step. A lot of stuff becomes easier this
+way.
+
+And actually also more correct, because a data-structure is always fully tested,
+it is not assumed that all data must be correct just because it is of a certain
+class.
