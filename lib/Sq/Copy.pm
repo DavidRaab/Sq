@@ -1,11 +1,11 @@
 package Sq::Copy;
 use 5.036;
 
-# This is inlined in equal() but i still provide this function as an API
+# This is inlined in copy() but i still provide this function as an API
 # called by other code
 sub hash($hash, $other) { ... }
 
-# This is inlined in equal() but i still provide this function as an API
+# This is inlined in copy() but i still provide this function as an API
 # called by other code
 sub array($array)   { ... }
 sub seq($seq)       { ... }
