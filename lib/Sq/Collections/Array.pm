@@ -794,14 +794,7 @@ sub shuffle($array) {
 }
 
 sub trim($array) {
-    my @new;
-    for ( @$array ) {
-        my $str = $_;
-        $str =~ s/\A\s+//;
-        $str =~ s/\s+\z//;
-        push @new, $str;
-    }
-    return CORE::bless(\@new, 'Array');
+    return CORE::bless([map { builtin::trim($_) } @$array], 'Array');
 }
 
 sub fill($array, $upto, $f_any) {
