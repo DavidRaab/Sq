@@ -3,7 +3,7 @@ use 5.036;
 use Scalar::Util ();
 
 *is_num  = \&Scalar::Util::looks_like_number;
-*refaddr = \&Scalar::Util::refaddr;
+*refaddr = \&builtin::refaddr;
 
 # This is inlined in equal() but i still provide this function as an API
 # called by other code
