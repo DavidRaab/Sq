@@ -7,6 +7,7 @@ use Sq::Signature;
 
 # Some predefined types
 my $any       = t_any;
+my $void      = t_void;
 my $opt       = t_opt;
 my $array     = t_array;
 my $hash      = t_hash;
@@ -15,6 +16,7 @@ my $sub       = t_sub;
 my $int       = t_int;
 my $num       = t_num;
 my $str       = t_str;
+my $bool      = t_bool;
 my $pint      = t_int(t_positive);
 
 my $aoa       = t_array(t_of $array);
@@ -32,11 +34,11 @@ my $str_array = t_eq('Array');
 my $str_seq   = t_eq('Seq');
 
 
-sigt('Option::Some', t_tuplev(t_array), $opt);
+sigt('Option::Some', t_tuplev($array), $opt);
 # sigt('Option::None', t_tuple(),         $opt); # doesn't work because of Prototype
 
-sig('Option::is_some', $any, t_bool);
-sig('Option::is_none', $any, t_bool);
+sig('Option::is_some', $any, $bool);
+sig('Option::is_none', $any, $bool);
 
 my $omatch = t_keys(
     Some => $sub,
@@ -48,7 +50,7 @@ sigt('Option::match', t_tuplev($opt, t_as_hash($omatch)), $any);
 # sigt('Option::or',    t_tuplev($opt, t_array(t_min(1), t_of($any))), $any);
 # sigt('Option::or_with', ...)
 
-sig('Option::or_else',      $opt, $opt,                    $opt);
+sig('Option::or_else',      $opt, $opt,                   $opt);
 sig('Option::or_else_with', $opt, $sub,                   $opt);
 sig('Option::bind',         $opt, $sub,                   $opt);
 sig('Option::bind2',        $opt, $opt,             $sub, $opt);
@@ -75,13 +77,13 @@ sigt('Option::map_v',
 );
 
 sig('Option::validate',  $opt, $sub,       $opt);
-sig('Option::check',     $opt, $sub,       t_bool);
+sig('Option::check',     $opt, $sub,       $bool);
 sig('Option::fold',      $opt, $any, $sub, $any);
 sig('Option::fold_back', $opt, $any, $sub, $any);
-sig('Option::iter',      $opt, $sub,       t_void);
-sig('Option::single',    $opt,              t_opt(t_array));
-sig('Option::to_array',  $opt,              t_array);
-sig('Option::to_seq',    $opt,              t_seq);
+sig('Option::iter',      $opt, $sub,       $void);
+sig('Option::single',    $opt,             t_opt($array));
+sig('Option::to_array',  $opt,             $array);
+sig('Option::to_seq',    $opt,             $seq);
 # sig('Option::get', ... ) # list context
 
 ### Module Functions
@@ -102,7 +104,7 @@ sig('Result::or_else_with', $result, $sub,                            $result);
 
 ### SIDE-EFFECTS
 
-sig('Result::iter',      $result, $sub, t_void);
+sig('Result::iter',      $result, $sub, $void);
 
 ### CONVERTERS
 my $rmatch = t_keys(
@@ -111,14 +113,14 @@ my $rmatch = t_keys(
 );
 sigt('Result::match',    t_tuplev($result, t_as_hash($rmatch)), $any);
 sig('Result::fold',      $result, $any, $sub,                   $any);
-sig('Result::is_ok',     $any,                                 t_bool);
-sig('Result::is_err',    $any,                                 t_bool);
-sig('Result::or',        $result, $any,                          $any);
+sig('Result::is_ok',     $any,                                 $bool);
+sig('Result::is_err',    $any,                                 $bool);
+sig('Result::or',        $result, $any,                         $any);
 sig('Result::or_with',   $result, $sub,                         $any);
-sig('Result::to_option', $result,                               t_opt);
-sig('Result::to_array',  $result,                             t_array);
-sig('Result::value',     $result,                                $any);
-sig('Result::get',       $result,                                $any);
+sig('Result::to_option', $result,                               $opt);
+sig('Result::to_array',  $result,                             $array);
+sig('Result::value',     $result,                               $any);
+sig('Result::get',       $result,                               $any);
 
 
 ###----------------------
@@ -130,15 +132,15 @@ sig('Result::get',       $result,                                $any);
 sigt('Array::new',        t_tuplev($str_array, $array),    $array);
 sigt('Array::concat',     t_tuplev($str_array, $aoa),      $array);
 sig ('Array::empty',      $str_array,                      $array);
-sig ('Array::replicate',  $pint, $any,                 $array);
+sig ('Array::replicate',  $pint, $any,                     $array);
 sig ('Array::bless',      $str_array, $array,              $array);
 sig ('Array::from_array', $str_array, $array,              $array);
-sig ('Array::init',       $pint, $sub,                 $array);
-sig ('Array::init2d',     $pint, $pint, $sub,          $array);
+sig ('Array::init',       $pint, $sub,                     $array);
+sig ('Array::init2d',     $pint, $pint, $sub,              $array);
 # Second argument is 'State, would be good to back-reference the type
 sig ('Array::unfold',     $str_array, $any, $sub,          $array);
-sig ('Array::range_step', $str_array, t_num, t_num, t_num, $array);
-sig ('Array::range',      $str_array, t_int, t_int,        $array);
+sig ('Array::range_step', $str_array, $num, $num, $num, $array);
+sig ('Array::range',      $str_array, $int, $int,        $array);
 sig ('Array::one',        $str_array, $any,                $array);
 
 
@@ -164,12 +166,12 @@ sig ('Array::choose',        $array, $sub,                         $array);
 sig ('Array::keep',          $array, $sub,                         $array);
 sig ('Array::keep_type',     $array, $sub,                         $array);
 sig ('Array::keep_ok',       t_array(t_of t_result),               $array);
-sig ('Array::keep_ok_by',    t_array, $sub,                        $array);
+sig ('Array::keep_ok_by',    $array, $sub,                        $array);
 sig ('Array::keep_e',        $array, t_str,                        $array);
 sig ('Array::remove',        $array, $sub,                         $array);
 sig ('Array::skip',          $array, $pint,                        $array);
 sig ('Array::take',          $array, $pint,                        $array);
-sig ('Array::indexed',       $array,          t_array(t_of t_tuple($any, t_int)));
+sig ('Array::indexed',       $array,          t_array(t_of t_tuple($any, $int)));
 sigt('Array::zip',           t_array(t_of $array),                   $aoa);
 sig ('Array::sort',          $array, $sub,                         $array);
 sig ('Array::sort_by',       $array, $sub, $sub,                   $array);
@@ -179,7 +181,7 @@ sig ('Array::snds',          $aoa,                                 $array);
 sigt('Array::to_array',
     t_or(
         t_tuple($array),
-        t_tuple($array, t_int),
+        t_tuple($array, $int),
     ),
     $array
 );
@@ -196,7 +198,7 @@ sig ('Array::intersperse',       $array, $any,             $array);
 sig ('Array::repeat',            $array, $pint,            $array);
 sig ('Array::take_while',        $array, $sub,             $array);
 sig ('Array::skip_while',        $array, $sub,             $array);
-sigt('Array::slice',             t_tuplev(t_array, $aint), $array);
+sigt('Array::slice',             t_tuplev($array, $aint), $array);
 sig ('Array::extract',           $array, $pint, $pint,     $array);
 sig ('Array::diff',              $array, $array, $sub,     $array);
 sig ('Array::intersect',         $array, $array, $sub,     $array);
@@ -219,25 +221,25 @@ sig ('Array::columns',           $array, $pint,           $aoa);
 
 ### SIDE-EFFECTS
 
-sig('Array::iter',      $array, $sub,        t_void);
-sig('Array::itern',     $array, $pint, $sub, t_void);
-sig('Array::iteri',     $array, $sub,        t_void);
-sig('Array::iter2d',    $aoa,   $sub,        t_void);
-sig('Array::iter_sort', $array, $sub, $sub,  t_void);
+sig('Array::iter',      $array, $sub,        $void);
+sig('Array::itern',     $array, $pint, $sub, $void);
+sig('Array::iteri',     $array, $sub,        $void);
+sig('Array::iter2d',    $aoa,   $sub,        $void);
+sig('Array::iter_sort', $array, $sub, $sub,  $void);
 
 
 ### CONVERTER
 
-sig('Array::is_empty',   $array,                      t_bool);
-sig('Array::fold',       $array, $any, $sub,            $any);
-sig('Array::fold_mut',   $array, $any, $sub,            $any);
-sig('Array::scan',       $array, $any, $sub,         t_array);
-sig('Array::average',    $array,                       t_num);
-sig('Array::average_by', $array, $sub,                 t_num);
+sig('Array::is_empty',   $array,                      $bool);
+sig('Array::fold',       $array, $any, $sub,           $any);
+sig('Array::fold_mut',   $array, $any, $sub,           $any);
+sig('Array::scan',       $array, $any, $sub,         $array);
+sig('Array::average',    $array,                       $num);
+sig('Array::average_by', $array, $sub,                 $num);
 sigt('Array::index',
     t_or(
-        t_tuple($array, t_int),
-        t_tuple($array, t_int, $any),
+        t_tuple($array, $int),
+        t_tuple($array, $int, $any),
     ),
     $any);
 sig('Array::reduce',     $array, $sub,                  $opt);
@@ -265,8 +267,8 @@ sigt('Array::last',
         $any   # or any
     )
 );
-sig('Array::sum',        $anum,                        t_num);
-sig('Array::sum_by',     $array, $sub,                 t_num);
+sig('Array::sum',        $anum,                        $num);
+sig('Array::sum_by',     $array, $sub,                 $num);
 sigt('Array::join',
     t_or(
         t_tuple($astr),
@@ -275,7 +277,7 @@ sigt('Array::join',
 sig('Array::split',      $astr, t_regex,              t_array(t_of $astr));
 sigt('Array::min',
     t_or(t_tuple($anum), t_tuple($anum, $any)),
-    t_or(t_opt(t_num),   t_num));
+    t_or(t_opt($num),   $num));
 sigt('Array::min_str',
     t_or(t_tuple($astr), t_tuple($astr, $any)),
     t_or(t_opt(t_str), t_str));
@@ -283,7 +285,7 @@ sig('Array::min_by',     $array, $sub,                 $opt);
 sig('Array::min_str_by', $array, $sub,                 $opt);
 sigt('Array::max',
     t_or(t_tuple($anum), t_tuple($anum, $any)),
-    t_or(t_opt(t_num), t_num));
+    t_or(t_opt($num), $num));
 sigt('Array::max_str',
     t_or(t_tuple($astr), t_tuple($astr, $any)),
     t_or(t_opt(t_str), t_str));
@@ -295,15 +297,15 @@ sig('Array::to_hash_of_array', $array, $sub,           $hoa);
 sig('Array::as_hash',    t_even_sized,                 $hash);
 sig('Array::keyed_by',   $array, $sub,                 $hash);
 sig('Array::group_by',   $array, $sub,                 $hoa);
-sig('Array::count',      $array,                       t_hash(t_of t_int));
-sig('Array::count_by',   $array, $sub,                 t_hash(t_of t_int));
+sig('Array::count',      $array,                       t_hash(t_of $int));
+sig('Array::count_by',   $array, $sub,                 t_hash(t_of $int));
 sig('Array::find',       $array, $sub,                 $opt);
-sig('Array::any',        $array, $sub,                 t_bool);
-sig('Array::all',        $array, $sub,                 t_bool);
-sig('Array::none',       $array, $sub,                 t_bool);
+sig('Array::any',        $array, $sub,                 $bool);
+sig('Array::all',        $array, $sub,                 $bool);
+sig('Array::none',       $array, $sub,                 $bool);
 sig('Array::pick',       $array, $sub,                 $opt);
 sig('Array::to_seq',     $array,                       t_seq);
-sigt('Array::contains',  t_tuplev($array, $array),     t_bool);
+sigt('Array::contains',  t_tuplev($array, $array),     $bool);
 sig('Array::fold_rec',   $array, $sub, $sub,           $any);
 sig('Array::map_array',  $array, $sub, $sub,           $any);
 sig('Array::head',       t_array(t_min 1),             $any);
@@ -313,19 +315,19 @@ sig('Array::head',       t_array(t_min 1),             $any);
 
 sig('Array::all_some',     $aopt,        $opt);
 sig('Array::all_some_by',  $array, $sub, $opt);
-sig('Array::all_ok',       $ares,        t_opt(t_array));
-sig('Array::all_ok_by',    $array, $sub, t_opt(t_array));
+sig('Array::all_ok',       $ares,        t_opt($array));
+sig('Array::all_ok_by',    $array, $sub, t_opt($array));
 sig('Array::keep_some',    $aopt,        $array);
 sig('Array::keep_some_by', $array, $sub, $array);
 
 
 ### MUTATION
 
-sigt('Array::push',        t_tuplev($array, $array),            t_void);
+sigt('Array::push',        t_tuplev($array, $array),            $void);
 sig ('Array::pop',         $array,                                $any);
 sig ('Array::shift',       $array,                                $any);
-sigt('Array::unshift',     t_tuplev($array, $array),            t_void);
-sig ('Array::blit',        $array, t_int, $array, t_int, t_int, t_void);
+sigt('Array::unshift',     t_tuplev($array, $array),            $void);
+sig ('Array::blit',        $array, $int, $array, $int, $int, $void);
 
 
 
@@ -339,13 +341,13 @@ sig ('Hash::empty',      $any,                                  $hash);
 sigt('Hash::new',        t_tuplev($any, t_array(t_even_sized)), $hash);
 sig ('Hash::bless',      $any, $hash,                           $hash);
 sig ('Hash::locked',     $any, $hash,                           $hash);
-sig ('Hash::init',       $any, $int, $sub,                    $hash);
-sig ('Hash::from_array', $any, t_array, $sub,                  $hash);
+sig ('Hash::init',       $any, $int, $sub,                      $hash);
+sig ('Hash::from_array', $any, $array, $sub,                   $hash);
 
 ### METHODS
 
 sig ('Hash::keys',         $hash,                t_array(t_of t_str));
-sig ('Hash::values',       $hash,                t_array);
+sig ('Hash::values',       $hash,                $array);
 sig ('Hash::map',          $hash, $sub,          $hash);
 sig ('Hash::find',         $hash, $sub,          t_opt($kv));
 sig ('Hash::pick',         $hash, $sub,          t_opt);
@@ -353,7 +355,7 @@ sig ('Hash::keep',         $hash, $sub,          $hash);
 sig ('Hash::fold',         $hash, $any, $sub,    $any);
 sig ('Hash::fold_back',    $hash, $any, $sub,    $any);
 sig ('Hash::length',       $hash,                $int);
-sig ('Hash::is_empty',     $hash,                t_bool);
+sig ('Hash::is_empty',     $hash,                $bool);
 sig ('Hash::bind',         $hash, $sub,          $hash);
 sig ('Hash::append',       $hash, $hash,         $hash);
 sig ('Hash::union',        $hash, $hash, $sub,   $hash);
@@ -367,23 +369,23 @@ sigt('Hash::extract',      t_tuplev($hash, t_array(t_min(1), t_of t_str)), t_arr
 sigt('Hash::slice',        t_tuplev($hash, t_array(t_min(1), t_of t_str)), $hash);
 sigt('Hash::with',         t_tuplev($hash, t_array(t_even_sized)),         $hash); # can be improved
 sigt('Hash::withf',        t_tuplev($hash, t_array(t_even_sized)),         $hash); # can be improved
-sigt('Hash::has_keys',     t_tuplev($hash, t_array(t_of t_str)),           t_bool);
-sig ('Hash::equal',        $hash, $any,                                    t_bool);
-sig ('Hash::to_array',     $hash, $sub,                                    t_array);
+sigt('Hash::has_keys',     t_tuplev($hash, t_array(t_of t_str)),           $bool);
+sig ('Hash::equal',        $hash, $any,                                    $bool);
+sig ('Hash::to_array',     $hash, $sub,                                    $array);
 
 ### SIDE-EFFECTS
 
-sigt('Hash::on',        t_tuplev($hash, t_array(t_even_sized)), t_void);
-sig ('Hash::iter',      $hash, $sub,                            t_void);
-sig ('Hash::iter_sort', $hash, $sub, $sub,                      t_void);
+sigt('Hash::on',        t_tuplev($hash, t_array(t_even_sized)), $void);
+sig ('Hash::iter',      $hash, $sub,                            $void);
+sig ('Hash::iter_sort', $hash, $sub, $sub,                      $void);
 sigt('Hash::lock',      t_tuplev($hash, t_array(t_of t_str)),   $hash);
 
 ### MUTATION METHODS
 
-sigt('Hash::set',     t_tuplev($hash, t_array(t_even_sized)),         t_void);
-sigt('Hash::change',  t_tuplev($hash, t_array(t_even_sized)),         t_void);
-sigt('Hash::push',    t_tuplev($hash, t_str, t_array(t_min 1)),       t_void);
-sigt('Hash::delete',  t_tuplev($hash, t_array(t_min(1), t_of t_str)), t_void);
+sigt('Hash::set',     t_tuplev($hash, t_array(t_even_sized)),         $void);
+sigt('Hash::change',  t_tuplev($hash, t_array(t_even_sized)),         $void);
+sigt('Hash::push',    t_tuplev($hash, t_str, t_array(t_min 1)),       $void);
+sigt('Hash::delete',  t_tuplev($hash, t_array(t_min(1), t_of t_str)), $void);
 
 
 
@@ -396,17 +398,17 @@ sigt('Hash::delete',  t_tuplev($hash, t_array(t_min(1), t_of t_str)), t_void);
 sig ('Seq::from_sub',   $str_seq,  $sub,               $seq);
 sig ('Seq::always',     $str_seq, $any,                $seq);
 sig ('Seq::empty',      $str_seq,                      $seq);
-sig ('Seq::replicate',  $str_seq, t_int, $any,         $seq);
+sig ('Seq::replicate',  $str_seq, $int, $any,         $seq);
 sig ('Seq::unfold',     $str_seq, $any,  $sub,         $seq);
-sig ('Seq::init',       $str_seq, t_int,  $sub,        $seq);
-sig ('Seq::range_step', $str_seq, t_num, t_num, t_num, $seq);
-sigt('Seq::new',        t_tuplev($str_seq, t_array),   $seq);
-sig ('Seq::range',      $str_seq, t_int, t_int,        $seq);
-sig ('Seq::from_array', $str_seq, t_array,             $seq);
+sig ('Seq::init',       $str_seq, $int,  $sub,        $seq);
+sig ('Seq::range_step', $str_seq, $num, $num, $num, $seq);
+sigt('Seq::new',        t_tuplev($str_seq, $array),   $seq);
+sig ('Seq::range',      $str_seq, $int, $int,        $seq);
+sig ('Seq::from_array', $str_seq, $array,             $seq);
 sig ('Seq::from_hash',  $str_seq, t_hash,  $sub,       $seq);
 sigt('Seq::concat',     t_tuplev($str_seq, $aos),      $seq);
-sig ('Seq::up',         $str_seq, t_int,               $seq);
-sig ('Seq::down',       $str_seq, t_int,               $seq);
+sig ('Seq::up',         $str_seq, $int,               $seq);
+sig ('Seq::down',       $str_seq, $int,               $seq);
 sig ('Seq::one',        $str_seq, $any,                $seq);
 
 ### METHODS
@@ -426,9 +428,9 @@ sig('Seq::choose',        $seq, $sub,           $seq);
 sig('Seq::mapi',          $seq, $sub,           $seq);
 sig('Seq::keep',          $seq, $sub,           $seq);
 sig('Seq::remove',        $seq, $sub,           $seq);
-sig('Seq::take',          $seq, t_int,          $seq);
+sig('Seq::take',          $seq, $int,          $seq);
 sig('Seq::take_while',    $seq, $sub,           $seq);
-sig('Seq::skip',          $seq, t_int,          $seq);
+sig('Seq::skip',          $seq, $int,          $seq);
 sig('Seq::skip_while',    $seq, $sub,           $seq);
 sig('Seq::indexed',       $seq,                 $seq);
 sig('Seq::distinct_by',   $seq, $sub,           $seq);
@@ -442,11 +444,11 @@ sig('Seq::rx',            $seq, t_regex,        $seq);
 sig('Seq::rxm',           $seq, t_regex,        $seq);
 sig('Seq::rxs',           $seq, t_regex, $sub, $seq);
 sig('Seq::rxsg',          $seq, t_regex, $sub, $seq);
-sig('Seq::chunked',       $seq, t_int,          $seq);
-sig('Seq::windowed',      $seq, t_int,          $seq);
+sig('Seq::chunked',       $seq, $int,          $seq);
+sig('Seq::windowed',      $seq, $int,          $seq);
 sig('Seq::intersperse',   $seq, $any,           $seq);
 sig('Seq::infinity',      $seq,                 $seq);
-sig('Seq::repeat',        $seq, t_int,          $seq);
+sig('Seq::repeat',        $seq, $int,          $seq);
 sig('Seq::trim',          $seq,                 $seq);
 sig('Seq::permute',       $seq,                 $seq);
 sig('Seq::tail',          $seq,                 $seq);
@@ -458,18 +460,18 @@ sig('Seq::tail',          $seq,                 $seq);
 
 ### SIDE-EFFECTS
 
-sig('Seq::iter',     $seq, $sub,      t_void);
-sig('Seq::iteri',    $seq, $sub,      t_void);
+sig('Seq::iter',     $seq, $sub,       $void);
+sig('Seq::iteri',    $seq, $sub,       $void);
 sig('Seq::do',       $seq, $sub,        $seq);
 sig('Seq::do_every', $seq, t_int, $sub, $seq);
 sig('Seq::doi',      $seq, $sub,        $seq);
 
 ### CONVERTER
 
-sig('Seq::is_empty',   $seq,                   t_bool);
+sig('Seq::is_empty',   $seq,                   $bool);
 sig('Seq::head',       $seq,                     $any);
-sig('Seq::sort',       $seq, $sub,            t_array);
-sig('Seq::sort_by',    $seq, $sub, $sub,      t_array);
+sig('Seq::sort',       $seq, $sub,            $array);
+sig('Seq::sort_by',    $seq, $sub, $sub,      $array);
 sig('Seq::group_fold', $seq, $sub, $sub, $sub, t_hash);
 sig('Seq::group_by',   $seq, $sub,               $hoa);
 sig('Seq::fold',       $seq, $any, $sub,         $any);
@@ -483,31 +485,31 @@ sigt('Seq::last',
     t_or(t_tuple($seq), t_tuple($seq, $any)),
     t_or($opt, $any)
 );
-sig('Seq::contains',   $seq, $any,             t_bool);
+sig('Seq::contains',   $seq, $any,             $bool);
 sigt('Seq::to_array',
     t_or(
         t_tuple($seq),
-        t_tuple($seq, t_int),
+        t_tuple($seq, $int),
     ),
-    t_array
+    $array
 );
 sigt('Seq::index',
     t_or(
-        t_tuple($seq, t_int),
-        t_tuple($seq, t_int, $any),
+        t_tuple($seq, $int),
+        t_tuple($seq, $int, $any),
     ),
     $any);
 sig('Seq::to_arrays',  $any, $any);
 sig('Seq::to_seq',     $seq, $seq);
 #sig('Seq::expand',    $seq, ...);
-sig('Seq::length',     $seq,                       t_int);
-sig('Seq::sum',        $seq,                       t_num);
-sig('Seq::sum_by',     $seq, $sub,                 t_num);
-sig('Seq::min',        $seq,                       t_opt(t_num));
+sig('Seq::length',     $seq,                       $int);
+sig('Seq::sum',        $seq,                       $num);
+sig('Seq::sum_by',     $seq, $sub,                 $num);
+sig('Seq::min',        $seq,                       t_opt($num));
 sig('Seq::min_by',     $seq, $sub,                 $opt);
 sig('Seq::min_str',    $seq,                       t_opt(t_str));
 sig('Seq::min_str_by', $seq, $sub,                 $opt);
-sig('Seq::max',        $seq,                       t_opt(t_num));
+sig('Seq::max',        $seq,                       t_opt($num));
 sig('Seq::max_by',     $seq, $sub,                 $opt);
 sig('Seq::max_str',    $seq,                       t_opt(t_str));
 sig('Seq::max_str_by', $seq, $sub,                 $opt);
@@ -523,13 +525,13 @@ sig('Seq::to_hash',    $seq, $sub,                 t_hash);
 sig('Seq::to_hash_of_array',  $seq, $sub,          $hoa);
 sig('Seq::to_array_of_array', $seq,                $aoa);
 sig('Seq::find',       $seq, $sub,                 $opt);
-sig('Seq::any',        $seq, $sub,                 t_bool);
-sig('Seq::all',        $seq, $sub,                 t_bool);
-sig('Seq::none',       $seq, $sub,                 t_bool);
+sig('Seq::any',        $seq, $sub,                 $bool);
+sig('Seq::all',        $seq, $sub,                 $bool);
+sig('Seq::none',       $seq, $sub,                 $bool);
 sig('Seq::pick',       $seq, $sub,                 $opt);
 sig('Seq::equal',      $seq, $any,                 $any);
-sig('Seq::count',      $seq,                       t_hash(t_of t_int));
-sig('Seq::count_by',   $seq, $sub,                 t_hash(t_of t_int));
-sig('Seq::intersect',  $seq, $seq, $sub,           t_array);
+sig('Seq::count',      $seq,                       t_hash(t_of $int));
+sig('Seq::count_by',   $seq, $sub,                 t_hash(t_of $int));
+sig('Seq::intersect',  $seq, $seq, $sub,           $array);
 
 1;
