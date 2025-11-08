@@ -4,6 +4,8 @@ use 5.036;
 use Hash::Util ();
 use subs 'bind', 'keys', 'values', 'bless', 'map', 'delete', 'length';
 
+*_copy = \&Sq::Copy::copy;
+
 ### CONSTRUCTORS
 
 sub empty($) {
@@ -301,12 +303,12 @@ sub with_default($hash, %def) {
     for my ($key,$value) ( %def ) {
         $src_value = $new{$key};
         if ( !defined $src_value ) {
-            $new{$key} = Sq::Copy::copy($value);
+            $new{$key} = _copy($value);
         }
         # when value in $hash is not of same type as provided in %def,
         # than the value in %def will always be used
         elsif ( Sq::get_type($src_value) ne Sq::get_type($value) ) {
-            $new{$key} = Sq::Copy::copy($value);
+            $new{$key} = _copy($value);
         }
     }
     return CORE::bless(\%new, 'Hash');

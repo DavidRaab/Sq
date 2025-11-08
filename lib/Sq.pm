@@ -120,6 +120,11 @@ use Sq::Reflection;
 use Sq::Core;
 use Sq::Core::DU;
 
+# Load basic functionality
+use Sq::Dump;
+use Sq::Equality;
+use Sq::Copy;
+
 # Load Collections
 use Sq::Collections::Array;
 use Sq::Collections::Hash;
@@ -127,11 +132,6 @@ use Sq::Collections::Seq;
 use Sq::Collections::Queue;
 use Sq::Collections::List;
 use Sq::Collections::Heap;
-
-# Load other basic functionality
-use Sq::Dump;
-use Sq::Equality;
-use Sq::Copy;
 
 # Access to submodules
 sub io($) {

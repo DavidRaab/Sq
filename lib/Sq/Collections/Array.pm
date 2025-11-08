@@ -3,6 +3,9 @@ package Array;
 use 5.036;
 use subs 'bind', 'join', 'last', 'sort', 'map', 'bless', 'length';
 
+*_equal    = \&Sq::Equality::equal;
+*_is_regex = \&Sq::is_regex;
+
 #-----------------------------------------------------------------------------#
 # CONSTRUCTORS                                                                #
 #                    Functions that create sequences                          #
@@ -1056,11 +1059,11 @@ sub reduce($array, $f) {
 sub contains($array, @any) {
     for my $x ( @$array ) {
         for my $any ( @any ) {
-            if ( Sq::is_regex($any) ) {
+            if ( _is_regex($any) ) {
                 return 1 if $x =~ $any;
             }
             else {
-                return 1 if Sq::Equality::equal($x, $any);
+                return 1 if _equal($x, $any);
             }
         }
     }
