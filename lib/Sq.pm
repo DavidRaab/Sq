@@ -88,7 +88,7 @@ sub import {
         }
     }
 
-    # TODO: This changed
+    # TODO: Merge to one file
     # Load signature if requested
     if ( $LOAD_SIGNATURE ) {
         require Sq::Sig::Core;
