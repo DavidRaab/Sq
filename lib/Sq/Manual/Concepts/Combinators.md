@@ -165,8 +165,8 @@ sub gen_array($amount, $f) {
 ```
 
 What now changed is that `gen_array` just expects a function `$f`. We don't
-know what this function does. We only know that when we execute it. It get's
-some random generated value. This value is just put into the generated array.
+know what this function does. We only know that when we execute it, it gegenrates
+some random value. This value is then just put into a newly generated array.
 
 Now we are able to write.
 
@@ -192,7 +192,7 @@ sub gen_array($amount, $f) {
 }
 ```
 
-usually it is best to include some called *Runners*. All our functions return
+Usually it is best to include some *Runners*. All our functions return
 functions. But instead of directly calling the function we build another function
 to execute them.
 
@@ -204,18 +204,28 @@ sub gen_run($f) {
 
 in this case the runner is less useful. But in other cases not. Not every
 Combinator is written that it expects no input values. So for example we could
-generate some data or structure that then is passed to `$f->($input)`. Also
-we could add some things and do whatever `$f` returns. So we can add
-something before and after our data is generated.
+generate some data or structure that then is passed to `$f->($input)`. And maybe
+we also could add or do something before we return the data. So a more complex
+runner could look like this:
 
-Now we can write the following.
+```perl
+sub whatever_run($whatever, $x, $y) {
+    my $input    = generate_input($x,$y);
+    my $out      = $whatever->($input);
+    my $enhanced = enhance($out);
+    return $enhanced;
+}
+```
+
+With the change of `gen_array` also returning a subroutine we are now able to
+write the following.
 
 ```perl
 # Those just defines what should be generated
 my $r1 = gen_array(100,  gen_int(1,100));
 my $r2 = gen_array(1024, gen_int(0,255));
 
-# This now really generates the data
+# Only here something really happens and things are generated.
 my $ints1 = gen_run($r1);
 my $ints2 = gen_run($r2);
 ```
@@ -230,15 +240,22 @@ my $aoa =
         gen_array(2, gen_int(1,10)));
 
 # this generates the data
-my $data = gen_run($aoa);
+my $data1 = gen_run($aoa);
+my $data2 = gen_run($aoa);
+my $data3 = gen_run($aoa);
 ```
+
+It's also important to know that `$aoa` is somehow lazy. As long they are never
+*runned* in some way, nothing is ever happening. And we can execute Combinators
+as often we wish. `$data1`, `$data2` and `$data3` will all be arrays of arrays
+containg two integers, but they will be different.
 
 Combinators are a poweful construct that allows you to generate all kind of
 things that are very descriptive. It's like an DSL inside your programing
 language. In `Sq` itself the type-system `Sq::Type`, `Sq::Parser` and `Sq::Gen`
 are written with this approach.
 
-In F# i also have written an Animation-System with this approach. In a
+In F# I also have written an Animation-System with this approach. In a
 typical Combinator approach it makes sense to implement some kind of *and*
 and *or* combinator.
 
