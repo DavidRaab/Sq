@@ -92,7 +92,6 @@ sub import {
     # Load signature if requested
     if ( $LOAD_SIGNATURE ) {
         require Sq::Sig::Core;
-        require Sq::Sig::Array;
         require Sq::Sig::Hash;
         require Sq::Sig::Seq;
         require Sq::Sig::Queue;

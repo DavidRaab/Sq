@@ -16,11 +16,14 @@ sub world() {
     return 'World';
 }
 
+sub whatever() {
+    return "Whatever";
+}
+
 package Test2;
 use Sq;
 use Sq::Exporter;
-our @EXPORT    = qw(foo bar);
-our $SIGNATURE = 'Sq/Sig/Array.pm';
+our @EXPORT = qw(foo bar);
 
 sub foo() { ... }
 sub bar() { ... }
@@ -35,27 +38,27 @@ fn has_func => \&Sq::Reflection::has_func;
 
 dies { Test->import() }
 qr/\Afunction 'test' does not exists/,
-'error on test';
+'import() dies when @EXPORT contains a function that does not exists';
 
 nok(has_func('Test', 'foo'),   'has_func 1');
  ok(has_func('Test', 'hello'), 'has_func 2');
 nok(has_func('main', 'hello'), 'has_func 3');
 
-# manual call to import()
+# manual call to import(), only import "hello()"
 Test->import('hello', -sig => 1);
 
- ok(has_func('main', 'hello'), 'has_func 4');
-nok(has_func('main', 'world'), 'has_func 5');
+ ok(has_func('main', 'hello'), 'hello was imported');
+nok(has_func('main', 'world'), 'world is not imported');
 
 is(hello(), 'Hello', 'hello correct');
 
 dies { Test->import('whatever') }
 qr/\Afunction 'whatever' is not in \@EXPORT/,
-'import not defined';
+'importing an existing function not in @EXPORT fails';
 
 dies { Test->import('test') }
 qr/\Afunction 'test' does not exists/,
-'function not in @EXPORT fails';
+'function in @EXPORT but does not exists also fails';
 
 # check if foo() and bar() is imported
 nok(has_func('main', 'foo'), 'foo not yet imported');
