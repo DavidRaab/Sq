@@ -22,6 +22,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Hash::Util" : "0",
             "List::MoreUtils" : "0",
             "List::Util" : "0",
             "Scalar::Util" : "0"
@@ -31,6 +32,7 @@
          "requires" : {
             "Carp" : "0",
             "Digest::SHA" : "0",
+            "JSON" : "0",
             "List::MoreUtils" : "0",
             "List::Util" : "0",
             "Path::Tiny" : "0",
@@ -197,9 +199,6 @@
       "Sq::Reflection" : {
          "file" : "lib/Sq/Reflection.pm"
       },
-      "Sq::Sig::Array" : {
-         "file" : "lib/Sq/Sig/Array.pm"
-      },
       "Sq::Sig::Core" : {
          "file" : "lib/Sq/Sig/Core.pm"
       },
@@ -211,9 +210,6 @@
       },
       "Sq::Sig::Fs" : {
          "file" : "lib/Sq/Sig/Fs.pm"
-      },
-      "Sq::Sig::Hash" : {
-         "file" : "lib/Sq/Sig/Hash.pm"
       },
       "Sq::Sig::Heap" : {
          "file" : "lib/Sq/Sig/Heap.pm"
@@ -235,9 +231,6 @@
       },
       "Sq::Sig::Queue" : {
          "file" : "lib/Sq/Sig/Queue.pm"
-      },
-      "Sq::Sig::Seq" : {
-         "file" : "lib/Sq/Sig/Seq.pm"
       },
       "Sq::Sig::Str" : {
          "file" : "lib/Sq/Sig/Str.pm"

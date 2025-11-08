@@ -180,6 +180,7 @@ lib/Sq/Language.pm
 lib/Sq/Manual.pod
 lib/Sq/Manual/BindChain.pod
 lib/Sq/Manual/Concepts/Bind.pod
+lib/Sq/Manual/Concepts/Combinators.md
 lib/Sq/Manual/Concepts/Exceptions.pod
 lib/Sq/Manual/Concepts/Folding.pod
 lib/Sq/Manual/Concepts/Immutability.pod
@@ -216,12 +217,10 @@ lib/Sq/Parser/Markdown.pm
 lib/Sq/Rand.pm
 lib/Sq/Reflection.pm
 lib/Sq/Reflection.pod
-lib/Sq/Sig/Array.pm
 lib/Sq/Sig/Core.pm
 lib/Sq/Sig/Fmt.pm
 lib/Sq/Sig/Fork.pm
 lib/Sq/Sig/Fs.pm
-lib/Sq/Sig/Hash.pm
 lib/Sq/Sig/Heap.pm
 lib/Sq/Sig/Io.pm
 lib/Sq/Sig/List.pm
@@ -229,7 +228,6 @@ lib/Sq/Sig/Math.pm
 lib/Sq/Sig/P.pm
 lib/Sq/Sig/Parser.pm
 lib/Sq/Sig/Queue.pm
-lib/Sq/Sig/Seq.pm
 lib/Sq/Sig/Str.pm
 lib/Sq/Signature.pm
 lib/Sq/Test.pm
