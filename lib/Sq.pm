@@ -2,6 +2,13 @@ package Sq;
 use 5.036;
 our $VERSION = '0.007';
 use Carp ();
+# TODO:
+#   Scalar::Util also loads List::Util. So theoretically List::Util
+#   functions can be used everywhere. This is somewhat annoying
+#   because i want to reduce loading time. And List::Util takes around
+#   4ms to load. The only function i need from Scalar::Util is
+#   looks_like_number(). When i find an alternative for this, i
+#   could remove Scalar::Util and this way also List::Util loading.
 use Scalar::Util ();
 # This variable is by default 0 and will be set to 1 when user does
 #
@@ -445,9 +452,10 @@ sub new($what, @args) {
 # to the function an an array-ref
 sub with_dispatch(@tf) {
     return sub {
-        my $it = List::MoreUtils::natatime 2, @tf;
+        my $end = int(@tf / 2) * 2;
         my ($type,$f);
-        while ( ($type, $f) = $it->() ) {
+        for (my $idx=0; $idx<$end; $idx+=2) {
+            ($type,$f) = @tf[$idx, $idx+1];
             if ( Sq::Type::t_valid($type, \@_) ) {
                 return $f->(@_);
             }
@@ -465,9 +473,10 @@ sub with_dispatch(@tf) {
 # pass the TYPE of the first argument.
 sub type_cond(@tf) {
     return sub($any) {
-        my $it = List::MoreUtils::natatime 2, @tf;
+        my $end = int(@tf / 2) * 2;
         my ($type,$f);
-        while ( ($type, $f) = $it->() ) {
+        for (my $idx=0; $idx<$end; $idx+=2) {
+            ($type,$f) = @tf[$idx, $idx+1];
             if ( Sq::Type::t_valid($type, $any) ) {
                 return $f->($any);
             }

@@ -1,7 +1,5 @@
 package Sq::Collections::Array;
 package Array;
-use List::Util ();
-use List::MoreUtils ();
 use 5.036;
 use subs 'bind', 'join', 'last', 'sort', 'map', 'bless', 'length';
 
@@ -209,11 +207,13 @@ sub rev($array) {
 }
 
 sub mapn($array, $count, $f) {
-    local $_;
     my @new;
-    my $it = List::MoreUtils::natatime $count, @$array;
-    while ( my @vals = $it->() ) {
-        CORE::push @new, (scalar $f->(@vals));
+    my $end       = int(@$array / $count) * $count;
+    my $stepSize  = $count - 1;
+    my $x;
+    for (my $idx=0; $idx<$end; $idx+=$count) {
+        $x = $f->( $array->@[$idx .. $idx+$stepSize] );
+        push @new, $x;
     }
     CORE::bless(\@new, 'Array');
 }
@@ -305,8 +305,13 @@ sub map_e($array, $expr) {
 
 sub chunked($array, $size) {
     my @new;
-    my $it = List::MoreUtils::natatime $size, @$array;
-    while ( my @vals = $it->() ) {
+    my $end         = @$array - 1;
+    my $stepSize    = $size - 1;
+    my ($idx,$idxe) = (0,0);
+    for (my $idx=0; $idx<=$end; $idx+=$size) {
+        $idxe    = $idx + $stepSize;
+        $idxe    = $idxe <= $end ? $idxe : $end;
+        my @vals = $array->@[$idx .. $idxe];
         push @new, CORE::bless(\@vals, 'Array');
     }
     return CORE::bless(\@new, 'Array');
@@ -782,9 +787,31 @@ sub intersect($arrayA, $arrayB, $f_key) {
     return CORE::bless(\@new, 'Array');
 }
 
+# TODO: Should it make a deep-copy?
+#
+# Makes a flat-copy, and then does an in-place shuffle
 sub shuffle($array) {
-    return CORE::bless([List::Util::shuffle @$array], 'Array');
+    my $new   = [@$array];
+    my $count = @$array;
+    my ($tmp, $new_idx);
+    for (my $idx=0; $idx < $count; $idx++) {
+        $new_idx         = rand $count;
+        $tmp             = $new->[$idx];
+        $new->[$idx]     = $new->[$new_idx];
+        $new->[$new_idx] = $tmp;
+    }
+    return CORE::bless($new, 'Array');
 }
+
+# TODO: Implement a way to check if certain Modules are Loaded.
+#       When they are, for example List::Util is loaded, then this
+#       implementation is used instead. Because List::Util::shuffle
+#       written in C provides a faster implementation as a Perl
+#       implementation.
+#
+# sub shuffle($array) {
+#     return CORE::bless([List::Util::shuffle @$array], 'Array');
+# }
 
 sub trim($array) {
     my @new;
@@ -966,8 +993,11 @@ sub iter($array, $f) {
 }
 
 sub itern($array, $amount, $f) {
-    my $it = List::MoreUtils::natatime $amount, @$array;
-    while ( my @vals = $it->() ) {
+    my $stepSize = $amount - 1;
+    my $end      = int(@$array / $amount) * $amount;
+    my @vals;
+    for (my $idx=0; $idx<$end; $idx+=$amount) {
+        @vals = $array->@[$idx .. $idx+$stepSize];
         $f->(@vals);
     }
     return;
