@@ -1,5 +1,5 @@
 package Sq::Gen;
-use 5.036;
+use 5.040;
 use Sq qw(sq);
 use Sq::Evaluator;
 use Sq::Exporter;

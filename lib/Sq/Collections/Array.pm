@@ -995,10 +995,12 @@ sub iter($array, $f) {
 sub itern($array, $amount, $f) {
     my $stepSize = $amount - 1;
     my $end      = int(@$array / $amount) * $amount;
+    my $idx      = 0;
     my @vals;
-    for (my $idx=0; $idx<$end; $idx+=$amount) {
+    while ( $idx < $end ) {
         @vals = $array->@[$idx .. $idx+$stepSize];
         $f->(@vals);
+        $idx += $amount;
     }
     return;
 }

@@ -1,5 +1,5 @@
 package Sq::Copy;
-use 5.036;
+use 5.040;
 
 # This is inlined in copy() but i still provide this function as an API
 # called by other code

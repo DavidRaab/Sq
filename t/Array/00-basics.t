@@ -1600,6 +1600,18 @@ is(
         [13 => "foofoo"],
         [17 => "foofoo"],
     ], 'itern 2');
+
+    my $hash = {};
+    Array::itern([1,"a",2,"b",3], 2, sub($k,$v) {
+        $hash->{$k} = $v;
+    });
+    is(
+        $hash,
+        {
+            1 => "a",
+            2 => "b",
+        },
+        'only loops over defined values');
 }
 
 # scan

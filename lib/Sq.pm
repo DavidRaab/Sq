@@ -1,5 +1,5 @@
 package Sq;
-use 5.036;
+use 5.040;
 our $VERSION = '0.007';
 use Carp ();
 # TODO:
@@ -452,10 +452,7 @@ sub new($what, @args) {
 # to the function an an array-ref
 sub with_dispatch(@tf) {
     return sub {
-        my $end = int(@tf / 2) * 2;
-        my ($type,$f);
-        for (my $idx=0; $idx<$end; $idx+=2) {
-            ($type,$f) = @tf[$idx, $idx+1];
+        for my ($type,$f) ( @tf ) {
             if ( Sq::Type::t_valid($type, \@_) ) {
                 return $f->(@_);
             }
@@ -473,10 +470,7 @@ sub with_dispatch(@tf) {
 # pass the TYPE of the first argument.
 sub type_cond(@tf) {
     return sub($any) {
-        my $end = int(@tf / 2) * 2;
-        my ($type,$f);
-        for (my $idx=0; $idx<$end; $idx+=2) {
-            ($type,$f) = @tf[$idx, $idx+1];
+        for my ($type,$f) ( @tf ) {
             if ( Sq::Type::t_valid($type, $any) ) {
                 return $f->($any);
             }
