@@ -17,7 +17,7 @@ our @EXPORT = (
 );
 
 # Manual import
-*blessed = \&Scalar::Util::blessed;
+*blessed = \&builtin::blessed;
 *is_num  = \&Scalar::Util::looks_like_number;
 *Ok      = \&Result::Ok;
 *Err     = \&Result::Err;
