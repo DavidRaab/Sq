@@ -789,8 +789,6 @@ sub intersect($arrayA, $arrayB, $f_key) {
 
 # TODO: Because List::Util is also loaded by Scalar::Util i keep using it for shuffle.
 # TODO: Should it make a deep-copy?
-#
-# Makes a flat-copy, and then does an in-place shuffle
 sub shuffle($array) {
     return CORE::bless([List::Util::shuffle(@$array)], 'Array');
 }
