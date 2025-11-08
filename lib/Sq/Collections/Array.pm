@@ -787,31 +787,13 @@ sub intersect($arrayA, $arrayB, $f_key) {
     return CORE::bless(\@new, 'Array');
 }
 
+# TODO: Because List::Util is also loaded by Scalar::Util i keep using it for shuffle.
 # TODO: Should it make a deep-copy?
 #
 # Makes a flat-copy, and then does an in-place shuffle
 sub shuffle($array) {
-    my $new   = [@$array];
-    my $count = @$array;
-    my ($tmp, $new_idx);
-    for (my $idx=0; $idx < $count; $idx++) {
-        $new_idx         = rand $count;
-        $tmp             = $new->[$idx];
-        $new->[$idx]     = $new->[$new_idx];
-        $new->[$new_idx] = $tmp;
-    }
-    return CORE::bless($new, 'Array');
+    return CORE::bless([List::Util::shuffle(@$array)], 'Array');
 }
-
-# TODO: Implement a way to check if certain Modules are Loaded.
-#       When they are, for example List::Util is loaded, then this
-#       implementation is used instead. Because List::Util::shuffle
-#       written in C provides a faster implementation as a Perl
-#       implementation.
-#
-# sub shuffle($array) {
-#     return CORE::bless([List::Util::shuffle @$array], 'Array');
-# }
 
 sub trim($array) {
     my @new;
