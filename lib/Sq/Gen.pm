@@ -12,68 +12,6 @@ our @EXPORT = (
     qw(gen_int gen_num),                                     # Nums
 );
 
-# Sq::Gen currently is also just a Combinator. This means all functions
-# just return new functions that can be executed. A Combinator is a way to
-# combine functions. Consider that even a "normal" programming language like
-# Perl can be seen as a combinator. For example the ";" can be seen as a
-# combinator that says: Runs this function, don't care what it returns,
-# then run the next function.
-#
-# But there are other ways to combine functions. When functions stick to a
-# certain input/output data-type, you can do lots of useful stuff.
-#
-# For example calling `gen_int(1,100)` does not immediately generate a
-# random number from 1-100. It returns a function that when is called
-# will return a number from 1-100. So theoretically you must do.
-#
-# my $func       = gen_int(1,100);
-# my $random_int = $func->();
-#
-# But instead of doing this manually, we use gen_run() that does this
-# executing for us. Why this extra step of returning a function you may ask?
-#
-# because then we can combine functions. Hence the name "Combinators".
-#
-# for example gen_and() just takes multiple generators. just executes them,
-# and puts all what those functions return into an array. So you can write.
-#
-#    my $dmy = gen_and(
-#        gen_int(1,28),
-#        gen_int(1,12),
-#        gen_int(0,3000),
-#    );
-#
-# and $dmy is, not an array. but will be another combinator, a function that
-# when you execute it, returns an array with 3 numbers. You can run this combinator
-# or again combain the result with another combinator. For example, you also
-# can say that you want 100 of those above. So there is a gen_repeat() that does
-# this task.
-#
-# my $hundred = gen_repeat(100, $dmy);
-#
-# Again, $hundreds is now a function that when is executed will return one array
-# that contain hundreds inner arrays containing 3 values.
-#
-# [
-#   [ 10,  7, 1149 ],
-#   [ 21, 10, 1059 ],
-#   [  3,  4, 1949 ],
-#   [ 14,  8, 2799 ],
-#   [ 22,  8, 1767 ],
-#   [ 26, 10, 1211 ],
-#   [  8, 10, 2953 ],
-#   [ 12,  7,  739 ],
-#   [ 10, 10, 2990 ],
-# ....
-#
-# Combinators are awesome. They are actually pretty easy once you get the
-# fundemantal understanding, and they allow for a DSL Like language
-# inside a programming language that nearly describe itself. Also Sq::Type
-# and Sq::Parser are based on Combinators.
-#
-# The only requirement for a Generator is that it is a function with no argument
-# returning something. That's it.
-
 ### RUNNERS
 
 sub gen_run($gen) {
