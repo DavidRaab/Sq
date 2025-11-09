@@ -1611,7 +1611,11 @@ is(
             1 => "a",
             2 => "b",
         },
-        'only loops over defined values');
+        'only loops over multiple of 2');
+
+    my $sum = array;
+    Array::itern([1,2,3,4,5,6,7], 3, sub($x,$y,$z) { $sum->push($x+$y+$z) });
+    is($sum, [6,15], 'only loops over multiple of 3');
 }
 
 # scan

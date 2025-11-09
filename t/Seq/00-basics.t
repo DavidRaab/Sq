@@ -1473,6 +1473,22 @@ is(seq {1,2,3}->tail,     seq {2,3}, 'tail 1');
             [7, 8, 9],
         ],
         'itern 3');
+
+    my $hash = {};
+    seq {1,"a",2,"b",3}->itern(2, sub($k,$v) {
+        $hash->{$k} = $v;
+    });
+    is(
+        $hash,
+        {
+            1 => "a",
+            2 => "b",
+        },
+        'only loops over multiple of 2');
+
+    my $sum = array;
+    Seq::itern(seq {1,2,3,4,5,6,7}, 3, sub($x,$y,$z) { $sum->push($x+$y+$z) });
+    is($sum, [6,15], 'only loops over multiple of 3');
 }
 
 # to_arrays
