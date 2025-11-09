@@ -113,10 +113,10 @@ sub import {
 
 # Load Core
 use Sq::Reflection;
+# Equality, Lazy, Option, Result,
 use Sq::Core;
 use Sq::Core::DU;
 use Sq::Dump;
-use Sq::Equality;
 use Sq::Copy;
 use Sq::Type;
 
