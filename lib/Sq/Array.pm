@@ -1,4 +1,4 @@
-package Sq::Collections::Array;
+package Sq::Array;
 package Array;
 use 5.036;
 use subs 'bind', 'join', 'last', 'sort', 'map', 'bless', 'length';

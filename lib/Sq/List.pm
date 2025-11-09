@@ -1,4 +1,4 @@
-package Sq::Collections::List;
+package Sq::List;
 package List;
 use 5.036;
 use subs 'bind', 'join', 'select', 'last', 'sort', 'map', 'foreach', 'length';

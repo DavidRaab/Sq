@@ -1,4 +1,4 @@
-# PODNAME: Sq::Collections::Hash
+# PODNAME: Sq::Hash
 # ABSTRACT: Array functions
 
 __END__

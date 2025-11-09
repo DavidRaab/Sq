@@ -1,4 +1,4 @@
-# PODNAME: Sq::Collections::Heap
+# PODNAME: Sq::Heap
 # ABSTRACT: Heap
 
 __END__

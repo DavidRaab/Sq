@@ -1,4 +1,4 @@
-package Sq::Collections::Query;
+package Sq::Query;
 use 5.036;
 
 # This will be a data-structure to build Queries that then can be

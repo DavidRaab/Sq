@@ -1,4 +1,4 @@
-package Sq::Collections::Hash;
+package Sq::Hash;
 package Hash;
 use 5.036;
 use Hash::Util ();

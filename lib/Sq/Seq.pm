@@ -1,4 +1,4 @@
-package Sq::Collections::Seq;
+package Sq::Seq;
 package Seq;
 use 5.036;
 use subs 'bind', 'join', 'select', 'last', 'sort', 'map', 'length';

@@ -1,4 +1,4 @@
-package Sq::Collections::Heap;
+package Sq::Heap;
 package Heap;
 use 5.036;
 

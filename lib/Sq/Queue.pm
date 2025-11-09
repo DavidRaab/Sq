@@ -1,4 +1,4 @@
-package Sq::Collections::Queue;
+package Sq::Queue;
 package Queue;
 use 5.036;
 use subs 'foreach';

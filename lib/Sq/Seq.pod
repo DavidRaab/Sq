@@ -1,4 +1,4 @@
-# PODNAME: Seq
+# PODNAME: Sq::Seq
 # ABSTRACT: What is Seq, and how do I use it?
 
 __END__

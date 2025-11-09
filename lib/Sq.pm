@@ -124,12 +124,12 @@ use Sq::Copy;
 use Sq::Type;
 
 # Load Collections
-use Sq::Collections::Array;
-use Sq::Collections::Hash;
-use Sq::Collections::Seq;
-use Sq::Collections::Queue;
-use Sq::Collections::List;
-use Sq::Collections::Heap;
+use Sq::Array;
+use Sq::Hash;
+use Sq::Seq;
+use Sq::Queue;
+use Sq::List;
+use Sq::Heap;
 
 # Access to submodules
 sub io($) {
