@@ -146,7 +146,7 @@ sub add_equality($type, $func) {
 }
 
 
-package Sq::Core::Lazy;
+package Sq::Lazy;
 use 5.036;
 
 sub lazy :prototype(&) {
@@ -157,7 +157,7 @@ sub lazy :prototype(&) {
         $cache = $fn->();
         $fn    = undef;
         return $cache;
-    }, 'Sq::Core::Lazy');
+    }, 'Sq::Lazy');
 }
 
 sub force($self) {
