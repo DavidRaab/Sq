@@ -1049,11 +1049,8 @@ sub index($array, $idx, $default=undef) {
 sub reduce($array, $f) {
     return Option::None()            if @$array == 0;
     return Option::Some($array->[0]) if @$array == 1;
-    my $init = $array->[0];
-    for (my $idx=1; $idx < @$array; $idx++) {
-        $init = $f->($init, $array->[$idx]);
-    }
-    return Option::Some($init);
+    local ($a,$b);
+    return Option::Some(List::Util::reduce(sub { $f->($a,$b) }, @$array));
 }
 
 sub contains($array, @any) {
@@ -1103,33 +1100,20 @@ sub sum($array) {
 }
 
 sub sum_by($array, $f_map) {
-    my $sum = 0;
-    for my $x ( @$array ) {
-        $sum += $f_map->($x);
-    }
-    return $sum;
+    local ($a,$b);
+    return List::Util::reduce(sub { $a + $f_map->($b) }, 0, @$array);
 }
 
 sub average($array) {
     return 0 if @$array == 0;
-    my $sum   = 0;
-    my $count = 0;
-    for my $x ( @$array ) {
-        $sum += $x;
-        $count++;
-    }
-    return $sum / $count;
+    return List::Util::sum0(@$array) / @$array;
 }
 
 sub average_by($array, $f_map) {
     return 0 if @$array == 0;
-    my $sum   = 0;
-    my $count = 0;
-    for my $x ( @$array ) {
-        $sum += $f_map->($x);
-        $count++;
-    }
-    return $sum / $count;
+    local ($a, $b);
+    my $sum = List::Util::reduce(sub { $a + $f_map->($b) }, 0, @$array);
+    return $sum / @$array;
 }
 
 sub join($array, $sep='') {
