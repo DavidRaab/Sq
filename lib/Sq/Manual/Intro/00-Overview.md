@@ -42,7 +42,7 @@ use `Carp::croak` and `Scalar::Util::looks_like_number`.
 When you don't need any default imported function you can write.
 
 ```perl
-Sq ();
+use Sq ();
 ```
 
 and import of any function can be avoided. Also you can choose to only load
@@ -186,25 +186,25 @@ the only thing you do is to create a function to access a hash-field or a
 specific index of an array. This is what `key` and `idx` is about.
 
 ```perl
-$array->sort_by(by_num, sub($hash) { $hash->{id} });
-$array->sort_by(by_num, key 'id');
+my $sorted = $aoh->sort_by(by_num, sub($hash) { $hash->{id} });
+my $sorted = $aoh->sort_by(by_num, key 'id');
 
-$array->sort_by(by_num, sub($array) { $array->[0] });
-$array->sort_by(by_num, idx 0);
+my $sorted = $aoa->sort_by(by_num, sub($array) { $array->[0] });
+my $sorted = $aoa->sort_by(by_num, idx 0);
 ```
 
 ## by_num(), by_str(), by_stri()
 
 Those are default comparison function for comparing things by string, numbers
-or string ignore case.
+or string ignore case. They are useful in `->sort()` or `->sort_by()`.
 
 ```perl
-$array->sort_by(
+my $sorted = $aoh->sort_by(
     sub($x,$y) { $x <=> $y   },
     sub($hash) { $hash->{id} });
 
 # Much better to read/write
-$array->sort_by(by_num, key 'id');
+my $sorted = $aoh->sort_by(by_num, key 'id');
 ```
 
 ## assign {}
@@ -471,7 +471,7 @@ my $sum1 = $ten->sum;
 my $sum2 = $ten->fold(0, sub($x,$acc) { $acc + $x });
 ```
 
-All three generates the sum. On some other iterator implementation maybe
+Both generate the sum. On some other iterator implementation maybe
 `$sum2` could be `0` because the iterator was already exhausted. This is not
 the case for `Seq`. That is the reason what makes it *immutable*. It's
 definition always stays the same.
