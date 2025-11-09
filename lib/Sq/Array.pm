@@ -1204,10 +1204,7 @@ sub max($array, $default=undef) {
     if ( @$array == 0 ) {
         return defined $default ? $default : Option::None();
     }
-    my $max = $array->[0];
-    for my $x ( @$array ) {
-        $max = $x if $x > $max;
-    }
+    my $max = List::Util::max(@$array);
     return defined $default ? $max : Option::Some($max);
 }
 
