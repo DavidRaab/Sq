@@ -111,13 +111,12 @@ sub import {
     }
 }
 
-# Load Core
+# Load Core functionality
 use Sq::Reflection;
-# Equality, Lazy, Option, Result,
-use Sq::Core;
-use Sq::Core::DU;
-use Sq::Dump;
-use Sq::Type;
+use Sq::Core;        # equal(), copy(), lazy {}, Option, Result
+use Sq::Core::DU;    # Discriminated Unions
+use Sq::Dump;        # dump(), dumps()
+use Sq::Type;        # Type System
 
 # Load Collections
 use Sq::Array;
