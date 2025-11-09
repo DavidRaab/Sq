@@ -1,7 +1,7 @@
 #!perl
 use 5.036;
 use List::Util qw(reduce);
-use Scalar::Util qw(refaddr);
+use builtin qw(refaddr);
 use Sq -sig => 1;
 use Sq::Gen qw(gen_run gen);
 use Sq::Test;
