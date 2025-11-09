@@ -371,7 +371,6 @@ sigt('Hash::slice',        t_tuplev($hash, t_array(t_min(1), t_of $str)),  $hash
 sigt('Hash::with',         t_tuplev($hash, $even_sized),                   $hash); # can be improved
 sigt('Hash::withf',        t_tuplev($hash, $even_sized),                   $hash); # can be improved
 sigt('Hash::has_keys',     t_tuplev($hash, $astr),                         $bool);
-sig ('Hash::equal',        $hash, $any,                                    $bool);
 sig ('Hash::to_array',     $hash, $sub,                                    $array);
 
 ### SIDE-EFFECTS
@@ -530,7 +529,6 @@ sig('Seq::any',        $seq, $sub,                 $bool);
 sig('Seq::all',        $seq, $sub,                 $bool);
 sig('Seq::none',       $seq, $sub,                 $bool);
 sig('Seq::pick',       $seq, $sub,                 $opt);
-sig('Seq::equal',      $seq, $any,                 $any);
 sig('Seq::count',      $seq,                       t_hash(t_of $int));
 sig('Seq::count_by',   $seq, $sub,                 t_hash(t_of $int));
 sig('Seq::intersect',  $seq, $seq, $sub,           $array);

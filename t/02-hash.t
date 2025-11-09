@@ -635,38 +635,38 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
     my $h = hash(foo => 1);
     my $i = hash(foo => 1);
 
-    ok($h->equal($i), 'equal');
-    ok(!$h->equal($i->with(test => 1)), 'not equal');
+    ok(equal($h, $i), 'equal');
+    ok(! equal($h, $i->with(test => 1)), 'not equal');
 
     # set a shared array
     my $shared = [1,2,3];
     $h->set(array => $shared);
     $i->set(array => $shared);
-    ok($h->equal($i), 'equal because same reference');
+    ok(equal($h,$i), 'equal because same reference');
 
     # replace a shared array, but same data
     $i->set(array => [1,2,3]);
-    ok($h->equal($i), 'recursive comparision');
+    ok(equal($h,$i), 'recursive comparision');
 
     # same keys, but different data
     $h->set(array => "foo");
     $i->set(array => "foo");
-    ok($h->equal($i), 'same again');
+    ok(equal($h,$i), 'same again');
 
     # one has one more key
     $h->set(new => 1);
-    ok(!$h->equal($i), 'not equal because $h has one more key');
+    ok(!equal($h,$i), 'not equal because $h has one more key');
 
     # delete additional keys
     $h->delete(qw/array new/);
     $i->delete('array');
-    ok($h->equal($i), 'same after delete');
+    ok(equal($h,$i), 'same after delete');
 
     # comparing with plain hash
-    ok($h->equal({foo => 1}), 'equal perl hash');
+    ok(equal($h, {foo => 1}), 'equal perl hash');
 
     # two perl hashes
-    ok(Hash::equal({foo => 1}, {foo => 1}), 'two perl hashes');
+    ok(equal({foo => 1}, {foo => 1}), 'two perl hashes');
 }
 
 # find

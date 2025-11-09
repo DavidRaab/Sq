@@ -5,8 +5,12 @@ use Sq::Test;
 use Scalar::Util qw(refaddr);
 
 # test method
-ok(sq({})->equal(sq {}), 'hash');
-ok(sq([])->equal(sq []), 'array');
+ok(equal(sq({}), sq {}), 'hash 1');
+ok(equal(sq({}),  hash), 'hash 2');
+ok(equal(sq({}),    {}), 'hash 3');
+ok(equal(sq([]), sq []), 'array 1');
+ok(equal(sq([]), array), 'array 2');
+ok(equal(sq([]),    []), 'array 3');
 
 # check equal import
 is([],          [], 'array');
@@ -96,7 +100,12 @@ is(
     [1,[6,{foo => 2},7],3, []],
     'struct 15');
 
-ok(Array->replicate(3, "foo")->equal(["foo", "foo", "foo"]), 'struct 16 A');
+ok(
+    equal(
+        Array->replicate(3, "foo"),
+        ["foo", "foo", "foo"]
+    ),
+    'struct 16 A');
 is(
     Array->replicate(3, "foo"),
     ["foo", "foo", "foo"],
@@ -265,28 +274,31 @@ nok(equal(
     }),
     'struct 51');
 
-ok(sq({
-        Artist => 'Queen',
-        Title  => 'Greatest Hits',
-        Tracks => seq {
-            { Title => 'We will Rock You'          },
-            { Title => 'Radio Gaga'                },
-            { Title => 'Who Wants To Life Forever' },
-            { Title => "You Don't Fool Me"         },
-        },
-        Tags => Some(qw/80/),
-    })->equal({
-        Artist => 'Queen',
-        Title  => 'Greatest Hits',
-        Tracks => seq {
-            { Title => 'We will Rock You'          },
-            { Title => 'Radio Gaga'                },
-            { Title => 'Who Wants To Life Forever' },
-            { Title => "You Don't Fool Me"         },
-        },
-        Tags => Some(qw/80/),
-    }), 'struct 52');
-
+ok(
+    equal(
+        sq({
+            Artist => 'Queen',
+            Title  => 'Greatest Hits',
+            Tracks => seq {
+                { Title => 'We will Rock You'          },
+                { Title => 'Radio Gaga'                },
+                { Title => 'Who Wants To Life Forever' },
+                { Title => "You Don't Fool Me"         },
+            },
+            Tags => Some(qw/80/),
+        }),
+        {
+            Artist => 'Queen',
+            Title  => 'Greatest Hits',
+            Tracks => seq {
+                { Title => 'We will Rock You'          },
+                { Title => 'Radio Gaga'                },
+                { Title => 'Who Wants To Life Forever' },
+                { Title => "You Don't Fool Me"         },
+            },
+            Tags => Some(qw/80/),
+        }),
+        'struct 52');
 
 {
     my $character = sq {
