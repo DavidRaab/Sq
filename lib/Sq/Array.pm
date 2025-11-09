@@ -1172,10 +1172,7 @@ sub min_str($array, $default=undef) {
     if ( @$array == 0 ) {
         return defined $default ? $default : Option::None();
     }
-    my $min = $array->[0];
-    for my $x ( @$array ) {
-        $min = $x if $x lt $min;
-    }
+    my $min = List::Util::minstr(@$array);
     return defined $default ? $min : Option::Some($min);
 }
 
@@ -1225,10 +1222,7 @@ sub max_str($array, $default=undef) {
     if ( @$array == 0 ) {
         return defined $default ? $default : Option::None();
     }
-    my $max = $array->[0];
-    for my $x ( @$array ) {
-        $max = $x if $x gt $max;
-    }
+    my $max = List::Util::maxstr(@$array);
     return defined $default ? $max : Option::Some($max);
 }
 
