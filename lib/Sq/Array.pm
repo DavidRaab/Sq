@@ -1151,10 +1151,7 @@ sub min($array, $default=undef) {
     if ( @$array == 0 ) {
         return defined $default ? $default : Option::None();
     }
-    my $min = $array->[0];
-    for my $x ( @$array ) {
-        $min = $x if $x < $min;
-    }
+    my $min = List::Util::min(@$array);
     return defined $default ? $min : Option::Some($min);
 }
 
