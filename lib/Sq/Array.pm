@@ -1318,10 +1318,9 @@ sub count_by($array, $f_key) {
 }
 
 sub find($array, $predicate) {
-    for my $x ( @$array ) {
-        return Option::Some($x) if $predicate->($x);
-    }
-    return Option::None();
+    local $_;
+    my $x = List::Util::first(sub{ $predicate->($_) }, @$array);
+    return defined $x ? Option::Some($x) : Option::None();
 }
 
 sub find_windowed($array, $amount, $predicate) {
