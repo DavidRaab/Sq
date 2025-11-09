@@ -168,29 +168,15 @@ sub force($self) {
 package Sq::Copy;
 use 5.036;
 
-# This is inlined in copy() but i still provide this function as an API
-# called by other code
-sub hash($hash, $other) { ... }
-
-# This is inlined in copy() but i still provide this function as an API
-# called by other code
-sub array($array)   { ... }
-sub seq($seq)       { ... }
-sub result($result) { ... }
-sub du($union)      { ... }
-sub du_case($union) { ... }
-
-# As far i see Path::Tiny objects has no mutation methods, so they can be returned as-is.
+# As far i see Path::Tiny objects don't do mutation. All methods return new
+# objects. So it should be safe to return object as-is. If I encounter a problem
+# with this, this must be changed.
 sub path_tiny($path) {
     return $path;
 }
 
 my $copy_dispatch = {
-    'Result'             => \&result,
-    'Seq'                => \&seq,
-    'Sq::Core::DU'       => \&du,
-    'Sq::Core::DU::Case' => \&du_case,
-    'Path::Tiny'         => \&path_tiny,
+    'Path::Tiny' => \&path_tiny,
 };
 
 sub copy($any) {
