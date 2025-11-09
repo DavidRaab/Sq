@@ -87,12 +87,9 @@ sub import {
         }
     }
 
-    # TODO: Merge to one file
     # Load signature if requested
     if ( $LOAD_SIGNATURE ) {
         require Sq::Sig::Core;
-        require Sq::Sig::Queue;
-        require Sq::Sig::Heap;
     }
 
     # Export only requested

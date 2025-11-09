@@ -3,8 +3,6 @@ use 5.036;
 use Sq::Type;
 use Sq::Signature;
 
-### OPTION MODULE
-
 # Some predefined types
 my $any       = t_any;
 my $void      = t_void;
@@ -35,6 +33,7 @@ my $hoa       = t_hash (t_of $array);
 my $str_array = t_eq('Array');
 my $str_seq   = t_eq('Seq');
 
+### OPTION MODULE
 
 sigt('Option::Some', t_tuplev($array), $opt);
 # sigt('Option::None', t_tuple(),         $opt); # doesn't work because of Prototype
@@ -535,5 +534,46 @@ sig('Seq::equal',      $seq, $any,                 $any);
 sig('Seq::count',      $seq,                       t_hash(t_of $int));
 sig('Seq::count_by',   $seq, $sub,                 t_hash(t_of $int));
 sig('Seq::intersect',  $seq, $seq, $sub,           $array);
+
+
+###---------------
+### QUEUE
+###---------------
+
+my $queue = t_ref('Queue');
+
+sigt('Queue::new',        t_tuplev(t_any, t_array),  $queue);
+sig ('Queue::length',     $queue,                     t_int);
+sigt('Queue::add',        t_tuplev($queue, t_array), t_void);
+sig ('Queue::to_array',   $queue,                   t_array);
+# list context
+# sigt('Queue::remove',
+#     t_or(
+#         t_tuple($queue),
+#         t_tuple($queue, t_int)
+#     ),
+#     t_array
+# );
+
+###----------------------------
+### HEAP
+###----------------------------
+
+my $heap = t_ref('Heap');
+
+sig ('Heap::new',        t_any, t_sub,              $heap);
+sig ('Heap::count',      $heap,                     t_int);
+sigt('Heap::add',        t_tuplev($heap, t_array), t_void);
+sig ('Heap::add_one',    $heap, t_any,             t_void);
+sig ('Heap::head',       $heap,                     t_any);
+sig ('Heap::remove',     $heap,                     t_any);
+# sig ('Heap::remove_all', $heap,                     t_any); # list context
+sigt('Heap::show_tree',
+    t_or(
+        t_tuple($heap),
+        t_tuple($heap, t_sub)
+    ),
+    t_void
+);
 
 1;
