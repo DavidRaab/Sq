@@ -958,12 +958,12 @@ is(
 # copy of array-ref
 {
     my $data = sq [1,2,3,4,5];
-    my $new  = $data->copy;
+    my $new  = copy($data);
 
     is($data, $new,         'contains same data');
     ok(not ($data eq $new), 'not same array references');
 
-    my $new2  = Array::copy([1,2,3,undef,4,5,6]);
+    my $new2  = copy([1,2,3,undef,4,5,6]);
     is($new2, [1,2,3], 'copy only copies up to first undef');
 }
 

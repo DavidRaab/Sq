@@ -117,7 +117,6 @@ use Sq::Reflection;
 use Sq::Core;
 use Sq::Core::DU;
 use Sq::Dump;
-use Sq::Copy;
 use Sq::Type;
 
 # Load Collections

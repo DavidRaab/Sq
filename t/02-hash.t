@@ -456,7 +456,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 # copy
 {
     my $h = hash(foo => 2);
-    my $i = $h->copy;
+    my $i = copy($h);
 
     $h->set(foo => 1);
 
@@ -846,7 +846,7 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
         birthday => '1970-01-01',
     )->lock;
 
-    my $orig = $h->copy;
+    my $orig = copy($h);
 
     dies { $h->{age} = 12 }
     qr/\AAttempt to access disallowed key/,

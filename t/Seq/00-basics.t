@@ -756,8 +756,8 @@ is(
 }
 
 {
-    my $range2 = $range->copy;
-    is($range, $range2,   'Seq has ->copy');
+    my $range2 = copy($range);
+    is($range, $range2,   'copy on Seq');
     ok($range eq $range2, 'same reference because sequence creates iterators');
 }
 

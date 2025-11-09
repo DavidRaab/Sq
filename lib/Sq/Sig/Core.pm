@@ -147,7 +147,6 @@ sig ('Array::one',        $str_array, $any,                $array);
 
 ### METHODS
 
-sig ('Array::copy',          $array,                               $array);
 sig ('Array::bind',          $array, $sub,                         $array);
 sig ('Array::flatten',       $aoa,                                 $array);
 sig ('Array::merge',         $aoa,                                 $array);
@@ -365,7 +364,6 @@ sig ('Hash::diff',         $hash, $hash,          $hash);
 sigt('Hash::concat',       t_tuplev($hash, $aoh), $hash);
 sig ('Hash::is_subset_of', $hash, $hash,          $int);
 sig ('Hash::get',          $hash, $str,           $opt);
-sig ('Hash::copy',         $hash,                 $hash);
 sigt('Hash::extract',      t_tuplev($hash, t_array(t_min(1), t_of $str)),  t_array(t_of t_opt));
 sigt('Hash::slice',        t_tuplev($hash, t_array(t_min(1), t_of $str)),  $hash);
 sigt('Hash::with',         t_tuplev($hash, $even_sized),                   $hash); # can be improved
@@ -413,7 +411,6 @@ sig ('Seq::one',        $str_seq, $any,                $seq);
 
 ### METHODS
 
-sig('Seq::copy',          $seq,                 $seq);
 sig('Seq::append',        $seq, $seq,           $seq);
 sig('Seq::map',           $seq, $sub,           $seq);
 sig('Seq::map2',          $seq, $seq, $sub,     $seq);
