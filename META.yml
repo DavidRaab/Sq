@@ -6,7 +6,6 @@ build_requires:
   Carp: '0'
   Digest::SHA: '0'
   JSON: '0'
-  List::MoreUtils: '0'
   List::Util: '0'
   Path::Tiny: '0'
   PerlIO::gzip: '0'
@@ -22,44 +21,32 @@ meta-spec:
 name: Sq
 provides:
   Array:
-    file: lib/Sq/Collections/Array.pm
+    file: lib/Sq/Array.pm
   Hash:
-    file: lib/Sq/Collections/Hash.pm
+    file: lib/Sq/Hash.pm
   Heap:
-    file: lib/Sq/Collections/Heap.pm
+    file: lib/Sq/Heap.pm
   List:
-    file: lib/Sq/Collections/List.pm
+    file: lib/Sq/List.pm
   Option:
     file: lib/Sq/Core.pm
   Queue:
-    file: lib/Sq/Collections/Queue.pm
+    file: lib/Sq/Queue.pm
   Result:
     file: lib/Sq/Core.pm
   Seq:
-    file: lib/Sq/Collections/Seq.pm
+    file: lib/Sq/Seq.pm
   Sq:
     file: lib/Sq.pm
     version: '0.007'
   Sq::Args:
     file: lib/Sq/Args.pm
+  Sq::Array:
+    file: lib/Sq/Array.pm
   Sq::Bench:
     file: lib/Sq/Bench.pm
   Sq::Cmd:
     file: lib/Sq/Cmd.pm
-  Sq::Collections::Array:
-    file: lib/Sq/Collections/Array.pm
-  Sq::Collections::Hash:
-    file: lib/Sq/Collections/Hash.pm
-  Sq::Collections::Heap:
-    file: lib/Sq/Collections/Heap.pm
-  Sq::Collections::List:
-    file: lib/Sq/Collections/List.pm
-  Sq::Collections::Query:
-    file: lib/Sq/Collections/Query.pm
-  Sq::Collections::Queue:
-    file: lib/Sq/Collections/Queue.pm
-  Sq::Collections::Seq:
-    file: lib/Sq/Collections/Seq.pm
   Sq::Concurrency::Async:
     file: lib/Sq/Concurrency/Async.pm
   Sq::Concurrency::Fork:
@@ -104,12 +91,18 @@ provides:
     file: lib/Sq/Fs.pm
   Sq::Gen:
     file: lib/Sq/Gen.pm
+  Sq::Hash:
+    file: lib/Sq/Hash.pm
+  Sq::Heap:
+    file: lib/Sq/Heap.pm
   Sq::Io:
     file: lib/Sq/Io.pm
   Sq::L:
     file: lib/Sq/L.pm
   Sq::Language:
     file: lib/Sq/Language.pm
+  Sq::List:
+    file: lib/Sq/List.pm
   Sq::Math:
     file: lib/Sq/Math.pm
   Sq::P:
@@ -122,10 +115,18 @@ provides:
     file: lib/Sq/Parser/JSON.pm
   Sq::Parser::Markdown:
     file: lib/Sq/Parser/Markdown.pm
+  Sq::Query:
+    file: lib/Sq/Query.pm
+  Sq::Queue:
+    file: lib/Sq/Queue.pm
   Sq::Rand:
     file: lib/Sq/Rand.pm
   Sq::Reflection:
     file: lib/Sq/Reflection.pm
+  Sq::Seq:
+    file: lib/Sq/Seq.pm
+  Sq::Set:
+    file: lib/Sq/Set.pm
   Sq::Sig::Core:
     file: lib/Sq/Sig/Core.pm
   Sq::Sig::Fmt:
@@ -134,8 +135,6 @@ provides:
     file: lib/Sq/Sig/Fork.pm
   Sq::Sig::Fs:
     file: lib/Sq/Sig/Fs.pm
-  Sq::Sig::Heap:
-    file: lib/Sq/Sig/Heap.pm
   Sq::Sig::Io:
     file: lib/Sq/Sig/Io.pm
   Sq::Sig::List:
@@ -146,8 +145,6 @@ provides:
     file: lib/Sq/Sig/P.pm
   Sq::Sig::Parser:
     file: lib/Sq/Sig/Parser.pm
-  Sq::Sig::Queue:
-    file: lib/Sq/Sig/Queue.pm
   Sq::Sig::Str:
     file: lib/Sq/Sig/Str.pm
   Sq::Signature:
@@ -159,7 +156,6 @@ provides:
 requires:
   Carp: '0'
   Hash::Util: '0'
-  List::MoreUtils: '0'
   List::Util: '0'
   Scalar::Util: '0'
 resources:
