@@ -1099,11 +1099,7 @@ sub last($array, $default=undef) {
 }
 
 sub sum($array) {
-    my $sum = 0;
-    for my $x ( @$array ) {
-        $sum += $x;
-    }
-    return $sum;
+    return List::Util::sum0(@$array);
 }
 
 sub sum_by($array, $f_map) {
