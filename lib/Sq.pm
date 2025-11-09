@@ -40,20 +40,18 @@ our @EXPORT = (
     union   => sub { \&Sq::Core::DU::union    },
     copy    => sub { \&Sq::Copy::copy         },
 );
+
+# This is a hash that is build only on the first ->import call. It builds a
+# uniform hash with the FUNCNAME => SUBREF mapping so exporting code becomes
+# easier to handle.
 my $export_funcs;
-my $first_load = 1;
 sub import {
     my ( $own, @requested ) = @_;
     my ( $pkg ) = caller;
 
-    # Load some modules on import()
-    if ( $first_load ) {
-        require Sq::Type;
-        $first_load = 0;
-    }
-
     no strict 'refs'; ## no critic
-    # Build cache for easier exporting
+
+    # Build hash/cache
     if ( !defined $export_funcs ) {
         my $idx = 0;
         while ( $idx < @EXPORT ) {
@@ -64,10 +62,10 @@ sub import {
                 $export_funcs->{$func} = $next;
                 $idx += 2;
             }
-            elsif ( $func eq '-sig' ) {
-                $idx += 2;
-            }
             else {
+                # This must be a sub-ref and therefore lazy executed, because
+                # maybe the signature is loaded after this code. When this is
+                # not lazy. No function with type-checking will be exported.
                 $export_funcs->{$func} = sub { *{$func}{CODE} };
                 $idx += 1;
             }
@@ -75,6 +73,7 @@ sub import {
     }
 
     # Build new @req with options removed
+    # @req contains the functions to be exported
     my ($idx, @req, $value) = (0);
     while ( $idx < @requested ) {
         $value = $requested[$idx];
@@ -119,11 +118,10 @@ sub import {
 use Sq::Reflection;
 use Sq::Core;
 use Sq::Core::DU;
-
-# Load basic functionality
 use Sq::Dump;
 use Sq::Equality;
 use Sq::Copy;
+use Sq::Type;
 
 # Load Collections
 use Sq::Collections::Array;

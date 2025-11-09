@@ -1,6 +1,5 @@
 package Sq::Exporter;
 use 5.036;
-use Carp ();
 
 no strict   'refs'; ## no critic
 no warnings 'once';
