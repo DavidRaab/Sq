@@ -1350,24 +1350,18 @@ sub find_windowed($array, $amount, $predicate) {
 }
 
 sub any($array, $predicate) {
-    for my $x ( @$array ) {
-        return 1 if $predicate->($x);
-    }
-    return 0;
+    local $_;
+    return List::Util::any(sub { $predicate->($_) }, @$array) ? 1 : 0;
 }
 
 sub all($array, $predicate) {
-    for my $x ( @$array ) {
-        return 0 if !$predicate->($x);
-    }
-    return 1;
+    local $_;
+    return List::Util::all(sub { $predicate->($_) }, @$array) ? 1 : 0;
 }
 
 sub none($array, $predicate) {
-    for my $x ( @$array ) {
-        return 0 if $predicate->($x);
-    }
-    return 1;
+    local $_;
+    return List::Util::none(sub { $predicate->($_) }, @$array) ? 1 : 0;
 }
 
 sub pick($array, $f_opt) {
@@ -1381,7 +1375,17 @@ sub pick($array, $f_opt) {
 
 # to_seq: Array<'a> -> Seq<'a>
 sub to_seq($array) {
-    return Seq->from_array($array);
+    return CORE::bless(sub {
+        my $abort = 0;
+        my $idx   = 0;
+        my $x;
+        return sub {
+            $x = $array->[$idx++];
+            return $x if defined $x;
+            $abort = 1;
+            return undef;
+        }
+    }, 'Seq');
 }
 
 sub all_some($array_of_opt) {

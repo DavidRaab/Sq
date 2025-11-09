@@ -1075,6 +1075,11 @@ is(
         $data,
         [1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1],
         'to_seq on array');
+
+    is(
+        Array->range(1,10)->to_seq->to_array,
+        [1..10],
+        'to_seq is isomorph');
 }
 
 # slice
