@@ -33,6 +33,11 @@ my $hoa       = t_hash (t_of $array);
 my $str_array = t_eq('Array');
 my $str_seq   = t_eq('Seq');
 
+# Sq main function
+
+# sig('Sq::key', $str, $sub);
+sig('Sq::key_equal', $str, $any, $sub);
+
 ### OPTION MODULE
 
 sigt('Option::Some', t_tuplev($array), $opt);
@@ -465,6 +470,8 @@ sig('Seq::doi',      $seq, $sub,        $seq);
 
 ### CONVERTER
 
+sig('Seq::average',    $seq,                     $num);
+sig('Seq::average_by', $seq, $sub,               $num);
 sig('Seq::is_empty',   $seq,                    $bool);
 sig('Seq::head',       $seq,                     $any);
 sig('Seq::sort',       $seq, $sub,             $array);
@@ -570,5 +577,11 @@ sigt('Heap::show_tree',
     ),
     t_void
 );
+
+###----------------------------------------
+### Equality
+###----------------------------------------
+
+sig('Sq::Equality::add_equality', $str, $sub, $void);
 
 1;
