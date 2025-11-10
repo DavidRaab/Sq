@@ -1,6 +1,6 @@
 package Sq::Core::Str;
 use 5.036;
-use Sq;
+use Sq qw(sq type static with_dispatch);
 use Sq::Exporter;
 our $SIGNATURE = 'Sq/Sig/Str.pm';
 our @EXPORT    = ();
