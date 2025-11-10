@@ -100,7 +100,7 @@ my $funcs =
         funcs_of('Sq')->map(sub($str) { 'Sq::' . $str }),
         Array::bind([
             qw/Array Hash Seq Queue Option Result Sq::Parser Sq::Gen Sq::Fmt Sq::Fs/,
-            qw/Sq::Math Sq::Bench Sq::Io Sq::Core::Str Sq::P Sq::Equality/
+            qw/Sq::Math Sq::Bench Sq::Io Sq::Core::Str Sq::P Sq::Equality Sq::Rand/
         ], \&fqn)
     )
     ->diff($skip, \&id);
