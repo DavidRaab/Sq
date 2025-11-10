@@ -112,7 +112,7 @@ sub import {
 }
 
 # Load Core functionality
-use Sq::Reflection;
+use Sq::Reflection ();
 use Sq::Core;        # equal(), copy(), lazy {}, Option, Result
 use Sq::Core::DU;    # Discriminated Unions
 use Sq::Dump;        # dump(), dumps()
