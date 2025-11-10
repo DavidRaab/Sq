@@ -50,17 +50,60 @@ sub fqn($package) {
     ->rxs(qr/\A/, sub   { $package . '::' });
 }
 
+# Following functions should be completely skipped. As no Signature
+# will be added for some reasons.
+my $skip = array(
+    # Sq Modules Start
+    'Sq::io',
+    'Sq::fs',
+    'Sq::math',
+    'Sq::fmt',
+    'Sq::bench',
+    'Sq::rand',
+    'Sq::p',
+    'Sq::Str',
+    # Sq Modules End
+    # Functions that support $any value
+    'Sq::is_array',
+    'Sq::is_hash',
+    'Sq::is_seq',
+    'Sq::is_opt',
+    'Sq::is_result',
+    'Sq::is_ref',
+    'Sq::is_regex',
+    'Sq::is_sub',
+    'Sq::is_num',
+    'Sq::is_str',
+    'Sq::sq',
+    'Sq::array',
+    'Sq::by_num',
+    'Sq::by_str',
+    'Sq::by_stri',
+    #
+    'Array::_equal',
+    'Array::_is_regex',
+    'Hash::_copy',
+    'Sq::Equality::du',
+    'Sq::Equality::du_case',
+    'Sq::Equality::path_tiny',
+    'Sq::Equality::result',
+
+);
+
 # Three examples that are all the same
 #
 # Array::concat(fqn($strA), fqn($strB));
 # Array::map ($strs, \&fqn)->flatten;
 # Array::bind($strs, \&fqn);
-my $funcs = Array::bind(
-    [
-        qw/Array Hash Seq Queue Option Result Sq::Parser Sq::Gen Sq::Fmt Sq::Fs/,
-        qw/Sq::Math Sq::Bench Sq::Io Sq::Core::Str/
-    ],
-    \&fqn);
+my $funcs =
+    Array->concat(
+        funcs_of('Sq')->map(sub($str) { 'Sq::' . $str }),
+        Array::bind([
+            qw/Array Hash Seq Queue Option Result Sq::Parser Sq::Gen Sq::Fmt Sq::Fs/,
+            qw/Sq::Math Sq::Bench Sq::Io Sq::Core::Str Sq::P Sq::Equality/
+        ], \&fqn)
+    )
+    ->diff($skip, \&id);
 
 # dump($funcs);
 
