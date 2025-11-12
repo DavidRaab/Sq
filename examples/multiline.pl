@@ -19,8 +19,8 @@ sub multiline($data) {
     my @new;
     for my $line ( @$data ) {
         if ( Array::any($line, \&is_array) ) {
-            # first convert every entry into an array
             my $lines =
+                # first convert every entry into an array
                 Array::map($line, sub($x) {
                     return is_array($x) ? $x : array($x);
                 })
@@ -28,8 +28,10 @@ sub multiline($data) {
                 ->fill2d(sub { "" })
                 # then transpose
                 ->transpose;
+            # add all new lines into @new
             push @new, @$lines;
         }
+        # when columns don't contain any array, nothing must be done
         else {
             push @new, copy($line);
         }
