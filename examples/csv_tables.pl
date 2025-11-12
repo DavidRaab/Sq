@@ -49,17 +49,14 @@ my $data =
         return None;
     })
     # ->dump
-    # this now combines every hash with the same "id". While the "tags" field
-    # are combined as an array
+    # combines every hash with the same "id" and the "tags" field as an array
     ->combine(key id => 'tags')
     # ->dump
-    # basically calls "->join(',')" on every tags array to turn it into a string
-    ->map(sub($k,$v) {
-        return $k, $v->withf( tags => call('join', ',') );
-    })
-    # ->dump
-    # only keep values of hash -now we have an array
+    # only keep values of hash - now we have an array of persons
     ->values
+    # calls "->join(',')" on every tags array to turn it into a string
+    ->map(sub($p) { $p->withf( tags => call('join', ',') ) })
+    # ->dump
     # and sort it by user id
     ->sort_by(by_num, key 'id');
 
