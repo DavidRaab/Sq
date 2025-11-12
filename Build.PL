@@ -19,8 +19,8 @@ my $builder = Module::Build->new(
         'List::Util'      => '0',
     },
     test_requires => {
-        'Scalar::Util'    => '0',
         'Carp'            => '0',
+        'Scalar::Util'    => '0',
         'Path::Tiny'      => '0',
         'List::Util'      => '0',
         'Digest::SHA'     => '0',
