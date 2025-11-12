@@ -50,11 +50,11 @@ my $data =
 my $data_table =
     # This transforms the "tags" array on each entry into a string
     $data->map(sub($k,$v) {
-        return $k, $v->withf(tags => sub($tags) { $tags->join(",") });
+        return $k, $v->withf( tags => call('join', ',') );
     })
-    # than transforms into array of hashes
-    ->to_array(sub($k,$v) { $v })
-    # and sorts it by user id
+    # only keep values / turns into an array
+    ->values
+    # and sort it by user id
     ->sort_by(by_num, key 'id');
 
 # $data was not mutated
