@@ -2611,10 +2611,10 @@ is(
     is(
         $data->combine(key 'id', 'tag')->sort_by(by_num, key 'id'),
         [
-            {id   => 1, name => "Zelda",       tag  => ["Action-Adventure", "Link", "Ganon"]},
-            {id   => 2, name => "Mario 64",    tag  => ["Mario", "Jump N Run"]              },
-            {id   => 3, name => "Doom 64",     tag  => ["Ego-Shooter"]                      },
-            {id   => 4, name => "Blast Corps", tag  => ["Rare", "Destruction"]              },
+            $game->(1, "Zelda",       ["Action-Adventure", "Link", "Ganon"]),
+            $game->(2, "Mario 64",    ["Mario", "Jump N Run"]              ),
+            $game->(3, "Doom 64",     ["Ego-Shooter"]                      ),
+            $game->(4, "Blast Corps", ["Rare", "Destruction"]              ),
         ],
         'combine 1');
 }
