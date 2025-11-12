@@ -20,9 +20,9 @@ sub multiline($data) {
 }
 
 is(
-    [
+    multiline([
         ["foo", ["kaz","faz"], "baz"],
-    ],
+    ]),
     [
         ["foo", "kaz", "baz"],
         ["",    "faz",    ""],
@@ -30,10 +30,10 @@ is(
     'multiline 1');
 
 is(
-    [
+    multiline([
         ["foo", ["kaz","faz"], "baz"],
         ["maz", "raz", "haz"],
-    ],
+    ]),
     [
         ["foo", "kaz", "baz"],
         ["",    "faz",    ""],
