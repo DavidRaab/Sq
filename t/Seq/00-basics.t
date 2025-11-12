@@ -1761,4 +1761,26 @@ is(
         'combine 2');
 }
 
+# test if combine() doesn't share data
+{
+    my $orig = sq [
+        { id => 1, tags => ['foo']},
+        { id => 1, tags => ['foo']},
+        { id => 1, tags => ['foo']},
+        { id => 1, tags => ['foo']},
+    ];
+
+    # we must create the sequence this way, so we can mutate something in $orig
+    my $data = $orig->to_seq;
+
+    my $new = $data->combine(key 'id', 'tags');
+    is($new, [{ id => 1, tags => [['foo'],['foo'],['foo'],['foo']]}], 'combine 3');
+
+    # mutate something on original data
+    push $orig->[0]{tags}->@*, 'bar';
+
+    # check if $new stays the same, and array-refs are not shared
+    is($new, [{ id => 1, tags => [['foo'],['foo'],['foo'],['foo']]}], 'combine 4');
+}
+
 done_testing;

@@ -19,6 +19,8 @@ use subs 'bind', 'join', 'select', 'last', 'sort', 'map', 'length';
 # o Maybe DU, Record fist-class support when i implement them.
 # o good way to also implement async with it?
 
+*_copy = \&Sq::Copy::copy;
+
 #-----------------------------------------------------------------------------#
 # CONSTRUCTORS                                                                #
 #                    Functions that create sequences                          #
@@ -1132,21 +1134,20 @@ sub chunked($seq, $size) {
 sub combine($seq_of_hash, $f_key, @fields) {
     my %to_array = map { $_ => 1 } @fields;
     my %new;
-
-    my $it = $seq_of_hash->();
     my $hash;
-    while ( defined($hash = $it->()) ) {
-        my $unique_value = $f_key->($hash);
-        if ( defined $unique_value ) {
-            my $value = $new{$unique_value};
+    my $it = $seq_of_hash->();
+    while (defined($hash = $it->())) {
+        my $key = $f_key->($hash);
+        if ( defined $key ) {
+            my $value = $new{$key};
             # add to existing hash
             if ( defined $value ) {
                 for my ($k,$v) ( %$hash ) {
                     if ( $to_array{$k} ) {
-                        Hash::push($value, $k, $v);
+                        push $value->{$k}->@*, _copy($v);
                     }
                     else {
-                        $value->{$k} = $v;
+                        $value->{$k} = _copy($v);
                     }
                 }
             }
@@ -1155,18 +1156,17 @@ sub combine($seq_of_hash, $f_key, @fields) {
                 my $entry = CORE::bless({}, 'Hash');
                 for my ($k,$v) ( %$hash ) {
                     if ( $to_array{$k} ) {
-                        # TODO: use copy() for $v
-                        Hash::push($entry, $k, $v);
+                        $entry->{$k} = CORE::bless([_copy($v)], 'Array');
                     }
                     else {
-                        $entry->{$k} = $v;
+                        $entry->{$k} = _copy($v);
                     }
                 }
-                $new{$unique_value} = $entry;
+                $new{$key} = $entry;
             }
         }
     }
-    return bless([values %new], 'Array');
+    CORE::bless([CORE::values %new], 'Array');
 }
 
 # intersperse : Seq<'a> -> 'a -> Seq<'a>

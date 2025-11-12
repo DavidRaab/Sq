@@ -5,6 +5,7 @@ use subs 'bind', 'join', 'last', 'sort', 'map', 'bless', 'length';
 
 *_equal    = \&Sq::Equality::equal;
 *_is_regex = \&Sq::is_regex;
+*_copy     = \&Sq::Copy::copy;
 
 #-----------------------------------------------------------------------------#
 # CONSTRUCTORS                                                                #
@@ -347,17 +348,17 @@ sub combine($array_of_hash, $f_key, @fields) {
     my %to_array = map { $_ => 1 } @fields;
     my %new;
     for my $hash ( @$array_of_hash ) {
-        my $unique_value = $f_key->($hash);
-        if ( defined $unique_value ) {
-            my $value = $new{$unique_value};
+        my $key = $f_key->($hash);
+        if ( defined $key ) {
+            my $value = $new{$key};
             # add to existing hash
             if ( defined $value ) {
                 for my ($k,$v) ( %$hash ) {
                     if ( $to_array{$k} ) {
-                        Hash::push($value, $k, $v);
+                        push $value->{$k}->@*, _copy($v);
                     }
                     else {
-                        $value->{$k} = $v;
+                        $value->{$k} = _copy($v);
                     }
                 }
             }
@@ -366,14 +367,13 @@ sub combine($array_of_hash, $f_key, @fields) {
                 my $entry = CORE::bless({}, 'Hash');
                 for my ($k,$v) ( %$hash ) {
                     if ( $to_array{$k} ) {
-                        # TODO: use copy() for $v
-                        Hash::push($entry, $k, $v);
+                        $entry->{$k} = CORE::bless([_copy($v)], 'Array');
                     }
                     else {
-                        $entry->{$k} = $v;
+                        $entry->{$k} = _copy($v);
                     }
                 }
-                $new{$unique_value} = $entry;
+                $new{$key} = $entry;
             }
         }
     }
