@@ -377,7 +377,7 @@ sub combine($array_of_hash, $f_key, @fields) {
             }
         }
     }
-    CORE::bless(\%new, 'Hash');
+    CORE::bless([CORE::values %new], 'Array');
 }
 
 sub columns($array, $amount) {

@@ -1166,7 +1166,7 @@ sub combine($seq_of_hash, $f_key, @fields) {
             }
         }
     }
-    CORE::bless(\%new, 'Hash');
+    return bless([values %new], 'Array');
 }
 
 # intersperse : Seq<'a> -> 'a -> Seq<'a>

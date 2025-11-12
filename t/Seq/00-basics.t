@@ -1691,29 +1691,29 @@ is(
     };
 
     is(
-        $data->combine(key 'id', 'tag'),
-        {
-            1 => {
+        $data->combine(key 'id', 'tag')->sort_by(by_num, key 'id'),
+        [
+            {
                 id   => 1,
                 name => "Zelda",
                 tag  => ["Action-Adventure", "Link", "Ganon"],
             },
-            2 => {
+            {
                 id   => 2,
                 name => "Mario 64",
                 tag  => ["Mario", "Jump N Run"],
             },
-            3 => {
+            {
                 id   => 3,
                 name => "Doom 64",
                 tag  => ["Ego-Shooter"],
             },
-            4 => {
+            {
                 id   => 4,
                 name => "Blast Corps",
                 tag  => ["Rare", "Destruction"],
             },
-        },
+        ],
         'combine 1');
 }
 
@@ -1731,33 +1731,33 @@ is(
     };
 
     is(
-        $data->combine(key 'id', qw/tag comment/),
-        {
-            1 => {
+        $data->combine(key 'id', qw/tag comment/)->sort_by(by_num, key 'id'),
+        [
+            {
                 id      => 1,
                 name    => "Zelda",
                 tag     => ["Action-Adventure", "Link", "Ganon"],
                 comment => [qw/A B C/],
             },
-            2 => {
+            {
                 id      => 2,
                 name    => "Mario 64",
                 tag     => ["Mario", "Jump N Run"],
                 comment => [qw/D E/],
             },
-            3 => {
+            {
                 id      => 3,
                 name    => "Doom 64",
                 tag     => ["Ego-Shooter"],
                 comment => ['F'],
             },
-            4 => {
+            {
                 id      => 4,
                 name    => "Blast Corps",
                 tag     => ["Rare", "Destruction"],
                 comment => [qw/H I/],
             },
-        },
+        ],
         'combine 2');
 }
 

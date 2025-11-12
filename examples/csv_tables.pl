@@ -52,8 +52,6 @@ my $data =
     # combines every hash with the same "id" and the "tags" field as an array
     ->combine(key id => 'tags')
     # ->dump
-    # only keep values of hash - now we have an array of persons
-    ->values
     # calls "->join(',')" on every tags array to turn it into a string
     ->map(sub($p) { $p->withf( tags => call('join', ',') ) })
     # ->dump
