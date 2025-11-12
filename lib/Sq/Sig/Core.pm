@@ -156,6 +156,10 @@ sig ('Array::bind',          $array, $sub,                         $array);
 sig ('Array::flatten',       $aoa,                                 $array);
 sig ('Array::merge',         $aoa,                                 $array);
 sigt('Array::cartesian',     t_array(t_of t_array(t_min 1)),         $aoa);
+sigt('Array::combine',
+    t_tuplev($aoh, $sub, $astr),
+    $hash
+);
 sig ('Array::append',        $array, $array,                       $array);
 sig ('Array::rev',           $array,                               $array);
 sig ('Array::map',           $array, $sub,                         $array);
@@ -417,6 +421,10 @@ sig ('Seq::one',        $str_seq, $any,                $seq);
 ### METHODS
 
 sig('Seq::append',        $seq, $seq,           $seq);
+sigt('Seq::combine',
+    t_tuplev($seq, $sub, $astr),
+    $hash
+);
 sig('Seq::map',           $seq, $sub,           $seq);
 sig('Seq::map2',          $seq, $seq, $sub,     $seq);
 sig('Seq::bind',          $seq, $sub,           $seq);

@@ -2604,7 +2604,7 @@ is(
     ];
 
     is(
-        $data->combine('id', 'tag'),
+        $data->combine(key 'id', 'tag'),
         {
             1 => {
                 id   => 1,
@@ -2644,7 +2644,7 @@ is(
     ];
 
     is(
-        $data->combine(id => qw/tag comment/),
+        $data->combine(key 'id', qw/tag comment/),
         {
             1 => {
                 id      => 1,

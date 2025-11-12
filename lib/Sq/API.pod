@@ -85,8 +85,8 @@ overview of the functionality of Sq itself.
 
 =head2 Sq->io
 
-    Sq->io->youtube($url)   # returns all video information as a data-structure; needs yt-dlp installed
-    Sq->io->csv_read($file) # returns sequence of hashes from a CSV file
+    my $data = Sq->io->youtube($url)   # video information as a data-structure; needs yt-dlp installed
+    my $seq  = Sq->io->csv_read($file) # sequence of hashes from a CSV file
 
 =head2 Sq->fs
 
@@ -125,10 +125,14 @@ overview of the functionality of Sq itself.
 
 =head2 Sq->rand
 
-    Sq->rand->int($min, $max)             # sequence of random integer from $min to $max
-    Sq->rand->num($min, $max)             # sequence of random number from $min to $max
-    Sq->rand->str($min, $max)             # sequence of random strings of length $min-$max
-    Sq->rand->str($min, $max, $str_chars) # sequence of random strings of length $min-$max that uses characters from $str_chars
+    my $seq = Sq->rand->int($min, $max)             # sequence of random integer from $min to $max
+    my $seq = Sq->rand->num($min, $max)             # sequence of random number from $min to $max
+    my $seq = Sq->rand->str($min, $max)             # sequence of random strings of length $min-$max
+    my $seq = Sq->rand->str($min, $max, $str_chars) # sequence of random strings of length $min-$max that uses characters from $str_chars
+
+=head2 Sq->sys
+
+    my $path = Sys->sys->dir()       # Path::Tiny object from directory executable is in
 
 =head2 Str
 
@@ -206,7 +210,7 @@ Variables that start with C<$f_> are functions.
     chunked          ($array, $size)
     chunked_size     ($array, $max_size, $f_size)
     columns          ($array, $amount)
-    combine          ($array_of_hash, $unique_key, @fields)
+    combine          ($array_of_hash, $f_key, @fields)
     contains         ($array, $any)
     count            ($array)
     count_by         ($array, $f_key)

@@ -1129,14 +1129,14 @@ sub chunked($seq, $size) {
     }, 'Seq');
 }
 
-sub combine($seq_of_hash, $unique_key, @fields) {
+sub combine($seq_of_hash, $f_key, @fields) {
     my %to_array = map { $_ => 1 } @fields;
     my %new;
 
     my $it = $seq_of_hash->();
     my $hash;
     while ( defined($hash = $it->()) ) {
-        my $unique_value = $hash->{$unique_key};
+        my $unique_value = $f_key->($hash);
         if ( defined $unique_value ) {
             my $value = $new{$unique_value};
             # add to existing hash
