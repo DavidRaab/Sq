@@ -4,9 +4,12 @@ use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Sq -sig => 1;
 
+# Path to CSV file, relative from current executable
+my $bench_file = Sq->sys->dir->child('csv', 'Borderlands3_Benchmark.csv');
+
 # CSV: timeinseconds, frametimems, fps
 my $data =
-    Sq->io->csv_read("csv/Borderlands3_Benchmark.csv")
+    Sq->io->csv_read($bench_file)
     ->map(call 'rename_keys', timeinseconds => "time", frametimems => "ms")
     ->cache;
 
