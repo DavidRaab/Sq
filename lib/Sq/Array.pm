@@ -1226,27 +1226,27 @@ sub max_str_by($array, $f_str) {
     return Option::Some($max);
 }
 
-# Combines grouping and folding in one operation. All elements of a sequence
-# are grouped together by a key. The $folder function than can combine
-# multiple elements of the same key. For the first element found for a
-# key the $get_state function is called to produce the initial value, otherwise
-# the existing value is used. Returns a Hash with the 'Key to 'State
-# mapping.
+# Combines grouping and folding in one operation.
+# 1. All elements of a sequence are grouped together by a key.
+# 2. The $f_state function than can combine multiple elements of the same key.
+# 3. For the first element found for a key the $f_init function is called to produce the initial value
+#
+# Returns a Hash with the 'Key to 'State mapping.
 #
 # Array<'a>
-# -> (unit -> 'State)
-# -> ('a -> 'Key)
-# -> ('State -> 'a -> 'State)
-# -> Hash<'key, 'State>
-sub group_fold($array, $f_init, $f_str, $f_state) {
+# $f_init:  (unit -> 'State)
+# $f_key:   ('a -> 'Key)
+# $f_state: ('State -> 'a -> 'State)
+# Hash<'key, 'State>
+sub group_fold($array, $f_init, $f_key, $f_state) {
     my $new = CORE::bless({}, 'Hash');
     for my $x ( @$array ) {
-        my $str = $f_str->($x);
-        if ( exists $new->{$str} ) {
-            $new->{$str} = $f_state->($new->{$str}, $x);
+        my $key = $f_key->($x);
+        if ( exists $new->{$key} ) {
+            $new->{$key} = $f_state->($new->{$key}, $x);
         }
         else {
-            $new->{$str} = $f_state->($f_init->(), $x);
+            $new->{$key} = $f_state->($f_init->(), $x);
         }
     }
     return $new;
