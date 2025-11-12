@@ -1676,87 +1676,57 @@ is(
         'keep_some multi 3');
 }
 
-# combine
+# combine($f_key, @fields)
+# combine works on an array of hashes. With $f_key you specify which
+# hashes should be combined. And @fields combines all defined fields from
+# all hashes into an array.
+# returns an array of hashes again, and some hashes are combined.
 {
+    my $game = record(qw/id name tag comment/);
     my $data = seq {
-        {id => 1, name => "Zelda",       tag => "Action-Adventure"},
-        {id => 1, name => "Zelda",       tag => "Link"},
-        {id => 1, name => "Zelda",       tag => "Ganon"},
-        {id => 2, name => "Mario 64",    tag => "Mario"},
-        {id => 2, name => "Mario 64",    tag => "Jump N Run"},
-        {id => 3, name => "Doom 64",     tag => "Ego-Shooter"},
-        {         name => "Turok",       tag => "Ego-Shooter"},
-        {id => 4, name => "Blast Corps", tag => "Rare"},
-        {id => 4, name => "Blast Corps", tag => "Destruction"},
+        $game->(1, "Zelda",       "Action-Adventure"),
+        $game->(1, "Zelda",       "Link"),
+        $game->(1, "Zelda",       "Ganon"),
+        $game->(2, "Mario 64",    "Mario"),
+        $game->(2, "Mario 64",    "Jump N Run"),
+        $game->(3, "Doom 64",     "Ego-Shooter"),
+        $game->(4, "Blast Corps", "Rare"),
+        $game->(4, "Blast Corps", "Destruction"),
+        { name => "Turok", tag => "Ego-Shooter"}, # hash without id
     };
 
     is(
-        $data->combine(key 'id', 'tag')->sort_by(by_num, key 'id'),
+        $data->combine(key('id'), 'tag')->sort_by(by_num, key 'id'),
         [
-            {
-                id   => 1,
-                name => "Zelda",
-                tag  => ["Action-Adventure", "Link", "Ganon"],
-            },
-            {
-                id   => 2,
-                name => "Mario 64",
-                tag  => ["Mario", "Jump N Run"],
-            },
-            {
-                id   => 3,
-                name => "Doom 64",
-                tag  => ["Ego-Shooter"],
-            },
-            {
-                id   => 4,
-                name => "Blast Corps",
-                tag  => ["Rare", "Destruction"],
-            },
+            $game->(1, "Zelda",       ["Action-Adventure", "Link", "Ganon"]),
+            $game->(2, "Mario 64",    ["Mario", "Jump N Run"]              ),
+            $game->(3, "Doom 64",     ["Ego-Shooter"]                      ),
+            $game->(4, "Blast Corps", ["Rare", "Destruction"]              ),
         ],
         'combine 1');
 }
 
 {
+    my $game = record(qw/id name tag comment/);
     my $data = seq {
-        {id => 1, name => "Zelda",       tag => "Action-Adventure", comment => "A"},
-        {id => 1, name => "Zelda",       tag => "Link",             comment => "B"},
-        {id => 1, name => "Zelda",       tag => "Ganon",            comment => "C"},
-        {id => 2, name => "Mario 64",    tag => "Mario",            comment => "D"},
-        {id => 2, name => "Mario 64",    tag => "Jump N Run",       comment => "E"},
-        {id => 3, name => "Doom 64",     tag => "Ego-Shooter",      comment => "F"},
-        {         name => "Turok",       tag => "Ego-Shooter",      comment => "G"},
-        {id => 4, name => "Blast Corps", tag => "Rare",             comment => "H"},
-        {id => 4, name => "Blast Corps", tag => "Destruction",      comment => "I"},
+        $game->(1, "Zelda",       "Action-Adventure", "A"),
+        $game->(1, "Zelda",       "Link",             "B"),
+        $game->(1, "Zelda",       "Ganon",            "C"),
+        $game->(2, "Mario 64",    "Mario",            "D"),
+        $game->(2, "Mario 64",    "Jump N Run",       "E"),
+        $game->(3, "Doom 64",     "Ego-Shooter",      "F"),
+        $game->(4, "Blast Corps", "Rare",             "H"),
+        $game->(4, "Blast Corps", "Destruction",      "I"),
+        { name => "Turok", tag => "Ego-Shooter", comment => "G"}, # hash without "id"
     };
 
     is(
-        $data->combine(key 'id', qw/tag comment/)->sort_by(by_num, key 'id'),
+        $data->combine(key('id'), qw/tag comment/)->sort_by(by_num, key 'id'),
         [
-            {
-                id      => 1,
-                name    => "Zelda",
-                tag     => ["Action-Adventure", "Link", "Ganon"],
-                comment => [qw/A B C/],
-            },
-            {
-                id      => 2,
-                name    => "Mario 64",
-                tag     => ["Mario", "Jump N Run"],
-                comment => [qw/D E/],
-            },
-            {
-                id      => 3,
-                name    => "Doom 64",
-                tag     => ["Ego-Shooter"],
-                comment => ['F'],
-            },
-            {
-                id      => 4,
-                name    => "Blast Corps",
-                tag     => ["Rare", "Destruction"],
-                comment => [qw/H I/],
-            },
+            $game->(1, "Zelda",       ["Action-Adventure", "Link", "Ganon"], [qw/A B C/]),
+            $game->(2, "Mario 64",    ["Mario", "Jump N Run"],               [qw/D E/]),
+            $game->(3, "Doom 64",     ["Ego-Shooter"],                       ['F']),
+            $game->(4, "Blast Corps", ["Rare", "Destruction"],               [qw/H I/]),
         ],
         'combine 2');
 }
