@@ -114,4 +114,16 @@ is(
     ],
     'multiline 2');
 
+is(
+    Sq->fmt->multiline([
+        ["foo", [qw/kaz faz/], [qw/faz boo/]],
+        ["maz", "raz", "haz"],
+    ]),
+    [
+        ["foo", "kaz", "faz"],
+        ["",    "faz", "boo"],
+        ["maz", "raz", "haz"],
+    ],
+    'multiline 3');
+
 done_testing;

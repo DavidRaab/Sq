@@ -53,9 +53,10 @@ my $table_aoh = [hash =>
 ];
 
 # otherwise data must be an AoA containing strings and header/border is optional
+my $column    = [or   => ['array'], ['str']];
 my $table_aoa = [hash =>
     [keys =>
-        data => [array => [of => [array => [of => ['str']]]]]
+        data => [array => [of => [array => [of => $column]]]]
     ],
     [okeys =>
         header => [array => [of => ['str']]],
@@ -66,14 +67,16 @@ my $table_aoa = [hash =>
 # TODO: Support Seq as data
 # TODO: Add Title
 # TODO: Add configurable spacing between cells
-# TODO: MultiLine Cells
 # TODO: Add Layout Scheme (which symbol used for table and presets)
 # TODO: Add ability to configure cells (like number format)
 static table => with_dispatch(
     type [tuple => $table_aoa] => sub ($args) {
+        # cache multiline function
+        state $multiline = multiline();
+
         my $header = $args->{header} // 0;
         my $border = $args->{border} // 0;
-        my $aoa    = $args->{data};
+        my $aoa    = $multiline->($args->{data});
 
         # check that we have at least one entry
         my $maxY = @$aoa;
