@@ -35,7 +35,7 @@ my $data =
         }
         return None;
     })
-    ->combine(id => 'tags');
+    ->combine(key id => 'tags');
 
 # dump($data);
 #
