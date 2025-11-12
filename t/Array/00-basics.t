@@ -2591,8 +2591,9 @@ is(
 
 # combine($f_key, @fields)
 # combine works on an array of hashes. With $f_key you specify which
-# hashes should be combined. And @fields puts all the fields into an array.
-# returns an array of hashes again, and some hashes are combined
+# hashes should be combined. And @fields combines all defined fields from
+# all hashes into an array.
+# returns an array of hashes again, and some hashes are combined.
 {
     my $game = record(qw/id name tag comment/);
     my $data = sq [
