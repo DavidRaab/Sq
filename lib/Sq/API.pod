@@ -413,6 +413,7 @@ Variables that start with C<$f_> are functions.
     cartesian        (@seqs)
     choose           ($seq, $f_opt)
     chunked          ($seq, $size)
+    combine          ($seq, $f_key, @fields)
     contains         ($seq, $any)
     copy             ($seq)
     count            ($seq)
