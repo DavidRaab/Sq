@@ -25,7 +25,7 @@ Sq->fmt->table({
 my $data =
     # This creates the Cartesian Product. Basically like SQL, it just creates
     # a N:M mapping of every possible combination.
-    $persons->cartesian($tags)
+    Seq::cartesian($persons,$tags)
     # choose is similar to keep(). Only those entries that return Some() are picked,
     # None are skipped. But this way, you also can change or return different values.
     # choose is like a keep()->map() in one operation.
@@ -35,7 +35,7 @@ my $data =
     # the second, so the second hash don't overrides the ones in the first hash.
     # Very similar to SQL.
     #
-    # SELECT p.id, p.name, t.id AS tid, t.person_id, t.tag AS tags
+    # SELECT p.id, p.name, t.id AS tid, t.tag AS tags
     # FROM   persons p, tags t
     # WHERE  p.id = t.person_id
     ->choose(sub($args) {
@@ -48,46 +48,25 @@ my $data =
         }
         return None;
     })
-    ->combine(key id => 'tags');
-
-# dump($data);
-#
-# TODO: DS changed
-# {
-#   0 => { name => "Cherry", tags => [ "hot", "beautiful" ]      },
-#   1 => { name => "Anny",   tags => [ "babe", "red", "french" ] },
-#   2 => { name => "Lilly",  tags => [ "hot+++", "latina" ]      },
-#   3 => { name => "Sola",   tags => [ "beautiful", "russian" ]  },
-# }
-
-my $data_table =
-    # This transforms the "tags" array on each entry into a string
-    $data->map(sub($k,$v) {
+    # ->dump
+    # this now combines every hash with the same "id". While the "tags" field
+    # are combined as an array
+    ->combine(key id => 'tags')
+    # ->dump
+    # basically calls "->join(',')" on every tags array to turn it into a string
+    ->map(sub($k,$v) {
         return $k, $v->withf( tags => call('join', ',') );
     })
-    # only keep values / turns into an array
+    # ->dump
+    # only keep values of hash -now we have an array
     ->values
     # and sort it by user id
     ->sort_by(by_num, key 'id');
-
-# $data was not mutated
-#
-# dump($data);
-# dump($data_table);
-
-# $data_table is now
-#
-# [
-#   { id => 0, name => "Cherry", tags => "hot,beautiful"     },
-#   { id => 1, name => "Anny",   tags => "babe,red,french"   },
-#   { id => 2, name => "Lilly",  tags => "hot+++,latina"     },
-#   { id => 3, name => "Sola",   tags => "beautiful,russian" },
-# ]
 
 # print the data as table
 print "\nCombine Tables\n";
 Sq->fmt->table({
     header => [qw/id name tags/],
-    data   => $data_table,
+    data   => $data,
     border => 0,
 });
