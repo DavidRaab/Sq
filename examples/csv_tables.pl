@@ -4,8 +4,21 @@ use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Sq -sig => 1;
 
-my $persons = Sq->io->csv_read("csv/persons.csv");
-my $tags    = Sq->io->csv_read("csv/tags.csv");
+# the ->cache ensures that every file is only read once
+my $persons = Sq->io->csv_read(Sq->sys->dir->child("csv/persons.csv"))->cache;
+my $tags    = Sq->io->csv_read(Sq->sys->dir->child("csv/tags.csv"))   ->cache;
+
+print "Persons Table\n";
+Sq->fmt->table({
+    header => [qw/id name/],
+    data   => $persons,
+});
+
+print "\nTags Table\n";
+Sq->fmt->table({
+    header => [qw/id person_id tag/],
+    data   => $tags,
+});
 
 # TODO: I still don't like it, even if it improved somehow. The choose() is
 #       still too much clutter.
@@ -72,6 +85,7 @@ my $data_table =
 # ]
 
 # print the data as table
+print "\nCombine Tables\n";
 Sq->fmt->table({
     header => [qw/id name tags/],
     data   => $data_table,
