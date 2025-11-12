@@ -16,7 +16,25 @@ use Sq::Test;
 # So MultiLines are just converted to the table format.
 
 sub multiline($data) {
-    return $data;
+    my @new;
+    for my $line ( @$data ) {
+        if ( Array::any($line, \&is_array) ) {
+            # first convert every entry into an array
+            my $lines =
+                Array::map($line, sub($x) {
+                    return is_array($x) ? $x : array($x);
+                })
+                # then fill AoA with empty strings
+                ->fill2d(sub { "" })
+                # then transpose
+                ->transpose;
+            push @new, @$lines;
+        }
+        else {
+            push @new, copy($line);
+        }
+    }
+    return bless(\@new, 'Array');
 }
 
 is(
