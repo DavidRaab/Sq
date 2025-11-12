@@ -116,7 +116,7 @@ use Sq::Reflection ();
 use Sq::Core;        # equal(), copy(), lazy {}, Option, Result
 use Sq::Core::DU;    # Discriminated Unions
 use Sq::Dump;        # dump(), dumps()
-use Sq::Type ();     # Type System
+require Sq::Type;    # Type System
 
 # Load Collections
 use Sq::Array;
@@ -175,6 +175,13 @@ sub p($) {
         Sq::P->load_signature();
     }
     return 'Sq::P';
+}
+sub sys($) {
+    if ( !exists $INC{'Sq/Sys.pm'} ) {
+        require Sq::Sys;
+        Sq::Sys->load_signature();
+    }
+    return 'Sq::Sys';
 }
 
 # Str Module
