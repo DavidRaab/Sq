@@ -8,6 +8,37 @@ our @EXPORT    = ();
 # This will be a module that help in formating/printing things.
 # For example pass it an array of array and it prints a table.
 
+# This function is used in table() to implement multiline support.
+#
+# It expects at least an AoA, where every column can be an array again.
+# It transforms the column array back into an AoA of just strings. So a single
+# line will be transformed into multiple lines where the empty columns are
+# just strings.
+static multiline => sub($aoa) {
+    my @new;
+    for my $line ( @$aoa ) {
+        if ( Array::any($line, \&is_array) ) {
+            my $lines =
+                # first convert every entry into an array
+                Array::map($line, sub($x) {
+                    return is_array($x) ? $x : array($x);
+                })
+                # then fill AoA with empty strings
+                ->fill2d(sub { "" })
+                # then transpose
+                ->transpose;
+            # add all new lines into @new
+            push @new, @$lines;
+        }
+        # when columns don't contain any array, nothing must be done
+        else {
+            push @new, copy($line);
+        }
+    }
+    return bless(\@new, 'Array');
+};
+
+
 ### Types for table().
 # when data is array of hash, then header must be specified, border is optional
 # but must be bool when specified.

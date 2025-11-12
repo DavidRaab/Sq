@@ -92,4 +92,26 @@ is(
         'HTML Table');
 }
 
+is(
+    Sq->fmt->multiline([
+        ["foo", ["kaz","faz"], "baz"],
+    ]),
+    [
+        ["foo", "kaz", "baz"],
+        ["",    "faz",    ""],
+    ],
+    'multiline 1');
+
+is(
+    Sq->fmt->multiline([
+        ["foo", ["kaz","faz"], "baz"],
+        ["maz", "raz", "haz"],
+    ]),
+    [
+        ["foo", "kaz", "baz"],
+        ["",    "faz",    ""],
+        ["maz", "raz", "haz"],
+    ],
+    'multiline 2');
+
 done_testing;
