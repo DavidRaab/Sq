@@ -108,6 +108,8 @@ examples/job_postings_mixed.pl
 examples/job_postings_pp.pl
 examples/markdown.md
 examples/markdown_parser.pl
+examples/monitor_resolutions.pl
+examples/multiline.pl
 examples/option_divide.pl
 examples/permutation.pl
 examples/permutation_random.pl
@@ -134,7 +136,6 @@ lib/Sq/Concurrency/Async.pm
 lib/Sq/Concurrency/Fork.pm
 lib/Sq/Concurrency/Mailbox.pm
 lib/Sq/Concurrency/Threads.pm
-lib/Sq/Copy.pm
 lib/Sq/Core.pm
 lib/Sq/Core.pod
 lib/Sq/Core/Date.pm
@@ -149,7 +150,6 @@ lib/Sq/Data/CSV.pm
 lib/Sq/Data/JSON.pm
 lib/Sq/Data/XML.pm
 lib/Sq/Dump.pm
-lib/Sq/Equality.pm
 lib/Sq/Evaluator.pm
 lib/Sq/Exporter.pm
 lib/Sq/Exporter.pod
@@ -186,6 +186,7 @@ lib/Sq/Manual/Design/Wrap.pod
 lib/Sq/Manual/Examples/CreatingSeqIterator.pod
 lib/Sq/Manual/FromSub.pod
 lib/Sq/Manual/Internal/Loading.md
+lib/Sq/Manual/Intro/00-Overview.md
 lib/Sq/Manual/MooseTraitVSSq.pod
 lib/Sq/Manual/Notes/2024-12-24-Realase-0.006.md
 lib/Sq/Manual/Notes/2024-12-26-CPAN-Release.md
@@ -224,7 +225,9 @@ lib/Sq/Sig/Math.pm
 lib/Sq/Sig/P.pm
 lib/Sq/Sig/Parser.pm
 lib/Sq/Sig/Str.pm
+lib/Sq/Sig/Sys.pm
 lib/Sq/Signature.pm
+lib/Sq/Sys.pm
 lib/Sq/Test.pm
 lib/Sq/Type.pm
 LICENSE

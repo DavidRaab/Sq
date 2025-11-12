@@ -93,7 +93,7 @@
          "file" : "lib/Sq/Concurrency/Threads.pm"
       },
       "Sq::Copy" : {
-         "file" : "lib/Sq/Copy.pm"
+         "file" : "lib/Sq/Core.pm"
       },
       "Sq::Core" : {
          "file" : "lib/Sq/Core.pm"
@@ -106,9 +106,6 @@
       },
       "Sq::Core::Date" : {
          "file" : "lib/Sq/Core/Date.pm"
-      },
-      "Sq::Core::Lazy" : {
-         "file" : "lib/Sq/Core.pm"
       },
       "Sq::Core::Measure" : {
          "file" : "lib/Sq/Core/Measure.pm"
@@ -129,7 +126,7 @@
          "file" : "lib/Sq/Dump.pm"
       },
       "Sq::Equality" : {
-         "file" : "lib/Sq/Equality.pm"
+         "file" : "lib/Sq/Core.pm"
       },
       "Sq::Evaluator" : {
          "file" : "lib/Sq/Evaluator.pm"
@@ -160,6 +157,9 @@
       },
       "Sq::Language" : {
          "file" : "lib/Sq/Language.pm"
+      },
+      "Sq::Lazy" : {
+         "file" : "lib/Sq/Core.pm"
       },
       "Sq::List" : {
          "file" : "lib/Sq/List.pm"
@@ -230,8 +230,14 @@
       "Sq::Sig::Str" : {
          "file" : "lib/Sq/Sig/Str.pm"
       },
+      "Sq::Sig::Sys" : {
+         "file" : "lib/Sq/Sig/Sys.pm"
+      },
       "Sq::Signature" : {
          "file" : "lib/Sq/Signature.pm"
+      },
+      "Sq::Sys" : {
+         "file" : "lib/Sq/Sys.pm"
       },
       "Sq::Test" : {
          "file" : "lib/Sq/Test.pm"
