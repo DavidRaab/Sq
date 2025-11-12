@@ -26,4 +26,5 @@ my $data = Array::cartesian($heights,$aspects)->map(sub($tuple) {
 Sq->fmt->table({
     header => [qw/Resolution Aspect MPixel/],
     data   => $data,
+    border => 0,
 });
