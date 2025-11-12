@@ -66,12 +66,24 @@ my $table_aoa = [hash =>
     ],
 ];
 
-# TODO: Support Seq as data
+# when a seq was provided as data. We only expect that data is provided.
+# then table() is called after data is transformed back to array. Then
+# it depends if we have seq<array> or seq<hash> if that call is valid or not.
+my $table_seq = [hash => [keys =>
+    data => ['seq'],
+]];
+
 # TODO: Add Title
 # TODO: Add configurable spacing between cells
 # TODO: Add Layout Scheme (which symbol used for table and presets)
 # TODO: Add ability to configure cells (like number format)
 static table => with_dispatch(
+    type [tuple => $table_seq] => sub ($args) {
+        state $multiline = multiline();
+        state $table     = table();
+        $table->(Hash::with($args, data => $args->{data}->to_array));
+        return;
+    },
     type [tuple => $table_aoa] => sub ($args) {
         # cache multiline function
         state $multiline = multiline();

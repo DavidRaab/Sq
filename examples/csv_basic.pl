@@ -50,9 +50,8 @@ $data->iter(dispatch(key 'operation', {
     },
 }));
 
-# TODO: table should support sequence
 Sq->fmt->table({
     header => [qw/date current balance comment/],
-    data   => $data->to_array,
+    data   => $data,
     border => 0,
 });

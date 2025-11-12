@@ -26,13 +26,13 @@ say "\n  Game runs capped at 60 fps, so optimal ms should be 16.66ms.";
 say "  Here are frames that took longer than 20ms.";
 Sq->fmt->table({
     header => [qw/time ms fps/],
-    data   => $data->keep(sub($row) { $row->{ms} > 20 })->to_array,
+    data   => $data->keep(sub($row) { $row->{ms} > 20 }),
 });
 
 say "\n  Cases where game droped below 50 fps";
 Sq->fmt->table({
     header => [qw/time ms fps/],
-    data   => $data->keep(sub($row) { $row->{fps} < 50 })->to_array,
+    data   => $data->keep(sub($row) { $row->{fps} < 50 }),
 });
 
 say "\nfps and frametime drops don't must be the same. But i guess the\n",
@@ -81,5 +81,5 @@ say "woue be noticeable. So here are some frames below <=14ms.\n";
 
 Sq->fmt->table({
     header => [qw/time ms fps/],
-    data   => $data->keep(sub($row) { $row->{ms} <= 14 })->to_array,
+    data   => $data->keep(sub($row) { $row->{ms} <= 14 }),
 });
