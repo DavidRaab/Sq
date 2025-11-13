@@ -106,7 +106,7 @@ sub unfold($, $state, $f_opt) {
 }
 
 # Seq->init: int -> (int -> 'a) -> Seq<'a>
-sub init($, $count, $f) {
+sub init($, $count, $init) {
     bless(sub {
         my $abort   = 0;
         my $current = 0;
@@ -114,7 +114,7 @@ sub init($, $count, $f) {
         return sub {
             return undef if $abort;
             if ( $current < $count ) {
-                $x = $f->($current++);
+                $x = Sq::init($init, $current++);
                 return $x if defined $x;
             }
             $abort = 1;

@@ -57,11 +57,11 @@ sub concat(@arrays) {
     return CORE::bless(\@new, 'Array');
 }
 
-Sq::Reflection::static(init => sub($count, $f) {
+Sq::Reflection::static(init => sub($count, $init) {
     my @new;
     my $x;
     for my $idx ( 0 .. ($count-1) ) {
-        if ( defined($x = $f->($idx)) ) {
+        if ( defined($x = Sq::init($init, $idx)) ) {
             push @new, $x;
         }
         else {

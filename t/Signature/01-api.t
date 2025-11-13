@@ -11,7 +11,6 @@ dies { Array->bless({})                    } qr/\AArray::/, 'bless';
 dies { Array->from_array({})               } qr/\AArray::/, 'from_array';
 dies { Array->init(1)                      } qr/\AArray::/, 'init 1';
 dies { Array->init("foo", sub{})           } qr/\AArray::/, 'init 2';
-dies { Array->init(1, "foo")               } qr/\AArray::/, 'init 3';
 dies { sq([1,2,3])->as_hash                } qr/\AArray::/, 'as_hash';
 dies { Array::to_array({})                 } qr/\AArray::/, 'to_array 1';
 dies { Array::to_array([], "foo")          } qr/\AArray::/, 'to_array 2';

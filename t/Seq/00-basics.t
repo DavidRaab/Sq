@@ -120,6 +120,18 @@ is(
     Seq->init(10, sub($idx) { [$idx+1,$idx ] }),
     'range->indexed vs. init');
 is(
+    Seq->init(10,0),
+    seq { 0,0,0,0,0,0,0,0,0,0 },
+    'Seq->init with value');
+{
+    my $result = Seq->init(3, [])->to_array;
+
+    is($result, [[],[],[]], 'Seq->init with ref');
+    push $result->[0]->@*, 1;
+    is($result, [[1],[],[]], 'Seq->init does not share data');
+}
+
+is(
     (reduce { $a->append($b) } map { seq { $_ } } 1 .. 10),
     $range,
     'append a list of wrapped values');

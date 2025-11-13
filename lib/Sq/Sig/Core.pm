@@ -141,7 +141,7 @@ sig ('Array::empty',      $str_array,                      $array);
 sig ('Array::replicate',  $pint, $any,                     $array);
 sig ('Array::bless',      $str_array, $array,              $array);
 sig ('Array::from_array', $str_array, $array,              $array);
-sig ('Array::init',       $pint, $sub,                     $array);
+sig ('Array::init',       $pint, $any,                     $array);
 sig ('Array::init2d',     $pint, $pint, $sub,              $array);
 # Second argument is 'State, would be good to back-reference the type
 sig ('Array::unfold',     $str_array, $any, $sub,          $array);
@@ -404,7 +404,7 @@ sig ('Seq::always',     $str_seq, $any,                $seq);
 sig ('Seq::empty',      $str_seq,                      $seq);
 sig ('Seq::replicate',  $str_seq, $int, $any,          $seq);
 sig ('Seq::unfold',     $str_seq, $any,  $sub,         $seq);
-sig ('Seq::init',       $str_seq, $int,  $sub,         $seq);
+sig ('Seq::init',       $str_seq, $int,  $any,         $seq);
 sig ('Seq::range_step', $str_seq, $num, $num, $num,    $seq);
 sigt('Seq::new',        t_tuplev($str_seq, $array),    $seq);
 sig ('Seq::range',      $str_seq, $int, $int,          $seq);

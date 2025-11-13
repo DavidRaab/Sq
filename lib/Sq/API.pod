@@ -176,6 +176,7 @@ Variables that start with C<$f_> are functions.
     $f_opt     # must return an option
     $f_key     # must return a key that is used as a key in a hash. So it must be a string.
     $predicate # A function that either returns 0 or 1
+    $init      # A sub-ref to initialize a value, or a value
 
     # CONSTRUCTORS
     Array->empty     ()
@@ -185,7 +186,7 @@ Variables that start with C<$f_> are functions.
     Array->from_array($array)
     Array->from_hash ($hash, $f)
     Array->replicate ($count, $init)
-    Array->init      ($count, $f)
+    Array->init      ($count, $init)
     Array->init2d    ($width, $height, $f)
     Array->unfold    ($state, $f_opt)
     Array->range     ($start, $stop)
@@ -214,7 +215,6 @@ Variables that start with C<$f_> are functions.
     contains         ($array, $any)
     count            ($array)
     count_by         ($array, $f_key)
-    copy             ($array)
     diff             ($arrayA, $arrayB, $f_key)
     distinct         ($array)
     distinct_by      ($array, $f_key)
@@ -301,10 +301,10 @@ Variables that start with C<$f_> are functions.
     zip              (@arrays)
 
     # 2D Array
-    fill2d       ($aoa, $f_or_value)
+    fill2d       ($aoa, $init)
     map2d        ($aoa, $f)
     transpose    ($aoa)
-    transpose_map($aoa,$f)
+    transpose_map($aoa, $f)
 
     # Mutation
     push   ($array, @values)
@@ -383,12 +383,13 @@ Variables that start with C<$f_> are functions.
     $f_opt     # must return an option
     $f_key     # must return a key that is used as a key in a hash. So it must be a string.
     $predicate # A function that either returns 0 or 1
+    $init      # A sub-ref to initialize a value, or a value
 
     # CONSTRUCTORS
     Seq->empty     ()
     Seq->new       (@elems)
     Seq->one       ($x)
-    Seq->init      ($count, $f)
+    Seq->init      ($count, $init)
     Seq->range     ($start, $stop)
     Seq->range_step($start, $step, $stop)
     Seq->concat    (@seqs)

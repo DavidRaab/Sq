@@ -171,6 +171,16 @@ is(
     Array->init(10, sub($idx) { [$idx+1, $idx] }),
     'range->indexed vs. init');
 is(
+    Array->init(10,0),
+    [0,0,0,0,0,0,0,0,0,0],
+    'Array->init with value');
+{
+    my $result = Array->init(3,[]);
+    is($result, [[],[],[]], 'Array->init with ref');
+    push $result->[0]->@*, 1;
+    is($result, [[1],[],[]], 'Array->init does not share data');
+}
+is(
     (reduce { $a->append($b) } map { array($_) } 1 .. 10),
     $range,
     'append a list of wrapped values');
