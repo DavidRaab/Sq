@@ -238,7 +238,7 @@ sub slice($hash, @keys) {
 }
 
 sub with($hash, @kvs) {
-    my $new = {%$hash};
+    my $new = Sq::Copy::copy($hash);
     for my ($k,$v) ( @kvs ) {
         $new->{$k} = $v;
     }

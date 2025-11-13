@@ -281,19 +281,15 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 
 # push with reduce
 {
-    # copy of the initial value, this is used because $data are mutated
-    # and we can easily test when $data is reseted to initial state
     my $initial = [
         {id => 1, name => "foo", tags => "one"   },
         {id => 1, name => "foo", tags => "two"   },
         {id => 1, name => "foo", tags => "three" },
     ];
 
-    my $data = array(
-        hash(id => 1, name => "foo", tags => "one"),
-        hash(id => 1, name => "foo", tags => "two"),
-        hash(id => 1, name => "foo", tags => "three"),
-    );
+    # copy of the initial value, this is used because $data is mutated during tests
+    # and we can easily test when $data is reseted to initial state
+    my $data = copy($initial);
 
     # we can reduce and use push
     my $entry = $data->reduce(sub($x,$y) { $x->push(tags => $y->{tags}); $x });
@@ -493,22 +489,21 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 
 # with - with mutable values
 {
-    # because with() only makes shallow copies (yet - maybe change that?)
-    # values that are references stay the same across copies
+    # test if with() does deep-copy not just shallow copy
 
     my $h = hash(foo => 1, bar => [1,2,3]);
     my $i = $h->with(foo => 2);
     $h->push(bar => 4);
 
-    is($h, {foo => 1, bar => [1..4]}, 'with mutable 1');
-    is($i, {foo => 2, bar => [1..4]}, 'with mutable 2');
+    is($h, {foo => 1, bar => [1,2,3,4]}, 'with mutable 1');
+    is($i, {foo => 2, bar => [1,2,3]  }, 'with mutable 2');
 
     $h->get("bar")->map(sub($array) {
         $array->push(5);
     });
 
-    is($h, {foo => 1, bar => [1..5]}, 'with mutable 3');
-    is($i, {foo => 2, bar => [1..5]}, 'with mutable 4');
+    is($h, {foo => 1, bar => [1..5]},  'with mutable 3');
+    is($i, {foo => 2, bar => [1,2,3]}, 'with mutable 4');
 }
 
 # check if some functions return blessed Array
