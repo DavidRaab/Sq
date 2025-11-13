@@ -136,7 +136,7 @@ sig('Result::get',       $result,                               $any);
 ### CONSTRUCTORS
 
 sigt('Array::new',        t_tuplev($str_array, $array),    $array);
-sigt('Array::concat',     t_tuplev($str_array, $aoa),      $array);
+sigt('Array::concat',     t_tuplev($aoa),                  $array);
 sig ('Array::empty',      $str_array,                      $array);
 sig ('Array::replicate',  $pint, $any,                     $array);
 sig ('Array::bless',      $str_array, $array,              $array);

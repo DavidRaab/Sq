@@ -414,7 +414,7 @@ is(
         return $array if @$array <= 1;
         my $pivot = $array->head;
         my $rest  = $array->tail;
-        Array->concat(
+        Array::concat(
             qsort($rest->keep(sub($x) { $x <= $pivot })),
             [$pivot],
             qsort($rest->keep(sub($x) { $x >  $pivot })),

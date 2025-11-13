@@ -6,7 +6,7 @@ use Sq::Test;
 # Fibonacci numbers
 {
     my $fib =
-        Array->concat(
+        Array::concat(
             Array->new(1,1),
             Array->unfold([1,1], sub($state) {
                 my $next = fst($state) + snd($state);
@@ -41,7 +41,7 @@ use Sq::Test;
 # and could be potential a little bit faster. But it envolves writing more code.
 {
     my $fib =
-        Array->concat(
+        Array::concat(
             Array->new(1,1),
             Array->unfold([1,1], sub($state) {
                 # uses $state/Array as a Queue, pushes next value onto the end and
@@ -62,7 +62,7 @@ use Sq::Test;
 # You also can use a hash as a state.
 {
     my $fib =
-        Array->concat(
+        Array::concat(
             Array->new(1,1),
             Array->unfold({x => 1, y => 1}, sub($state) {
                 my $next = $state->{x} + $state->{y};

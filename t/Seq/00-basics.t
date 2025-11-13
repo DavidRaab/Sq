@@ -1148,7 +1148,7 @@ is(
     seq {qw/A B/  }->permute->bind(sub($fst) {
     seq {qw/C G A/}->permute->bind(sub($snd) {
     seq {qw/T K/  }->permute->bind(sub($third) {
-        seq { Array->concat($fst, $snd, $third) }
+        seq { Array::concat($fst, $snd, $third) }
     })})}),
     seq {
         ["A","B", "C","G","A", "T","K"],

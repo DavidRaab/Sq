@@ -175,11 +175,11 @@ is(
     $range,
     'append a list of wrapped values');
 is(
-    Array->concat(map { array($_) } 1 .. 10),
+    Array::concat(map { array($_) } 1 .. 10),
     $range,
     'concat');
 is(
-    Array->concat, Array->empty,
+    Array::concat, Array->empty,
     'concat on zero is empty');
 is(
     array(Array->range(1,10)->expand),
@@ -187,7 +187,7 @@ is(
     'expand');
 is(
     array(1..5)->append(array(6..10)),
-    Array->concat(
+    Array::concat(
         sq [1..3],
         sq [4..6],
         sq [7..10],
@@ -198,7 +198,7 @@ is(
     $range,
     'append on empty');
 is(
-    Array->concat(
+    Array::concat(
         Array->empty,
         Array->range(1,5),
         array(),
@@ -231,17 +231,17 @@ is(
 
 # concat tests
 {
-    is(Array->concat, [], 'Empty concat');
-    is(Array->concat($range), $range, 'concat with 1 element');
+    is(Array::concat, [], 'Empty concat');
+    is(Array::concat($range), $range, 'concat with 1 element');
     is(
-        Array->concat(
+        Array::concat(
             Array->range(1,5),
             Array->range(6,10),
         ),
         [1..10],
         'concat with 2 elemets');
     is(
-        Array->concat(
+        Array::concat(
             Array->range(1,5),
             Array->range(6,10),
             Array->range(11,15),
@@ -289,11 +289,11 @@ is($range->take(5)->skip(6),  [],      'take->skip 2');
 }
 
 is(
-    Array->concat(
+    Array::concat(
         Array->range(1,10),
         Array->range(10,1),
     ),
-    Array->concat(
+    Array::concat(
         $range,
         $range->rev
     ),
@@ -2198,7 +2198,7 @@ is(
     array(qw/A B/  )->permute->bind(sub($fst) {
     array(qw/C G A/)->permute->bind(sub($snd) {
     array(qw/T K/  )->permute->bind(sub($third) {
-        array(Array->concat($fst, $snd, $third))
+        array(Array::concat($fst, $snd, $third))
     })})}),
     [
         ["A","B", "C","G","A", "T","K"],

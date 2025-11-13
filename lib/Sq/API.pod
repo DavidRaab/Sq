@@ -185,7 +185,6 @@ Variables that start with C<$f_> are functions.
     Array->from_array($array)
     Array->from_hash ($hash, $f)
     Array->replicate ($count, $init)
-    Array->concat    (@arrays)
     Array->init      ($count, $f)
     Array->init2d    ($width, $height, $f)
     Array->unfold    ($state, $f_opt)
@@ -206,6 +205,7 @@ Variables that start with C<$f_> are functions.
     bind             ($array, $f_array)
     cache            ($array)
     cartesian        (@arrays)
+    concat           (@arrays)
     choose           ($array, $f_opt)
     chunked          ($array, $size)
     chunked_size     ($array, $max_size, $f_size)
@@ -301,7 +301,7 @@ Variables that start with C<$f_> are functions.
     zip              (@arrays)
 
     # 2D Array
-    fill2d       ($aoa, $f)
+    fill2d       ($aoa, $f_or_value)
     map2d        ($aoa, $f)
     transpose    ($aoa)
     transpose_map($aoa,$f)

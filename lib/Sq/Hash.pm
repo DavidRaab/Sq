@@ -195,8 +195,6 @@ sub diff($hash, $other) {
     return CORE::bless(\%new, 'Hash');
 }
 
-# TODO: Array->concat is a constructor, this is a method. This is not consistent
-#       Either Array->concat or this one needs to change.
 sub concat(@hashes) {
     my %new;
     for my $hash ( @hashes ) {

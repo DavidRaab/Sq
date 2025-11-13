@@ -49,7 +49,7 @@ sub from_hash($, $hash, $f) {
     return CORE::bless(\@array, 'Array');
 }
 
-sub concat($, @arrays) {
+sub concat(@arrays) {
     my @new;
     for my $array ( @arrays ) {
         push @new, @$array;
