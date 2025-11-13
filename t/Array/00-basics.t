@@ -1328,6 +1328,21 @@ is(
         [4,5,6,7],
         [1,2],
         [1],
+    ], 0),
+    [
+        [1,2,3,0],
+        [4,5,6,7],
+        [1,2,0,0],
+        [1,0,0,0],
+    ],
+    'fill2d 1 - now also supports direct values');
+
+is(
+    Array::fill2d([
+        [1,2,3],
+        [4,5,6,7],
+        [1,2],
+        [1],
     ], sub($x,$y) { ($y*10) + $x }),
     [
         [1, 2, 3, 3],
@@ -1336,6 +1351,40 @@ is(
         [1,31,32,33],
     ],
     'fill2d 2');
+
+# check if fill2d with direct-value makes a copy
+{
+    my $result =
+        Array::fill2d([
+            [1,2,3],
+            [4,5,6,7],
+            [1,2],
+            [1],
+        ], []);
+
+    is(
+        $result,
+        [
+            [1, 2, 3,[]],
+            [4, 5, 6, 7],
+            [1, 2,[],[]],
+            [1,[],[],[]],
+        ],
+        'fill2d fills with array-ref');
+
+    # mutate array-ref in first row
+    push $result->[0][3]->@*, 1;
+
+    is(
+        $result,
+        [
+            [1, 2, 3,[1]],
+            [4, 5, 6,  7],
+            [1, 2,[], []],
+            [1,[],[], []],
+        ],
+        'fill2d - array-refs not shared');
+}
 
 # trim
 {

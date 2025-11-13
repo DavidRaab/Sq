@@ -219,7 +219,7 @@ sig ('Array::tail',              t_array(t_min 1),         $array);
 
 ### ARRAY 2D
 
-sig ('Array::fill2d',            $aoa, $sub,              $aoa);
+sig ('Array::fill2d',            $aoa, $any,              $aoa);
 sig ('Array::transpose',         $aoa,                    $aoa);
 sig ('Array::transpose_map',     $aoa, $sub,              $aoa);
 sig ('Array::columns',           $array, $pint,           $aoa);

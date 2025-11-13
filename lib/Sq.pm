@@ -20,8 +20,8 @@ our $LOAD_SIGNATURE = 0;
 # All functions that are Exported
 our @EXPORT = (
     qw(sq call key idx key_equal assign seq new),
-    qw(is_num is_str is_array is_hash is_seq is_opt is_result is_sub is_regex is_ref get_type),
-    qw(fn match multi dispatch with_dispatch type_cond),
+    qw(get_type is_num is_str is_array is_hash is_seq is_opt is_result is_sub is_regex is_ref),
+    qw(fn match multi dispatch with_dispatch type_cond init),
     qw(id fst snd),
     qw(by_num by_str by_stri),
     qw(array hash record),
@@ -521,6 +521,21 @@ sub dispatch {
         else {
             Carp::croak "dispatch: '$key' not provided as a case.\n";
         }
+    }
+}
+
+# Init is used in places where you usually have a function to create
+# an initialized value. Because of mutable data-structures, you must
+# wrap things in subroutines, if not, the same value is re-used many
+# times. But with the introduction of copy() i can now support both.
+# When a subroutine was passed, it get's executed, otherwise any other
+# value is just copied. init() helps in implementing those functions.
+sub init($f_or_value, @args) {
+    if ( is_sub($f_or_value) ) {
+        return $f_or_value->(@args);
+    }
+    else {
+        return Sq::Copy::copy($f_or_value);
     }
 }
 

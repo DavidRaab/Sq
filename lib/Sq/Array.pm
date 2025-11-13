@@ -905,7 +905,7 @@ sub fill2d($aoa, $f) {
                 push @inner, $value;
             }
             else {
-                push @inner, $f->($x,$y);
+                push @inner, Sq::init($f, $x, $y);
             }
         }
         $y++;
