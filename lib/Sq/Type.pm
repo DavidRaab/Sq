@@ -86,6 +86,17 @@ sub t_is($predicate) {
     }
 }
 
+sub t_not(@checks) {
+    return sub($any) {
+        my $err;
+        for my $check ( @checks ) {
+            $err = $check->($any);
+            return "not: check valid" if !defined $err;
+        }
+        return $valid;
+    }
+}
+
 ### type checkers
 
 sub t_ref($ref, @checks) {
@@ -671,17 +682,6 @@ sub t_key_is(@checks) {
             return $valid;
         }
         return "key_is: Not Hash. Got: $type";
-    }
-}
-
-sub t_not(@checks) {
-    return sub($any) {
-        my $err;
-        for my $check ( @checks ) {
-            $err = $check->($any);
-            return "not: check valid" if !defined $err;
-        }
-        return $valid;
     }
 }
 
