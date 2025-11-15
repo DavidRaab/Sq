@@ -456,6 +456,8 @@ is(get_type(sub{}),        'Sub',    'get_type 12');
 is(get_type(qr/\d+/),      'Regex',  'get_type 13');
 is(get_type(Ok(1)),        'Result', 'get_type 14');
 is(get_type(Err(1)),       'Result', 'get_type 15');
+is(get_type(sub  {}),      'Sub',    'get_type 16');
+is(get_type(lazy {}),      'Sub',    'get_type 17');
 
 {
     is(idx(0) ->([1,2,3]), 1, 'idx 0');

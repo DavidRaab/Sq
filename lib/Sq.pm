@@ -286,7 +286,7 @@ sub get_type($any) {
     }
     return 'Array' if $ref eq 'Array' || $ref eq 'ARRAY';
     return 'Hash'  if $ref eq 'Hash'  || $ref eq 'HASH';
-    return 'Sub'   if $ref eq 'CODE';
+    return 'Sub'   if $ref eq 'CODE'  || $ref eq 'Sq::Lazy';
     return 'Regex' if $ref eq 'Regexp';
     return $ref;
 }
