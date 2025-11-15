@@ -18,10 +18,10 @@ Sq->fmt->table({
     header => ["Aspect Ratio", "Diagonal (inch)", "Width x Height (cm)"],
     data   => Array::cartesian($aspects, $diagonals)->map(sub($args) {
         my ($aspect, $diag) = @$args;
-        my ($ax, $ay)       = @$aspect;
+        my ($aratio)        = $aspect->[0] / $aspect->[1];
 
-        my $height = $diag / (sqrt(($ax/$ay) ** 2 + 1)) * 2.54;
-        my $width  = $height * ($ax/$ay);
+        my $height = $diag / (sqrt($aratio ** 2 + 1)) * 2.54;
+        my $width  = $height * $aratio;
 
         return [$aspect->join(':'), sprintf('%2d"', $diag), sprintf("%6.2f x %.2f cm", $width, $height)];
     }),
