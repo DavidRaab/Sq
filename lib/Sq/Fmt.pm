@@ -58,7 +58,7 @@ my $table_aoh = [hash =>
 my $column    = [or   => ['array'], ['str']];
 my $table_aoa = [hash =>
     [keys =>
-        data => [array => [of => [array => [of => $column]]]]
+        data   => [array => [of => [array => [of => $column]]]]
     ],
     [okeys =>
         header => [array => [of => ['str']]],
