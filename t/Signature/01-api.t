@@ -78,4 +78,19 @@ dies {
 qr/\AOption::match/,
 'Option::match 5';
 
+
+# check Sq::dispatch() with correct amount of arguments
+dies { dispatch()        } qr/\ASq::dispatch:/, 'dispatch() with 0 arguments';
+dies { dispatch(1)       } qr/\ASq::dispatch:/, 'dispatch() with 1 arguments';
+dies { dispatch(1,2,3)   } qr/\ASq::dispatch:/, 'dispatch() with 3 arguments';
+dies { dispatch(1,2,3,4) } qr/\ASq::dispatch:/, 'dispatch() with 4 arguments';
+
+# correct call
+ok(
+    is_sub(dispatch(sub{ 'num' }, { num => sub { 1 } })),
+    'dispatch($sub,$dispatch) -> $sub');
+
+dies { dispatch("", { num => sub { 1 } })  } qr/\ASq::dispatch:/, 'dispatch without sub-ref';
+dies { dispatch(sub{'num'}, { num => "" }) } qr/\ASq::dispatch:/, 'dispatch without hash of func';
+
 done_testing;
