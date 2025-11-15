@@ -83,11 +83,15 @@ is(
 }
 
 # is_empty
-ok(Str->is_empty(undef), 'is_empty 0');
-ok(Str->is_empty(""),    'is_empty 1');
-ok(Str->is_empty(" "),   'is_empty 2');
-ok(Str->is_empty("  "),  'is_empty 3');
-nok(Str->is_empty(" a"), 'is_empty 4');
+dies
+    { Str->is_empty(undef) }
+    qr/\ASq::Core::Str::is_empty:/,
+    'is_empty 0';
+
+ok (Str->is_empty(""),    'is_empty 1');
+ok (Str->is_empty(" "),   'is_empty 2');
+ok (Str->is_empty("  "),  'is_empty 3');
+nok(Str->is_empty(" a"),  'is_empty 4');
 
 is(Str->to_array(""),       [qw//],            "to_array 1");
 is(Str->to_array("abcdef"), [qw/a b c d e f/], "to_array 2");

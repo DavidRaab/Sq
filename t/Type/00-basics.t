@@ -65,19 +65,19 @@ is(t_run(t_array, {}), Err('array: Not an Array'), '{} not an array');
 is(t_run(t_hash, {}, {}, {}),                   Ok(1), 'multiple hashes');
 is(t_run(t_hash, {}, {}, []), Err("hash: Not a Hash"), 'one not hash');
 
-ok( t_valid($is_album, $album),        'check if $album is album');
-ok(!t_valid($is_album, $album_wrong1), 'check if $album_wrong1 fails');
+ok( t_run($is_album, $album),        'check if $album is album');
+nok(t_run($is_album, $album_wrong1), 'check if $album_wrong1 fails');
 ok(
-    t_valid($is_album, $album_wrong2),
+    t_run($is_album, $album_wrong2),
     '$album_wrong2 is a valid $album because tracks only need to be defined');
 
-ok( t_valid(t_keys(artist => t_str), $album), 'check if album.artist is_str');
-ok(!t_valid(t_keys(foo    => t_str), $album), 'album.foo must fail');
+ok( t_run(t_keys(artist => t_str), $album), 'check if album.artist is_str');
+nok(t_run(t_keys(foo    => t_str), $album), 'album.foo must fail');
 ok(
-    t_valid(t_keys(artist => t_enum('Michael Jackson')), $album),
+    t_run(t_keys(artist => t_enum('Michael Jackson')), $album),
     'album is from Michael Jackson');
-ok( t_valid($is_album2, $album),        'full album check');
-ok(!t_valid($is_album2, $album_wrong2), 'album.tracks not an array');
+ok( t_run($is_album2, $album),        'full album check');
+nok(t_run($is_album2, $album_wrong2), 'album.tracks not an array');
 
 # t_enum
 {
@@ -316,43 +316,43 @@ ok(!t_valid($is_album2, $album_wrong2), 'album.tracks not an array');
 {
     # How can i test if t_any really checks against any value? Don't know
     # but i just check some common things.
-    ok(t_valid(t_any,             1), 't_any  1');
-    ok(t_valid(t_any,         "foo"), 't_any  2');
-    ok(t_valid(t_any,            []), 't_any  3');
-    ok(t_valid(t_any,            {}), 't_any  4');
-    ok(t_valid(t_any,         undef), 't_any  5');
-    ok(t_valid(t_any,         sub{}), 't_any  6');
-    ok(t_valid(t_any,         sq []), 't_any  7');
-    ok(t_valid(t_any,         sq {}), 't_any  8');
-    ok(t_valid(t_any,       Some(1)), 't_any  9');
-    ok(t_valid(t_any,          None), 't_any 10');
-    ok(t_valid(t_any,         Ok(1)), 't_any 11');
-    ok(t_valid(t_any,        Err(1)), 't_any 12');
-    ok(t_valid(t_any, Seq->new(1,2)), 't_any 13');
-    ok(t_valid(t_any,         t_any), 't_any 14');
+    ok(t_run(t_any,             1), 't_any  1');
+    ok(t_run(t_any,         "foo"), 't_any  2');
+    ok(t_run(t_any,            []), 't_any  3');
+    ok(t_run(t_any,            {}), 't_any  4');
+    ok(t_run(t_any,         undef), 't_any  5');
+    ok(t_run(t_any,         sub{}), 't_any  6');
+    ok(t_run(t_any,         sq []), 't_any  7');
+    ok(t_run(t_any,         sq {}), 't_any  8');
+    ok(t_run(t_any,       Some(1)), 't_any  9');
+    ok(t_run(t_any,          None), 't_any 10');
+    ok(t_run(t_any,         Ok(1)), 't_any 11');
+    ok(t_run(t_any,        Err(1)), 't_any 12');
+    ok(t_run(t_any, Seq->new(1,2)), 't_any 13');
+    ok(t_run(t_any,         t_any), 't_any 14');
 }
 
 # other simple checks
 {
-    ok( t_valid(t_sub,       sub{}), 't_sub 1');
-    ok(!t_valid(t_sub,          {}), 't_sub 2');
-    ok(!t_valid(t_sub,          []), 't_sub 3');
-    ok(!t_valid(t_sub,           1), 't_sub 4');
-    ok(!t_valid(t_sub,       "foo"), 't_sub 5');
+    ok( t_run(t_sub,       sub{}), 't_sub 1');
+    nok(t_run(t_sub,          {}), 't_sub 2');
+    nok(t_run(t_sub,          []), 't_sub 3');
+    nok(t_run(t_sub,           1), 't_sub 4');
+    nok(t_run(t_sub,       "foo"), 't_sub 5');
 
-    ok( t_valid(t_regex,      qr//), 't_regex 1');
-    ok(!t_valid(t_regex,        ""), 't_regex 2');
+    ok( t_run(t_regex,      qr//), 't_regex 1');
+    nok(t_run(t_regex,        ""), 't_regex 2');
 
-    ok( t_valid(t_bool,          0), 't_bool 1');
-    ok( t_valid(t_bool,          1), 't_bool 2');
-    ok(!t_valid(t_bool,         -1), 't_bool 3');
-    ok(!t_valid(t_bool,          2), 't_bool 4');
+    ok( t_run(t_bool,          0), 't_bool 1');
+    ok( t_run(t_bool,          1), 't_bool 2');
+    nok(t_run(t_bool,         -1), 't_bool 3');
+    nok(t_run(t_bool,          2), 't_bool 4');
 
-    ok( t_valid(t_seq, Seq->new(1)), 't_seq 1');
-    ok( t_valid(t_seq,  Seq->empty), 't_seq 2');
-    ok(!t_valid(t_seq,          {}), 't_seq 3');
-    ok(!t_valid(t_seq,       sub{}), 't_seq 4');
-    ok(!t_valid(t_seq,          []), 't_seq 5');
+    ok( t_run(t_seq, Seq->new(1)), 't_seq 1');
+    ok( t_run(t_seq,  Seq->empty), 't_seq 2');
+    nok(t_run(t_seq,          {}), 't_seq 3');
+    nok(t_run(t_seq,       sub{}), 't_seq 4');
+    nok(t_run(t_seq,          []), 't_seq 5');
 }
 
 # t_even_sized
@@ -362,25 +362,25 @@ ok(!t_valid($is_album2, $album_wrong2), 'album.tracks not an array');
 
     my $idx = 0;
     for my $es ( $es1, $es2 ) {
-        ok( t_valid($es,        []), "$idx: t_even_sized 1");
-        ok(!t_valid($es,       [1]), "$idx: t_even_sized 2");
-        ok( t_valid($es,     [1,2]), "$idx: t_even_sized 3");
-        ok(!t_valid($es,   [1,2,3]), "$idx: t_even_sized 4");
-        ok( t_valid($es, [1,2,3,4]), "$idx: t_even_sized 5");
-        ok(!t_valid($es,        {}), "$idx: t_even_sized 6");
-        ok(!t_valid($es,     "foo"), "$idx: t_even_sized 7");
-        ok(!t_valid($es,         1), "$idx: t_even_sized 8");
+        ok( t_run($es,        []), "$idx: t_even_sized 1");
+        nok(t_run($es,       [1]), "$idx: t_even_sized 2");
+        ok( t_run($es,     [1,2]), "$idx: t_even_sized 3");
+        nok(t_run($es,   [1,2,3]), "$idx: t_even_sized 4");
+        ok( t_run($es, [1,2,3,4]), "$idx: t_even_sized 5");
+        nok(t_run($es,        {}), "$idx: t_even_sized 6");
+        nok(t_run($es,     "foo"), "$idx: t_even_sized 7");
+        nok(t_run($es,         1), "$idx: t_even_sized 8");
         $idx++;
     }
 }
 
 # t_void
 {
-    ok( t_valid(t_void, undef), 't_void 1');
+    ok( t_run(t_void, undef), 't_void 1');
 
-    ok(!t_valid(t_void,     1), 't_void 3');
-    ok(!t_valid(t_void, "foo"), 't_void 4');
-    ok(!t_valid(t_void,    {}), 't_void 6');
+    nok(t_run(t_void,     1), 't_void 3');
+    nok(t_run(t_void, "foo"), 't_void 4');
+    nok(t_run(t_void,    {}), 't_void 6');
 }
 
 # t_ref
@@ -388,21 +388,21 @@ ok(!t_valid($is_album2, $album_wrong2), 'album.tracks not an array');
     my $point    = bless({X=>1, Y=>1}, 'Point');
     my $is_point = t_ref('Point');
 
-    ok( t_valid($is_point, $point), 't_ref 1');
-    ok(!t_valid($is_point,     {}), 't_ref 2');
-    ok(!t_valid($is_point,     []), 't_ref 3');
+    ok( t_run($is_point, $point), 't_ref 1');
+    nok(t_run($is_point,     {}), 't_ref 2');
+    nok(t_run($is_point,     []), 't_ref 3');
 }
 
 # t_can
 {
     my $opt = None;
-    ok( t_valid(t_can('map', 'iter'), $opt), 't_methods 1');
-    ok(!t_valid(t_can('dope'),        $opt), 't_methods 2');
-    ok(!t_valid(t_can('dope'),          []), 't_methods 3');
-    ok(!t_valid(t_can('dope'),          {}), 't_methods 4');
+    ok( t_run(t_can('map', 'iter'), $opt), 't_methods 1');
+    nok(t_run(t_can('dope'),        $opt), 't_methods 2');
+    nok(t_run(t_can('dope'),          []), 't_methods 3');
+    nok(t_run(t_can('dope'),          {}), 't_methods 4');
 
     my $is_seq = t_ref('Seq', t_can('map', 'keep'));
-    ok( t_valid($is_seq, Seq->empty), 't_ref & t_methods');
+    ok( t_run($is_seq, Seq->empty), 't_ref & t_methods');
 }
 
 # t_and
@@ -442,6 +442,52 @@ ok(!t_valid($is_album2, $album_wrong2), 'album.tracks not an array');
     }), 't_and 4');
 }
 
+# t_maybe
+{
+    my $aoh = type [hash => [keys =>
+        header => [array => [of => ['str']]],
+        data   => [array => [of => ['hash']]],
+        border => [maybe => ['bool']],
+    ]];
+
+    ok(t_run($aoh, {
+        header => [qw/a b c/],
+        data   => [{foo=>1}],
+        border => 1,
+    }), 't_maybe 1 - border defined and bool 1');
+
+    ok(t_run($aoh, {
+        header => [qw/a b c/],
+        data   => [{foo=>1}],
+        border => 0,
+    }), 't_maybe 2 - border defined and bool 0');
+
+    ok(t_run($aoh, {
+        header => [qw/a b c/],
+        data   => [{foo=>1}],
+    }), 't_maybe 3 - border not defined - still valid');
+
+    nok(t_run($aoh, {
+        header => [qw/a b c/],
+        data   => [{foo=>1}],
+        border => 3,
+    }), 't_maybe 4 - border defined but not bool');
+
+    # check maybe number
+    my $mnum = t_maybe(t_num);
+     ok(t_run($mnum, undef), 'maybe num - undef turns into no check and valid');
+     ok(t_run($mnum,    10), 'maybe num - is number');
+    nok(t_run($mnum, "abc"), 'maybe num - string not number');
+    nok(t_run($mnum,    []), 'maybe num - array-ref not number');
+}
+
+# t_sub
+{
+    ok(t_run(t_sub,   sub{}), 'sub {} is t_sub');
+    ok(t_run(t_sub, lazy {}), 'lay {} is t_sub');
+}
+
+
 # Build a stupid class with inheritance. Throughout Sq i don't have that
 package Stupid;
 use 5.036;
@@ -461,20 +507,20 @@ package main;
     my $s  = Stupid->new;
     my $ms = MoreStupid->new;
 
-    ok( t_valid(t_isa('Stupid'),     $s),  't_isa 1');
-    ok(!t_valid(t_isa('MoreStupid'), $s),  't_isa 2');
-    ok( t_valid(t_isa('Stupid'),     $ms), 't_isa 3');
-    ok( t_valid(t_isa('MoreStupid'), $ms), 't_isa 4');
+    ok( t_run(t_isa('Stupid'),     $s),  't_isa 1');
+    nok(t_run(t_isa('MoreStupid'), $s),  't_isa 2');
+    ok( t_run(t_isa('Stupid'),     $ms), 't_isa 3');
+    ok( t_run(t_isa('MoreStupid'), $ms), 't_isa 4');
 
-    ok( t_valid(t_isa('Stupid', t_can('foo')),  $s), 't_isa 5');
-    ok(!t_valid(t_isa('Stupid', t_can('bar')),  $s), 't_isa 6');
-    ok( t_valid(t_isa('Stupid', t_can('foo')), $ms), 't_isa 7');
-    ok( t_valid(t_isa('Stupid', t_can('bar')), $ms), 't_isa 8');
+    ok( t_run(t_isa('Stupid', t_can('foo')),  $s), 't_isa 5');
+    nok(t_run(t_isa('Stupid', t_can('bar')),  $s), 't_isa 6');
+    ok( t_run(t_isa('Stupid', t_can('foo')), $ms), 't_isa 7');
+    ok( t_run(t_isa('Stupid', t_can('bar')), $ms), 't_isa 8');
 
-    ok(!t_valid(t_isa('MoreStupid', t_can('foo')),  $s), 't_isa 9');
-    ok(!t_valid(t_isa('MoreStupid', t_can('bar')),  $s), 't_isa 10');
-    ok( t_valid(t_isa('MoreStupid', t_can('foo')), $ms), 't_isa 11');
-    ok( t_valid(t_isa('MoreStupid', t_can('bar')), $ms), 't_isa 12');
+    nok(t_run(t_isa('MoreStupid', t_can('foo')),  $s), 't_isa 9');
+    nok(t_run(t_isa('MoreStupid', t_can('bar')),  $s), 't_isa 10');
+    ok( t_run(t_isa('MoreStupid', t_can('foo')), $ms), 't_isa 11');
+    ok( t_run(t_isa('MoreStupid', t_can('bar')), $ms), 't_isa 12');
 }
 
 # t_tuplev

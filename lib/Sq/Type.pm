@@ -4,16 +4,15 @@ use Sq::Evaluator;
 use Sq::Exporter;
 our @EXPORT = (
     qw(type),
-    qw(t_run t_valid t_assert),                               # Runners
-    qw(t_and t_or t_is t_not t_rec),                          # Combinators
-    qw(t_str t_enum t_match t_matchf t_parser t_eq),          # String
-    qw(t_num t_int t_positive t_negative t_range),            # Numbers
-    qw(t_opt),
-    qw(t_hash t_with_keys t_keys t_okeys t_as_hash t_key_is), # Hash
-    qw(t_array t_idx t_tuple t_tuplev t_even_sized),          # Array
+    qw(t_run t_valid t_assert),                                 # Runners
+    qw(t_and t_or t_is t_not t_rec t_maybe),                    # Combinators
+    qw(t_str t_enum t_match t_matchf t_parser t_eq),            # String
+    qw(t_num t_int t_positive t_negative t_range),              # Numbers
+    qw(t_hash t_with_keys t_keys t_okeys t_as_hash t_key_is),   # Hash
+    qw(t_array t_idx t_tuple t_tuplev t_even_sized),            # Array
+    qw(t_any t_opt t_sub t_regex t_bool t_seq t_void t_result), # Basic Types
     qw(t_of t_min t_max t_length),
-    qw(t_any t_sub t_regex t_bool t_seq t_void t_result),
-    qw(t_ref t_isa t_can),                                    # Objects
+    qw(t_ref t_isa t_can),                                      # Objects
     qw(t_union t_runion),
 );
 
@@ -199,15 +198,22 @@ sub t_keys(%kt) {
             my ($err, $value);
             for my $key ( keys %kt ) {
                 $value = $any->{$key};
-                if ( !defined $value ) {
-                    return "keys: '$key' not defined";
-                }
-                $err = $kt{$key}->($value);
+                $err   = $kt{$key}->($value);
                 return "keys: $key $err" if defined $err;
             }
             return $valid;
         }
         return 'keys: not a hash';
+    }
+}
+
+sub t_maybe($check) {
+    return sub($any) {
+        if ( defined $any ) {
+            my $err = $check->($any);
+            return "maybe: " . $err if defined $err;
+        }
+        return $valid;
     }
 }
 
@@ -231,6 +237,7 @@ sub t_okeys(%kt) {
 
 sub t_eq($expect) {
     return sub($any) {
+        return "eq: Got undef" if !defined $any;
         if ( ref $any eq "" ) {
             return $valid if $any eq $expect;
             return "eq: Expected '$expect' Got '$any'";
@@ -241,6 +248,7 @@ sub t_eq($expect) {
 
 sub t_enum(@expected) {
     return sub($any) {
+        return "enum: Got undef" if !defined $any;
         if ( ref $any eq "" ) {
             for my $expected ( @expected ) {
                 return $valid if $any eq $expected;
@@ -253,6 +261,7 @@ sub t_enum(@expected) {
 
 sub t_num(@checks) {
     return sub($any) {
+        return "num: Got undef" if !defined $any;
         if ( is_num($any) ) {
             my $err;
             for my $check ( @checks ) {
@@ -267,6 +276,7 @@ sub t_num(@checks) {
 
 sub t_int(@checks) {
     return sub($any) {
+        return "int: Got undef" if !defined $any;
         if ( $any =~ m/\A[-+]?[0-9]+\z/ ) {
             my $err;
             for my $check ( @checks ) {
@@ -281,6 +291,7 @@ sub t_int(@checks) {
 
 sub t_positive() {
     state $fn = sub($any) {
+        return "positive: Got undef" if !defined $any;
         if ( is_num($any) ) {
             return $valid if $any >= 0;
             return "positive: '$any' not >= 0";
@@ -292,6 +303,7 @@ sub t_positive() {
 
 sub t_negative() {
     state $fn = sub($any) {
+        return "negative: Got undef" if !defined $any;
         if ( is_num($any) ) {
             return $valid if $any <= 0;
             return "negative: '$any' not <= 0";
@@ -303,6 +315,7 @@ sub t_negative() {
 
 sub t_str(@checks) {
     return sub($any) {
+        return "str: Got undef" if !defined $any;
         my $type = ref $any;
         if ( $type eq '' ) {
             my $err;
@@ -369,6 +382,7 @@ sub t_of(@types) {
 # checks if Array/Hash/string has minimum upto maximum amount of elements
 sub t_length($min, $max) {
     return sub($any) {
+        return "length: Got undef" if !defined $any;
         my $type = ref $any;
 
         if ( $type eq 'Array' || $type eq 'ARRAY' ) {
@@ -398,18 +412,26 @@ sub t_length($min, $max) {
 
 sub t_match($regex) {
     return sub($any) {
+        return "match: Got undef" if !defined $any;
         return $valid if $any =~ $regex;
         return "match: $regex no match: $any";
     }
 }
 
 sub t_matchf($regex, $predicate) {
-    return sub($str) {
-        if ( $str =~ $regex ) {
-            return $valid if $predicate->(@{^CAPTURE});
-            return "\$predicate not succesful";
+    return sub($any) {
+        return "matchf: Got undef" if !defined $any;
+        my $ref = ref $any;
+        if ( $ref eq '' ) {
+            if ( $any =~ $regex ) {
+                return $valid if $predicate->(@{^CAPTURE});
+                return "\$predicate not succesful";
+            }
+            else {
+                return "matchf: No match: $regex =~ '$any'";
+            }
         }
-        return "matchf: $regex does not match";
+        return "matchf: Not a string";
     }
 }
 
@@ -493,7 +515,7 @@ sub t_any() {
 sub t_sub() {
     state $fn = sub($any) {
         my $type = ref $any;
-        return $valid if $type eq 'CODE' || $type eq 'Sq::Core::Lazy';
+        return $valid if $type eq 'CODE' || $type eq 'Sq::Lazy';
         return "sub: Not a CODE reference.";
     };
     return $fn;
@@ -519,8 +541,9 @@ sub t_bool() {
 
 sub t_seq() {
     state $fn = sub($any) {
-        return $valid if ref $any eq 'Seq';
-        return "seq: Not a sequence $any";
+        my $ref = ref $any;
+        return $valid if $ref eq 'Seq';
+        return "seq: Not a sequence: Got $ref";
     };
     return $fn;
 }
@@ -555,7 +578,7 @@ sub t_tuple(@checks) {
     }
 }
 
-# variable tuple version. tuplev first expects a minimal fixed amoun of parameters.
+# variable tuple version. tuplev first expects a minimal fixed amount of parameters.
 # But more than the fixed amount can be passed. All values more than the fixed amount
 # are passed as an array to the last type-check passed.
 #
