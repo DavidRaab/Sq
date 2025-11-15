@@ -273,7 +273,10 @@ sub is_opt    :prototype($)  { return ref $_[0] eq 'Option' ? 1 : 0 }
 sub is_result :prototype($)  { return ref $_[0] eq 'Result' ? 1 : 0 }
 sub is_ref    :prototype($$) { return ref $_[1] eq $_[0]    ? 1 : 0 }
 sub is_regex  :prototype($)  { return ref $_[0] eq 'Regexp' ? 1 : 0 }
-sub is_sub    :prototype($)  { return ref $_[0] eq 'CODE'   ? 1 : 0 }
+sub is_sub    :prototype($)  {
+    my $ref = ref $_[0];
+    return ($ref eq 'CODE' || $ref eq 'Sq::Lazy') ? 1 : 0
+}
 
 sub get_type($any) {
     my $ref = ref $any;

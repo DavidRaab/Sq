@@ -245,6 +245,9 @@ is(
     nok(is_result([]),       'is_result 3');
      ok(is_regex(qr/\Aasd/), 'is_regex 1');
     nok(is_regex("asd"),     'is_regex 2');
+     ok(is_sub(sub  {}),     'is_sub 1');
+     ok(is_sub(lazy {}),     'is_sub 2');
+    nok(is_sub(""),          'is_sub 2');
      ok(is_ref('Foo', bless([], 'Foo')), 'is_ref 1');
     nok(is_ref('Bar', bless([], 'Foo')), 'is_ref 2');
 }
