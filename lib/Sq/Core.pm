@@ -227,7 +227,7 @@ sub copy($any) {
         if ( defined $func ) {
             return $func->($any);
         }
-        Carp::croak "No copy for '$ref' defined.";
+        Carp::croak "copy: unknown type '$ref'";
     }
 }
 

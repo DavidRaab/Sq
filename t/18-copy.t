@@ -217,4 +217,39 @@ use Sq::Test;
     ok(equal($orig, $copy), 'Regexes can be copied');
 }
 
+# test add_copy()
+my $whatever1 = bless([1,2,3], 'Whatever');
+my $whatever2 = bless([1,2,3], 'Whatever');
+
+nok(equal($whatever1, $whatever2),             'Whatever is unknown to equal');
+dies { my $c = copy($whatever1) } qr/\Acopy:/, 'copy() on Whatever must fail';
+
+# Whatever are just arrays - so we can just use array equality
+Sq::Equality::add_equality('Whatever' => sub($x,$y) {
+    Sq::Equality::array($x,$y);
+});
+
+is($whatever1, $whatever2, 'Whatever can now be compared');
+
+# Implement copy of Whatever
+Sq::Copy::add_copy('Whatever' => sub($what) {
+    my @new;
+    for my $x ( @$what ) {
+        push @new, copy($x);
+    }
+    return bless(\@new, 'Whatever');
+});
+
+# copy is now possible
+is($whatever1, copy($whatever2), 'Whatever can now be copied');
+
+# is deep-copy and equality possible?
+my $whatever3 = bless([1,2,3, bless([4], 'Whatever')], 'Whatever');
+my $whatever4 = copy($whatever3);
+
+is(
+    $whatever4,
+    bless([1,2,3, bless([4], 'Whatever')], 'Whatever'),
+    'check recursion');
+
 done_testing;
