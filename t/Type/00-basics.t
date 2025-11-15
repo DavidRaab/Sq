@@ -405,6 +405,43 @@ ok(!t_valid($is_album2, $album_wrong2), 'album.tracks not an array');
     ok( t_valid($is_seq, Seq->empty), 't_ref & t_methods');
 }
 
+# t_and
+{
+    my $has_position = t_hash(t_keys(
+        x => t_num,
+        y => t_num,
+    ));
+    my $has_health = t_hash(t_keys(
+        health_max     => t_positive,
+        health_current => t_positive,
+    ));
+    my $combined = t_and($has_position, $has_health);
+
+    ok(t_run($combined, {
+        title => "Entity",
+        x => 10, y => 20,
+        health_max => 100, health_current => 20
+    }), 't_and 1');
+
+    nok(t_run($combined, {
+        title => "Entity",
+        x => 10, z => 20,
+        health_max => 100, health_current => 20
+    }), 't_and 2');
+
+    nok(t_run($combined, {
+        title => "Entity",
+        x => 10, y => 20,
+        health_max => 100
+    }), 't_and 3');
+
+    nok(t_run($combined, {
+        title => "Entity",
+        x => 10, y => 20,
+        health_max => 100, health_current => -100
+    }), 't_and 4');
+}
+
 # Build a stupid class with inheritance. Throughout Sq i don't have that
 package Stupid;
 use 5.036;

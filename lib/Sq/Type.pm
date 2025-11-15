@@ -5,7 +5,7 @@ use Sq::Exporter;
 our @EXPORT = (
     qw(type),
     qw(t_run t_valid t_assert),                               # Runners
-    qw(t_or t_is t_not t_rec),                                # Combinators
+    qw(t_and t_or t_is t_not t_rec),                          # Combinators
     qw(t_str t_enum t_match t_matchf t_parser t_eq),          # String
     qw(t_num t_int t_positive t_negative t_range),            # Numbers
     qw(t_opt),
@@ -75,7 +75,20 @@ sub t_or(@checks) {
             return $valid if !defined $err;
             push @errs, $err;
         }
-        return "or: No check succesfull\n    " . join("\n    ", @errs);
+        return "or: No check succesfull"
+            . "\n    "
+            . join("\n    ", @errs);
+    }
+}
+
+sub t_and(@checks) {
+    return sub($any) {
+        my $err;
+        for my $check ( @checks ) {
+            $err = $check->($any);
+            return "and: " . $err if defined $err;
+        }
+        return $valid;
     }
 }
 
