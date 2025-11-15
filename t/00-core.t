@@ -520,7 +520,7 @@ is(get_type(lazy {}),      'Sub',    'get_type 17');
             DECR => sub { 1 },
         );
     }
-    qr/\Adispatch:/,
+    qr/\ASq::dispatch:/,
     'dispatch with non existing key throws exception';
 
     # dispatch() in two argument version can also be used in Array::map

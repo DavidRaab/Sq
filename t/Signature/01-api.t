@@ -85,12 +85,28 @@ dies { dispatch(1)       } qr/\ASq::dispatch:/, 'dispatch() with 1 arguments';
 dies { dispatch(1,2,3)   } qr/\ASq::dispatch:/, 'dispatch() with 3 arguments';
 dies { dispatch(1,2,3,4) } qr/\ASq::dispatch:/, 'dispatch() with 4 arguments';
 
-# correct call
+# A correct call
 ok(
     is_sub(dispatch(sub{ 'num' }, { num => sub { 1 } })),
     'dispatch($sub,$dispatch) -> $sub');
 
+# correct amount of args, but wrong types
 dies { dispatch("", { num => sub { 1 } })  } qr/\ASq::dispatch:/, 'dispatch without sub-ref';
 dies { dispatch(sub{'num'}, { num => "" }) } qr/\ASq::dispatch:/, 'dispatch without hash of func';
+
+# A correct call and also call sub-ref
+{
+    my $calc = dispatch(
+        sub($array) { $array->[0] },
+        {
+            add => sub($array) { $array->[1] + $array->[2] },
+            sub => sub($array) { $array->[1] - $array->[2] },
+        }
+    );
+
+    is($calc->(['add',3,5]),  8, 'calc example 1');
+    is($calc->(['sub',3,5]), -2, 'calc example 2');
+    dies { $calc->(['mul',3,5]) } qr/\ASq::dispatch/, 'Fails if key not exists';
+}
 
 done_testing;

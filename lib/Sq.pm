@@ -493,13 +493,9 @@ sub fn($name,$sub) {
 # and i don't have the patience to always do the if checking and error-throwing
 # myself.
 sub dispatch {
-    if ( @_ == 0 ) {
-        Carp::croak "dispatch: No arguments.\n";
-    }
-    elsif ( @_ == 2 ) {
+    # expect sub-ref and hash of subs
+    if ( @_ == 2 ) {
         my ($f_key, $case_sub) = @_;
-        Carp::croak "dispatch: First argument must be sub in two-argument call" if !is_sub($f_key);
-        Carp::croak "dispatch: Must be hash in two-argument call"               if !is_hash($case_sub);
         return sub($x) {
             my $key  = $f_key->($x);
             my $func = $case_sub->{$key};
@@ -507,22 +503,20 @@ sub dispatch {
                 return $func->($x);
             }
             else {
-                Carp::croak "dispatch: '$key' not provided as a case.\n";
+                Carp::croak "Sq::dispatch: '$key' not provided as a case.\n";
             }
         }
     }
-    elsif ( @_ < 5 ) {
-        Carp::croak "dispatch: Expects two or at least five arguments!\n";
-    }
+    # Expect at least 5 arguments (checked through signature)
+    # expect str to dispatch, and at least two cases
     else {
         my ($key, %case_sub) = @_;
-        Carp::croak "dispatch: Expects a Str as first argument" if !is_str($key);
         my $func = $case_sub{$key};
         if ( defined $func ) {
             return $func->();
         }
         else {
-            Carp::croak "dispatch: '$key' not provided as a case.\n";
+            Carp::croak "Sq::dispatch: '$key' not provided as a case.\n";
         }
     }
 }

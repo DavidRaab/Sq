@@ -40,7 +40,7 @@ sig('Sq::key_equal', $str, $any, $sub);
 sigt('Sq::dispatch',
     t_or(
         t_tuple ($sub, t_hash(t_of $sub)),
-        t_tuplev($str, $str, $sub, $str, $sub, t_array($str, $sub))
+        t_tuplev($str, $str, $sub, $str, $sub, t_array(t_of($str, $sub)))
     ),
     $any
 );
