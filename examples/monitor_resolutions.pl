@@ -13,35 +13,32 @@ my $aspects = sq [
 # diagonals of monitor in inch
 my $diagonals = array(24..45);
 
-# print real sizes of monitor in cm
-my $sizes = Array::cartesian($aspects, $diagonals)->map(sub($args) {
-    my ($aspect, $diag) = @$args;
-    my ($ax, $ay)       = @$aspect;
-
-    my $height = $diag / (sqrt(($ax/$ay) ** 2 + 1)) * 2.54;
-    my $width  = $height * ($ax/$ay);
-
-    return [$aspect->join(':'), sprintf('%2d"', $diag), sprintf("%6.2f x %.2f cm", $width, $height)];
-});
-
+# print real sizes of monitors
 Sq->fmt->table({
     header => ["Aspect Ratio", "Diagonal (inch)", "Width x Height (cm)"],
-    data   => $sizes,
+    data   => Array::cartesian($aspects, $diagonals)->map(sub($args) {
+        my ($aspect, $diag) = @$args;
+        my ($ax, $ay)       = @$aspect;
+
+        my $height = $diag / (sqrt(($ax/$ay) ** 2 + 1)) * 2.54;
+        my $width  = $height * ($ax/$ay);
+
+        return [$aspect->join(':'), sprintf('%2d"', $diag), sprintf("%6.2f x %.2f cm", $width, $height)];
+    }),
     border => 0,
 });
 
-# print resolutions
-my $resolutions = Array::cartesian($heights,$aspects)->map(sub($tuple) {
-    my ($height, $aspect) = @$tuple;
-    my ($ax,$ay)          = @$aspect;
-
-    my $width = ($height / $ay) * $ax;
-    return array("$width x $height", $aspect->join(':'), ($width * $height / 1_000_000));
-});
-
 say "";
+
+# print resolution of aspect ratio
 Sq->fmt->table({
     header => [qw/Resolution Aspect MPixel/],
-    data   => $resolutions,
+    data   => Array::cartesian($heights,$aspects)->map(sub($tuple) {
+        my ($height, $aspect) = @$tuple;
+        my ($ax,$ay)          = @$aspect;
+
+        my $width = ($height / $ay) * $ax;
+        return ["$width x $height", $aspect->join(':'), ($width * $height / 1_000_000)];
+    }),
     border => 0,
 });
