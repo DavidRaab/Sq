@@ -534,7 +534,8 @@ sub dispatch {
 # When a subroutine was passed, it get's executed, otherwise any other
 # value is just copied. init() helps in implementing those functions.
 sub init($f_or_value, @args) {
-    if ( is_sub($f_or_value) ) {
+    my $ref = ref $f_or_value;
+    if ( $ref eq 'CODE' || $ref eq 'Sq::Lazy' ) {
         return $f_or_value->(@args);
     }
     else {
