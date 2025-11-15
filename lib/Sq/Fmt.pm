@@ -48,21 +48,17 @@ my $table_aoh = [hash =>
     [keys =>
         header => [array => [of => ['str']]],
         data   => [array => [of => ['hash']]],
+        border => [maybe => ['bool']],
     ],
-    [okeys =>
-        border => ['bool'],
-    ]
 ];
 
 # otherwise data must be an AoA containing strings and header/border is optional
 my $column    = [or   => ['array'], ['str']];
 my $table_aoa = [hash =>
     [keys =>
+        header => [maybe => [array => [of => ['str']]]],
+        border => [maybe => ['bool']],
         data   => [array => [of => [array => [of => $column]]]]
-    ],
-    [okeys =>
-        header => [array => [of => ['str']]],
-        border => ['bool'],
     ],
 ];
 
