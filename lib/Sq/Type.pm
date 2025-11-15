@@ -4,7 +4,8 @@ use Sq::Evaluator;
 use Sq::Exporter;
 our @EXPORT = (
     qw(type),
-    qw(t_run t_valid t_assert t_or t_is t_not t_rec),         # Basic
+    qw(t_run t_valid t_assert),                               # Runners
+    qw(t_or t_is t_not t_rec),                                # Combinators
     qw(t_str t_enum t_match t_matchf t_parser t_eq),          # String
     qw(t_num t_int t_positive t_negative t_range),            # Numbers
     qw(t_opt),
@@ -62,6 +63,27 @@ sub t_assert($check, @values) {
         Carp::croak "Type Error: $err\n" if defined $err;
     }
     return;
+}
+
+### Combinators
+
+sub t_or(@checks) {
+    return sub($any) {
+        my @errs;
+        for my $check ( @checks ) {
+            my $err = $check->($any);
+            return $valid if !defined $err;
+            push @errs, $err;
+        }
+        return "or: No check succesfull\n    " . join("\n    ", @errs);
+    }
+}
+
+sub t_is($predicate) {
+    return sub($any) {
+        return $valid if $predicate->($any);
+        return "is: \$predicate not succesful";
+    }
 }
 
 ### type checkers
@@ -285,13 +307,6 @@ sub t_idx($index, @checks) {
     };
 }
 
-sub t_is($predicate) {
-    return sub($any) {
-        return $valid if $predicate->($any);
-        return "is: \$predicate not succesful";
-    }
-}
-
 sub t_of(@types) {
     my $count = @types;
     return sub($any) {
@@ -434,18 +449,6 @@ sub t_range($min, $max) {
             return "range: Expected: $min-$max Got: $num";
         }
         return "range: not a number";
-    }
-}
-
-sub t_or(@checks) {
-    return sub($any) {
-        my @errs;
-        for my $check ( @checks ) {
-            my $err = $check->($any);
-            return $valid if !defined $err;
-            push @errs, $err;
-        }
-        return "or: No check succesfull\n    " . join("\n    ", @errs);
     }
 }
 
