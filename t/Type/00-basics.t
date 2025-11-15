@@ -483,8 +483,8 @@ nok(t_run($is_album2, $album_wrong2), 'album.tracks not an array');
 
 # t_sub
 {
-    ok(t_run(t_sub,   sub{}), 'sub {} is t_sub');
-    ok(t_run(t_sub, lazy {}), 'lay {} is t_sub');
+    ok(t_run(t_sub,   sub{}), 'sub  {} is t_sub');
+    ok(t_run(t_sub, lazy {}), 'lazy {} is t_sub');
 }
 
 
