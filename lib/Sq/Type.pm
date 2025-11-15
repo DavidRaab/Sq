@@ -196,9 +196,9 @@ sub t_keys(%kt) {
         my $type = ref $any;
         if ( $type eq 'Hash' || $type eq 'HASH' ) {
             my ($err, $value);
-            for my $key ( keys %kt ) {
+            for my ($key,$check) ( %kt ) {
                 $value = $any->{$key};
-                $err   = $kt{$key}->($value);
+                $err   = $check->($value);
                 return "keys: $key $err" if defined $err;
             }
             return $valid;
