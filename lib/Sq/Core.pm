@@ -127,6 +127,9 @@ sub equal($any1, $any2) {
             }
             return 1;
         }
+        elsif ( $t1 eq 'Regexp' ) {
+            return $any1 eq $any2 ? 1 : 0;
+        }
 
         # dispatch all other types
         my $fn = $dispatch->{$t1};
@@ -214,6 +217,9 @@ sub copy($any) {
         return bless([$any->[0], copy($any->[1])], 'Result');
     }
     elsif ( $ref eq 'Seq' ) {
+        return $any;
+    }
+    elsif ( $ref eq 'Regexp' ) {
         return $any;
     }
     else {

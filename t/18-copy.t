@@ -211,4 +211,10 @@ use Sq::Test;
         '$copy is modified');
 }
 
+{
+    my $orig = { foo => 1, match => qr/\Aabc/ };
+    my $copy = copy($orig);
+    ok(equal($orig, $copy), 'Regexes can be copied');
+}
+
 done_testing;

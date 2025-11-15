@@ -321,12 +321,22 @@ ok(
         'struct 53');
 }
 
- ok(equal(undef, undef), 'undef is equal');
-nok(equal(undef, 1),     'one value is undef 1');
-nok(equal(1, undef),     'one value is undef 2');
-nok(equal("foo", 1),     'string and num');
-nok(equal(1, "foo"),     'num and string');
- ok(equal("123", 123),   'nums one as a sring');
+ ok(equal(undef, undef),      'undef is equal');
+nok(equal(undef, 1),          'one value is undef 1');
+nok(equal(1, undef),          'one value is undef 2');
+nok(equal("foo", 1),          'string and num');
+nok(equal(1, "foo"),          'num and string');
+ ok(equal("123", 123),        'nums one as a sring');
+ ok(equal(qr/abc/, qr/abc/),  'Regexes can be compared');
+nok(equal(qr/abc/, qr/abcd/), 'Regexes not the same');
+
+# data-structure containing regex
+ok(
+    equal(
+        { foo => 1, match => qr/\Aabc/ },
+        { foo => 1, match => qr/\Aabc/ }
+    ),
+    'hash with regexes');
 
 ### Check adding another class to Equality
 package Stupid;
