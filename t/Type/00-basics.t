@@ -479,6 +479,12 @@ nok(t_run($is_album2, $album_wrong2), 'album.tracks not an array');
      ok(t_run($mnum,    10), 'maybe num - is number');
     nok(t_run($mnum, "abc"), 'maybe num - string not number');
     nok(t_run($mnum,    []), 'maybe num - array-ref not number');
+
+    # t_maybe(t_str) vs t_str
+    nok(t_run(t_str,          undef), 'undef not allowed');
+     ok(t_run(t_str,             ""), 'empty string is fine');
+     ok(t_run(t_maybe(t_str), undef), 'undef now allowed');
+     ok(t_run(t_maybe(t_str),    ""), 'empty string is fine');
 }
 
 # t_sub
