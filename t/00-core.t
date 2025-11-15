@@ -550,6 +550,25 @@ is(get_type(lazy {}),      'Sub',    'get_type 17');
         'dispatch with Array::map on array');
 }
 
+# init() should either expect a function or a value. A function is executed.
+# also lazy {} blocks should be accepted and executed as a function.
+# All other values must be a copy.
+{
+    is(init(sub  { 1 }), 1, 'init with sub-ref');
+    is(init(lazy { 1 }), 1, 'init with lazy block');
+    is(init(1),          1, 'init with value');
+
+    # check if init() makes a copy, by later mutating $aref
+    my $aref  = [[foo =>1], [bar => 2]];
+    my $caref = init($aref);
+
+    is($caref, $aref, 'init created exact copy');
+    push $aref->@*, [baz => 3];
+
+    is($aref,  [[foo =>1], [bar => 2], [baz => 3]], '$aref changed');
+    is($caref, [[foo =>1], [bar => 2]],             '$caref stayed the same');
+}
+
 # Pattern Matching - Draft
 
 =pod
