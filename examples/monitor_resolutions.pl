@@ -36,11 +36,7 @@ my $resolutions = Array::cartesian($heights,$aspects)->map(sub($tuple) {
     my ($ax,$ay)          = @$aspect;
 
     my $width = ($height / $ay) * $ax;
-    array(
-        "$width x $height",
-        $aspect->join(':'),
-        ($width * $height / 1_000_000)
-    );
+    return array("$width x $height", $aspect->join(':'), ($width * $height / 1_000_000));
 });
 
 say "";
