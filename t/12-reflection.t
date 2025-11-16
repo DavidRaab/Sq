@@ -9,24 +9,24 @@ use Sq::Test;
 
 # check lazy loading of Sq::Fmt
 {
-    # Because Sq::Fmt is not loaded by default anymore. `Sq::Fmt::table` should
+    # Because Sq::Fmt is not loaded by default anymore. `Sq::Fmt::multiline` should
     # not appear in $statics;
     my $statics    = Sq::Reflection::statics;
     my $signatures = Sq::Reflection::signatures;
 
-    nok($statics   ->contains('Sq::Fmt::table'), 'No Sq::Fmt::table');
-    nok($signatures->contains('Sq::Fmt::table'), 'No signature for Sq::Fmt::table');
+    nok($statics   ->contains('Sq::Fmt::multiline'), 'No Sq::Fmt::multiline');
+    nok($signatures->contains('Sq::Fmt::multiline'), 'No signature for Sq::Fmt::multiline');
 
     # This line loads Sq::Fmt
-    my $table = Sq->fmt->table;
-    ok(is_sub($table), '$table is sub-ref');
+    my $multiline = Sq->fmt->multiline;
+    ok(is_sub($multiline), '$multiline is sub-ref');
 
     # reload statics & signatures
     $statics    = Sq::Reflection::statics;
     $signatures = Sq::Reflection::signatures;
 
-    ok($statics   ->contains('Sq::Fmt::table'), 'Sq::Fmt::table is now available');
-    ok($signatures->contains('Sq::Fmt::table'), 'Signature also loaded for Sq::Fmt::table');
+    ok($statics   ->contains('Sq::Fmt::multiline'), 'Sq::Fmt::multiline is now available');
+    ok($signatures->contains('Sq::Fmt::multiline'), 'Signature also loaded for Sq::Fmt::multiline');
 }
 
 
