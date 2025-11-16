@@ -56,6 +56,7 @@ sub fqn($package) {
 my $skip = array(
     # Sq Modules Start
     'Sq::import',
+    'Sq::unimport',
     'Sq::io',
     'Sq::fs',
     'Sq::math',
@@ -63,6 +64,7 @@ my $skip = array(
     'Sq::bench',
     'Sq::rand',
     'Sq::p',
+    'Sq::sys',
     'Sq::Str',
     # Sq Modules End
     # Functions that support $any value

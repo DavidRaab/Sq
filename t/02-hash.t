@@ -1037,17 +1037,12 @@ is(
     {bar => 1, foo => 2, baz => 3},
     'rename_keys 4');
 
-is(
-    Hash::rename_keys({foo => 1, bar => 2, baz => 3}, foo => undef),
-    {foo => 1, bar => 2, baz => 3},
-    'rename_keys 5');
-
 one_of(
     Hash::rename_keys({foo => 1, bar => 2, baz => 3}, foo => "bar"),
     [
         {bar => 1, baz => 3},
         {bar => 2, baz => 3},
     ],
-    'rename_keys 6');
+    'rename_keys 5');
 
 done_testing;

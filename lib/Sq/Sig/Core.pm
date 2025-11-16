@@ -365,6 +365,7 @@ sig ('Hash::diff',         $hash, $hash,          $hash);
 sigt('Hash::concat',       t_tuplev($hash, $aoh), $hash);
 sig ('Hash::is_subset_of', $hash, $hash,          $int);
 sig ('Hash::get',          $hash, $str,           $opt);
+sigt('Hash::rename_keys',  t_tuplev($hash, t_as_hash(t_of t_str)),         $hash);
 sigt('Hash::extract',      t_tuplev($hash, t_array(t_min(1), t_of $str)),  t_array(t_of t_opt));
 sigt('Hash::slice',        t_tuplev($hash, t_array(t_min(1), t_of $str)),  $hash);
 sigt('Hash::with',         t_tuplev($hash, $even_sized),                   $hash); # can be improved
@@ -414,8 +415,9 @@ sig ('Seq::one',        $str_seq, $any,                $seq);
 
 sig('Seq::append',        $seq, $seq,               $seq);
 sigt('Seq::combine', t_tuplev($seq, $sub, $astr), $array);
-sig('Seq::map',           $seq, $sub,           $seq);
-sig('Seq::map2',          $seq, $seq, $sub,     $seq);
+sig('Seq::map',           $seq, $sub,               $seq);
+sig('Seq::map2',          $seq, $seq, $sub,         $seq);
+sig('Seq::map3',          $seq, $seq, $seq, $sub,   $seq);
 sig('Seq::bind',          $seq, $sub,           $seq);
 sig('Seq::flatten',       $seq,                 $seq);
 sig('Seq::merge',         $seq,                 $seq);
@@ -445,6 +447,7 @@ sig('Seq::rxs',           $seq, $regex, $sub,  $seq);
 sig('Seq::rxsg',          $seq, $regex, $sub,  $seq);
 sig('Seq::chunked',       $seq, $int,           $seq);
 sig('Seq::windowed',      $seq, $int,           $seq);
+sig('Seq::find_windowed', $seq, $int, $sub,     t_opt(t_array));
 sig('Seq::intersperse',   $seq, $any,           $seq);
 sig('Seq::infinity',      $seq,                 $seq);
 sig('Seq::repeat',        $seq, $int,           $seq);
@@ -461,6 +464,7 @@ sig('Seq::tail',          $seq,                 $seq);
 
 sig('Seq::iter',     $seq, $sub,       $void);
 sig('Seq::iteri',    $seq, $sub,       $void);
+sig('Seq::itern',    $seq, $int, $sub, $void);
 sig('Seq::do',       $seq, $sub,        $seq);
 sig('Seq::do_every', $seq, $int, $sub,  $seq);
 sig('Seq::doi',      $seq, $sub,        $seq);
