@@ -55,8 +55,8 @@ sub whatever() { return 1 }
 sig('main::whatever', t_void);
 
 dies { whatever() }
-    qr/Not void/, '
-    fails because returns something';
+    qr/Not void/,
+    'fails because returns something';
 
 # Examples in README
 sub what($int, $str, $array_of_nums) {
@@ -85,5 +85,38 @@ is( what(123, "foo", [1,2,3]), {}, 'what ok 3');
     qr/\ASq::Math::is_prime:/,
     'type-check on returning function';
 }
+
+
+# check if sigt() with multiple IN => OUT correctly throws errors when
+# the types don't match.
+sub mapping1($in) {
+    if    ( is_num($in) ) { return [] }
+    elsif ( is_str($in) ) { return {} }
+}
+
+# first a "correct" version check that should not fail
+sigt('main::mapping1',
+    t_tuple(t_num), t_array,
+    t_tuple(t_str), t_hash,
+);
+
+is(mapping1(123),   [], 'mapping1(123) should not fail');
+is(mapping1("foo"), {}, 'mapping1("foo") should not fail');
+
+
+# now a version that should fail
+sub mapping2($in) {
+    if    ( is_num($in) ) { return [] }
+    elsif ( is_str($in) ) { return {} }
+}
+
+# first a "correct" version check that should not fail
+sigt('main::mapping2',
+    t_tuple(t_num), t_hash,
+    t_tuple(t_str), t_array,
+);
+
+dies { mapping2(123)   } qr/\Amain::mapping2:/, 'mapping2(123) should fail';
+dies { mapping2("foo") } qr/\Amain::mapping2:/, 'mapping2("foo") should fail';
 
 done_testing;
