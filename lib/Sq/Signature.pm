@@ -74,7 +74,7 @@ sub sig($func_name, @types) {
 # t_tuple() is used. t_array() for completely variable args or
 # t_tuplev() for fixed-size + varargs.
 sub sigt($func_name, @in_out) {
-    Carp::croak('sige($name, @args): @args must be multiple of 2') if @in_out % 2 == 1;
+    Carp::croak('sigt($name, @args): @args must be multiple of 2') if @in_out % 2 == 1;
     if ( $sigs{$func_name} ) { Carp::croak "$func_name: Signature already added" }
     else                     { $sigs{$func_name} = 1                             }
 
