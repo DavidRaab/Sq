@@ -3,15 +3,6 @@ use 5.036;
 use Sq -sig => 1;
 use Sq::Test;
 
-# Some values, functions, ... for testing
-my $add     = sub($x,$y) { $x + $y     };
-my $add1    = sub($x)    { $x + 1      };
-my $double  = sub($x)    { $x * 2      };
-my $square  = sub($x)    { $x * $x     };
-my $is_even = sub($x)    { $x % 2 == 0 };
-
-#----------
-
 my $a1 = sq([1..10]);
 check_isa($a1, 'Array', '$a1');
 
