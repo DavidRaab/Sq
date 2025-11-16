@@ -430,11 +430,11 @@ sub new($what, @args) {
 
 # TYPE -> Function
 # Returns a function that expects multiple arguments and passes all arguments
-# to the function an an array-ref
+# to the function as an array-ref
 sub with_dispatch(@tf) {
     return sub {
         for my ($type,$f) ( @tf ) {
-            if ( Sq::Type::t_valid($type, \@_) ) {
+            if ( !defined $type->(\@_) ) {
                 return $f->(@_);
             }
         }
