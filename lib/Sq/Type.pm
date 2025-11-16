@@ -560,15 +560,24 @@ sub t_tuple(@checks) {
     }
 }
 
-# variable tuple version. tuplev first expects a minimal fixed amount of parameters.
-# But more than the fixed amount can be passed. All values more than the fixed amount
-# are passed as an array to the last type-check passed.
+# variable tuple version.
+# tuplev first expects a minimal fixed amount of parameters. But more than the
+# fixed amount can be passed. All values more than the fixed amount are passed
+# as an array to the last type-check.
 #
-# so when someone calls t_tuplev(t_int, t_int, t_array)
+# so when someone calls: t_tuplev(t_int, t_int, t_array(t_of t_str))
 #
-# then this version has two fixed arguments. And the last check get's all
-# remaining variables passed to the last check. Obviously this must be another
-# t_array or another t_tuple check again to work.
+# then this means two integers must be passed with all remaining elements
+# being a str. So this will be valid:
+#
+#   (1,2)
+#   (1,2,"foo")
+#   (1,2,"foo","bar","baz")
+#
+# All remaining arguments beyond the fixed are passed as another array. So
+# the last type-check in a tuplev always must be another check that accepts
+# some kind of array. Typically another t_array, t_tuple, t_of, t_min, t_max,
+# t_even_sizes, ...
 sub t_tuplev(@checks) {
     my $varargs = pop @checks;
     my $min     = @checks;
@@ -581,13 +590,13 @@ sub t_tuplev(@checks) {
                 my $err;
                 for my $idx ( 0 .. $#checks ) {
                     $err = $checks[$idx]->($array->[$idx]);
-                    return "tuplev: Index $idx: $err" if defined $err;
+                    return "tuplev: idx $idx: $err" if defined $err;
                 }
 
                 # slice the rest of the array and check against $varargs
                 my @rest = $array->@[$min .. $#$array];
                 $err = $varargs->(\@rest);
-                return "tuplev: varargs failed: $err" if defined $err;
+                return "tuplev: idx $min: $err" if defined $err;
 
                 # Otherwise everything is ok
                 return $valid;
