@@ -129,56 +129,89 @@ sub t_ref($ref, @checks) {
 
 # check references
 sub t_hash(@checks) {
-    return sub($any) {
-        my $type = ref $any;
-        if ( $type eq 'Hash' || $type eq 'HASH' ) {
-            my $err;
-            for my $check ( @checks ) {
-                $err = $check->($any);
-                return "hash: $err" if defined $err;
-            }
-            return $valid;
-        }
+    state $no_checks = sub($any) {
+        my $ref = ref $any;
+        return $valid if $ref eq 'Hash' || $ref eq 'HASH';
         return "hash: Not a Hash";
+    };
+
+    if ( @checks ) {
+        return sub($any) {
+            my $type = ref $any;
+            if ( $type eq 'Hash' || $type eq 'HASH' ) {
+                my $err;
+                for my $check ( @checks ) {
+                    $err = $check->($any);
+                    return "hash: $err" if defined $err;
+                }
+                return $valid;
+            }
+            return "hash: Not a Hash";
+        }
+    }
+    else {
+        return $no_checks;
     }
 }
 
 sub t_array(@checks) {
-    return sub($any) {
-        my $type = ref $any;
-        if ( $type eq 'Array' || $type eq 'ARRAY' ) {
-            my $err;
-            for my $check ( @checks ) {
-                $err = $check->($any);
-                return "array: $err" if defined $err;
-            }
-            return $valid;
-        }
+    state $no_checks = sub($any) {
+        my $ref = ref $any;
+        return $valid if $ref eq 'Array' || $ref eq 'ARRAY';
         return "array: Not an Array";
+    };
+
+    if ( @checks ) {
+        return sub($any) {
+            my $type = ref $any;
+            if ( $type eq 'Array' || $type eq 'ARRAY' ) {
+                my $err;
+                for my $check ( @checks ) {
+                    $err = $check->($any);
+                    return "array: $err" if defined $err;
+                }
+                return $valid;
+            }
+            return "array: Not an Array";
+        }
+    }
+    else {
+        return $no_checks;
     }
 }
 
 sub t_opt(@checks) {
-    return sub($any) {
-        my $type = ref $any;
-        if ( $type eq 'Option' ) {
-            # when $any is some value all @checks must be Ok
-            if ( @$any ) {
-                my $err;
-                for my $check ( @checks ) {
-                    $err = $check->($any->[0]);
-                    return "opt: $err" if defined $err;
-                }
-            }
-            # when None or no checks
-            return $valid;
-        }
+    state $no_checks = sub($any) {
+        return $valid if ref $any eq 'Option';
         return "opt: Not an Option";
+    };
+
+    if ( @checks ) {
+        return sub($any) {
+            my $type = ref $any;
+            if ( $type eq 'Option' ) {
+                # when $any is some value all @checks must be Ok
+                if ( @$any ) {
+                    my $err;
+                    for my $check ( @checks ) {
+                        $err = $check->($any->[0]);
+                        return "opt: $err" if defined $err;
+                    }
+                }
+                # when None or no checks
+                return $valid;
+            }
+            return "opt: Not an Option";
+        }
+    }
+    else {
+        return $no_checks;
     }
 }
 
 # check hash keys
 sub t_with_keys(@keys) {
+    Carp::croak "with_keys: at least on key should be passed" if @keys == 0;
     return sub($hash) {
         my $type = ref $hash;
         if ( $type eq 'Hash' || $type eq 'HASH' ) {
@@ -229,6 +262,7 @@ sub t_eq($expect) {
 }
 
 sub t_enum(@expected) {
+    Carp::croak "enum: expects at least one string" if @expected == 0;
     return sub($any) {
         return "enum: Got undef" if !defined $any;
         if ( ref $any eq "" ) {
@@ -242,32 +276,54 @@ sub t_enum(@expected) {
 }
 
 sub t_num(@checks) {
-    return sub($any) {
+    state $no_checks = sub($any) {
         return "num: Got undef" if !defined $any;
-        if ( is_num($any) ) {
-            my $err;
-            for my $check ( @checks ) {
-                $err = $check->($any);
-                return "num: $err" if defined $err;
-            }
-            return $valid;
-        }
+        return $valid if is_num($any);
         return "num: Not a number '$any'";
+    };
+
+    if ( @checks ) {
+        return sub($any) {
+            return "num: Got undef" if !defined $any;
+            if ( is_num($any) ) {
+                my $err;
+                for my $check ( @checks ) {
+                    $err = $check->($any);
+                    return "num: $err" if defined $err;
+                }
+                return $valid;
+            }
+            return "num: Not a number '$any'";
+        }
+    }
+    else {
+        return $no_checks;
     }
 }
 
 sub t_int(@checks) {
-    return sub($any) {
+    state $no_checks = sub($any) {
         return "int: Got undef" if !defined $any;
-        if ( $any =~ m/\A[-+]?[0-9]+\z/ ) {
-            my $err;
-            for my $check ( @checks ) {
-                $err = $check->($any);
-                return "int: $err" if defined $err;
-            }
-            return $valid;
-        }
+        return $valid if $any =~ m/\A[-+]?[0-9]+\z/;
         return "int: Not int";
+    };
+
+    if ( @checks ) {
+        return sub($any) {
+            return "int: Got undef" if !defined $any;
+            if ( $any =~ m/\A[-+]?[0-9]+\z/ ) {
+                my $err;
+                for my $check ( @checks ) {
+                    $err = $check->($any);
+                    return "int: $err" if defined $err;
+                }
+                return $valid;
+            }
+            return "int: Not int";
+        }
+    }
+    else {
+        return $no_checks;
     }
 }
 
@@ -296,18 +352,30 @@ sub t_negative() {
 }
 
 sub t_str(@checks) {
-    return sub($any) {
+    state $no_checks = sub($any) {
         return "str: Got undef" if !defined $any;
-        my $type = ref $any;
-        if ( $type eq '' ) {
-            my $err;
-            for my $check ( @checks ) {
-                $err = $check->($any);
-                return "str: $err" if defined $err;
+        my $ref = ref $any;
+        return $valid if $ref eq '';
+        return "str: Expected string got '$ref'";
+    };
+
+    if ( @checks ) {
+        return sub($any) {
+            return "str: Got undef" if !defined $any;
+            my $type = ref $any;
+            if ( $type eq '' ) {
+                my $err;
+                for my $check ( @checks ) {
+                    $err = $check->($any);
+                    return "str: $err" if defined $err;
+                }
+                return $valid;
             }
-            return $valid;
+            return "str: Expected string got '$type'";
         }
-        return "str: Expected string got '$type'";
+    }
+    else {
+        return $no_checks;
     }
 }
 
@@ -540,23 +608,37 @@ sub t_void() {
 }
 
 sub t_tuple(@checks) {
-    return sub($array) {
-        my $type = ref $array;
-        if ( $type eq 'Array' || $type eq 'ARRAY' ) {
-            if ( @checks == @$array ) {
-                my $err;
-                for my $idx ( 0 .. $#checks ) {
-                    $err = $checks[$idx]->( $array->[$idx] );
-                    return "tuple: Index $idx: $err"  if defined $err;
-                }
-                return $valid;
-            }
-            return
-                sprintf "tuple: Not correct size. Expected: %d Got: %d",
-                scalar @checks,
-                scalar @$array;
+    state $no_checks = sub($any) {
+        my $ref = ref $any;
+        if ( $ref eq 'Array' || $ref eq 'ARRAY' ) {
+            return $valid if @$any == 0;
+            return "tuple: Expected Empty";
         }
-        return "tuple: Must be an Array";
+        return "tuple: Not an Array";
+    };
+
+    if ( @checks ) {
+        return sub($array) {
+            my $type = ref $array;
+            if ( $type eq 'Array' || $type eq 'ARRAY' ) {
+                if ( @checks == @$array ) {
+                    my $err;
+                    for my $idx ( 0 .. $#checks ) {
+                        $err = $checks[$idx]->( $array->[$idx] );
+                        return "tuple: Index $idx: $err"  if defined $err;
+                    }
+                    return $valid;
+                }
+                return
+                    sprintf "tuple: Not correct size. Expected: %d Got: %d",
+                    scalar @checks,
+                    scalar @$array;
+            }
+            return "tuple: Must be an Array";
+        }
+    }
+    else {
+        return $no_checks;
     }
 }
 
