@@ -318,10 +318,10 @@ sub rename_keys($hash, %old_new) {
     for my ($k,$v) ( %$hash ) {
         my $new_key = $old_new{$k};
         if ( defined $new_key ) {
-            $new{$new_key} = $v;
+            $new{$new_key} = _copy($v);
         }
         else {
-            $new{$k} = $v;
+            $new{$k} = _copy($v);
         }
     }
     return CORE::bless(\%new, 'Hash');
