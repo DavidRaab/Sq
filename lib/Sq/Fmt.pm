@@ -58,18 +58,18 @@ static multiline => sub($aoa) {
 # when data is array of hash, then header must be specified, border is optional
 # but must be bool when specified.
 my $table_aoh = [hash => [keys =>
+    data   => [array => [of => ['hash']]],
     title  => [maybe => ['str']],
     header => [maybe => [array => [of => ['str']]]],
-    data   => [array => [of => ['hash']]],
     border => [maybe => ['bool']],
 ]];
 
 # otherwise data must be an AoA containing strings and header/border is optional
 my $column    = [or   => [array => [of => ['str']]], ['str']];
 my $table_aoa = [hash => [keys =>
+    data   => [array => [of => [array => [of => $column]]]],
     title  => [maybe => ['str']],
     header => [maybe => [array => [of => ['str']]]],
-    data   => [array => [of => [array => [of => $column]]]],
     border => [maybe => ['bool']],
 ]];
 
