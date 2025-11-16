@@ -35,6 +35,7 @@ our @EXPORT = qw(get_func set_func funcs_of has_func signatures set_static is_st
                 push @funcs, $key;
             }
         }
+
         return bless(\@funcs, 'Array');
     }
 

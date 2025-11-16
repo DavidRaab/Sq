@@ -79,15 +79,16 @@ my $skip = array(
     'Sq::by_num',
     'Sq::by_str',
     'Sq::by_stri',
-    #
+    # just short aliases
     'Array::_equal',
     'Array::_is_regex',
     'Hash::_copy',
+    # Not needed they already have type-tests
     'Sq::Equality::du',
     'Sq::Equality::du_case',
     'Sq::Equality::path_tiny',
     'Sq::Equality::result',
-
+    'Sq::Fmt::table',
 );
 
 # Three examples that are all the same
