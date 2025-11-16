@@ -74,6 +74,34 @@ Test2->import(-sig => 1, 'bar');
 ok(has_func('main', 'foo'), 'foo is imported');
 ok(has_func('main', 'bar'), 'bar not yet imported');
 
+Test2->unimport('bar');
+
+ ok(has_func('main', 'foo'), 'foo is imported');
+nok(has_func('main', 'bar'), 'bar not yet imported');
+
+Test2->unimport();
+
+nok(has_func('main', 'foo'), 'foo is imported');
+nok(has_func('main', 'bar'), 'bar not yet imported');
+
+# Check if Sq can unimport all it's functions and still work as intended
+package Whatever;
+use Sq;
+
+# use an imported function
+sub check {
+    return get_type([]);
+}
+
+# unimport functions
+no Sq;
+
+package main;
+
+ ok(has_func('Whatever', 'check'),    'has check');
+nok(has_func('Whatever', 'get_type'), 'imports should be deleted');
+ is(Whatever->check, 'Array',         'call check()');
+
 # TODO: tests that really checks if signature was loaded???
 
 done_testing;

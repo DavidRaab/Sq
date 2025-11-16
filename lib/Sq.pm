@@ -111,6 +111,29 @@ sub import {
     }
 }
 
+# TODO: Unimporting not quite right as it deleted the whole Type-Glob
+sub unimport($own, @funcs) {
+    my ( $pkg ) = caller;
+    no strict 'refs'; ## no critic
+
+    if ( @funcs ) {
+        for my $func ( @funcs ) {
+            delete ${ $pkg . '::' }{$func};
+        }
+    }
+    else {
+        for my $func ( keys %$export_funcs ) {
+            # TODO: This is not correct
+            #       This deletes the full TYPE-GLOB, but only CODE should be deleted.
+            #       Theoretically i must first create a backup, and then re-install
+            #       everything else that is not a function. But i don't care for those
+            #       cases. The way how I write code, this problem should basically not
+            #       appear at all. This can be later fixed.
+            delete ${ $pkg . '::' }{$func};
+        }
+    }
+}
+
 # Load Core functionality
 use Sq::Reflection ();
 use Sq::Core;        # equal(), copy(), lazy {}, Option, Result
