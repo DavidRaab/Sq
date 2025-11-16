@@ -30,6 +30,7 @@ sub fqn($package) {
     state $skip = assign {
         my %skip = (
             import         => 1,
+            unimport       => 1,
             load_signature => 1,
             '(""'          => 1, # string overload
             '(('           => 1, # string overload
