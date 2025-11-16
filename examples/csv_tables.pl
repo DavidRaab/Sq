@@ -8,11 +8,17 @@ use Sq -sig => 1;
 my $persons = Sq->io->csv_read(Sq->sys->dir->child("csv/persons.csv"))->cache;
 my $tags    = Sq->io->csv_read(Sq->sys->dir->child("csv/tags.csv"))   ->cache;
 
-print "Persons Table\n";
-Sq->fmt->table({ data => $persons });
+Sq->fmt->table({
+    title => "Persons Table",
+    data  => $persons
+});
+print "\n";
 
-print "\nTags Table\n";
-Sq->fmt->table({ data => $tags });
+Sq->fmt->table({
+    title => "Tags Table",
+    data  => $tags
+});
+print "\n";
 
 # TODO: I still don't like it, even if it improved somehow. The choose() is
 #       still too much clutter.
@@ -53,8 +59,8 @@ my $data =
     ->sort_by(by_num, key 'id');
 
 # print the data as table
-print "\nCombine Tables\n";
 Sq->fmt->table({
+    title  => "Combine Tables",
     header => [qw/id name tags/],
     data   => $data,
     border => 0,

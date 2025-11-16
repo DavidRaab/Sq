@@ -58,6 +58,7 @@ static multiline => sub($aoa) {
 # when data is array of hash, then header must be specified, border is optional
 # but must be bool when specified.
 my $table_aoh = [hash => [keys =>
+    title  => [maybe => ['str']],
     header => [maybe => [array => [of => ['str']]]],
     data   => [array => [of => ['hash']]],
     border => [maybe => ['bool']],
@@ -66,6 +67,7 @@ my $table_aoh = [hash => [keys =>
 # otherwise data must be an AoA containing strings and header/border is optional
 my $column    = [or   => ['array'], ['str']];
 my $table_aoa = [hash => [keys =>
+    title  => [maybe => ['str']],
     header => [maybe => [array => [of => ['str']]]],
     data   => [array => [of => [array => [of => $column]]]],
     border => [maybe => ['bool']],
@@ -78,21 +80,48 @@ my $table_seq = [hash => [keys =>
     data => ['seq'],
 ]];
 
-# TODO: Add Title
 # TODO: Add configurable spacing between cells
 # TODO: Add Layout Scheme (which symbol used for table and presets)
 # TODO: Add ability to configure cells (like number format)
 static table => with_dispatch(
+    # convert seq to array and then call table() again
     type [tuple => $table_seq] => sub ($args) {
         state $multiline = multiline();
         state $table     = table();
         $table->(Hash::with($args, data => $args->{data}->to_array));
         return;
     },
+    # convert array of hash into AoA and call table() again
+    type [tuple => $table_aoh] => sub($args) {
+        state $table = table();
+        # on the data array, call "extract" on every hash to turn it into an array
+        # with the defined order in "header". This returns optionals that are then
+        # mapped with "or" so non existing keys in the hash turn into empty strings.
+
+        # When no header exists, then we build the headers from the data hashes
+        my $header =
+            $args->{header}
+            // Array::bind($args->{data}, call 'keys')->distinct->sort(by_stri);
+
+        # map every element in data that is an hash
+        my $aoa = Array::map($args->{data}, sub($hash) {
+            # "extract" creates an array of those keys in the exact order they
+            # are specified, but as optionals. We map every element and turn every
+            # None value (keys that didn't exists in the hash) into an empty string
+            Hash::extract($hash, $header->@*)->map(call 'or', "");
+        });
+
+        # call table again with the AoA
+        $table->(Hash::with($args, header => $header, data => $aoa));
+
+        return;
+    },
+    # when AoA is called
     type [tuple => $table_aoa] => sub ($args) {
         # cache multiline function
         state $multiline = multiline();
 
+        my $title  = $args->{title};
         my $header = $args->{header} // 0;
         my $border = $args->{border} // 0;
         my $aoa    = $multiline->($args->{data});
@@ -126,6 +155,10 @@ static table => with_dispatch(
             });
         }
 
+        # print title
+        if ( defined $title ) {
+            printf "%s\n", $title;
+        }
         # print header
         if ( $header ) {
             if ( $border ) { printf "| %s |\n", $header->join(' | ') }
@@ -136,30 +169,6 @@ static table => with_dispatch(
             if ( $border ) { printf "| %s |\n", $inner->join(' | ') }
             else           { print $inner->join(" "), "\n"          }
         }
-
-        return;
-    },
-    type [tuple => $table_aoh] => sub($args) {
-        state $table = table();
-        # on the data array, call "extract" on every hash to turn it into an array
-        # with the defined order in "header". This returns optionals that are then
-        # mapped with "or" so non existing keys in the hash turn into empty strings.
-
-        # When no header exists, then we build the headers from the data hashes
-        my $header =
-            $args->{header}
-            // Array::bind($args->{data}, call 'keys')->distinct->sort(by_stri);
-
-        # map every element in data that is an hash
-        my $aoa = Array::map($args->{data}, sub($hash) {
-            # "extract" creates an array of those keys in the exact order they
-            # are specified, but as optionals. We map every element and turn every
-            # None value (keys that didn't exists in the hash) into an empty string
-            Hash::extract($hash, $header->@*)->map(call 'or', "");
-        });
-
-        # call table again with the AoA
-        $table->(Hash::with($args, header => $header, data => $aoa));
 
         return;
     },

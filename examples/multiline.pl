@@ -4,8 +4,8 @@ use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Sq -sig => 1;
 
-say "AoA containing another array";
 Sq->fmt->table({
+    title  => "AoA containing another array",
     header => [qw/id text1 text2/],
     data   => [
         [1, "foo", "bar"],
@@ -14,8 +14,8 @@ Sq->fmt->table({
     ],
 });
 
-say "AoH containing Arrays";
 Sq->fmt->table({
+    title  => "AoH containing Arrays",
     header => [qw/id text1 text2/],
     data   => [
         {id => 1, text1 => "foo",          text2 => "bar"         },
@@ -24,8 +24,8 @@ Sq->fmt->table({
     ],
 });
 
-say "Seq of Array: Containg Arrays";
 Sq->fmt->table({
+    title  => "Seq of Array: Containg Arrays",
     header => [qw/id text1 text2/],
     data   => seq {
         [1, "foo", "bar"],
@@ -34,8 +34,8 @@ Sq->fmt->table({
     },
 });
 
-say "Seq of Hash: Containing Arrays";
 Sq->fmt->table({
+    title  => "Seq of Hash: Containing Arrays",
     header => [qw/id text1 text2/],
     data   => seq {
         {id => 1, text1 => "foo",          text2 => "bar"         },
@@ -44,8 +44,8 @@ Sq->fmt->table({
     },
 });
 
-say "Seq of Hash: Containing Strings with newlines";
 Sq->fmt->table({
+    title  => "Seq of Hash: Containing Strings with newlines",
     header => [qw/id text1 text2/],
     data   => seq {
         {id => 1, text1 => "foo",      text2 => "bar"      },
@@ -54,9 +54,9 @@ Sq->fmt->table({
     },
 });
 
-say "Seq of Hash: Containing newline Strings and Arrays, No Header defined";
 Sq->fmt->table({
-    data => seq {
+    title => "Seq of Hash: Containing newline Strings and Arrays, No Header defined",
+    data  => seq {
         {id => 1, text1 => "foo",      text2 => "bar"                     },
         {id => 2, text1 => "foo\nbar", text2 => "maz",        Awesome => 2},
         {id => 3, text1 => "test",     text2 => [qw/maz raz/]             },
