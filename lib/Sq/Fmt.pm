@@ -10,6 +10,17 @@ our @EXPORT    = ();
 # For example pass it an array of array and it prints a table.
 ####
 
+# This function recursively goes through an array structure of any depth.
+# strings with newlines are turned into arrays.
+static nl_to_array => sub ($ds) {
+    Array::map_rec($ds, sub($x) {
+        if ( is_str($x) && $x =~ m/\r?\n/ ) {
+            return [split /\r?\n/, $x];
+        }
+        return $x;
+    });
+};
+
 # This function is used in table() to implement multiline support.
 #
 # It expects at least an AoA, where every column can be an array again.
@@ -17,12 +28,14 @@ our @EXPORT    = ();
 # line will be transformed into multiple lines where the empty columns are
 # just strings.
 static multiline => sub($aoa) {
+    state $nl = nl_to_array();
     my @new;
     for my $line ( @$aoa ) {
-        if ( Array::any($line, \&is_array) ) {
+        my $l = $nl->($line);
+        if ( Array::any($l, \&is_array) ) {
             my $lines =
                 # first convert every entry into an array
-                Array::map($line, sub($x) {
+                Array::map($l, sub($x) {
                     return is_array($x) ? $x : array($x);
                 })
                 # then fill AoA with empty strings
@@ -44,23 +57,19 @@ static multiline => sub($aoa) {
 ### Types for table().
 # when data is array of hash, then header must be specified, border is optional
 # but must be bool when specified.
-my $table_aoh = [hash =>
-    [keys =>
-        header => [array => [of => ['str']]],
-        data   => [array => [of => ['hash']]],
-        border => [maybe => ['bool']],
-    ],
-];
+my $table_aoh = [hash => [keys =>
+    header => [array => [of => ['str']]],
+    data   => [array => [of => ['hash']]],
+    border => [maybe => ['bool']],
+]];
 
 # otherwise data must be an AoA containing strings and header/border is optional
 my $column    = [or   => ['array'], ['str']];
-my $table_aoa = [hash =>
-    [keys =>
-        header => [maybe => [array => [of => ['str']]]],
-        border => [maybe => ['bool']],
-        data   => [array => [of => [array => [of => $column]]]]
-    ],
-];
+my $table_aoa = [hash => [keys =>
+    header => [maybe => [array => [of => ['str']]]],
+    border => [maybe => ['bool']],
+    data   => [array => [of => [array => [of => $column]]]]
+]];
 
 # when a seq was provided as data. We only expect that data is provided.
 # then table() is called after data is transformed back to array. Then

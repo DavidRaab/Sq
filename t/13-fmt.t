@@ -126,4 +126,29 @@ is(
     ],
     'multiline 3');
 
+is(
+    Sq->fmt->nl_to_array([
+        [qw/abc def/],
+        ["foo\nbar", "Lilly\nWhat"],
+        ["Test\r\n1\n2\n3", "chup"]
+    ]),
+    [
+        ["abc", "def"],
+        [["foo", "bar"], ["Lilly", "What"]],
+        [[qw/Test 1 2 3/], "chup"],
+    ],
+    'nl_to_array');
+
+is(
+    Sq->fmt->multiline([
+        ["foo", "kaz\nfaz", "faz\nboo"],
+        ["maz", "raz", "haz"],
+    ]),
+    [
+        ["foo", "kaz", "faz"],
+        ["",    "faz", "boo"],
+        ["maz", "raz", "haz"],
+    ],
+    'multiline 4');
+
 done_testing;

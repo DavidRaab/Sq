@@ -39,3 +39,12 @@ Sq->fmt->table({
         {id => 3, text1 => "test",         text2 => ["maz", "raz"]},
     },
 });
+
+Sq->fmt->table({
+    header => [qw/id text1 text2/],
+    data   => seq {
+        {id => 1, text1 => "foo",      text2 => "bar"      },
+        {id => 2, text1 => "foo\nbar", text2 => "maz"      },
+        {id => 3, text1 => "test",     text2 => "maz\nraz" },
+    },
+});
