@@ -55,6 +55,7 @@ sub fqn($package) {
 # will be added for some reasons.
 my $skip = array(
     # Sq Modules Start
+    'Sq::import',
     'Sq::io',
     'Sq::fs',
     'Sq::math',
@@ -80,6 +81,11 @@ my $skip = array(
     'Sq::by_num',
     'Sq::by_str',
     'Sq::by_stri',
+    'Sq::array',
+    'Sq::hash',
+    'Sq::seq',
+    'Sq::id',
+    'Sq::get_type',
     # just short aliases
     'Array::_copy',
     'Array::_equal',

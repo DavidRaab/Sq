@@ -35,8 +35,11 @@ my $str_seq   = t_eq('Seq');
 
 # Sq main function
 
+# Need to look how Prototype is reserved
 # sig('Sq::key', $str, $sub);
+
 sig('Sq::key_equal', $str, $any, $sub);
+sigt('Sq::record',   t_of($str), $sub);
 sigt('Sq::dispatch',
     t_tuple ($sub, t_hash(t_of $sub))                        => $sub,
     t_tuplev($str, $str, $sub, $str, $sub, t_of($str, $sub)) => $any,
@@ -140,7 +143,7 @@ sig('Result::get',       $result,                               $any);
 ### CONSTRUCTORS
 
 sigt('Array::new',        t_tuplev($str_array, $array),    $array);
-sigt('Array::concat',     t_tuplev($aoa),                  $array);
+sigt('Array::concat',     $aoa,                            $array);
 sig ('Array::empty',      $str_array,                      $array);
 sig ('Array::replicate',  $pint, $any,                     $array);
 sig ('Array::bless',      $str_array, $array,              $array);
