@@ -8,6 +8,7 @@ sub import {
     my ($pkg) = caller;
     *{"$pkg\::import"}         = \&export_import;
     *{"$pkg\::load_signature"} = \&load_signature;
+    *{"$pkg\::unimport"}       = \&unimport;
 }
 
 sub export_import($own, @args) {
@@ -61,6 +62,28 @@ sub load_signature($own) {
     my $signature = ${"$own\::SIGNATURE"};
     if ( $Sq::LOAD_SIGNATURE && $signature ) {
         require $signature;
+    }
+}
+
+# TODO: Unimporting not quite right as it deleted the whole Type-Glob
+sub unimport($own, @funcs) {
+    my ( $pkg ) = caller;
+
+    if ( @funcs ) {
+        for my $func ( @funcs ) {
+            delete ${ $pkg . '::' }{$func};
+        }
+    }
+    else {
+        for my $func ( @{"$own\::EXPORT"} ) {
+            # TODO: This is not correct
+            #       This deletes the full TYPE-GLOB, but only CODE should be deleted.
+            #       Theoretically i must first create a backup, and then re-install
+            #       everything else that is not a function. But i don't care for those
+            #       cases. The way how I write code, this problem should basically not
+            #       appear at all. This can be later fixed.
+            delete ${ $pkg . '::' }{$func};
+        }
     }
 }
 

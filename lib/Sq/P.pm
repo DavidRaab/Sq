@@ -24,4 +24,6 @@ sub date_dmy($,$sep='.') {
     });
 }
 
+no Sq::Parser;
+
 1;
