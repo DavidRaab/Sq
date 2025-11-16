@@ -59,6 +59,7 @@ sub with_type($name, $f, @in_out) {
 sub sig($func_name, @types) {
     Carp::croak("sig needs at least one type") if @types == 0;
     my $out_type = pop @types;
+    local $Carp::CarpLevel += 1;
     my $in_type  = t_tuple(@types);
     sigt($func_name, $in_type, $out_type);
     return;
