@@ -58,7 +58,7 @@ static multiline => sub($aoa) {
 # when data is array of hash, then header must be specified, border is optional
 # but must be bool when specified.
 my $table_aoh = [hash => [keys =>
-    header => [array => [of => ['str']]],
+    header => [maybe => [array => [of => ['str']]]],
     data   => [array => [of => ['hash']]],
     border => [maybe => ['bool']],
 ]];
@@ -67,8 +67,8 @@ my $table_aoh = [hash => [keys =>
 my $column    = [or   => ['array'], ['str']];
 my $table_aoa = [hash => [keys =>
     header => [maybe => [array => [of => ['str']]]],
+    data   => [array => [of => [array => [of => $column]]]],
     border => [maybe => ['bool']],
-    data   => [array => [of => [array => [of => $column]]]]
 ]];
 
 # when a seq was provided as data. We only expect that data is provided.
@@ -145,16 +145,21 @@ static table => with_dispatch(
         # with the defined order in "header". This returns optionals that are then
         # mapped with "or" so non existing keys in the hash turn into empty strings.
 
+        # When no header exists, then we build the headers from the data hashes
+        my $header =
+            $args->{header}
+            // Array::bind($args->{data}, call 'keys')->distinct->sort(by_stri);
+
         # map every element in data that is an hash
         my $aoa = Array::map($args->{data}, sub($hash) {
             # "extract" creates an array of those keys in the exact order they
             # are specified, but as optionals. We map every element and turn every
             # None value (keys that didn't exists in the hash) into an empty string
-            Hash::extract($hash, $args->{header}->@*)->map(call 'or', "");
+            Hash::extract($hash, $header->@*)->map(call 'or', "");
         });
 
         # call table again with the AoA
-        $table->(Hash::with($args, data => $aoa));
+        $table->(Hash::with($args, header => $header, data => $aoa));
 
         return;
     },

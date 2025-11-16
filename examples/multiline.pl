@@ -4,6 +4,7 @@ use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Sq -sig => 1;
 
+say "AoA containing another array";
 Sq->fmt->table({
     header => [qw/id text1 text2/],
     data   => [
@@ -13,6 +14,7 @@ Sq->fmt->table({
     ],
 });
 
+say "AoH containing Arrays";
 Sq->fmt->table({
     header => [qw/id text1 text2/],
     data   => [
@@ -22,6 +24,7 @@ Sq->fmt->table({
     ],
 });
 
+say "Seq of Array: Containg Arrays";
 Sq->fmt->table({
     header => [qw/id text1 text2/],
     data   => seq {
@@ -31,6 +34,7 @@ Sq->fmt->table({
     },
 });
 
+say "Seq of Hash: Containing Arrays";
 Sq->fmt->table({
     header => [qw/id text1 text2/],
     data   => seq {
@@ -40,11 +44,21 @@ Sq->fmt->table({
     },
 });
 
+say "Seq of Hash: Containing Strings with newlines";
 Sq->fmt->table({
     header => [qw/id text1 text2/],
     data   => seq {
         {id => 1, text1 => "foo",      text2 => "bar"      },
         {id => 2, text1 => "foo\nbar", text2 => "maz"      },
         {id => 3, text1 => "test",     text2 => "maz\nraz" },
+    },
+});
+
+say "Seq of Hash: Containing newline Strings and Arrays, No Header defined";
+Sq->fmt->table({
+    data => seq {
+        {id => 1, text1 => "foo",      text2 => "bar"                     },
+        {id => 2, text1 => "foo\nbar", text2 => "maz",        Awesome => 2},
+        {id => 3, text1 => "test",     text2 => [qw/maz raz/]             },
     },
 });
