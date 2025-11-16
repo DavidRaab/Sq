@@ -15,7 +15,7 @@ dies { sq([1,2,3])->as_hash                } qr/\AArray::/, 'as_hash';
 dies { Array::to_array({})                 } qr/\AArray::/, 'to_array 1';
 dies { Array::to_array([], "foo")          } qr/\AArray::/, 'to_array 2';
 dies { Array::slice([1,2,3], 1,2,'foo')    } qr/\AArray::/, 'slice';
-dies { Array->concat([], [], 1)            } qr/\AArray::/, 'concat';
+dies { Array::concat([], [], 1)            } qr/\AArray::/, 'concat';
 dies { Array->range(1.2, 3.3)              } qr/\AArray::/, 'range';
 dies { Array->range_step(1, "f", 4)        } qr/\AArray::/, 'range_step';
 dies { Array::append([], {})               } qr/\AArray::/, 'append 1';

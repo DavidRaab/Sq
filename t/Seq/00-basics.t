@@ -1135,14 +1135,14 @@ is(
     'cartesian on many sequences');
 
 # bind() is like binding the inner value of a sequence to a variable
-# so somehow similar like just iterating through a sequence. or like map().
-# but we return another sequence that then is flattened. bind() is like just
+# so somehow similar like just iterating through a sequence or like map().
+# But we return another sequence that then is flattened. bind() is like just
 # reversing typical code with assignment from right-to-left to a left-to-right.
 #
 # my $fst   = $seqA->permute;
 # my $snd   = $seqB->permute;
 # my $third = $seqC->permute;
-# return Array->concat($fst,$snd,$third)
+# return Array::concat($fst,$snd,$third)
 #
 # or when those would be arrays.
 #
@@ -1150,13 +1150,19 @@ is(
 # for my $fst ( @{ $seqA->permute } ) {
 #     for my $snd ( @{ $seqB->permute } ) {
 #         for my my $third ( @{ $seqC->permute } ) {
-#             push @results, Array->concat($fst,$snd,$third);
+#             push @results, Array::concat($fst,$snd,$third);
 #         }
 #      }
 # }
 #
 # But the sequence does it lazy
 is(
+    # here calling ->bind() is like the above three inner for-loops on array
+    # they are just written flat instead that every level is indented.
+    # $fst is one of AB, $snd is one of CGA and so on.
+    # The $f function in bind($type, $f) always must return the same $type.
+    # So in Array::bind you must return an Array. In Seq::bind you must return
+    # a sequence and so on.
     seq {qw/A B/  }->permute->bind(sub($fst) {
     seq {qw/C G A/}->permute->bind(sub($snd) {
     seq {qw/T K/  }->permute->bind(sub($third) {

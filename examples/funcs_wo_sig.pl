@@ -96,7 +96,7 @@ my $skip = array(
 # Array::map ($strs, \&fqn)->flatten;
 # Array::bind($strs, \&fqn);
 my $funcs =
-    Array->concat(
+    Array::concat(
         funcs_of('Sq')->map(sub($str) { 'Sq::' . $str }),
         Array::bind([
             qw/Array Hash Seq Queue Option Result Sq::Parser Sq::Gen Sq::Fmt Sq::Fs/,
