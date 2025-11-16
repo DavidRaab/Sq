@@ -80,9 +80,11 @@ my $skip = array(
     'Sq::by_str',
     'Sq::by_stri',
     # just short aliases
+    'Array::_copy',
     'Array::_equal',
     'Array::_is_regex',
     'Hash::_copy',
+    'Seq::_copy',
     # Not needed they already have type-tests
     'Sq::Equality::du',
     'Sq::Equality::du_case',
