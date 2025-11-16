@@ -65,7 +65,7 @@ my $table_aoh = [hash => [keys =>
 ]];
 
 # otherwise data must be an AoA containing strings and header/border is optional
-my $column    = [or   => ['array'], ['str']];
+my $column    = [or   => [array => of => ['str']], ['str']];
 my $table_aoa = [hash => [keys =>
     title  => [maybe => ['str']],
     header => [maybe => [array => [of => ['str']]]],
