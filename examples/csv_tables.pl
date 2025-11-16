@@ -9,16 +9,10 @@ my $persons = Sq->io->csv_read(Sq->sys->dir->child("csv/persons.csv"))->cache;
 my $tags    = Sq->io->csv_read(Sq->sys->dir->child("csv/tags.csv"))   ->cache;
 
 print "Persons Table\n";
-Sq->fmt->table({
-    header => [qw/id name/],
-    data   => $persons,
-});
+Sq->fmt->table({ data => $persons });
 
 print "\nTags Table\n";
-Sq->fmt->table({
-    header => [qw/id person_id tag/],
-    data   => $tags,
-});
+Sq->fmt->table({ data => $tags });
 
 # TODO: I still don't like it, even if it improved somehow. The choose() is
 #       still too much clutter.
