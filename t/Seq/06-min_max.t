@@ -9,14 +9,18 @@ my $range = Seq->range(1, 10);
 # min
 is($range->min,                   Some(1), 'min');
 is(Seq->range(-100, -50)->min, Some(-100), 'min with negative values');
+is(Seq->range(1,10)->min(0),            1, 'min with default');
 is(Seq->empty->min,                  None, 'min on empty');
-is(Seq->empty->min->or(0),              0, 'min on empty with default');
+is(Seq->empty->min(0),                  0, 'min on empty with default');
+is(Seq->empty->min->or(0),              0, 'min on empty with optional');
 
 # max
 is($range->max,                   Some(10), 'max');
 is($range->max->or(100),                10, 'max with option::or');
+is(Seq->range(1,10)->max(0),            10, 'max with default');
 is(Seq->range(-100, -50)->max,   Some(-50), 'max with negative values');
 is(Seq->empty->max,                   None, 'max on empty');
+is(Seq->empty->max(0),                   0, 'max on empty with default');
 is(Seq->empty->max->or(0),               0, 'max on empty with option::or');
 
 my $words = seq { qw/Hello World you Are welcome/ };

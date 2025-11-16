@@ -38,8 +38,8 @@ my $str_seq   = t_eq('Seq');
 # sig('Sq::key', $str, $sub);
 sig('Sq::key_equal', $str, $any, $sub);
 sigt('Sq::dispatch',
-    t_tuple ($sub, t_hash(t_of $sub)),                        $sub,
-    t_tuplev($str, $str, $sub, $str, $sub, t_of($str, $sub)), $any,
+    t_tuple ($sub, t_hash(t_of $sub))                        => $sub,
+    t_tuplev($str, $str, $sub, $str, $sub, t_of($str, $sub)) => $any,
 );
 
 ### OPTION MODULE
@@ -247,35 +247,19 @@ sig('Array::scan',       $array, $any, $sub,         $array);
 sig('Array::average',    $array,                       $num);
 sig('Array::average_by', $array, $sub,                 $num);
 sigt('Array::index',
-    t_or(
-        t_tuple($array, $int),
-        t_tuple($array, $int, $any),
-    ),
-    $any);
+    t_tuple($array, $int)       => $opt,
+    t_tuple($array, $int, $any) => $any,
+);
 sig('Array::reduce',     $array, $sub,                  $opt);
 sig('Array::length',     $array,                       $pint);
 #sig('Array::expand',   $array, ...);
 sigt('Array::first',
-    t_or(
-        t_tuple($array),      # either 1 arg, an array
-        t_tuple($array, $any) # or 2 args, array and anything else
-    ),
-    # TODO: This should improve. input should be mappable to output
-    #       this currently makes less sense, also could be just $any.
-    t_or(
-        t_opt, # either returns optional
-        $any   # or any
-    )
+    t_tuple($array)       => $opt,
+    t_tuple($array, $any) => $any,
 );
 sigt('Array::last',
-    t_or(
-        t_tuple($array),      # either 1 arg, an array
-        t_tuple($array, $any) # or 2 args, array and anything else
-    ),
-    t_or(
-        t_opt, # either returns optional
-        $any   # or any
-    )
+    t_tuple($array)       => $opt,
+    t_tuple($array, $any) => $any,
 );
 sig('Array::sum',        $anum,                        $num);
 sig('Array::sum_by',     $array, $sub,                 $num);
@@ -286,39 +270,43 @@ sigt('Array::join',
     ), $str);
 sig('Array::split',      $astr, $regex,      t_array(t_of $astr));
 sigt('Array::min',
-    t_or(t_tuple($anum), t_tuple($anum, $any)),
-    t_or(t_opt($num),   $num));
+    t_tuple($anum)       => t_opt($num),
+    t_tuple($anum, $num) => $num,
+);
 sigt('Array::min_str',
-    t_or(t_tuple($astr), t_tuple($astr, $any)),
-    t_or(t_opt($str), $str));
+    t_tuple($astr)       => t_opt($str),
+    t_tuple($astr, $any) => $str,
+);
 sig('Array::min_by',     $array, $sub,                 $opt);
 sig('Array::min_str_by', $array, $sub,                 $opt);
 sigt('Array::max',
-    t_or(t_tuple($anum), t_tuple($anum, $any)),
-    t_or(t_opt($num), $num));
+    t_tuple($anum)       => t_opt($num),
+    t_tuple($anum, $any) => $num,
+);
 sigt('Array::max_str',
-    t_or(t_tuple($astr), t_tuple($astr, $any)),
-    t_or(t_opt($str), $str));
-sig('Array::max_by',     $array, $sub,                 $opt);
-sig('Array::max_str_by', $array, $sub,                 $opt);
-sig('Array::group_fold', $array, $sub, $sub, $sub,     $hash);
-sig('Array::to_hash',    $array, $sub,                 $hash);
-sig('Array::to_hash_of_array', $array, $sub,           $hoa);
-sig('Array::as_hash',    $even_sized,                  $hash);
-sig('Array::keyed_by',   $array, $sub,                 $hash);
-sig('Array::group_by',   $array, $sub,                 $hoa);
-sig('Array::count',      $array,                       t_hash(t_of $int));
-sig('Array::count_by',   $array, $sub,                 t_hash(t_of $int));
-sig('Array::find',       $array, $sub,                 $opt);
-sig('Array::any',        $array, $sub,                 $bool);
-sig('Array::all',        $array, $sub,                 $bool);
-sig('Array::none',       $array, $sub,                 $bool);
-sig('Array::pick',       $array, $sub,                 $opt);
-sig('Array::to_seq',     $array,                       t_seq);
-sigt('Array::contains',  t_tuplev($array, $array),     $bool);
-sig('Array::fold_rec',   $array, $sub, $sub,           $any);
-sig('Array::map_array',  $array, $sub, $sub,           $any);
-sig('Array::head',       t_array(t_min 1),             $any);
+    t_tuple($astr)       => t_opt($str),
+    t_tuple($astr, $any) => $str,
+);
+sig('Array::max_by',     $array, $sub,             $opt);
+sig('Array::max_str_by', $array, $sub,             $opt);
+sig('Array::group_fold', $array, $sub, $sub, $sub, $hash);
+sig('Array::to_hash',    $array, $sub,             $hash);
+sig('Array::to_hash_of_array', $array, $sub,       $hoa);
+sig('Array::as_hash',    $even_sized,              $hash);
+sig('Array::keyed_by',   $array, $sub,             $hash);
+sig('Array::group_by',   $array, $sub,             $hoa);
+sig('Array::count',      $array,                   t_hash(t_of $int));
+sig('Array::count_by',   $array, $sub,             t_hash(t_of $int));
+sig('Array::find',       $array, $sub,             $opt);
+sig('Array::any',        $array, $sub,             $bool);
+sig('Array::all',        $array, $sub,             $bool);
+sig('Array::none',       $array, $sub,             $bool);
+sig('Array::pick',       $array, $sub,             $opt);
+sig('Array::to_seq',     $array,                   t_seq);
+sigt('Array::contains',  t_tuplev($array, $array), $bool);
+sig('Array::fold_rec',   $array, $sub, $sub,       $any);
+sig('Array::map_array',  $array, $sub, $sub,       $any);
+sig('Array::head',       t_array(t_min 1),         $any);
 
 
 ### OPTION MODULE
@@ -392,7 +380,7 @@ sigt('Hash::lock',      t_tuplev($hash, $astr),       $hash);
 
 sigt('Hash::set',     t_tuplev($hash, $even_sized),                  $void);
 sigt('Hash::change',  t_tuplev($hash, $even_sized),                  $void);
-sigt('Hash::push',    t_tuplev($hash, $str, t_array(t_min 1)),       $void);
+sigt('Hash::push',    t_tuplev($hash, $str, t_min 1),                $void);
 sigt('Hash::delete',  t_tuplev($hash, t_array(t_min(1), t_of $str)), $void);
 
 
@@ -488,12 +476,12 @@ sig('Seq::fold',       $seq, $any, $sub,         $any);
 sig('Seq::fold_mut',   $seq, $any, $sub,         $any);
 sig('Seq::reduce',     $seq, $sub,               $opt);
 sigt('Seq::first',
-    t_or(t_tuple($seq), t_tuple($seq, $any)),
-    t_or($opt, $any)
+    t_tuple($seq)       => $opt,
+    t_tuple($seq, $any) => $any,
 );
 sigt('Seq::last',
-    t_or(t_tuple($seq), t_tuple($seq, $any)),
-    t_or($opt, $any)
+    t_tuple($seq)       => $opt,
+    t_tuple($seq, $any) => $any,
 );
 sig('Seq::contains',   $seq, $any,             $bool);
 sigt('Seq::to_array',
@@ -504,22 +492,26 @@ sigt('Seq::to_array',
     $array
 );
 sigt('Seq::index',
-    t_or(
-        t_tuple($seq, $int),
-        t_tuple($seq, $int, $any),
-    ),
-    $any);
+    t_tuple($seq, $int)       => $opt,
+    t_tuple($seq, $int, $any) => $any,
+);
 sig('Seq::to_arrays',  $any, $any);
 sig('Seq::to_seq',     $seq, $seq);
 #sig('Seq::expand',    $seq, ...);
 sig('Seq::length',     $seq,                       $int);
 sig('Seq::sum',        $seq,                       $num);
 sig('Seq::sum_by',     $seq, $sub,                 $num);
-sig('Seq::min',        $seq,                       t_opt($num));
+sigt('Seq::min',
+    t_tuple($seq)       => t_opt($num),
+    t_tuple($seq, $num) => $num,
+);
 sig('Seq::min_by',     $seq, $sub,                 $opt);
 sig('Seq::min_str',    $seq,                       t_opt($str));
 sig('Seq::min_str_by', $seq, $sub,                 $opt);
-sig('Seq::max',        $seq,                       t_opt($num));
+sigt('Seq::max',
+    t_tuple($seq)       => t_opt($num),
+    t_tuple($seq, $num) => $num,
+);
 sig('Seq::max_by',     $seq, $sub,                 $opt);
 sig('Seq::max_str',    $seq,                       t_opt($str));
 sig('Seq::max_str_by', $seq, $sub,                 $opt);
