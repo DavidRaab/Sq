@@ -1045,4 +1045,19 @@ one_of(
     ],
     'rename_keys 5');
 
+{
+    my $orig = {
+        foo => [1,2,3],
+        bar => [4,5,6],
+    };
+
+    my $new = Hash::rename_keys($orig, foo => 'aaa', bar => 'bbb');
+    is($new, { aaa => [1,2,3], bbb => [4,5,6] }, 'rename_keys 6');
+
+    push $orig->{foo}->@*, 10;
+
+    is($orig, { foo => [1,2,3,10], bar => [4,5,6] }, 'rename_keys 7');
+    is($new,  { aaa => [1,2,3],    bbb => [4,5,6] }, "rename_keys don't share data");
+}
+
 done_testing;
