@@ -137,7 +137,7 @@ Here the Array `$album->{tracks}` got the `Array` blessing added, so you can
 call `Array::sum_by` by on it.
 
 Also consider that every *method* is still callable as a procedural function
-and an unblessed reference.
+with an unblessed reference.
 
 ```perl
 my $runtime = Array::sum_by(
@@ -156,12 +156,12 @@ my $runtime = Array::sum_by(
 );
 ```
 
-will also work. Even the Array/Hashes are all unblessed. This is a feature.
-Also `equal()` correctly works and don't care about the blessings. A blessed
-`Array` and a non-blessed `ARRAY` are considered the same.
+will also work. All Array/Hash functions are written in a way to accept unblessed
+references. This is a feature. Also `equal()` correctly works and don't care about
+the blessings. A blessed `Array` and a non-blessed `ARRAY` are considered the same.
 
 All functions in `Array` or `Hash` always return blessed Arrays/Hashes. So sometimes
-instead of adding a blessing, you also just can use the procedural-style to
+instead of adding a blessing you just can use the procedural-style to
 start and then after this use the method chaining syntax.
 
 ## array(), hash()
@@ -178,6 +178,20 @@ my $hash  = hash(
     2 => "Bar",
 );
 ```
+
+or with using `sq`.
+
+```perl
+my $array = sq [1,2,3,4,5];
+my $hash  = sq {
+    1 => "Foo",
+    2 => "Bar",
+};
+```
+
+`sq` is preferred when your data-structure is like Arrays of Array, Hashes of
+Hashes and so on. Because then the deeper Array/Hashes also get a blessing
+added.
 
 ## key(), idx()
 
@@ -199,11 +213,12 @@ Those are default comparison function for comparing things by string, numbers
 or string ignore case. They are useful in `->sort()` or `->sort_by()`.
 
 ```perl
+# Long version
 my $sorted = $aoh->sort_by(
     sub($x,$y) { $x <=> $y   },
     sub($hash) { $hash->{id} });
 
-# Much better to read/write
+# Shorter version
 my $sorted = $aoh->sort_by(by_num, key 'id');
 ```
 
@@ -262,7 +277,7 @@ is(
     'is $whatever correct');
 ```
 
-There is a single rule. When you can dump() data, you also can test it!
+There is a single rule. **When you can dump() data, you also can test it!**
 Because dump() is so useful it also exists as a method on the
 data-structures.
 
@@ -275,7 +290,7 @@ my $data =
 ```
 
 This will not only generate `$data` but gives you two data-structures
-dumps of two arrays that was created on STDERR. On the console it will show
+dumps of two arrays that are printed to STDERR. On the console it will show
 
 ```perl
 [1,2,3,4,5,  ...]
@@ -313,69 +328,11 @@ my $album2 = copy($album1);
 Here `$album2` is not only a full copy of the data-structure, also *Array* and
 *Hash* blessings are added to the copy. The original `$album1` stays unaffected.
 
-## Some(), None()
-
-This is an *Option* implemtation. This is another way of saying that something
-is either a value, or it is no value. This is an alternative for using `undef`.
-
-The difference is that both are blessed objects and still provide calling methods
-on it. This allows writing code where you don't need to check after every operation
-if you encountered an `undef` or not.
-
-In OO languages like `C#` for example they added operators like `?.` so you
-don't get insane. This is actually a bad implementation because the language
-must be added for a single feature. `Option` is the functional way to solve
-that problem through a data-type.
-
-Maybe at the beginning when you never worked with it, it is somewhat harder to
-understand the benefits. So here is a small example. Consider you want the
-Minimum value of an Array. So there is `Array::min` you can call.
-
-But what should it return when the `Array` is empty? Two solutions can be made.
-
-The first one is throwing an exception. This is bad, because an empty array
-is not really exceptional code. It just let's your program crash. Maybe in
-development you don't encounter the crash because you only test arrays that
-has data in it and completely forget about the empty array case. Throwing
-an exception means you maybe just forget it, you end up with a bug, and you
-later need to fix it. How do you fix it? By writing code that checks the
-Array length and then do a branching on it. This is horrible and ugly code.
-
-Another solution is by returning `undef`. Here you end up with the same problem.
-Maybe you expect it to return an object, call a method on it. And your
-program crashes again. Maybe you just use it as a string or number. Then at
-least in Perl you don't get crashes but a lot of warnings about undef values
-will appear.
-
-`Option` is the alternative. By default `Array::min` returns
-an Option. So to work with the value, you must write explicit code for both
-cases. Or just the case when a value is available.
-
-```perl
-my $min = $array->min->or(0);  # min value or 0
-my $min = $array->min(0)       # provide a default value to min()
-my $min = $array->min->match(  # doubles the min value or 0
-    Some => sub($x) { $x * 2 },
-    None => sub     { 0      },
-);
-
-# doubles the min value, if there is one, otherwise does nothing, it still
-# will be an Option where you can call ->map() again. or call ->or()
-# or other methods.
-my $min = $array->min->map(sub($x) { $x * 2 });
-```
-
-When you work with `Option` then doing the wrong thing will lead you
-immediately into an error.
-
 ## Ok(), Err()
 
-This is a `Result` type that is somewhat like an `Option`. But an `Option` is just
-there to say. Here is a value, or we have Nothing at all. The Nothing State doesn't
-provide any additional value with it.
-
-A `Result` type on the other hand carries the idea that something was `Ok` or is
-an `Err` along having some data. For example those both are not the same.
+This is a `Result` type. A `Result` type is either `Ok($x)` or `Err($y)`. It describes
+that something either was sucessfull or not, in both cases some data are attached
+to it. You can write the following.
 
 ```perl
 my $result = Ok(0);
@@ -396,6 +353,121 @@ Data can be of any type.
 my $err = Err("Database connection failed");
 my $err = Err({ op => 'connect', reason => 'wrong password'});
 ```
+
+The most basic way to work with an `Result` is to use its `match` method.
+
+```perl
+my $y = $result->match(
+    Ok  => sub($x) { printf "Success: %d\n", $x; return 1 },
+    Err => sub($x) { printf "Error: %d\n",   $x; return 0 },
+);
+```
+
+It's a better way to work with functions that can return errors. Consider
+the following pattern you see often in Perl programs or used by a lot of modules.
+
+```perl
+my $ret = open my $fh, '<', 'some_file.txt';
+if ( !defined $ret ) {
+    my $error = $!; # Or some other global variable that is now set.
+}
+```
+
+So very often `undef` is used as an error indication, but `undef` caries no
+extra information. Sometimes functions set `$!`, sometimes some other global
+variable like `$DBI::err` or whatever. With an `Result` type you instead just
+get a value that is either `Ok` or `Err`.
+
+## Some(), None()
+
+This is the `Option` type. An `Option` type is similar to a `Result`. An `Option`
+either can be `Some($x)` or `None`.
+
+```perl
+my $opt = Some(0);
+my $opt = None;
+```
+
+Different to an `Result` the `None` case carries no extra information. Sometimes
+you have failing functions, but you just don't need any extra information. Then
+using `Option` is good.
+
+For example `Array::min` returns an `Option`. It either returns `Some($min)`
+or `None` when the Array was empty.
+
+For beginners it is sometimes harder to understand of what is the benefit of it
+compared to just returning `undef`. So here are two examples.
+
+Consider you want to return the `max` value of something, just to create the
+highest value to create a new max. By just adding `+1` to it.
+
+Let's imagine i had implement `Array::max` to return `undef` instead of returning
+an `Option`. You might end up writing code like this.
+
+```perl
+my $max     = $array->max;
+my $new_max = $max + 1;
+```
+
+This code will run, most of the time. It might be that you miss that error
+during programing, because when you write tests you maybe only test Arrays
+with something in it, and just forget to test an empty array. In the case of
+an empty array you might get some warning, at least in Perl it continues. Some
+other languages might crash. Consider `max` would return an object, you maybe
+are invited to write.
+
+```perl
+my $whatever = $array->max->some_method();
+```
+
+This will defenetily crash your Perl program as soon `$array` is empty. As you
+cannot call a method on an `undef` value.
+
+The correct way in both cases would be.
+
+```perl
+my $max = $array->max;
+if ( defined $max ) {
+    # Valid
+}
+else {
+    # Not valid
+}
+```
+
+you are technically not allowed to *chain* anything. It is basically errornous code
+to not explicitly check for `undef`. An `Option` instead forces you todo so.
+You basically always must write.
+
+```perl
+my $new_max = $array->max(
+    Some => sub($max) { $max + 1 },
+    None => sub       { 0        },
+);
+```
+
+Here `$new_max` is now either `$max + 1` if there was some `$max` or will be
+initialized with `0`.
+
+Consider that `match` does an extraction. So you must provide code for both cases.
+Sometimes you just want todo something in the case it was `Some` value or just don't do
+anything. That's what `map` is doing.
+
+```perl
+my $opt_new_max = $array->max->map(sub($max) { $max + 1 });
+```
+
+Here `$opt_new_max` is either `Some($max + 1)` or `None`.
+
+```perl
+my $opt_whatever = $array->max->map(sub($obj) { $obj->whatever() });
+```
+
+Here `$opt_whatever` is either `Some($obj->whatever)` when there was some `$obj`
+or is either `None`.
+
+`Result` also provides an `map` method that only executes when the value was some
+`OK($value)`.
 
 # Some more functions
 
@@ -502,8 +574,8 @@ be computed or a full array of 100 Mio elements needs to be stored.
 
 Doing a `my $sum = $bigS->sum()` for example calculates the sum of it, but
 still it doesn't need to store 100 Mio elements in memory. In this case only
-two values are needed. The final computed `$sum` and one element. Using a
-sequence is like writing.
+two values are needed. The final computed `$sum` and one element from the sequence.
+Using a sequence is like writing.
 
 ```perl
 my $sum = 0;
@@ -523,7 +595,9 @@ You still can if you prefer. Like i said. `Array` is just a plain perl Array.
 You could do.
 
 ```perl
-my $array = Array->init(100, sub($idx) { Sq->rand->str(1,$idx)->first("") });
+# contains 100 random strings of length 1-10
+my $array = Sq->rand->str(1,10)->to_array(100);
+# then use map on every string
 my @new   = map { length $_ } @$array;
 ```
 
@@ -535,8 +609,9 @@ blessed Array/Hashes you can chain functions.
 
 ```perl
 my $array =
-    Array->init(100, sub($idx) { Sq->rand->str(1,$idx)->first("") })
-         ->map(sub($x) { length($x) });
+    Sq->rand->str(1,10)
+      ->map(sub($x) { length($x) })
+      ->to_array(100);
 ```
 
 The advantage of this style is, that `Seq` and `Array` are mostly API compatible
@@ -563,7 +638,7 @@ my $lengths =
 
 only then a computation starts. `to_array(3)` forces an eager evaluation as it
 wants to turn the sequence into an array with the limitation of only
-reading 3 entries from the sequence. But only ever 3 lines from `whatever.txt`
+reading 3 entries from the sequence. So only 3 lines from `whatever.txt`
 are read into memory. And also not all three lines at once. The file could be
 several gigabytes big and would only read 3 lines one after another,
 computes the length of each lines and just saves three integers into one
@@ -573,7 +648,7 @@ be similar to.
 ```perl
 my $lengths;
 my $lines_read_so_far = 0;
-open my $fh, '<', 'whatever.txt' or die "Blub";
+open my $fh, '<', 'whatever.txt' or die $!;
 while ( my $line = <$fh> ) {
     chomp $line;
     push @$lengths, length($line);
@@ -598,7 +673,7 @@ This is the same as the following code.
 ```perl
 my $lengths;
 my $lines_read_so_far = 0;
-open my $fh, '<', 'whatever.txt' or die "Blub";
+open my $fh, '<', 'whatever.txt' or die $!;
 while ( my $line = <$fh> ) {
     chomp $line;
     if ( $line =~ m/\AFOO:/ ) {
