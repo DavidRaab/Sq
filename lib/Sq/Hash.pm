@@ -232,7 +232,7 @@ sub slice($hash, @keys) {
     my $v;
     for my $key ( @keys ) {
         $v = $hash->{$key};
-        $new->{$key} = $v if defined $v;
+        $new->{$key} = _copy($v) if defined $v;
     }
     return $new;
 }
