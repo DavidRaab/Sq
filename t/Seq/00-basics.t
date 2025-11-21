@@ -70,6 +70,27 @@ is(
     $range->fold_mut([], sub($x,$array) { push @$array, $x         }),
     'fold_mut');
 
+# fold tests that check behaviour that it uses Sq::init()
+{
+    my $empty = [];
+    is(
+        Seq::fold(Seq->range(1,3), $empty, sub($x,$state) {
+            $state->push($x);
+            $state;
+        }),
+        [1,2,3],
+        'fold - $empty is blessed');
+    is($empty, [], 'previous fold call did not change $empty');
+
+    is(
+        Seq::fold(Seq->range(1,3), sub { array }, sub($x,$state) {
+            $state->push($x);
+            $state;
+        }),
+        [1,2,3],
+        'fold also accepts sub-ref for initilization');
+}
+
 check_isa($range->rev, 'Seq', 'rev return Seq');
 is($range->rev, Seq->range(10,1), 'rev');
 is(

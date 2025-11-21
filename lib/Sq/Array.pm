@@ -1015,7 +1015,8 @@ sub is_empty($array) { @$array == 0 ? 1 : 0 }
 sub head    ($array) { $array->[0] }
 
 # fold : Array<'a> -> 'State -> (a -> 'State -> 'State) -> 'State
-sub fold($array, $state, $folder) {
+sub fold($array, $init, $folder) {
+    my $state = Sq::init($init);
     for my $x ( @$array ) {
         $state = scalar $folder->($x,$state);
     }

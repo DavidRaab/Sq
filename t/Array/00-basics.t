@@ -105,11 +105,31 @@ is(
     $range->fold    ([], sub($x,$array) { push @$array, $x; $array }),
     $range->fold_mut([], sub($x,$array) { push @$array, $x         }),
     'fold_mut');
-
 is(
     $range->fold_mut(Array->new, sub($x,$new) { $new->push($x) }),
     [1 .. 10],
     'Array->push should be used with fold_mut');
+
+# fold tests that check behaviour that it uses Sq::init()
+{
+    my $empty = [];
+    is(
+        Array::fold([1,2,3], $empty, sub($x,$state) {
+            $state->push($x);
+            $state;
+        }),
+        [1,2,3],
+        'fold - $empty is blessed');
+    is($empty, [], 'previous fold call did not change $empty');
+
+    is(
+        Array::fold([1,2,3], sub { array }, sub($x,$state) {
+            $state->push($x);
+            $state;
+        }),
+        [1,2,3],
+        'fold also accepts sub-ref for initilization');
+}
 
 check_isa($range->rev, 'Array', 'rev return Array');
 is($range->rev, [10,9,8,7,6,5,4,3,2,1], 'rev');

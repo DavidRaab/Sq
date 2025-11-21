@@ -1501,14 +1501,14 @@ sub group_by($seq, $f_key) {
 }
 
 # fold : Seq<'a> -> 'State -> ('a -> 'State -> 'State) -> 'State
-sub fold($seq, $state, $f_state) {
-    my $it     = $seq->();
-    my $result = $state;
+sub fold($seq, $init, $f_state) {
+    my $it    = $seq->();
+    my $state = Sq::init($init);
     my $x;
     while ( defined($x = $it->()) ) {
-        $result = $f_state->($x,$result);
+        $state = $f_state->($x,$state);
     }
-    return $result;
+    return $state;
 }
 
 # fold_mut : Seq<'a> -> 'State -> ('a -> 'State -> unit) -> 'State
