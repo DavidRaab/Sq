@@ -4,6 +4,8 @@ package Sq::Equality;
 use 5.036;
 use builtin 'refaddr';
 
+our $FloatTolerance = 0.00000001;
+
 *is_num = \&Scalar::Util::looks_like_number;
 
 # This is inlined in equal() but i still provide this function as an API
@@ -84,7 +86,7 @@ sub equal($any1, $any2) {
     if ( defined $any1 && defined $any2 ) {
         # when number
         if ( is_num($any1) && is_num($any2) ) {
-            return $any1 == $any2 ? 1 : 0;
+            return abs($any1 - $any2) < $FloatTolerance ? 1 : 0;
         }
         # get type of references
         my $t1 = ref $any1;

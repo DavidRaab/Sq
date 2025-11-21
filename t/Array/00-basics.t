@@ -160,6 +160,11 @@ is($range->sum, $range->rev->sum, 'sum 2');
 }
 
 is(
+    Array->range_step(1, 0.3, 2),
+    [ 1, 1.3, 1.6, 1.9 ],
+    'does not overshoot');
+
+is(
     Array::zip(
         Array->new(qw/A B C D E F/),
         Array->range(0, 1_000),
@@ -442,11 +447,10 @@ is(
 is(Array->init(0, \&id),      [], 'init with length 0');
 is(Array->range_step(1,1,1), [1], 'range_step with 1,1,1');
 
-# TODO: floating point inaccuraccy
-# is(
-#     Array->range_step(0,0.1,1),
-#     [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
-#     'range_step with 0,0.1,1');
+is(
+    Array->range_step(0,0.1,1),
+    [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+    'range_step with 0,0.1,1');
 
 dies { Array->range_step(0,0,1) }
 qr/^\$step is 0/,

@@ -361,11 +361,10 @@ is(Seq->init(-1,  sub($idx) { $idx }), Seq->empty, 'init with length -1');
 is(Seq->init(-10, sub($idx) { $idx }), Seq->empty, 'init with length -10');
 is(Seq->range_step(1,1,1), seq { 1 }, 'range_step with 1,1,1');
 
-# TODO
-# is(
-#     Seq->range_step(0,0.1,1)->to_array,
-#     [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
-#     'range_step with 0,0.1,1');
+is(
+    Seq->range_step(0,0.1,1)->to_array,
+    [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+    'range_step with 0,0.1,1');
 
 dies { Seq->range_step(0,0,1)->to_array }
 qr/^\$step is 0/,
@@ -862,15 +861,10 @@ is(
         'map2 - functional');
 }
 
-# range
-# {
-    # TODO: floating-point
-    # my $seq = Seq->range_step(1, 0.3, 2);
-    # is(
-    #     $seq->to_array,
-    #     [1,1.3, 1.6, 1.9],
-    #     'does not overshoot');
-# }
+is(
+    Seq->range_step(1, 0.3, 2),
+    seq { 1, 1.3, 1.6, 1.9 },
+    'does not overshoot');
 
 # to_seq
 {
