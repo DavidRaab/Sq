@@ -4,7 +4,7 @@ package Sq::Equality;
 use 5.036;
 use builtin 'refaddr';
 
-our $FloatTolerance = 0.00000001;
+our $FloatTolerance = 0.000_000_01;
 
 *is_num = \&Scalar::Util::looks_like_number;
 
