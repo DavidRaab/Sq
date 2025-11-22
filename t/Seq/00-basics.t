@@ -1717,24 +1717,24 @@ is(
 {
     my $game = record(qw/id name tag comment/);
     my $data = seq {
-        $game->(1, "Zelda",       "Action-Adventure"),
-        $game->(1, "Zelda",       "Link"),
-        $game->(1, "Zelda",       "Ganon"),
-        $game->(2, "Mario 64",    "Mario"),
-        $game->(2, "Mario 64",    "Jump N Run"),
-        $game->(3, "Doom 64",     "Ego-Shooter"),
-        $game->(4, "Blast Corps", "Rare"),
-        $game->(4, "Blast Corps", "Destruction"),
+        $game->(1, "Zelda",       "Action-Adventure", ""),
+        $game->(1, "Zelda",       "Link"            , ""),
+        $game->(1, "Zelda",       "Ganon"           , ""),
+        $game->(2, "Mario 64",    "Mario"           , ""),
+        $game->(2, "Mario 64",    "Jump N Run"      , ""),
+        $game->(3, "Doom 64",     "Ego-Shooter"     , ""),
+        $game->(4, "Blast Corps", "Rare"            , ""),
+        $game->(4, "Blast Corps", "Destruction"     , ""),
         { name => "Turok", tag => "Ego-Shooter"}, # hash without id
     };
 
     is(
         $data->combine(key('id'), 'tag')->sort_by(by_num, key 'id'),
         [
-            $game->(1, "Zelda",       ["Action-Adventure", "Link", "Ganon"]),
-            $game->(2, "Mario 64",    ["Mario", "Jump N Run"]              ),
-            $game->(3, "Doom 64",     ["Ego-Shooter"]                      ),
-            $game->(4, "Blast Corps", ["Rare", "Destruction"]              ),
+            $game->(1, "Zelda",       ["Action-Adventure", "Link", "Ganon"], ""),
+            $game->(2, "Mario 64",    ["Mario", "Jump N Run"]              , ""),
+            $game->(3, "Doom 64",     ["Ego-Shooter"]                      , ""),
+            $game->(4, "Blast Corps", ["Rare", "Destruction"]              , ""),
         ],
         'combine 1');
 }

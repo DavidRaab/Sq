@@ -400,13 +400,28 @@ is(
 }
 
 is(
-    array(1, "Anny", 100, 2, "Frank", 12, 3, "Peter", 33)->mapn(3, record(qw/id name points/)),
+    array(1, "Anny", 100, 2, "Frank", 12, 3, "Peter", 33)
+    ->mapn(3, record(qw/id name points/)),
     [
         {id => 1, name => "Anny",  points => 100},
         {id => 2, name => "Frank", points => 12 },
         {id => 3, name => "Peter", points => 33 },
     ],
     'record');
+
+# when record does not get correct size of arguments it throws an error
+{
+    my $to_hash = record(qw/id name points/);
+
+    dies { $to_hash->()          } qr/\Arecord:/, '0 args';
+    dies { $to_hash->(1)         } qr/\Arecord:/, '1 args';
+    dies { $to_hash->(1,"Zelda") } qr/\Arecord:/, '2 args';
+    is(
+        $to_hash->(1,"Zelda",100),
+        { id => 1, name => "Zelda", points => 100 },
+        'Expected Args is correct');
+    dies { $to_hash->(1,"Zelda",100,"") } qr/\Arecord:/, '4 args';
+}
 
 # Haskell's slow "QuickSort"
 {
