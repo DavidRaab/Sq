@@ -15,4 +15,25 @@ sub dir($) {
     return path($FindBin::Dir);
 }
 
+sub env($) {
+    state $split = sub($p) { Str->split(qr/:/, $p)->map(\&path) };
+    my $env = hash(%ENV);
+    $env->change(
+        HOME            => \&path,
+        PATH            => $split,
+        MANPATH         => $split,
+        PWD             => \&path,
+        OLDPWD          => \&path,
+        SHELL           => \&path,
+        XDG_DATA_DIRS   => $split,
+        XDG_DATA_HOME   => \&path,
+        XDG_CACHE_HOME  => \&path,
+        XDG_STATE_HOME  => \&path,
+        XDG_CONFIG_HOME => \&path,
+        XDG_CONFIG_DIRS => $split,
+        XDG_RUNTIME_DIR => \&path,
+    );
+    return $env;
+}
+
 1;

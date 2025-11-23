@@ -132,7 +132,8 @@ overview of the functionality of Sq itself.
 
 =head2 Sq->sys
 
-    my $path = Sys->sys->dir()       # Path::Tiny object from directory executable is in
+    my $path = Sys->sys->dir()  # Path::Tiny object from directory executable is in
+    my $env  = Sys->env;        # Enhanced version of %ENV. Hash blessing added and for example PATH is already split into an Array of Path::Tiny objects
 
 =head2 Str
 
