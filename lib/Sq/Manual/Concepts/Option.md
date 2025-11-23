@@ -55,11 +55,145 @@ my $opt =
 
 Now `$opt` is either `Some($stat_hash)` or `None`.
 
-# match
+# Nested Options
+
+You can nest options in any depth, but they are automcatically flatted.
+
+```perl
+# Same as: Some(1,2,3,4,5,6,7,8)
+my $opt = Some(
+    1,2,3,
+    Some(4,5,6),
+    Some(7,Some(8))
+);
+```
+
+But as soon there is some `undef` or `None` in it, everything evaluates to
+`None`.
+
+```perl
+# Same as: None
+my $opt = Some(
+    1,2,3,
+    Some(4,None,6),
+    Some(7,Some(8))
+);
+```
+
+you theoretically can use this feature for example to wrap multiple function
+outputs in a `Some`, and only when all three returned some valid value the
+whole result is successfull.
+
+```perl
+my $all_valid = Some(
+    function1(),
+    function2(),
+    function3(),
+);
+```
+
+the nesting has some kind of *compatiblity* layer in it. The advantage of this
+behaviour is that you always can wrap a `Some()` around another option, and
+you never get an option of an option.
+
+In a language like F#, and maybe other there it might be possible to create this,
+but i decided that this makes no sense. Technically an option of an option
+means the whole state of the option just depends on the most inner value.
+The compatibility that this creates is the following. Look at this code.
+
+```perl
+my $opt = Some(function());
+```
+
+Now the return value of `function()` will be wrapped in an optional. But the
+interesting thing is that `function()` can return a normale value/undef or
+decide to return an `Option` type. No matter what it returns, `$opt` will
+just be a single Option representing the output.
+
+This feature can be used and is especially useful for lambda functions.
+
+# Array::pick
+
+For example `Array::pick` is a function that tries to find a variable in an
+Array. But also combines a `map` in one operation. You simply pass a function
+to it. And as soon it returns `Some($value)` the value is used, while `None`
+values are skipped.
+
+Because in the implementation I also basically wrap the result of the lambda
+in a `Some()` call, you now can return both an `Option` or still use `undef`.
+
+```perl
+my $opt = Array->range(1,10)->pick(sub($x) { $x % 2 == 0 ? Some($x*$x) : None  });
+my $opt = Array->range(1,10)->pick(sub($x) { $x % 2 == 0 ?      $x*$x  : undef });
+```
+
+Both work and will give you `Some(4)` as a result.
+
+This gives you the flexibility to use functions that do not return an `Option`
+without the need to explcitiy call `Some()` in the lambda, but also to
+upgrade your own function and switch to an `Option` without changing code
+at every place.
+
+# match, map, iter
+
+The most used function are probably `match`, `map` and `iter`.
+
+`match` is a function that allows you to extract the value of an `Option` and
+also do some additional computation on it. You use that function when you want
+to decide and check if you either get `Some($value)` or `None`. Typical usage
+looks like this.
+
+```perl
+# 20
+my $double = Some(10)->match(
+    Some = sub($x) { $x * $x },
+    None = sub     { 0       },
+);
+
+# 0
+my $double = None->match(
+    Some = sub($x) { $x * $x },
+    None = sub     { 0       },
+);
+```
+
+`match` extracts the value, so after a `match` you don't have an `Option` value
+anymore. But because of this you must provide a function for both cases.
+Sometimes you are just interested to execute some code when you got `Some($value)`
+and do nothing at all when you got `None`. In this case you use `map`.
+
+```perl
+my $opt = Some(10)->map(sub($x) { $x * $x }); # Some(20)
+my $opt =     None->map(sub($x) { $x * $x }); # None
+```
+
+`match` and `map` are both functions to give you a new value. Sometimes you
+just want to execute some code when you got `Some($value)`, do something,
+for example a side-effect (like printig) or do nothing at all. You are also
+not interested in a new value. In that case you use `iter`.
+
+```perl
+Some(10)->iter(sub($x) { printf "Got Number: %f\n", $x }); # printf will be excuted
+    None->iter(sub($x) { printf "Got Number: %f\n", $x }); # nothing will happen
+```
+
+# map2, map3, map4, map_v
 
 TODO
 
-# Nested Options
+# bind
+
+TODO
+
+# or, or_with, or_else, or_else_with
+
+TODO
+
+# Array::all_some
+
+TODO
+
+# Option->extract()
 
 TODO
 

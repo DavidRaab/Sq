@@ -695,6 +695,10 @@ is($range->none(sub($x) { $x > 10  }), 1, 'none value greater 10');
         $range->pick(sub($x) { $x*$x > 50 ? Some($x*$x) : None })->or('No'),
         64,
         'pick squared element that is greater 50');
+    is(
+        $range->pick(sub($x) { $x % 2 == 0 ? $x*$x : undef }),
+        Some(4),
+        'pick without option');
 
     # pod examples
     my $r   = Array->range(1,10);
