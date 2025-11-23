@@ -8,9 +8,7 @@ our @EXPORT    = ();
 
 use JSON qw/decode_json/;
 
-# TODO: + Check if yt-dlp is installed / throw error if not
-#       + build function to check/scan for binary files in OS
-#       + check if url is a youtube URL?
+# TODO: + check if url is a youtube URL?
 #       + safer way to run a program and get output of program
 static youtube => sub($url) {
     return Sq->sys->find_bin('yt-dlp')->match(
