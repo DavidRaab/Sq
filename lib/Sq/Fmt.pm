@@ -53,6 +53,46 @@ static multiline => sub($aoa) {
     return bless(\@new, 'Array');
 };
 
+my $new_table = type [hash => [keys =>
+    data    => [array => [of => [array => [of => ['str']]]]],
+    columns => [maybe => [array => [of => ['num']]]],
+]];
+static new_table => sub($config) {
+    Sq::Type::t_assert($new_table, $config);
+    state $format = format_aoa();
+    state $print  = print_aoa();
+
+    my $aoa = $format->(Hash::slice($config, 'columns'), $config->{data});
+    # dump($aoa);
+    $print->($aoa);
+};
+
+static format_aoa => sub ($config, $aoa) {
+    # TODO: Must be calculated if empty
+    my $columns = $config->{columns} // [];
+
+    my @new;
+    for my $row ( @$aoa ) {
+        my @inner;
+        my $idx = 0;
+        for my $col ( @$row ) {
+            my $size = $columns->[$idx++];
+            push @inner, sprintf("%${size}s", $col);
+        }
+        push @new, \@inner;
+    }
+    bless(\@new, 'Array');
+};
+
+static print_aoa => sub ($aoa) {
+    for my $line ( @$aoa ) {
+        for my $column ( @$line ) {
+            print $column;
+        }
+        print "\n";
+    }
+    return;
+};
 
 ### Types for table().
 # when data is array of hash, then header must be specified, border is optional

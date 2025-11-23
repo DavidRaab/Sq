@@ -11,5 +11,6 @@ my $aoa   = t_array(t_of t_array);
 sig('Sq::Fmt::html',        $any,   t_tuple(t_eq('HTML'), t_str));
 sig('Sq::Fmt::nl_to_array', $array, $array);
 sig('Sq::Fmt::multiline',   $aoa,   $aoa);
+sig('Sq::Fmt::print_aoa',   t_array(t_of t_array(t_of t_str)), t_void);
 
 1;
