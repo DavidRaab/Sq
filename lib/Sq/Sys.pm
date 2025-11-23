@@ -36,4 +36,13 @@ sub env($) {
     return $env;
 }
 
+# Lookup $file in $PATH
+static find_bin => sub ($file) {
+    return env('')->{PATH}->pick(sub($folder) {
+        my $bin = $folder->child($file);
+        return Some($bin) if -x $bin;
+        None;
+    });
+};
+
 1;

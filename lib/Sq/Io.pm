@@ -13,9 +13,16 @@ use JSON qw/decode_json/;
 #       + check if url is a youtube URL?
 #       + safer way to run a program and get output of program
 static youtube => sub($url) {
-    my $out  = qx/yt-dlp -J $url/;
-    my $data = decode_json($out);
-    return sq($data);
+    return Sq->sys->find_bin('yt-dlp')->match(
+        Some => sub($exe) {
+            my $out  = qx/$exe -J $url/;
+            my $data = decode_json($out);
+            return sq($data);
+        },
+        None => sub {
+            Carp::croak "Cannot find yt-dlp in PATH. Check if yt-dlp is installed";
+        }
+    )
 };
 
 static csv_read => sub($file) {

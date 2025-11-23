@@ -181,7 +181,11 @@ sub path_tiny($path) {
 }
 
 my $copy_dispatch = {
-    'Path::Tiny' => \&path_tiny,
+    'Path::Tiny'        => \&path_tiny,
+    'JSON::PP::Boolean' => sub($b) {
+        my $value = $$b;
+        bless(\$value, 'JSON::PP::Boolean');
+    },
 };
 
 sub copy($any) {
