@@ -45,4 +45,14 @@ static find_bin => sub ($file) {
     });
 };
 
+static capture => sub(@prog) {
+    use IPC::Cmd qw(run);
+    my ($exit, $err, $full, $stdout, $stderr) =
+        run(command => \@prog, verose => 0);
+
+    return $exit == 0
+        ? Ok ([$stdout, $stderr])
+        : Err([$exit, $stdout, $stderr]);
+};
+
 1;

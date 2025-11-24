@@ -9,16 +9,26 @@ our @EXPORT    = ();
 use JSON qw/decode_json/;
 
 # TODO: + check if url is a youtube URL?
-#       + safer way to run a program and get output of program
+#       + error handling of yt-dlp (just check if it returns a valid JSON?)
 static youtube => sub($url) {
     return Sq->sys->find_bin('yt-dlp')->match(
         Some => sub($exe) {
-            my $out  = qx/$exe -J $url/;
-            my $data = decode_json($out);
-            return sq($data);
+            return Sq->sys->capture($exe, '-J', $url)->match(
+                Ok  => sub($args) {
+                    my ($out, $err) = @$args;
+                    return sq decode_json(join '', @$out)
+                },
+                Err => sub($args) {
+                    my ($exit, $out, $err) = @$args;
+                    warn(
+                        "Crappy yt-dlp does always return error code 1 even when successful and no warnings.\n"
+                        . "Here is what yt-dlp sent on STDERR:\n" . join('', @$err) . "\n");
+                    return sq decode_json(join '', @$out);
+                }
+            )
         },
         None => sub {
-            Carp::croak "Cannot find yt-dlp in PATH. Check if yt-dlp is installed";
+            Carp::croak "Cannot find yt-dlp in PATH. Check if yt-dlp is installed.";
         }
     )
 };
