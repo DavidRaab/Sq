@@ -9,26 +9,42 @@ our @EXPORT    = ();
 use JSON qw/decode_json/;
 
 # TODO: + check if url is a youtube URL?
-#       + error handling of yt-dlp (just check if it returns a valid JSON?)
 static youtube => sub($url) {
     return Sq->sys->find_bin('yt-dlp')->match(
         Some => sub($exe) {
             return Sq->sys->capture($exe, '-J', $url)->match(
                 Ok  => sub($args) {
                     my ($out, $err) = @$args;
-                    return sq decode_json(join '', @$out)
+                    return Ok(sq(decode_json(join '', @$out)));
                 },
                 Err => sub($args) {
                     my ($exit, $out, $err) = @$args;
-                    warn(
-                        "Crappy yt-dlp does always return error code 1 even when successful and no warnings.\n"
-                        . "Here is what yt-dlp sent on STDERR:\n" . join('', @$err) . "\n");
-                    return sq decode_json(join '', @$out);
+
+                    # I just try to parse the OUT as JSON, when this succedds
+                    # i consider the call sucessfull, when there still was
+                    # a warning, it is printed to STDERR.
+                    local $@;
+                    my ($error, $ds) = (0);
+                    eval {
+                        $ds    = decode_json(join '', @$out);
+                        $error = 1;
+                    };
+                    if ( $error ) {
+                        # TODO: This shouldn't be here
+                        if ( @$err ) {
+                            warn "yt-dlp WARNINGS\n";
+                            warn join('', @$err);
+                        }
+                        return Ok(sq $ds);
+                    }
+                    else {
+                        return Err(join('', @$err));
+                    }
                 }
             )
         },
         None => sub {
-            Carp::croak "Cannot find yt-dlp in PATH. Check if yt-dlp is installed.";
+            Err("Cannot find yt-dlp in PATH. Check if yt-dlp is installed.");
         }
     )
 };

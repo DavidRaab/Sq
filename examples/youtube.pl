@@ -13,9 +13,10 @@ use Sq -sig => 1;
 
 # $usage->die if $opt->help;
 
-my $data = Sq->io->youtube($ARGV[0]);
-
-# dump $data->{formats};
+my $data = Sq->io->youtube($ARGV[0])->match(
+    Ok  => \&id,
+    Err => sub($msg) { die $msg },
+);
 
 Sq->fmt->table({
     header => [qw/format_id format fps ext vcodec protocol quality vbr/],
