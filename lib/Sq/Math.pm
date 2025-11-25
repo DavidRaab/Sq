@@ -85,4 +85,26 @@ static permute_count_up => sub($array) {
     return 1;
 };
 
+# converts number to any other number system
+static to_num_system => sub($str_places, $num) {
+    my @places = split //, $str_places;
+    my $count  = @places;
+
+    $num = int($num);
+    return $places[0] if $num == 0;
+
+    my $result = "";
+    while ( $num != 0 ) {
+        my $mod   = $num % $count;
+        my $digit = $places[$mod];
+        $result .= $digit;
+        $num -= $mod;
+        $num  = $num / $count;
+    }
+    reverse $result;
+};
+
+static to_binary => sub($num) { sprintf "%b", $num };
+static to_hex    => sub($num) { sprintf "%x", $num };
+
 1;

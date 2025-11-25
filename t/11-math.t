@@ -110,4 +110,76 @@ use Sq::Test;
     is($fac->(5), 120, 'fac 6');
 }
 
+{
+    my $ns = Sq->math->to_num_system;
+
+    # binary
+    is($ns->("01", 0),           "0", 'to_binary 1');
+    is($ns->("01", 1),           "1", 'to_binary 2');
+    is($ns->("01", 2),          "10", 'to_binary 3');
+    is($ns->("01", 3),          "11", 'to_binary 4');
+    is($ns->("01", 4),         "100", 'to_binary 5');
+    is($ns->("01", 64),    "1000000", 'to_binary 6');
+    is($ns->("01", 128),  "10000000", 'to_binary 7');
+    is($ns->("01", 256), "100000000", 'to_binary 8');
+    is($ns->("01", 123),   "1111011", 'to_binary 9');
+
+    # quads
+    is($ns->("0123", 0),       "0", 'to_quad 1');
+    is($ns->("0123", 1),       "1", 'to_quad 2');
+    is($ns->("0123", 2),       "2", 'to_quad 3');
+    is($ns->("0123", 3),       "3", 'to_quad 4');
+    is($ns->("0123", 4),      "10", 'to_quad 5');
+    is($ns->("0123", 64),   "1000", 'to_quad 6');
+    is($ns->("0123", 128),  "2000", 'to_quad 7');
+    is($ns->("0123", 256), "10000", 'to_quad 8');
+    is($ns->("0123", 123),  "1323", 'to_quad 9');
+
+    # octal
+    is($ns->("01234567", 0),     "0", 'to_oct 1');
+    is($ns->("01234567", 1),     "1", 'to_oct 2');
+    is($ns->("01234567", 2),     "2", 'to_oct 3');
+    is($ns->("01234567", 3),     "3", 'to_oct 4');
+    is($ns->("01234567", 4),     "4", 'to_oct 5');
+    is($ns->("01234567", 64),  "100", 'to_oct 6');
+    is($ns->("01234567", 128), "200", 'to_oct 7');
+    is($ns->("01234567", 256), "400", 'to_oct 8');
+    is($ns->("01234567", 123), "173", 'to_oct 9');
+
+    # hex
+    my $hex = "0123456789abcdef";
+    is($ns->($hex, 0),     "0", 'to_hex 1');
+    is($ns->($hex, 1),     "1", 'to_hex 2');
+    is($ns->($hex, 2),     "2", 'to_hex 3');
+    is($ns->($hex, 3),     "3", 'to_hex 4');
+    is($ns->($hex, 4),     "4", 'to_hex 5');
+    is($ns->($hex, 64),   "40", 'to_hex 6');
+    is($ns->($hex, 128),  "80", 'to_hex 7');
+    is($ns->($hex, 256), "100", 'to_hex 8');
+    is($ns->($hex, 123),  "7b", 'to_hex 9');
+
+    # CAGD system
+    my $cagd = "CAGD";
+    is($ns->($cagd, 0),       "C", 'to_cagd 1');
+    is($ns->($cagd, 1),       "A", 'to_cagd 2');
+    is($ns->($cagd, 2),       "G", 'to_cagd 3');
+    is($ns->($cagd, 3),       "D", 'to_cagd 4');
+    is($ns->($cagd, 4),      "AC", 'to_cagd 5');
+    is($ns->($cagd, 64),   "ACCC", 'to_cagd 6');
+    is($ns->($cagd, 128),  "GCCC", 'to_cagd 7');
+    is($ns->($cagd, 256), "ACCCC", 'to_cagd 8');
+    is($ns->($cagd, 123),  "ADGD", 'to_cagd 9');
+
+    my $nums = Sq->rand->int(0,256)->to_array(100);
+    is(
+        Array::map($nums, Sq->math->to_binary),
+        Array::map($nums, sub($x) { $ns->("01", $x) }),
+        'to_binary vs to_num_system');
+
+    is(
+        Array::map($nums, Sq->math->to_hex),
+        Array::map($nums, sub($x) { $ns->("0123456789abcdef", $x) }),
+        'to_hex vs to_num_system');
+}
+
 done_testing;
