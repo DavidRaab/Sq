@@ -179,7 +179,93 @@ Some(10)->iter(sub($x) { printf "Got Number: %f\n", $x }); # printf will be excu
 
 # map2, map3, map4, map_v
 
-TODO
+`map2` is a function that you use, when you want to unpack two options
+and when they are some value, want to execute some code with those values in
+it.
+
+```perl
+my $optA = Some(8);
+my $optB = Some(7);
+my $optC = None;
+my $mul  = sub($x,$y) { $x * $y };
+
+my $optD = Option::map2($optA, $optB, $mul); # Some(56)
+my $optE = Option::map2($optB, $optC, $mul); # None
+```
+
+Often when working with `map`, `map2`, ... we focus too much on the data. As a Perl
+developer you are probably used to think `map` is just about creating a new Array.
+
+But the concept comes from functional programming that is more focused about
+the function instead of the data. You can have many `map` functions for different
+data-types. Sq ships with `map` functions for *Array*, *Hash*, *Seq*, *Option*
+and *Result*.
+
+Better is to think about the function instead. In this example `$mul`. `$mul`
+is a function that don't know about `Option` type. It also don't know about
+`Array`, `Seq` or `Result`. But with those `map` functions you can make
+`$mul` operate on those types. For example you can re-use `$mul`.
+
+```perl
+# array(Some(56), None)
+my $arrayMul =
+    Array::map2(
+        [Some(8), Some(8)],
+        [Some(7), None],
+        $mul
+    );
+
+my $resultMulA = Result::map2(Ok(8), Ok(7),        $mul); # Ok(56)
+my $resultMulB = Result::map2(Ok(8), Err("error"), $mul); # Err("error")
+```
+
+Consider it the other way around. With `Array::map2` it is like that `$mul` get
+enhanced, and it's function arguments now supports being Arrays. With `Result::map2`
+you can enhance `$mul` and it's arguments now can be `Result` types, without
+that you need to write code yourself to somehow extract, iterate and do some
+other stuff to make it compatible, depending on the data-type.
+
+In functional programming, a data-type that supports a `map` function is also
+named a **Functor**.
+
+Not very difficult at all, but sometimes people are scared of unknown names.
+I assume you know also could guess what a
+
+```perl
+my $asyncC = Async::map2($asyncA, $asyncB, $mul);
+```
+
+would do? Or
+
+```perl
+my $bananaC = Banana::map2($bananaA, $bananaB, $mul);
+```
+
+`map3` and `map4` just does the same for three or four arguments. When you need
+more than four arguments, you should use `map_v`. The `v` is for *variable*.
+You can pass as many *Options* you want, only the last one must be a *function*.
+
+Just as an extended example. You could for example implement `map2` yourself
+with `match`.
+
+```perl
+sub map2($optA, $optB, $f) {
+    $optA->match(
+        None => sub { None },
+        Some => sub($a) {
+            $optB->match(
+                None => sub { None },
+                Some => sub($b) {
+                    Some($a * $b);
+                }
+            )
+        }
+    );
+}
+
+# Signature with Sq::Signature
+sig('map2', t_opt, t_opt, t_sub, t_opt);
+```
 
 # bind
 
