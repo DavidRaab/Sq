@@ -1,0 +1,21 @@
+# INSTALLATION
+
+Installation is simple.
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+You obviously should only install when all tests succedded.
+
+For Sq to properly work you should have installed following modules.
+
+Last Update: 2025-11-25
+
+* Text::CSV
+* Path::Tiny
+* JSON
+
+Sq will start without them, but then not all functionality will be available.
+But if a module is missing you will get a runtime exception telling you.
