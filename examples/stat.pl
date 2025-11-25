@@ -6,10 +6,11 @@ use Sq -sig => 1;
 
 sub mystat($file) {
     state $to_hash = record(qw/dev ino mode nlink uid gid rdev size atime mtime ctime blksize blocks/);
+    state $to_date = sub($str) { scalar localtime $str };
     return Some(stat $file)->map($to_hash)->map(sub($stat) {
-        $stat->{ctime_date} = scalar localtime $stat->{ctime};
-        $stat->{mtime_date} = scalar localtime $stat->{mtime};
-        $stat->{atime_date} = scalar localtime $stat->{atime};
+        $stat->{ctime_date} = $to_date->($stat->{ctime});
+        $stat->{mtime_date} = $to_date->($stat->{mtime});
+        $stat->{atime_date} = $to_date->($stat->{atime});
         $stat
     });
 }
