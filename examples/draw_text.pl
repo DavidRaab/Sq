@@ -14,6 +14,8 @@ sub create_canvas($width, $height, $default=" ") {
     return sq {
         width  => $width,
         height => $height,
+        ox     => 0,       # Offset X
+        oy     => 0,       # Offset Y
         data   => [($default) x ($width * $height)],
     };
 }
@@ -21,18 +23,36 @@ sub create_canvas($width, $height, $default=" ") {
 # data is a single array that emulates a 2D Array, so $x,$y must be converted
 # into an offset. Position outside canvas are ignored
 sub setChar($canvas, $x,$y, $char) {
-    my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
-    return if $x < 0 || $x >= $cw;
-    return if $y < 0 || $y >= $ch;
-    $data->[$cw * $y + $x] = $char;
+    my ($cw,$ch,$data,$ox,$oy) = $canvas->@{qw/width height data ox oy/};
+    my ($rx,$ry) = ($ox+$x, $oy+$y);
+    return if $rx < 0 || $rx >= $cw;
+    return if $ry < 0 || $ry >= $ch;
+    $data->[$cw * $ry + $rx] = $char;
     return;
 }
 
 sub getChar($canvas, $x,$y) {
-    my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
-    return if $x < 0 || $x >= $cw;
-    return if $y < 0 || $y >= $ch;
-    return $data->[$cw * $y + $x];
+    my ($cw,$ch,$data,$ox,$oy) = $canvas->@{qw/width height data ox oy/};
+    my ($rx,$ry) = ($ox+$x, $oy+$y);
+    return if $rx < 0 || $rx >= $cw;
+    return if $ry < 0 || $ry >= $ch;
+    return $data->[$cw * $ry + $rx];
+}
+
+sub addOffset($canvas, $x,$y) {
+    $canvas->{ox} = $canvas->{ox} + $x;
+    $canvas->{oy} = $canvas->{oy} + $y;
+    return;
+}
+
+sub iter($canvas, $f) {
+    my ($data, $w, $h) = $canvas->@{qw/data width height/};
+    for my $y ( 0 .. ($h-1) ) {
+        for my $x ( 0 .. ($w-1) ) {
+            $f->($x,$y, $data->[$y*$w + $x]);
+        }
+    }
+    return;
 }
 
 # creates string out of $canvas
@@ -61,7 +81,7 @@ sub c_run($width, $height, $default, @draws) {
     my $setChar = sub($x,$y,$char) { setChar($canvas, $x,$y, $char) };
     my $getChar = sub($x,$y)       { getChar($canvas, $x,$y)        };
     for my $draw ( @draws ) {
-        $draw->($setChar,$getChar,$width,$height);
+        $draw->($canvas);
     }
     return $canvas;
 }
@@ -71,9 +91,9 @@ sub c_string($width, $height, $default, @draws) {
 }
 
 sub c_and(@draws) {
-    return sub($set,$get,$w,$h) {
+    return sub($canvas) {
         for my $draw ( @draws ) {
-            $draw->($set,$get,$w,$h);
+            $draw->($canvas);
         }
         return;
     }
@@ -81,9 +101,9 @@ sub c_and(@draws) {
 
 # from Array of Array
 sub c_fromAoA($aoa) {
-    return sub($set,$get,$w,$h) {
+    return sub($canvas) {
         Array::iter2d($aoa, sub($char, $x,$y) {
-            $set->($x,$y,$char);
+            setChar($canvas, $x,$y, $char);
         });
         return;
     }
@@ -91,12 +111,12 @@ sub c_fromAoA($aoa) {
 
 # from Array of Strings
 sub c_fromArray($array) {
-    return sub($set,$get,$w,$h) {
+    return sub($canvas) {
         my $y = 0;
         for my $line ( @$array ) {
             my $x = 0;
             for my $char ( split //, $line ) {
-                $set->($x++, $y, $char);
+                setChar($canvas, $x++, $y, $char);
             }
             $y++;
         }
@@ -105,27 +125,22 @@ sub c_fromArray($array) {
 }
 
 sub c_set($x,$y,$str) {
-    return sub($set,$get,$w,$h) {
+    return sub($canvas) {
         my $idx = 0;
         for my $char ( split //, $str ) {
-            $set->(($x+$idx++), $y, $char);
+            setChar($canvas, ($x+$idx++), $y, $char);
         }
         return;
     }
 }
 
 sub c_offset($ox,$oy, @draws) {
-    return sub($set,$get,$w,$h) {
-        my $newSet = sub($x,$y,$char) {
-            $set->($ox+$x, $oy+$y, $char);
-            return;
-        };
-        my $newGet = sub($x,$y) {
-            return $get->($ox+$x, $oy+$y);
-        };
+    return sub($canvas) {
+        addOffset($canvas, $ox,$oy);
         for my $draw ( @draws ) {
-            $draw->($newSet, $newGet, $w, $h);
+            $draw->($canvas);
         }
+        addOffset($canvas, -$ox,-$oy);
         return;
     }
 }
@@ -136,16 +151,16 @@ sub c_offset($ox,$oy, @draws) {
 # the same as calling c_offset(). But here you can set another background.
 sub c_canvas($width, $height, $default, @draws) {
     Carp::croak 'c_canvas($width,$height,$char,@draws)' if ref $default ne "";
-    return sub($setChar,$getChar,$w,$h) {
+    return sub($canvas) {
         # generates a new canvas, and does all drawing operation on it
-        my $canvas = c_run($width, $height, $default, @draws);
-        my $data   = $canvas->{data};
+        my $new  = c_run($width, $height, $default, @draws);
+        my $data = $new->{data};
 
         # than merge new canvas in current one
         my $idx = 0;
         for my $x ( 0 .. ($width-1) ) {
             for my $y ( 0 .. ($height-1) ) {
-                $setChar->($x,$y,$data->[$idx++]);
+                setChar($canvas, $x,$y, $data->[$idx++]);
             }
         }
 
@@ -154,22 +169,24 @@ sub c_canvas($width, $height, $default, @draws) {
 }
 
 sub c_iter($f) {
-    return sub($set,$get,$w,$h) {
-        for my $y ( 0 .. ($h-1) ) {
-            for my $x ( 0 .. ($w-1) ) {
-                $set->($x,$y, $f->($x,$y,$get->($x,$y)));
-            }
-        }
+    return sub($canvas) {
+        iter($canvas, sub($x,$y,$char){
+            setChar($canvas, $x,$y, $f->($x,$y,$char));
+        });
         return;
     }
 }
 
 sub c_fill($def) {
-    return c_iter(sub($x,$y,$char) { $def });
+    return sub($canvas) {
+        iter($canvas, sub($x,$y,$char){
+            setChar($canvas, $x,$y, $def);
+        });
+    }
 }
 
 sub c_line($xs,$ys, $xe,$ye, $char) {
-    return sub($set, $get, $w, $h) {
+    return sub($canvas) {
         my $dx  = abs($xe - $xs);
         my $sx  = $xs < $xe ? 1 : -1;
         my $dy  = -abs($ye - $ys);
@@ -178,7 +195,7 @@ sub c_line($xs,$ys, $xe,$ye, $char) {
         my $e2; # error value e_xy
 
         while (1) {
-            $set->($xs, $ys, $char);
+            setChar($canvas, $xs, $ys, $char);
             last if $xs == $xe && $ys == $ye;
             $e2 = 2 * $err;
             if ($e2 > $dy) { $err += $dy; $xs += $sx; }
@@ -602,12 +619,23 @@ is(
     'c_line 6');
 
 is(
-    c_string(5,5,".", c_rect(0,0, 4,4, '+')),
-    "+++++\n".
-    "+...+\n".
-    "+...+\n".
-    "+...+\n".
-    "+++++\n",
+    c_string(5,5,".", c_line(-5,-3, 12,9, '+')),
+    ".....\n".
+    "++...\n".
+    "..+..\n".
+    "...++\n".
+    ".....\n",
+    'c_line 7');
+
+is(
+    c_string(5,5,'.', c_rect(0,0, 4,4, '+')),
+    c_string(5,5,'.', c_fromArray([
+        "+++++",
+        "+...+",
+        "+...+",
+        "+...+",
+        "+++++",
+    ])),
     'c_rect 1');
 
 is(
@@ -618,3 +646,5 @@ is(
     ".+++.\n".
     ".....\n",
     'c_rect 2');
+
+done_testing;
