@@ -79,6 +79,15 @@ sub c_run($width, $height, $default, @draws) {
     return $canvas;
 }
 
+sub c_and(@draws) {
+    return sub($set,$get,$w,$h) {
+        for my $draw ( @draws ) {
+            $draw->($set,$get,$w,$h);
+        }
+        return;
+    }
+}
+
 # from Array of Array
 sub c_fromAoA($aoa) {
     return sub($set,$get,$w,$h) {
@@ -117,15 +126,6 @@ sub c_str($x,$y,$str) {
         my $idx = 0;
         for my $char ( split //, $str ) {
             $set->(($x+$idx++), $y, $char);
-        }
-        return;
-    }
-}
-
-sub c_and(@draws) {
-    return sub($set,$get,$w,$h) {
-        for my $draw ( @draws ) {
-            $draw->($set,$get,$w,$h);
         }
         return;
     }
