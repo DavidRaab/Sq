@@ -59,6 +59,13 @@ sub iter($canvas, $f) {
     return;
 }
 
+sub fill($canvas, $char) {
+    for my $x ( $canvas->{data}->@* ) {
+        $x = $char;
+    }
+    return;
+}
+
 # creates string out of $canvas
 sub to_string($canvas) {
     my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
@@ -116,11 +123,7 @@ sub c_fromArray($array) {
     return sub($canvas) {
         my $y = 0;
         for my $line ( @$array ) {
-            my $x = 0;
-            for my $char ( split //, $line ) {
-                setChar($canvas, $x++, $y, $char);
-            }
-            $y++;
+            setChar($canvas, 0,$y++, $line);
         }
         return;
     }
@@ -169,19 +172,18 @@ sub c_canvas($width, $height, $default, @draws) {
 
 sub c_iter($f) {
     return sub($canvas) {
-        iter($canvas, sub($x,$y,$char){
-            setChar($canvas, $x,$y, $f->($x,$y,$char));
-        });
+        my ($data,$cw,$ch) = $canvas->@{qw/data width height/};
+        for my $y ( 0 .. ($ch-1) ) {
+            for my $x ( 0 .. ($cw-1) ) {
+                setChar($canvas, $x,$y, $f->($x,$y,$data->[$cw*$y+$x]));
+            }
+        }
         return;
     }
 }
 
 sub c_fill($def) {
-    return sub($canvas) {
-        iter($canvas, sub($x,$y,$char){
-            setChar($canvas, $x,$y, $def);
-        });
-    }
+    return sub($canvas) { fill($canvas, $def) }
 }
 
 sub c_line($xs,$ys, $xe,$ye, $char) {
