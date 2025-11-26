@@ -176,6 +176,7 @@ sub c_offset($ox,$oy, @draws) {
 # explicitly, so more advanced effects are possible. Currently it is nearly
 # the same as calling c_offset(). But here you can set another background.
 sub c_canvas($width, $height, $default, @draws) {
+    Carp::croak 'c_canvas($width,$height,$char,@draws)' if ref $default ne "";
     return sub($setChar,$getChar,$w,$h) {
         my $canvas = create_canvas($width, $height, $default);
         my $set    = sub($x,$y,$char) { setChar($canvas, $x,$y, $char) };
@@ -255,8 +256,10 @@ is(
     "          \n",
     'canvas 1');
 
+
+my $canvas = c_canvas(20,20,".",c_fill('a'));
 is(
-    to_string(c_run(10,10,'.', c_fill('a'))),
+    to_string(c_run(10,10,'.', $canvas)),
     "aaaaaaaaaa\n".
     "aaaaaaaaaa\n".
     "aaaaaaaaaa\n".
@@ -269,14 +272,14 @@ is(
     "aaaaaaaaaa\n",
     'canvas 2');
 
+my $with_corner = c_and($canvas,
+    c_char(0,0, 'b'),
+    c_char(9,0, 'b'),
+    c_char(0,9, 'b'),
+    c_char(9,9, 'b'),
+);
 is(
-    to_string(c_run(10,10,'.',
-        c_fill('a'),
-        c_char(0,0, 'b'),
-        c_char(9,0, 'b'),
-        c_char(0,9, 'b'),
-        c_char(9,9, 'b'),
-    )),
+    to_string(c_run(10,10,'.',$with_corner)),
     "baaaaaaaab\n".
     "aaaaaaaaaa\n".
     "aaaaaaaaaa\n".
@@ -289,14 +292,9 @@ is(
     "baaaaaaaab\n",
     'canvas 3');
 
-
 is(
     to_string(c_run(10,10,'.',
-        c_fill('a'),
-        c_char(0,0, 'b'),
-        c_char(9,0, 'b'),
-        c_char(0,9, 'b'),
-        c_char(9,9, 'b'),
+        $with_corner,
         c_char(-1,0, 'c'),
         c_char(10,0, 'c'),
         c_char(5,-1, 'c'),
@@ -315,14 +313,9 @@ is(
     'canvas 4');
 
 my $box = c_canvas(4,4,'X');
-
 is(
     to_string(c_run(10,10,'.',
-        c_fill('a'),
-        c_char(0,0, 'b'),
-        c_char(9,0, 'b'),
-        c_char(0,9, 'b'),
-        c_char(9,9, 'b'),
+        $with_corner,
         c_char(-1,0, 'c'),
         c_char(10,0, 'c'),
         c_char(5,-1, 'c'),
@@ -343,16 +336,12 @@ is(
 
 is(
     to_string(c_run(10,10,'.',
-        c_fill('a'),
-        c_char(0,0, 'b'),
-        c_char(9,0, 'b'),
-        c_char(0,9, 'b'),
-        c_char(9,9, 'b'),
+        $with_corner,
         c_char(-1,0, 'c'),
         c_char(10,0, 'c'),
         c_char(5,-1, 'c'),
         c_char(5,10, 'c'),
-        c_offset( 3, 3, $box),
+        c_offset( 3, 3, $box), # middle
         c_offset( 3,-3, $box), # top
         c_offset(-3, 3, $box), # left
         c_offset( 9, 3, $box), # right
