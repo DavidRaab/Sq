@@ -13,8 +13,8 @@ sub create_canvas($width, $height, $default=" ") {
     };
 }
 
-# data is a single array that emulates a 2D Array,
-# so $x,$y must be converted into an offset
+# data is a single array that emulates a 2D Array, so $x,$y must be converted
+# into an offset. Position outside canvas are ignored
 sub setChar($canvas, $x,$y, $char) {
     my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
     return if $x < 0 || $x >= $cw;
@@ -56,6 +56,7 @@ sub cwrite($canvas, $x,$y, $str) {
     return;
 }
 
+# completely fills a canvas with a character
 sub fill($canvas, $char) {
     my $data = $canvas->{data};
     for my $x ( @$data ) {
@@ -64,6 +65,7 @@ sub fill($canvas, $char) {
     return;
 }
 
+# inserts $other_canvas into $canvas at position $x,$y
 sub insert($canvas, $x,$y, $other_canvas) {
     my ($w,$h,$data) = $canvas->@{qw/width height data/};
     my $oc           = $other_canvas;
@@ -82,6 +84,7 @@ sub insert($canvas, $x,$y, $other_canvas) {
     return;
 }
 
+# creates string out of $canvas
 sub to_string($canvas) {
     my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
 
