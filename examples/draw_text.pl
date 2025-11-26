@@ -45,15 +45,6 @@ sub iter($canvas, $f) {
     return;
 }
 
-# completely fills a canvas with a character
-sub fill($canvas, $char) {
-    my $data = $canvas->{data};
-    for my $x ( @$data ) {
-        $x = $char;
-    }
-    return;
-}
-
 # inserts $other_canvas into $canvas at position $x,$y -- does clipping
 sub insert($canvas, $x,$y, $other_canvas) {
     my ($w,$h,$data) = $canvas->@{qw/width height data/};
