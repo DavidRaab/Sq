@@ -138,6 +138,19 @@ sub c_offset($ox,$oy,$combinator) {
     }
 }
 
+sub c_canvas($width, $height, $default, @draws) {
+    return sub($setChar) {
+        my $canvas = create_canvas($width, $height, $default);
+        my $set    = sub($x,$y,$char) { setChar($canvas, $x,$y, $char) };
+        for my $draw ( @draws ) {
+            $draw->($set);
+        }
+        iter($canvas, sub($x,$y,$char) {
+            $setChar->($x,$y,$char);
+        });
+        return;
+    }
+}
 
 ### Tests
 
@@ -300,3 +313,35 @@ is(
     "........\n".
     "..a..a..\n",
     'combinator 4');
+
+is(
+    to_string(
+        c_run(9,9,".", c_and(
+            c_offset(0,0,
+                c_canvas(3,3, "o",
+                    c_char(0,0, "X"), c_char(2,0, "X"),
+                    c_char(0,2, "X"), c_char(2,2, "X"))),
+            c_offset(6,0,
+                c_canvas(3,3, "o",
+                    c_char(0,0, "X"), c_char(2,0, "X"),
+                    c_char(0,2, "X"), c_char(2,2, "X"))),
+            c_offset(0,6,
+                c_canvas(3,3, "o",
+                    c_char(0,0, "X"), c_char(2,0, "X"),
+                    c_char(0,2, "X"), c_char(2,2, "X"))),
+            c_offset(6,6,
+                c_canvas(3,3, "o",
+                    c_char(0,0, "X"), c_char(2,0, "X"),
+                    c_char(0,2, "X"), c_char(2,2, "X")))
+        ))
+    ),
+    "XoX...XoX\n".
+    "ooo...ooo\n".
+    "XoX...XoX\n".
+    ".........\n".
+    ".........\n".
+    ".........\n".
+    "XoX...XoX\n".
+    "ooo...ooo\n".
+    "XoX...XoX\n",
+    'c_canvas 1');
