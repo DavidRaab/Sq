@@ -99,12 +99,21 @@ sub line($canvas, $xs,$ys, $xe,$ye, $char) {
     return;
 }
 
+
+sub rect($canvas, $tx,$ty, $bx,$by, $char) {
+    line($canvas, $tx,$ty, $bx,$ty, $char); # top
+    line($canvas, $tx,$ty, $tx,$by, $char); # left
+    line($canvas, $bx,$ty, $bx,$by, $char); # right
+    line($canvas, $tx,$by, $bx,$by, $char); # bottom
+    return;
+}
+
 sub show_canvas($canvas) {
     print to_string($canvas);
 }
 
 ### Combinator API
-# Build on top of the five basic functions
+# Build on top of the basic functions
 
 sub c_run($width, $height, $default, @draws) {
     my $canvas = create_canvas($width, $height, $default);
@@ -207,12 +216,7 @@ sub c_line($xs,$ys, $xe,$ye, $char) {
 }
 
 sub c_rect($tx,$ty, $bx,$by, $char) {
-    return
-        c_and(
-            c_line($tx,$ty, $bx,$ty, $char), # top
-            c_line($tx,$ty, $tx,$by, $char), # left
-            c_line($bx,$ty, $bx,$by, $char), # right
-            c_line($tx,$by, $bx,$by, $char)) # bottom
+    return sub($canvas) { rect($canvas, $tx,$ty, $bx,$by, $char) }
 }
 
 # vertically splits space into same amounts
