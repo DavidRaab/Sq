@@ -81,6 +81,24 @@ sub to_string($canvas) {
     return $str;
 }
 
+sub line($canvas, $xs,$ys, $xe,$ye, $char) {
+    my $dx  = abs($xe - $xs);
+    my $sx  = $xs < $xe ? 1 : -1;
+    my $dy  = -abs($ye - $ys);
+    my $sy  = $ys < $ye ? 1 : -1;
+    my $err = $dx + $dy;
+    my $e2; # error value e_xy
+
+    while (1) {
+        setChar($canvas, $xs, $ys, $char);
+        last if $xs == $xe && $ys == $ye;
+        $e2 = 2 * $err;
+        if ($e2 > $dy) { $err += $dy; $xs += $sx; }
+        if ($e2 < $dx) { $err += $dx; $ys += $sy; }
+    }
+    return;
+}
+
 sub show_canvas($canvas) {
     print to_string($canvas);
 }
@@ -188,23 +206,7 @@ sub c_fill($def) {
 }
 
 sub c_line($xs,$ys, $xe,$ye, $char) {
-    return sub($canvas) {
-        my $dx  = abs($xe - $xs);
-        my $sx  = $xs < $xe ? 1 : -1;
-        my $dy  = -abs($ye - $ys);
-        my $sy  = $ys < $ye ? 1 : -1;
-        my $err = $dx + $dy;
-        my $e2; # error value e_xy
-
-        while (1) {
-            setChar($canvas, $xs, $ys, $char);
-            last if $xs == $xe && $ys == $ye;
-            $e2 = 2 * $err;
-            if ($e2 > $dy) { $err += $dy; $xs += $sx; }
-            if ($e2 < $dx) { $err += $dx; $ys += $sy; }
-        }
-        return;
-    }
+    return sub($canvas) { line($canvas, $xs,$ys, $xe,$ye, $char) }
 }
 
 sub c_rect($tx,$ty, $bx,$by, $char) {
