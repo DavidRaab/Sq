@@ -79,6 +79,16 @@ sub c_run($width, $height, $default, @draws) {
     return $canvas;
 }
 
+sub c_string($width, $height, $default, @draws) {
+    my $canvas  = create_canvas($width, $height, $default);
+    my $setChar = sub($x,$y,$char) { setChar($canvas, $x,$y, $char) };
+    my $getChar = sub($x,$y)       { getChar($canvas, $x,$y)        };
+    for my $draw ( @draws ) {
+        $draw->($setChar,$getChar,$width,$height);
+    }
+    return to_string($canvas);
+}
+
 sub c_and(@draws) {
     return sub($set,$get,$w,$h) {
         for my $draw ( @draws ) {
@@ -206,6 +216,11 @@ sub c_rect($tx,$ty, $bx,$by, $char) {
 ### Tests
 
 is(
+    to_string(c_run(5,5,'.', c_set(3,3,'X') )),
+    c_string(5,5,'.',        c_set(3,3,'X') ),
+    'c_string is the same as to_string(c_run())');
+
+is(
     to_string({
         data   => [1,2,3,4,5,".",".",".",".",".",".",".",".",".","."],
         height => 3,
@@ -228,7 +243,7 @@ is(
     'to_string 2');
 
 is(
-    to_string(c_run(10,10,' ',
+    c_string(10,10,' ',
         c_set( 0,0, "a"),
         c_set(1,0, "a"),
         c_set( 2,0, "a"),
@@ -239,7 +254,7 @@ is(
         c_set(-3,0, "abcdefghijkl"),
         c_set(-3,0, "TTTT"),
         c_set(-3,4, "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"),
-    )),
+    ),
     "Tefghijkl \n".
     "aa        \n".
     "          \n".
@@ -255,7 +270,7 @@ is(
 
 my $canvas = c_canvas(20,20,".",c_fill('a'));
 is(
-    to_string(c_run(10,10,'.', $canvas)),
+    c_string(10,10,'.', $canvas),
     "aaaaaaaaaa\n".
     "aaaaaaaaaa\n".
     "aaaaaaaaaa\n".
@@ -275,7 +290,7 @@ my $with_corner = c_and($canvas,
     c_set(9,9, 'b'),
 );
 is(
-    to_string(c_run(10,10,'.',$with_corner)),
+    c_string(10,10,'.',$with_corner),
     "baaaaaaaab\n".
     "aaaaaaaaaa\n".
     "aaaaaaaaaa\n".
@@ -289,13 +304,13 @@ is(
     'canvas 3');
 
 is(
-    to_string(c_run(10,10,'.',
+    c_string(10,10,'.',
         $with_corner,
         c_set(-1,0, 'c'),
         c_set(10,0, 'c'),
         c_set(5,-1, 'c'),
         c_set(5,10, 'c'),
-    )),
+    ),
     "baaaaaaaab\n".
     "aaaaaaaaaa\n".
     "aaaaaaaaaa\n".
@@ -310,14 +325,14 @@ is(
 
 my $box = c_canvas(4,4,'X');
 is(
-    to_string(c_run(10,10,'.',
+    c_string(10,10,'.',
         $with_corner,
         c_set(-1,0, 'c'),
         c_set(10,0, 'c'),
         c_set(5,-1, 'c'),
         c_set(5,10, 'c'),
         c_offset(3,3, $box),
-    )),
+    ),
     "baaaaaaaab\n".
     "aaaaaaaaaa\n".
     "aaaaaaaaaa\n".
@@ -331,7 +346,7 @@ is(
     'canvas 5');
 
 is(
-    to_string(c_run(10,10,'.',
+    c_string(10,10,'.',
         $with_corner,
         c_set(-1,0, 'c'),
         c_set(10,0, 'c'),
@@ -342,7 +357,7 @@ is(
         c_offset(-3, 3, $box), # left
         c_offset( 9, 3, $box), # right
         c_offset( 3, 9, $box), # bottom
-    )),
+    ),
     "baaXXXXaab\n".
     "aaaaaaaaaa\n".
     "aaaaaaaaaa\n".
@@ -363,7 +378,7 @@ my $cbox =
         c_set(3,3,'a'));
 
 is(
-    to_string(c_run(4,4," ",$cbox)),
+    c_string(4,4," ",$cbox),
     "a  a\n".
     "    \n".
     "    \n".
@@ -371,7 +386,7 @@ is(
     'combinator 1');
 
 is(
-    to_string(c_run(4,4,".",$cbox)),
+    c_string(4,4,".",$cbox),
     "a..a\n".
     "....\n".
     "....\n".
@@ -379,7 +394,7 @@ is(
     'combinator 2');
 
 is(
-    to_string(c_run(6,6,".",$cbox)),
+    c_string(6,6,".",$cbox),
     "a..a..\n".
     "......\n".
     "......\n".
@@ -389,7 +404,7 @@ is(
     'combinator 3');
 
 is(
-    to_string(c_run(8,6,".", c_offset(2,2,$cbox))),
+    c_string(8,6,".", c_offset(2,2,$cbox)),
     "........\n".
     "........\n".
     "..a..a..\n".
@@ -405,13 +420,11 @@ is(
             c_set(0,2, "X"), c_set(2,2, "X"));
 
     is(
-        to_string(
-            c_run(9,9,".",
-                c_offset(0,0, $box),
-                c_offset(6,0, $box),
-                c_offset(0,6, $box),
-                c_offset(6,6, $box))
-        ),
+        c_string(9,9,".",
+            c_offset(0,0, $box),
+            c_offset(6,0, $box),
+            c_offset(0,6, $box),
+            c_offset(6,6, $box)),
         "XoX...XoX\n".
         "ooo...ooo\n".
         "XoX...XoX\n".
@@ -425,43 +438,43 @@ is(
 }
 
 is(
-    to_string(c_run(8,3,".", c_set(0,0,"12345"))),
+    c_string(8,3,".", c_set(0,0,"12345")),
     "12345...\n".
     "........\n".
     "........\n",
     'c_str 1');
 
 is(
-    to_string(c_run(8,3,".", c_set(0,1,"12345"))),
+    c_string(8,3,".", c_set(0,1,"12345")),
     "........\n".
     "12345...\n".
     "........\n",
     'c_str 2');
 
 is(
-    to_string(c_run(8,3,".", c_set(0,2,"12345"))),
+    c_string(8,3,".", c_set(0,2,"12345")),
     "........\n".
     "........\n".
     "12345...\n",
     'c_str 3');
 
 is(
-    to_string(c_run(8,3,".",
+    c_string(8,3,".",
         c_fill('o'),
-        c_set(0,2,"12345"))),
+        c_set(0,2,"12345")),
     "oooooooo\n".
     "oooooooo\n".
     "12345ooo\n",
     'c_str 4');
 
 is(
-    to_string(c_run(4,4,".",
+    c_string(4,4,".",
         c_fromAoA([
             [qw/o o o o/],
             [qw/o o o o/],
             [qw/o o o o/],
             [qw/o o o o/],
-        ]))),
+        ])),
     "oooo\n".
     "oooo\n".
     "oooo\n".
@@ -469,7 +482,7 @@ is(
     'c_fromAoA 1');
 
 is(
-    to_string(c_run(4,4,".",
+    c_string(4,4,".",
         c_fromAoA([
             [qw/o o o o/],
             [qw/o o o o/],
@@ -479,7 +492,7 @@ is(
         c_set(0,0, 'X'),
         c_set(1,1, 'X'),
         c_set(2,2, 'X'),
-        c_set(3,3, 'X'))),
+        c_set(3,3, 'X')),
     "Xooo\n".
     "oXoo\n".
     "ooXo\n".
@@ -487,13 +500,13 @@ is(
     'c_fromAoA 2');
 
 is(
-    to_string(c_run(4,4,".",
+    c_string(4,4,".",
         c_fromArray([
             "oooo",
             "oooo",
             "oooo",
             "oooo",
-        ]))),
+        ])),
     "oooo\n".
     "oooo\n".
     "oooo\n".
@@ -501,8 +514,38 @@ is(
     'c_fromArray 1');
 
 is(
-    to_string(
-        c_run(4,4,'.',
+    c_string(4,4,'.',
+        c_fromArray([
+            "oooo",
+            "oooo",
+            "oooo",
+            "oooo",
+        ]),
+        c_set(0,0, 'X'),
+        c_set(1,1, 'X'),
+        c_set(2,2, 'X'),
+        c_set(3,3, 'X')),
+    "Xooo\n".
+    "oXoo\n".
+    "ooXo\n".
+    "oooX\n",
+    'c_fromArray 2');
+
+is(
+    c_string(9,5,".",
+        c_offset(0,0,
+            c_fromAoA([
+                [qw/o o o o/],
+                [qw/o o o o/],
+                [qw/o o o o/],
+                [qw/o o o o/],
+            ]),
+            c_set(0,0, 'X'),
+            c_set(1,1, 'X'),
+            c_set(2,2, 'X'),
+            c_set(3,3, 'X')),
+
+        c_offset(5,0,
             c_fromArray([
                 "oooo",
                 "oooo",
@@ -513,38 +556,6 @@ is(
             c_set(1,1, 'X'),
             c_set(2,2, 'X'),
             c_set(3,3, 'X'))),
-    "Xooo\n".
-    "oXoo\n".
-    "ooXo\n".
-    "oooX\n",
-    'c_fromArray 2');
-
-is(
-    to_string(
-        c_run(9,5,".",
-            c_offset(0,0,
-                c_fromAoA([
-                    [qw/o o o o/],
-                    [qw/o o o o/],
-                    [qw/o o o o/],
-                    [qw/o o o o/],
-                ]),
-                c_set(0,0, 'X'),
-                c_set(1,1, 'X'),
-                c_set(2,2, 'X'),
-                c_set(3,3, 'X')),
-
-            c_offset(5,0,
-                c_fromArray([
-                    "oooo",
-                    "oooo",
-                    "oooo",
-                    "oooo",
-                ]),
-                c_set(0,0, 'X'),
-                c_set(1,1, 'X'),
-                c_set(2,2, 'X'),
-                c_set(3,3, 'X')))),
     "Xooo.Xooo\n".
     "oXoo.oXoo\n".
     "ooXo.ooXo\n".
@@ -553,9 +564,7 @@ is(
     'c_fromAoA and c_fromArray');
 
 is(
-    to_string(
-        c_run(5,5,".",
-            c_line(0,0, 4,4, '+'))),
+    c_string(5,5,".", c_line(0,0, 4,4, '+')),
     "+....\n".
     ".+...\n".
     "..+..\n".
@@ -564,9 +573,7 @@ is(
     'c_line 1');
 
 is(
-    to_string(
-        c_run(5,5,".",
-            c_line(0,0, 4,0, '+'))),
+    c_string(5,5,".", c_line(0,0, 4,0, '+')),
     "+++++\n".
     ".....\n".
     ".....\n".
@@ -575,9 +582,7 @@ is(
     'c_line 2');
 
 is(
-    to_string(
-        c_run(5,5,".",
-            c_line(0,0, 0,4, '+'))),
+    c_string(5,5,".", c_line(0,0, 0,4, '+')),
     "+....\n".
     "+....\n".
     "+....\n".
@@ -586,9 +591,7 @@ is(
     'c_line 3');
 
 is(
-    to_string(
-        c_run(5,5,".",
-            c_line(0,0, 4,3, '+'))),
+    c_string(5,5,".", c_line(0,0, 4,3, '+')),
     "+....\n".
     ".++..\n".
     "...+.\n".
@@ -597,9 +600,7 @@ is(
     'c_line 4');
 
 is(
-    to_string(
-        c_run(5,5,".",
-            c_line(0,0, 4,2, '+'))),
+    c_string(5,5,".", c_line(0,0, 4,2, '+')),
     "++...\n".
     "..++.\n".
     "....+\n".
@@ -608,9 +609,7 @@ is(
     'c_line 5');
 
 is(
-    to_string(
-        c_run(5,5,".",
-            c_line(0,0, 4,1, '+'))),
+    c_string(5,5,".", c_line(0,0, 4,1, '+')),
     "+++..\n".
     "...++\n".
     ".....\n".
@@ -619,9 +618,7 @@ is(
     'c_line 6');
 
 is(
-    to_string(
-        c_run(5,5,".",
-            c_rect(0,0, 4,4, '+'))),
+    c_string(5,5,".", c_rect(0,0, 4,4, '+')),
     "+++++\n".
     "+...+\n".
     "+...+\n".
@@ -630,9 +627,7 @@ is(
     'c_rect 1');
 
 is(
-    to_string(
-        c_run(5,5,".",
-            c_rect(1,1, 3,3, '+'))),
+    c_string(5,5,".", c_rect(1,1, 3,3, '+')),
     ".....\n".
     ".+++.\n".
     ".+.+.\n".
