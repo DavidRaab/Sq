@@ -3,6 +3,7 @@ use 5.040;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Sq -sig => 1;
+use Sq::Test;
 
 sub create_canvas($width, $height, $default=" ") {
     return {
@@ -31,6 +32,22 @@ sub cwrite($canvas, $x,$y, $str) {
     return;
 }
 
+sub fill($canvas, $char) {
+    my $data = $canvas->{data};
+    for my $x ( @$data ) {
+        $x = $char;
+    }
+    return;
+}
+
+sub insert($canvas, $x,$y, $other_canvas) {
+    my ($w,$h,$data) = $canvas->@{qw/width height data/};
+    # when target position is
+    # if
+
+    return;
+}
+
 sub to_string($canvas) {
     my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
 
@@ -49,6 +66,8 @@ sub show_canvas($canvas) {
 }
 
 
+### Tests
+
 my $canvas = create_canvas(10,10);
 cwrite($canvas, 0,0, "a");
 cwrite($canvas, 1,0, "a");
@@ -62,4 +81,33 @@ cwrite($canvas,  3,3, "xxxxxxxxxxxxxx");
 cwrite($canvas, -3,0, "abcdefghijkl");
 cwrite($canvas, -3,0, "TTTT");
 cwrite($canvas, -3,4, "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT");
-show_canvas($canvas);
+is(
+    to_string($canvas),
+    "Tefghijkl \n".
+    "aa        \n".
+    "          \n".
+    "   xxxxxxx\n".
+    "TTTTTTTTTT\n".
+    "          \n".
+    "          \n".
+    "          \n".
+    "          \n".
+    "          \n",
+    'canvas 1');
+
+# show_canvas($canvas);
+
+fill($canvas, 'a');
+is(
+    to_string($canvas),
+    "aaaaaaaaaa\n".
+    "aaaaaaaaaa\n".
+    "aaaaaaaaaa\n".
+    "aaaaaaaaaa\n".
+    "aaaaaaaaaa\n".
+    "aaaaaaaaaa\n".
+    "aaaaaaaaaa\n".
+    "aaaaaaaaaa\n".
+    "aaaaaaaaaa\n".
+    "aaaaaaaaaa\n",
+    'canvas 2');
