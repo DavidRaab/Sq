@@ -122,21 +122,29 @@ sub c_run($width, $height, $default, @draws) {
     return $canvas;
 }
 
-sub c_fromAoA($default, $aoa, @draws) {
-    my $new    = Array::fill2d($aoa, $default);
-    my $height = @$new;
-    my $width  = $new->[0]->@*;
-    my $canvas = sq {
-        width  => $width,
-        height => $height,
-        data   => $new->flatten,
-    };
-    my $set = sub($x,$y,$char) { setChar($canvas, $x,$y, $char) };
-    my $get = sub($x,$y)       { getChar($canvas, $x,$y)        };
-    for my $draw ( @draws ) {
-        $draw->($set, $get, $width, $height);
+# from Array of Array
+sub c_fromAoA($aoa) {
+    return sub($set,$get,$w,$h) {
+        Array::iter2d($aoa, sub($char, $x,$y) {
+            $set->($x,$y,$char);
+        });
+        return;
     }
-    return $canvas;
+}
+
+# from Array of Strings
+sub c_fromArray($array) {
+    return sub($set,$get,$w,$h) {
+        my $y = 0;
+        for my $line ( @$array ) {
+            my $x = 0;
+            for my $char ( split //, $line ) {
+                $set->($x++, $y, $char);
+            }
+            $y++;
+        }
+        return;
+    }
 }
 
 sub c_char($x,$y,$char) {
@@ -166,7 +174,7 @@ sub c_and(@draws) {
     }
 }
 
-sub c_offset($ox,$oy,$combinator) {
+sub c_offset($ox,$oy, @draws) {
     return sub($set,$get,$w,$h) {
         my $newSet = sub($x,$y,$char) {
             $set->($ox+$x, $oy+$y, $char);
@@ -175,7 +183,9 @@ sub c_offset($ox,$oy,$combinator) {
         my $newGet = sub($x,$y) {
             return $get->($ox+$x, $oy+$y);
         };
-        $combinator->($newSet, $newGet, $w, $h);
+        for my $draw ( @draws ) {
+            $draw->($newSet, $newGet, $w, $h);
+        }
         return;
     }
 }
@@ -456,12 +466,13 @@ is(
     'c_str 4');
 
 is(
-    to_string(c_fromAoA("x", [
-        [qw/o o o o/],
-        [qw/o o o o/],
-        [qw/o o o o/],
-        [qw/o o o o/],
-    ])),
+    to_string(c_run(4,4,".",
+        c_fromAoA([
+            [qw/o o o o/],
+            [qw/o o o o/],
+            [qw/o o o o/],
+            [qw/o o o o/],
+        ]))),
     "oooo\n".
     "oooo\n".
     "oooo\n".
@@ -469,20 +480,86 @@ is(
     'c_fromAoA 1');
 
 is(
-    to_string(c_fromAoA("x", [
+    to_string(c_run(4,4,".",
+        c_fromAoA([
             [qw/o o o o/],
             [qw/o o o o/],
             [qw/o o o o/],
             [qw/o o o o/],
-        ],
+        ]),
         c_char(0,0, 'X'),
         c_char(1,1, 'X'),
         c_char(2,2, 'X'),
-        c_char(3,3, 'X')
-    )),
+        c_char(3,3, 'X'))),
     "Xooo\n".
     "oXoo\n".
     "ooXo\n".
     "oooX\n",
     'c_fromAoA 2');
 
+is(
+    to_string(c_run(4,4,".",
+        c_fromArray([
+            "oooo",
+            "oooo",
+            "oooo",
+            "oooo",
+        ]))),
+    "oooo\n".
+    "oooo\n".
+    "oooo\n".
+    "oooo\n",
+    'c_fromArray 1');
+
+is(
+    to_string(
+        c_run(4,4,'.',
+            c_fromArray([
+                "oooo",
+                "oooo",
+                "oooo",
+                "oooo",
+            ]),
+            c_char(0,0, 'X'),
+            c_char(1,1, 'X'),
+            c_char(2,2, 'X'),
+            c_char(3,3, 'X'))),
+    "Xooo\n".
+    "oXoo\n".
+    "ooXo\n".
+    "oooX\n",
+    'c_fromArray 2');
+
+
+is(
+    to_string(
+        c_run(9,5,".",
+            c_offset(0,0,
+                c_fromAoA([
+                    [qw/o o o o/],
+                    [qw/o o o o/],
+                    [qw/o o o o/],
+                    [qw/o o o o/],
+                ]),
+                c_char(0,0, 'X'),
+                c_char(1,1, 'X'),
+                c_char(2,2, 'X'),
+                c_char(3,3, 'X')),
+
+            c_offset(5,0,
+                c_fromArray([
+                    "oooo",
+                    "oooo",
+                    "oooo",
+                    "oooo",
+                ]),
+                c_char(0,0, 'X'),
+                c_char(1,1, 'X'),
+                c_char(2,2, 'X'),
+                c_char(3,3, 'X')))),
+    "Xooo.Xooo\n".
+    "oXoo.oXoo\n".
+    "ooXo.ooXo\n".
+    "oooX.oooX\n".
+    ".........\n",
+    'c_fromAoA 2');
