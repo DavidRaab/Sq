@@ -45,25 +45,6 @@ sub iter($canvas, $f) {
     return;
 }
 
-# inserts $other_canvas into $canvas at position $x,$y -- does clipping
-sub insert($canvas, $x,$y, $other_canvas) {
-    my ($w,$h,$data) = $canvas->@{qw/width height data/};
-    my $oc           = $other_canvas;
-
-    # when x,y is outside canvas (right,bottom) immediately abort
-    return if $x > $w && $y > $h;
-    # when x,y is too far top/left outside canvas without that anything
-    # clips into $canvas, also abort.
-    return if ($x + $oc->{width})  < 0;
-    return if ($y + $oc->{height}) < 0;
-
-    iter($other_canvas, sub($ox,$oy,$char) {
-        setChar($canvas, ($x+$ox), ($y+$oy), $char);
-    });
-
-    return;
-}
-
 # creates string out of $canvas
 sub to_string($canvas) {
     my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
