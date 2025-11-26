@@ -888,7 +888,7 @@ sub tail($array) {
 #          Here are functions designed for working with 2D Arrays             #
 #-----------------------------------------------------------------------------#
 
-sub fill2d($aoa, $f) {
+sub fill2d($aoa, $init) {
     my $maxX = 0;
     for my $array ( @$aoa ) {
         my $l = @$array;
@@ -905,7 +905,7 @@ sub fill2d($aoa, $f) {
                 push @inner, $value;
             }
             else {
-                push @inner, Sq::init($f, $x, $y);
+                push @inner, Sq::init($init, $x, $y);
             }
         }
         $y++;
