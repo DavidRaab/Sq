@@ -113,15 +113,7 @@ sub c_fromArray($array) {
     }
 }
 
-sub c_char($x,$y,$char) {
-    Carp::croak "c_char: must be a single char." if length($char) != 1;
-    return sub($set,$get,$w,$h) {
-        $set->($x,$y,$char);
-        return;
-    }
-}
-
-sub c_str($x,$y,$str) {
+sub c_set($x,$y,$str) {
     return sub($set,$get,$w,$h) {
         my $idx = 0;
         for my $char ( split //, $str ) {
@@ -237,16 +229,16 @@ is(
 
 is(
     to_string(c_run(10,10,' ',
-        c_char( 0,0, "a"),
-        c_char( 1,0, "a"),
-        c_char( 2,0, "a"),
-        c_char( 0,1, "a"),
-        c_char( 1,1, "a"),
-        c_char( 1,1, "a"),
-        c_str ( 3,3, "xxxxxxxxxxxxxx"),
-        c_str (-3,0, "abcdefghijkl"),
-        c_str (-3,0, "TTTT"),
-        c_str (-3,4, "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"),
+        c_set( 0,0, "a"),
+        c_set(1,0, "a"),
+        c_set( 2,0, "a"),
+        c_set( 0,1, "a"),
+        c_set( 1,1, "a"),
+        c_set( 1,1, "a"),
+        c_set( 3,3, "xxxxxxxxxxxxxx"),
+        c_set(-3,0, "abcdefghijkl"),
+        c_set(-3,0, "TTTT"),
+        c_set(-3,4, "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"),
     )),
     "Tefghijkl \n".
     "aa        \n".
@@ -277,10 +269,10 @@ is(
     'canvas 2');
 
 my $with_corner = c_and($canvas,
-    c_char(0,0, 'b'),
-    c_char(9,0, 'b'),
-    c_char(0,9, 'b'),
-    c_char(9,9, 'b'),
+    c_set(0,0, 'b'),
+    c_set(9,0, 'b'),
+    c_set(0,9, 'b'),
+    c_set(9,9, 'b'),
 );
 is(
     to_string(c_run(10,10,'.',$with_corner)),
@@ -299,10 +291,10 @@ is(
 is(
     to_string(c_run(10,10,'.',
         $with_corner,
-        c_char(-1,0, 'c'),
-        c_char(10,0, 'c'),
-        c_char(5,-1, 'c'),
-        c_char(5,10, 'c'),
+        c_set(-1,0, 'c'),
+        c_set(10,0, 'c'),
+        c_set(5,-1, 'c'),
+        c_set(5,10, 'c'),
     )),
     "baaaaaaaab\n".
     "aaaaaaaaaa\n".
@@ -320,10 +312,10 @@ my $box = c_canvas(4,4,'X');
 is(
     to_string(c_run(10,10,'.',
         $with_corner,
-        c_char(-1,0, 'c'),
-        c_char(10,0, 'c'),
-        c_char(5,-1, 'c'),
-        c_char(5,10, 'c'),
+        c_set(-1,0, 'c'),
+        c_set(10,0, 'c'),
+        c_set(5,-1, 'c'),
+        c_set(5,10, 'c'),
         c_offset(3,3, $box),
     )),
     "baaaaaaaab\n".
@@ -341,10 +333,10 @@ is(
 is(
     to_string(c_run(10,10,'.',
         $with_corner,
-        c_char(-1,0, 'c'),
-        c_char(10,0, 'c'),
-        c_char(5,-1, 'c'),
-        c_char(5,10, 'c'),
+        c_set(-1,0, 'c'),
+        c_set(10,0, 'c'),
+        c_set(5,-1, 'c'),
+        c_set(5,10, 'c'),
         c_offset( 3, 3, $box), # middle
         c_offset( 3,-3, $box), # top
         c_offset(-3, 3, $box), # left
@@ -365,10 +357,10 @@ is(
 
 my $cbox =
     c_and(
-        c_char(0,0,'a'),
-        c_char(3,0,'a'),
-        c_char(0,3,'a'),
-        c_char(3,3,'a'));
+        c_set(0,0,'a'),
+        c_set(3,0,'a'),
+        c_set(0,3,'a'),
+        c_set(3,3,'a'));
 
 is(
     to_string(c_run(4,4," ",$cbox)),
@@ -409,8 +401,8 @@ is(
 {
     my $box =
         c_canvas(3,3, "o",
-            c_char(0,0, "X"), c_char(2,0, "X"),
-            c_char(0,2, "X"), c_char(2,2, "X"));
+            c_set(0,0, "X"), c_set(2,0, "X"),
+            c_set(0,2, "X"), c_set(2,2, "X"));
 
     is(
         to_string(
@@ -433,21 +425,21 @@ is(
 }
 
 is(
-    to_string(c_run(8,3,".", c_str(0,0,"12345"))),
+    to_string(c_run(8,3,".", c_set(0,0,"12345"))),
     "12345...\n".
     "........\n".
     "........\n",
     'c_str 1');
 
 is(
-    to_string(c_run(8,3,".", c_str(0,1,"12345"))),
+    to_string(c_run(8,3,".", c_set(0,1,"12345"))),
     "........\n".
     "12345...\n".
     "........\n",
     'c_str 2');
 
 is(
-    to_string(c_run(8,3,".", c_str(0,2,"12345"))),
+    to_string(c_run(8,3,".", c_set(0,2,"12345"))),
     "........\n".
     "........\n".
     "12345...\n",
@@ -456,7 +448,7 @@ is(
 is(
     to_string(c_run(8,3,".",
         c_fill('o'),
-        c_str(0,2,"12345"))),
+        c_set(0,2,"12345"))),
     "oooooooo\n".
     "oooooooo\n".
     "12345ooo\n",
@@ -484,10 +476,10 @@ is(
             [qw/o o o o/],
             [qw/o o o o/],
         ]),
-        c_char(0,0, 'X'),
-        c_char(1,1, 'X'),
-        c_char(2,2, 'X'),
-        c_char(3,3, 'X'))),
+        c_set(0,0, 'X'),
+        c_set(1,1, 'X'),
+        c_set(2,2, 'X'),
+        c_set(3,3, 'X'))),
     "Xooo\n".
     "oXoo\n".
     "ooXo\n".
@@ -517,16 +509,15 @@ is(
                 "oooo",
                 "oooo",
             ]),
-            c_char(0,0, 'X'),
-            c_char(1,1, 'X'),
-            c_char(2,2, 'X'),
-            c_char(3,3, 'X'))),
+            c_set(0,0, 'X'),
+            c_set(1,1, 'X'),
+            c_set(2,2, 'X'),
+            c_set(3,3, 'X'))),
     "Xooo\n".
     "oXoo\n".
     "ooXo\n".
     "oooX\n",
     'c_fromArray 2');
-
 
 is(
     to_string(
@@ -538,10 +529,10 @@ is(
                     [qw/o o o o/],
                     [qw/o o o o/],
                 ]),
-                c_char(0,0, 'X'),
-                c_char(1,1, 'X'),
-                c_char(2,2, 'X'),
-                c_char(3,3, 'X')),
+                c_set(0,0, 'X'),
+                c_set(1,1, 'X'),
+                c_set(2,2, 'X'),
+                c_set(3,3, 'X')),
 
             c_offset(5,0,
                 c_fromArray([
@@ -550,16 +541,16 @@ is(
                     "oooo",
                     "oooo",
                 ]),
-                c_char(0,0, 'X'),
-                c_char(1,1, 'X'),
-                c_char(2,2, 'X'),
-                c_char(3,3, 'X')))),
+                c_set(0,0, 'X'),
+                c_set(1,1, 'X'),
+                c_set(2,2, 'X'),
+                c_set(3,3, 'X')))),
     "Xooo.Xooo\n".
     "oXoo.oXoo\n".
     "ooXo.ooXo\n".
     "oooX.oooX\n".
     ".........\n",
-    'c_fromAoA 2');
+    'c_fromAoA and c_fromArray');
 
 is(
     to_string(
