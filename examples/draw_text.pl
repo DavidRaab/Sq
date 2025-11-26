@@ -202,3 +202,23 @@ is(
     "aaaaaaaaaa\n".
     "baaaaaaaab\n",
     'canvas 5');
+
+insert($canvas,  3,-3, $box); # top
+insert($canvas, -3, 3, $box); # left
+insert($canvas,  9, 3, $box); # right
+insert($canvas,  3, 9, $box); # bottom
+
+is(
+    to_string($canvas),
+    "baaXXXXaab\n".
+    "aaaaaaaaaa\n".
+    "aaaaaaaaaa\n".
+    "XaaXXXXaaX\n".
+    "XaaXXXXaaX\n".
+    "XaaXXXXaaX\n".
+    "XaaXXXXaaX\n".
+    "aaaaaaaaaa\n".
+    "aaaaaaaaaa\n".
+    "baaXXXXaab\n",
+    'canvas 6');
+
