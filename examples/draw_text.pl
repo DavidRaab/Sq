@@ -22,18 +22,22 @@ sub create_canvas($width, $height, $default=" ") {
 
 # data is a single array that emulates a 2D Array, so $x,$y must be converted
 # into an offset. Position outside canvas are ignored
-sub setChar($canvas, $x,$y, $char) {
-    my ($cw,$ch,$data,$ox,$oy) = $canvas->@{qw/width height data ox oy/};
-    my ($rx,$ry) = ($ox+$x, $oy+$y);
-    return if $rx < 0 || $rx >= $cw;
-    return if $ry < 0 || $ry >= $ch;
-    $data->[$cw * $ry + $rx] = $char;
+sub setChar($canvas, $x,$y, $str) {
+    my ($cw,$ch,$data,$ox,$oy) = $canvas->@{qw/width height data/};
+    my ($rx,$ry)               = ($canvas->{ox}+$x, $canvas->{oy}+$y);
+
+    for my $char ( split //, $str ) {
+        $rx++, next if $rx < 0 || $rx >= $cw;
+        $rx++, next if $ry < 0 || $ry >= $ch;
+        $data->[$cw * $ry + $rx] = $char;
+        $rx++;
+    }
     return;
 }
 
 sub getChar($canvas, $x,$y) {
-    my ($cw,$ch,$data,$ox,$oy) = $canvas->@{qw/width height data ox oy/};
-    my ($rx,$ry) = ($ox+$x, $oy+$y);
+    my ($cw,$ch,$data,$ox,$oy) = $canvas->@{qw/width height data/};
+    my ($rx,$ry) = ($canvas->{ox} + $x, $canvas->{oy}+$y);
     return if $rx < 0 || $rx >= $cw;
     return if $ry < 0 || $ry >= $ch;
     return $data->[$cw * $ry + $rx];
@@ -124,10 +128,7 @@ sub c_fromArray($array) {
 
 sub c_set($x,$y,$str) {
     return sub($canvas) {
-        my $idx = 0;
-        for my $char ( split //, $str ) {
-            setChar($canvas, ($x+$idx++), $y, $char);
-        }
+        setChar($canvas, $x,$y, $str);
         return;
     }
 }
@@ -261,6 +262,13 @@ is(
     "........\n".
     "12345...\n",
     'c_set 3');
+
+is(
+    c_string(8,3,".", c_set(2,1,"12345")),
+    "........\n".
+    "..12345.\n".
+    "........\n",
+    'c_set 4');
 
 is(
     c_string(8,3,".",
