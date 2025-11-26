@@ -24,6 +24,19 @@ sub setChar($canvas, $x,$y, $char) {
     return;
 }
 
+# this iterates a $canvas
+sub iter($canvas, $f) {
+    my ($cw, $ch, $data) = $canvas->@{qw/width height data/};
+
+    my $idx = 0;
+    for my $x ( 0 .. ($cw-1) ) {
+        for my $y ( 0 .. ($ch-1) ) {
+            $f->($x,$y,$data->[$idx++]);
+        }
+    }
+    return;
+}
+
 # writes $str into $x,$y position in $canvas, does clipping by default
 sub cwrite($canvas, $x,$y, $str) {
     my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
@@ -54,6 +67,7 @@ sub fill($canvas, $char) {
 sub insert($canvas, $x,$y, $other_canvas) {
     my ($w,$h,$data) = $canvas->@{qw/width height data/};
     my $oc           = $other_canvas;
+
     # when x,y is outside canvas (right,bottom) immediately abort
     return if $x > $w && $y > $h;
     # when x,y is too far top/left outside canvas without that anything
@@ -61,7 +75,9 @@ sub insert($canvas, $x,$y, $other_canvas) {
     return if ($x + $oc->{width})  < 0;
     return if ($y + $oc->{height}) < 0;
 
-
+    iter($other_canvas, sub($ox,$oy,$char) {
+        setChar($canvas, ($x+$ox), ($y+$oy), $char);
+    });
 
     return;
 }
@@ -166,3 +182,20 @@ is(
     "aaaaaaaaaa\n".
     "baaaaaaaab\n",
     'canvas 4');
+
+my $box = create_canvas(4,4, "X");
+insert($canvas, 3,3, $box);
+
+is(
+    to_string($canvas),
+    "baaaaaaaab\n".
+    "aaaaaaaaaa\n".
+    "aaaaaaaaaa\n".
+    "aaaXXXXaaa\n".
+    "aaaXXXXaaa\n".
+    "aaaXXXXaaa\n".
+    "aaaXXXXaaa\n".
+    "aaaaaaaaaa\n".
+    "aaaaaaaaaa\n".
+    "baaaaaaaab\n",
+    'canvas 5');
