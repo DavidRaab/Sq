@@ -6,7 +6,7 @@ use Sq -sig => 1;
 use Sq::Test;
 
 # Most basic mutable implementation:
-# create_canvas, setChar, getChar, iter, to_string, show_canvas
+# create_canvas, setChar, getChar, to_string, show_canvas
 
 sub create_canvas($width, $height, $default=" ") {
     Carp::croak "width  must be > 0" if $width  <= 0;
@@ -33,19 +33,6 @@ sub getChar($canvas, $x,$y) {
     return if $x < 0 || $x >= $cw;
     return if $y < 0 || $y >= $ch;
     return $data->[$cw * $y + $x];
-}
-
-# this iterates a $canvas
-sub iter($canvas, $f) {
-    my ($cw, $ch, $data) = $canvas->@{qw/width height data/};
-
-    my $idx = 0;
-    for my $x ( 0 .. ($cw-1) ) {
-        for my $y ( 0 .. ($ch-1) ) {
-            $f->($x,$y,$data->[$idx++]);
-        }
-    }
-    return;
 }
 
 # creates string out of $canvas
@@ -150,15 +137,18 @@ sub c_offset($ox,$oy, @draws) {
 sub c_canvas($width, $height, $default, @draws) {
     Carp::croak 'c_canvas($width,$height,$char,@draws)' if ref $default ne "";
     return sub($setChar,$getChar,$w,$h) {
-        my $canvas = create_canvas($width, $height, $default);
-        my $set    = sub($x,$y,$char) { setChar($canvas, $x,$y, $char) };
-        my $get    = sub($x,$y)       { getChar($canvas, $x,$y)        };
-        for my $draw ( @draws ) {
-            $draw->($set,$get,$width,$height);
+        # generates a new canvas, and does all drawing operation on it
+        my $canvas = c_run($width, $height, $default, @draws);
+        my $data   = $canvas->{data};
+
+        # than merge new canvas in current one
+        my $idx = 0;
+        for my $x ( 0 .. ($width-1) ) {
+            for my $y ( 0 .. ($height-1) ) {
+                $setChar->($x,$y,$data->[$idx++]);
+            }
         }
-        iter($canvas, sub($x,$y,$char) {
-            $setChar->($x,$y,$char);
-        });
+
         return;
     }
 }
