@@ -65,7 +65,7 @@ sub fill($canvas, $char) {
     return;
 }
 
-# inserts $other_canvas into $canvas at position $x,$y
+# inserts $other_canvas into $canvas at position $x,$y -- does clipping
 sub insert($canvas, $x,$y, $other_canvas) {
     my ($w,$h,$data) = $canvas->@{qw/width height data/};
     my $oc           = $other_canvas;
@@ -100,6 +100,32 @@ sub to_string($canvas) {
 
 sub show_canvas($canvas) {
     print to_string($canvas);
+}
+
+### Combinator API
+
+sub c_char($x,$y,$char) {
+    return sub($setChar) {
+        $setChar->($x,$y,$char);
+        return;
+    }
+}
+
+sub c_and(@draws) {
+    return sub($setChar) {
+        for my $draw ( @draws ) {
+            $draw->($setChar);
+        }
+        return;
+    }
+}
+
+sub c_run($width, $height, $default, $combinator) {
+    my $canvas = create_canvas($width, $height, $default);
+    $combinator->(sub($x,$y,$char) {
+        setChar($canvas, $x,$y, $char);
+    });
+    return $canvas;
 }
 
 
@@ -222,3 +248,35 @@ is(
     "baaXXXXaab\n",
     'canvas 6');
 
+my $cbox =
+    c_and(
+        c_char(0,0,'a'),
+        c_char(3,0,'a'),
+        c_char(0,3,'a'),
+        c_char(3,3,'a'));
+
+is(
+    to_string(c_run(4,4," ",$cbox)),
+    "a  a\n".
+    "    \n".
+    "    \n".
+    "a  a\n",
+    'combinator 1');
+
+is(
+    to_string(c_run(4,4,".",$cbox)),
+    "a..a\n".
+    "....\n".
+    "....\n".
+    "a..a\n",
+    'combinator 2');
+
+is(
+    to_string(c_run(6,6,".",$cbox)),
+    "a..a..\n".
+    "......\n".
+    "......\n".
+    "a..a..\n".
+    "......\n".
+    "......\n",
+    'combinator 3');
