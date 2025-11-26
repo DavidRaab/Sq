@@ -12,11 +12,12 @@ sub create_canvas($width, $height, $default=" ") {
     Carp::croak "width  must be > 0" if $width  <= 0;
     Carp::croak "height must be > 0" if $height <= 0;
     return sq {
-        width  => $width,
-        height => $height,
-        ox     => 0,       # Offset X
-        oy     => 0,       # Offset Y
-        data   => [($default) x ($width * $height)],
+        width   => $width,
+        height  => $height,
+        default => $default,
+        ox      => 0,        # Offset X
+        oy      => 0,        # Offset Y
+        data    => [($default) x ($width * $height)],
     };
 }
 
@@ -214,6 +215,26 @@ sub c_rect($tx,$ty, $bx,$by, $char) {
         c_line($tx,$by, $bx,$by, $char)) # bottom
 }
 
+# vertically splits space into same amounts
+sub c_vsplit(@draws) {
+    my $spaces = @draws;
+    Carp::croak "vsplit: Needs at least one drawing operation" if $spaces == 0;
+    return sub($canvas) {
+        my ($cw,$ch,$def) = $canvas->@{qw/width height default/};
+        my $width         = $cw / $spaces;
+
+        my $offset = 0;
+        for my $draw ( @draws ) {
+            my $new = create_canvas($width, $ch, $def);
+            $draw->($new);
+            iter($new, sub($x,$y,$char) {
+                setChar($canvas, $x+$offset,$y, $char);
+            });
+            $offset += $width;
+        }
+        return;
+    }
+}
 
 ### Tests
 
@@ -654,5 +675,39 @@ is(
     ".+++.\n".
     ".....\n",
     'c_rect 2');
+
+is(
+    c_string(20,3,'.', c_vsplit(
+        c_set(0,0,"Hello"),
+        c_set(0,0,"World"),
+    )),
+    "Hello.....World.....\n".
+    "....................\n".
+    "....................\n",
+    'vsplit 1');
+
+is(
+    c_string(20,3,'.', c_vsplit(
+        c_set(0,0,"x"),
+        c_set(0,0,"x"),
+        c_set(0,0,"x"),
+        c_set(0,0,"x"),
+    )),
+    "x....x....x....x....\n".
+    "....................\n".
+    "....................\n",
+    'vsplit 2');
+
+is(
+    c_string(20,3,'.', c_vsplit(
+        c_set(0,0,"aaaaaaaaaaaa"),
+        c_set(0,0,"bbbbbbbbbbbb"),
+        c_set(0,0,"cccccccccccc"),
+        c_set(0,0,"dddddddddddd"),
+    )),
+    "aaaaabbbbbcccccddddd\n".
+    "....................\n".
+    "....................\n",
+    'vsplit 3');
 
 done_testing;
