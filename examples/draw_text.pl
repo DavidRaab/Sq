@@ -108,6 +108,26 @@ sub rect($canvas, $tx,$ty, $bx,$by, $char) {
     return;
 }
 
+sub vsplit($canvas, @draws) {
+    state $div = Sq->math->divide_even_spread;
+
+    my $spaces        = @draws;
+    my ($cw,$ch,$def) = $canvas->@{qw/width height default/};
+    my $widths        = $div->($cw, $spaces);
+
+    my $offset = 0;
+    for (my $idx=0; $idx<@draws; $idx++) {
+        my $width = $widths->[$idx];
+        my $new   = create_canvas($width, $ch, $def);
+        $draws[$idx]->($new);
+        iter($new, sub($x,$y,$char) {
+            setChar($canvas, $x+$offset,$y, $char);
+        });
+        $offset += $width;
+    }
+    return;
+}
+
 sub show_canvas($canvas) {
     print to_string($canvas);
 }
@@ -223,21 +243,7 @@ sub c_rect($tx,$ty, $bx,$by, $char) {
 sub c_vsplit(@draws) {
     my $spaces = @draws;
     Carp::croak "vsplit: Needs at least one drawing operation" if $spaces == 0;
-    return sub($canvas) {
-        my ($cw,$ch,$def) = $canvas->@{qw/width height default/};
-        my $width         = $cw / $spaces;
-
-        my $offset = 0;
-        for my $draw ( @draws ) {
-            my $new = create_canvas($width, $ch, $def);
-            $draw->($new);
-            iter($new, sub($x,$y,$char) {
-                setChar($canvas, $x+$offset,$y, $char);
-            });
-            $offset += $width;
-        }
-        return;
-    }
+    return sub($canvas) { vsplit($canvas, @draws) }
 }
 
 ### Tests
@@ -713,5 +719,17 @@ is(
     "....................\n".
     "....................\n",
     'vsplit 3');
+
+is(
+    c_string(19,3,'.', c_vsplit(
+        c_set(0,0,"aaaaaaaaaaaa"),
+        c_set(0,0,"bbbbbbbbbbbb"),
+        c_set(0,0,"cccccccccccc"),
+        c_set(0,0,"dddddddddddd"),
+    )),
+    "aaaabbbbbcccccddddd\n".
+    "...................\n".
+    "...................\n",
+    'vsplit 4');
 
 done_testing;

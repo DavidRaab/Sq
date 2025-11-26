@@ -107,4 +107,17 @@ static to_num_system => sub($str_places, $num) {
 static to_binary => sub($num) { sprintf "%b", $num };
 static to_hex    => sub($num) { sprintf "%x", $num };
 
+static divide_even_spread => sub($k,$n) {
+    my @widths;
+    my $ideal = $k / $n;
+    my $accum = 0;
+    for ( 1 .. $k ) {
+        $accum   += $ideal;
+        my $value = int $accum;
+        push @widths, $value;
+        $accum -= $value;
+    }
+    bless(\@widths, 'Array');
+};
+
 1;
