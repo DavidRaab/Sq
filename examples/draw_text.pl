@@ -80,13 +80,7 @@ sub c_run($width, $height, $default, @draws) {
 }
 
 sub c_string($width, $height, $default, @draws) {
-    my $canvas  = create_canvas($width, $height, $default);
-    my $setChar = sub($x,$y,$char) { setChar($canvas, $x,$y, $char) };
-    my $getChar = sub($x,$y)       { getChar($canvas, $x,$y)        };
-    for my $draw ( @draws ) {
-        $draw->($setChar,$getChar,$width,$height);
-    }
-    return to_string($canvas);
+    return to_string(c_run($width, $height, $default, @draws));
 }
 
 sub c_and(@draws) {
