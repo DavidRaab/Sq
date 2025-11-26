@@ -25,6 +25,13 @@ sub setChar($canvas, $x,$y, $char) {
     return;
 }
 
+sub getChar($canvas, $x,$y) {
+    my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
+    return if $x < 0 || $x >= $cw;
+    return if $y < 0 || $y >= $ch;
+    return $data->[$cw * $y + $x];
+}
+
 # this iterates a $canvas
 sub iter($canvas, $f) {
     my ($cw, $ch, $data) = $canvas->@{qw/width height data/};
@@ -108,45 +115,50 @@ sub show_canvas($canvas) {
 sub c_run($width, $height, $default, @draws) {
     my $canvas  = create_canvas($width, $height, $default);
     my $setChar = sub($x,$y,$char) { setChar($canvas, $x,$y, $char) };
+    my $getChar = sub($x,$y)       { getChar($canvas, $x,$y)        };
     for my $draw ( @draws ) {
-        $draw->($setChar,$width,$height);
+        $draw->($setChar,$getChar,$width,$height);
     }
     return $canvas;
 }
 
 sub c_char($x,$y,$char) {
     Carp::croak "c_char: must be a single char." if length($char) != 1;
-    return sub($setChar,$w,$h) {
-        $setChar->($x,$y,$char);
+    return sub($set,$get,$w,$h) {
+        $set->($x,$y,$char);
         return;
     }
 }
 
 sub c_str($x,$y,$str) {
-    return sub($setChar,$w,$h) {
+    return sub($set,$get,$w,$h) {
         my $idx = 0;
         for my $char ( split //, $str ) {
-            $setChar->(($x+$idx++), $y, $char);
+            $set->(($x+$idx++), $y, $char);
         }
         return;
     }
 }
 
 sub c_and(@draws) {
-    return sub($setChar,$w,$h) {
+    return sub($set,$get,$w,$h) {
         for my $draw ( @draws ) {
-            $draw->($setChar,$w,$h);
+            $draw->($set,$get,$w,$h);
         }
         return;
     }
 }
 
 sub c_offset($ox,$oy,$combinator) {
-    return sub($setChar,$w,$h) {
-        $combinator->(sub($x,$y,$char) {
-            $setChar->($ox+$x, $oy+$y, $char);
+    return sub($set,$get,$w,$h) {
+        my $newSet = sub($x,$y,$char) {
+            $set->($ox+$x, $oy+$y, $char);
             return;
-        }, $w, $h);
+        };
+        my $newGet = sub($x,$y) {
+            return $get->($ox+$x, $oy+$y);
+        };
+        $combinator->($newSet, $newGet, $w, $h);
         return;
     }
 }
@@ -156,11 +168,12 @@ sub c_offset($ox,$oy,$combinator) {
 # explicitly, so more advanced effects are possible. Currently it is nearly
 # the same as calling c_offset(). But here you can set another background.
 sub c_canvas($width, $height, $default, @draws) {
-    return sub($setChar,$w,$h) {
+    return sub($setChar,$getChar,$w,$h) {
         my $canvas = create_canvas($width, $height, $default);
         my $set    = sub($x,$y,$char) { setChar($canvas, $x,$y, $char) };
+        my $get    = sub($x,$y)       { getChar($canvas, $x,$y)        };
         for my $draw ( @draws ) {
-            $draw->($set,$width,$height);
+            $draw->($set,$get,$width,$height);
         }
         iter($canvas, sub($x,$y,$char) {
             $setChar->($x,$y,$char);
@@ -169,15 +182,19 @@ sub c_canvas($width, $height, $default, @draws) {
     }
 }
 
-sub c_fill($char) {
-    return sub($setChar,$w,$h) {
+sub c_iter($f) {
+    return sub($set,$get,$w,$h) {
         for my $y ( 0 .. ($h-1) ) {
             for my $x ( 0 .. ($w-1) ) {
-                $setChar->($x,$y, $char);
+                $set->($x,$y, $f->($x,$y,$get->($x,$y)));
             }
         }
         return;
     }
+}
+
+sub c_fill($def) {
+    c_iter(sub($x,$y,$char) { $def });
 }
 
 ### Tests
