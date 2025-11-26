@@ -210,11 +210,6 @@ sub c_rect($tx,$ty, $bx,$by, $char) {
 ### Tests
 
 is(
-    to_string(c_run(5,5,'.', c_set(3,3,'X') )),
-    c_string(5,5,'.',        c_set(3,3,'X') ),
-    'c_string is the same as to_string(c_run())');
-
-is(
     to_string({
         data   => [1,2,3,4,5,".",".",".",".",".",".",".",".",".","."],
         height => 3,
@@ -237,9 +232,44 @@ is(
     'to_string 2');
 
 is(
+    to_string(c_run(5,5,'.', c_set(3,3,'X') )),
+    c_string(5,5,'.',        c_set(3,3,'X') ),
+    'c_string is the same as to_string(c_run())');
+
+is(
+    c_string(8,3,".", c_set(0,0,"12345")),
+    "12345...\n".
+    "........\n".
+    "........\n",
+    'c_set 1');
+
+is(
+    c_string(8,3,".", c_set(0,1,"12345")),
+    "........\n".
+    "12345...\n".
+    "........\n",
+    'c_set 2');
+
+is(
+    c_string(8,3,".", c_set(0,2,"12345")),
+    "........\n".
+    "........\n".
+    "12345...\n",
+    'c_set 3');
+
+is(
+    c_string(8,3,".",
+        c_fill('o'),
+        c_set(0,2,"12345")),
+    "oooooooo\n".
+    "oooooooo\n".
+    "12345ooo\n",
+    'c_fill 1');
+
+is(
     c_string(10,10,' ',
         c_set( 0,0, "a"),
-        c_set(1,0, "a"),
+        c_set( 1,0, "a"),
         c_set( 2,0, "a"),
         c_set( 0,1, "a"),
         c_set( 1,1, "a"),
@@ -337,7 +367,7 @@ is(
     "aaaaaaaaaa\n".
     "aaaaaaaaaa\n".
     "baaaaaaaab\n",
-    'canvas 5');
+    'c_offset 1');
 
 is(
     c_string(10,10,'.',
@@ -362,7 +392,7 @@ is(
     "aaaaaaaaaa\n".
     "aaaaaaaaaa\n".
     "baaXXXXaab\n",
-    'canvas 6');
+    'c_offset 2');
 
 my $cbox =
     c_and(
@@ -377,7 +407,7 @@ is(
     "    \n".
     "    \n".
     "a  a\n",
-    'combinator 1');
+    'c_and 1');
 
 is(
     c_string(4,4,".",$cbox),
@@ -385,7 +415,7 @@ is(
     "....\n".
     "....\n".
     "a..a\n",
-    'combinator 2');
+    'c_and 2');
 
 is(
     c_string(6,6,".",$cbox),
@@ -395,7 +425,7 @@ is(
     "a..a..\n".
     "......\n".
     "......\n",
-    'combinator 3');
+    'c_and 3');
 
 is(
     c_string(8,6,".", c_offset(2,2,$cbox)),
@@ -405,7 +435,7 @@ is(
     "........\n".
     "........\n".
     "..a..a..\n",
-    'combinator 4');
+    'c_and + c_offset');
 
 {
     my $box =
@@ -430,36 +460,6 @@ is(
         "XoX...XoX\n",
         'c_canvas 1');
 }
-
-is(
-    c_string(8,3,".", c_set(0,0,"12345")),
-    "12345...\n".
-    "........\n".
-    "........\n",
-    'c_str 1');
-
-is(
-    c_string(8,3,".", c_set(0,1,"12345")),
-    "........\n".
-    "12345...\n".
-    "........\n",
-    'c_str 2');
-
-is(
-    c_string(8,3,".", c_set(0,2,"12345")),
-    "........\n".
-    "........\n".
-    "12345...\n",
-    'c_str 3');
-
-is(
-    c_string(8,3,".",
-        c_fill('o'),
-        c_set(0,2,"12345")),
-    "oooooooo\n".
-    "oooooooo\n".
-    "12345ooo\n",
-    'c_str 4');
 
 is(
     c_string(4,4,".",
