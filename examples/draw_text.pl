@@ -149,10 +149,7 @@ sub c_fromArray($array) {
 }
 
 sub c_set($x,$y,$str) {
-    return sub($canvas) {
-        setChar($canvas, $x,$y, $str);
-        return;
-    }
+    return sub($canvas) { setChar($canvas, $x,$y, $str) }
 }
 
 sub c_offset($ox,$oy, @draws) {
@@ -210,11 +207,12 @@ sub c_line($xs,$ys, $xe,$ye, $char) {
 }
 
 sub c_rect($tx,$ty, $bx,$by, $char) {
-    return c_and(
-        c_line($tx,$ty, $bx,$ty, $char), # top
-        c_line($tx,$ty, $tx,$by, $char), # left
-        c_line($bx,$ty, $bx,$by, $char), # right
-        c_line($tx,$by, $bx,$by, $char)) # bottom
+    return
+        c_and(
+            c_line($tx,$ty, $bx,$ty, $char), # top
+            c_line($tx,$ty, $tx,$by, $char), # left
+            c_line($bx,$ty, $bx,$by, $char), # right
+            c_line($tx,$by, $bx,$by, $char)) # bottom
 }
 
 # vertically splits space into same amounts
