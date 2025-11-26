@@ -122,6 +122,23 @@ sub c_run($width, $height, $default, @draws) {
     return $canvas;
 }
 
+sub c_fromAoA($default, $aoa, @draws) {
+    my $new    = Array::fill2d($aoa, $default);
+    my $height = @$new;
+    my $width  = $new->[0]->@*;
+    my $canvas = sq {
+        width  => $width,
+        height => $height,
+        data   => $new->flatten,
+    };
+    my $set = sub($x,$y,$char) { setChar($canvas, $x,$y, $char) };
+    my $get = sub($x,$y)       { getChar($canvas, $x,$y)        };
+    for my $draw ( @draws ) {
+        $draw->($set, $get, $width, $height);
+    }
+    return $canvas;
+}
+
 sub c_char($x,$y,$char) {
     Carp::croak "c_char: must be a single char." if length($char) != 1;
     return sub($set,$get,$w,$h) {
@@ -196,6 +213,7 @@ sub c_iter($f) {
 sub c_fill($def) {
     c_iter(sub($x,$y,$char) { $def });
 }
+
 
 ### Tests
 
@@ -436,3 +454,35 @@ is(
     "oooooooo\n".
     "12345ooo\n",
     'c_str 4');
+
+is(
+    to_string(c_fromAoA("x", [
+        [qw/o o o o/],
+        [qw/o o o o/],
+        [qw/o o o o/],
+        [qw/o o o o/],
+    ])),
+    "oooo\n".
+    "oooo\n".
+    "oooo\n".
+    "oooo\n",
+    'c_fromAoA 1');
+
+is(
+    to_string(c_fromAoA("x", [
+            [qw/o o o o/],
+            [qw/o o o o/],
+            [qw/o o o o/],
+            [qw/o o o o/],
+        ],
+        c_char(0,0, 'X'),
+        c_char(1,1, 'X'),
+        c_char(2,2, 'X'),
+        c_char(3,3, 'X')
+    )),
+    "Xooo\n".
+    "oXoo\n".
+    "ooXo\n".
+    "oooX\n",
+    'c_fromAoA 2');
+
