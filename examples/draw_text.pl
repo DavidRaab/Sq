@@ -128,6 +128,16 @@ sub c_run($width, $height, $default, $combinator) {
     return $canvas;
 }
 
+sub c_offset($ox,$oy,$combinator) {
+    return sub($setChar) {
+        $combinator->(sub($x,$y,$char) {
+            $setChar->($ox+$x, $oy+$y, $char);
+            return;
+        });
+        return;
+    }
+}
+
 
 ### Tests
 
@@ -280,3 +290,13 @@ is(
     "......\n".
     "......\n",
     'combinator 3');
+
+is(
+    to_string(c_run(8,6,".", c_offset(2,2,$cbox))),
+    "........\n".
+    "........\n".
+    "..a..a..\n".
+    "........\n".
+    "........\n".
+    "..a..a..\n",
+    'combinator 4');
