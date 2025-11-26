@@ -315,34 +315,28 @@ is(
     "..a..a..\n",
     'combinator 4');
 
-is(
-    to_string(
-        c_run(9,9,".",
-            c_offset(0,0,
-                c_canvas(3,3, "o",
-                    c_char(0,0, "X"), c_char(2,0, "X"),
-                    c_char(0,2, "X"), c_char(2,2, "X"))),
-            c_offset(6,0,
-                c_canvas(3,3, "o",
-                    c_char(0,0, "X"), c_char(2,0, "X"),
-                    c_char(0,2, "X"), c_char(2,2, "X"))),
-            c_offset(0,6,
-                c_canvas(3,3, "o",
-                    c_char(0,0, "X"), c_char(2,0, "X"),
-                    c_char(0,2, "X"), c_char(2,2, "X"))),
-            c_offset(6,6,
-                c_canvas(3,3, "o",
-                    c_char(0,0, "X"), c_char(2,0, "X"),
-                    c_char(0,2, "X"), c_char(2,2, "X")))
-        )
-    ),
-    "XoX...XoX\n".
-    "ooo...ooo\n".
-    "XoX...XoX\n".
-    ".........\n".
-    ".........\n".
-    ".........\n".
-    "XoX...XoX\n".
-    "ooo...ooo\n".
-    "XoX...XoX\n",
-    'c_canvas 1');
+{
+    my $box =
+        c_canvas(3,3, "o",
+            c_char(0,0, "X"), c_char(2,0, "X"),
+            c_char(0,2, "X"), c_char(2,2, "X"));
+
+    is(
+        to_string(
+            c_run(9,9,".",
+                c_offset(0,0, $box),
+                c_offset(6,0, $box),
+                c_offset(0,6, $box),
+                c_offset(6,6, $box))
+        ),
+        "XoX...XoX\n".
+        "ooo...ooo\n".
+        "XoX...XoX\n".
+        ".........\n".
+        ".........\n".
+        ".........\n".
+        "XoX...XoX\n".
+        "ooo...ooo\n".
+        "XoX...XoX\n",
+        'c_canvas 1');
+}
