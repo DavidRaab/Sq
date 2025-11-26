@@ -195,8 +195,8 @@ sub c_line($xs,$ys, $xe,$ye, $char) {
             $set->($xs, $ys, $char);
             last if $xs == $xe && $ys == $ye;
             $e2 = 2 * $err;
-            if ($e2 > $dy) { $err += $dy; $xs += $sx; } # e_xy+e_x > 0 */
-            if ($e2 < $dx) { $err += $dx; $ys += $sy; } # e_xy+e_y < 0 */
+            if ($e2 > $dy) { $err += $dy; $xs += $sx; }
+            if ($e2 < $dx) { $err += $dx; $ys += $sy; }
         }
         return;
     }
