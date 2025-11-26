@@ -5,6 +5,9 @@ use open ':std', ':encoding(UTF-8)';
 use Sq -sig => 1;
 use Sq::Test;
 
+# Most basic mutable implementation:
+# create_canvas, setChar, getChar, iter, to_string, show_canvas
+
 sub create_canvas($width, $height, $default=" ") {
     Carp::croak "width  must be > 0" if $width  <= 0;
     Carp::croak "height must be > 0" if $height <= 0;
@@ -64,6 +67,7 @@ sub show_canvas($canvas) {
 }
 
 ### Combinator API
+# Build on top of the five basic functions
 
 sub c_run($width, $height, $default, @draws) {
     my $canvas  = create_canvas($width, $height, $default);
@@ -175,7 +179,35 @@ sub c_iter($f) {
 }
 
 sub c_fill($def) {
-    c_iter(sub($x,$y,$char) { $def });
+    return c_iter(sub($x,$y,$char) { $def });
+}
+
+sub c_line($xs,$ys, $xe,$ye, $char) {
+    return sub($set, $get, $w, $h) {
+        my $dx  = abs($xe - $xs);
+        my $sx  = $xs < $xe ? 1 : -1;
+        my $dy  = -abs($ye - $ys);
+        my $sy  = $ys < $ye ? 1 : -1;
+        my $err = $dx + $dy;
+        my $e2; # error value e_xy
+
+        while (1) {
+            $set->($xs, $ys, $char);
+            last if $xs == $xe && $ys == $ye;
+            $e2 = 2 * $err;
+            if ($e2 > $dy) { $err += $dy; $xs += $sx; } # e_xy+e_x > 0 */
+            if ($e2 < $dx) { $err += $dx; $ys += $sy; } # e_xy+e_y < 0 */
+        }
+        return;
+    }
+}
+
+sub c_rect($tx,$ty, $bx,$by, $char) {
+    return c_and(
+        c_line($tx,$ty, $bx,$ty, $char), # top
+        c_line($tx,$ty, $tx,$by, $char), # left
+        c_line($bx,$ty, $bx,$by, $char), # right
+        c_line($tx,$by, $bx,$by, $char)) # bottom
 }
 
 
@@ -528,3 +560,91 @@ is(
     "oooX.oooX\n".
     ".........\n",
     'c_fromAoA 2');
+
+is(
+    to_string(
+        c_run(5,5,".",
+            c_line(0,0, 4,4, '+'))),
+    "+....\n".
+    ".+...\n".
+    "..+..\n".
+    "...+.\n".
+    "....+\n",
+    'c_line 1');
+
+is(
+    to_string(
+        c_run(5,5,".",
+            c_line(0,0, 4,0, '+'))),
+    "+++++\n".
+    ".....\n".
+    ".....\n".
+    ".....\n".
+    ".....\n",
+    'c_line 2');
+
+is(
+    to_string(
+        c_run(5,5,".",
+            c_line(0,0, 0,4, '+'))),
+    "+....\n".
+    "+....\n".
+    "+....\n".
+    "+....\n".
+    "+....\n",
+    'c_line 3');
+
+is(
+    to_string(
+        c_run(5,5,".",
+            c_line(0,0, 4,3, '+'))),
+    "+....\n".
+    ".++..\n".
+    "...+.\n".
+    "....+\n".
+    ".....\n",
+    'c_line 4');
+
+is(
+    to_string(
+        c_run(5,5,".",
+            c_line(0,0, 4,2, '+'))),
+    "++...\n".
+    "..++.\n".
+    "....+\n".
+    ".....\n".
+    ".....\n",
+    'c_line 5');
+
+is(
+    to_string(
+        c_run(5,5,".",
+            c_line(0,0, 4,1, '+'))),
+    "+++..\n".
+    "...++\n".
+    ".....\n".
+    ".....\n".
+    ".....\n",
+    'c_line 6');
+
+is(
+    to_string(
+        c_run(5,5,".",
+            c_rect(0,0, 4,4, '+'))),
+    "+++++\n".
+    "+...+\n".
+    "+...+\n".
+    "+...+\n".
+    "+++++\n",
+    'c_rect 1');
+
+is(
+    to_string(
+        c_run(5,5,".",
+            c_rect(1,1, 3,3, '+'))),
+    ".....\n".
+    ".+++.\n".
+    ".+.+.\n".
+    ".+++.\n".
+    ".....\n",
+    'c_rect 2');
