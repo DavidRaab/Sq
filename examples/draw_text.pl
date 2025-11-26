@@ -6,11 +6,22 @@ use Sq -sig => 1;
 use Sq::Test;
 
 sub create_canvas($width, $height, $default=" ") {
-    return {
+    return sq {
         width  => $width,
         height => $height,
         data   => [($default) x ($width * $height)],
     };
+}
+
+# data is a single array that emulates a 2D Array,
+# so $x,$y must be converted into an offset
+sub setChar($canvas, $x,$y, $char) {
+    my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
+    return if $x < 0 || $x >= $cw;
+    return if $y < 0 || $y >= $ch;
+    my $offset = ($y * $ch) + $x;
+    $data->[$offset] = $char;
+    return;
 }
 
 # writes $str into $x,$y position in $canvas, does clipping by default
@@ -42,8 +53,15 @@ sub fill($canvas, $char) {
 
 sub insert($canvas, $x,$y, $other_canvas) {
     my ($w,$h,$data) = $canvas->@{qw/width height data/};
-    # when target position is
-    # if
+    my $oc           = $other_canvas;
+    # when x,y is outside canvas (right,bottom) immediately abort
+    return if $x > $w && $y > $h;
+    # when x,y is too far top/left outside canvas without that anything
+    # clips into $canvas, also abort.
+    return if ($x + $oc->{width})  < 0;
+    return if ($y + $oc->{height}) < 0;
+
+
 
     return;
 }
@@ -111,3 +129,40 @@ is(
     "aaaaaaaaaa\n".
     "aaaaaaaaaa\n",
     'canvas 2');
+
+setChar($canvas, 0,0, 'b');
+setChar($canvas, 9,0, 'b');
+setChar($canvas, 0,9, 'b');
+setChar($canvas, 9,9, 'b');
+is(
+    to_string($canvas),
+    "baaaaaaaab\n".
+    "aaaaaaaaaa\n".
+    "aaaaaaaaaa\n".
+    "aaaaaaaaaa\n".
+    "aaaaaaaaaa\n".
+    "aaaaaaaaaa\n".
+    "aaaaaaaaaa\n".
+    "aaaaaaaaaa\n".
+    "aaaaaaaaaa\n".
+    "baaaaaaaab\n",
+    'canvas 3');
+
+setChar($canvas, -1,0, 'c');
+setChar($canvas, 10,0, 'c');
+setChar($canvas, 5,-1, 'c');
+setChar($canvas, 5,10, 'c');
+
+is(
+    to_string($canvas),
+    "baaaaaaaab\n".
+    "aaaaaaaaaa\n".
+    "aaaaaaaaaa\n".
+    "aaaaaaaaaa\n".
+    "aaaaaaaaaa\n".
+    "aaaaaaaaaa\n".
+    "aaaaaaaaaa\n".
+    "aaaaaaaaaa\n".
+    "aaaaaaaaaa\n".
+    "baaaaaaaab\n",
+    'canvas 4');
