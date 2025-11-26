@@ -120,11 +120,12 @@ sub c_and(@draws) {
     }
 }
 
-sub c_run($width, $height, $default, $combinator) {
-    my $canvas = create_canvas($width, $height, $default);
-    $combinator->(sub($x,$y,$char) {
-        setChar($canvas, $x,$y, $char);
-    });
+sub c_run($width, $height, $default, @draws) {
+    my $canvas  = create_canvas($width, $height, $default);
+    my $setChar = sub($x,$y,$char) { setChar($canvas, $x,$y, $char) };
+    for my $draw ( @draws ) {
+        $draw->($setChar);
+    }
     return $canvas;
 }
 
@@ -316,7 +317,7 @@ is(
 
 is(
     to_string(
-        c_run(9,9,".", c_and(
+        c_run(9,9,".",
             c_offset(0,0,
                 c_canvas(3,3, "o",
                     c_char(0,0, "X"), c_char(2,0, "X"),
@@ -333,7 +334,7 @@ is(
                 c_canvas(3,3, "o",
                     c_char(0,0, "X"), c_char(2,0, "X"),
                     c_char(0,2, "X"), c_char(2,2, "X")))
-        ))
+        )
     ),
     "XoX...XoX\n".
     "ooo...ooo\n".
