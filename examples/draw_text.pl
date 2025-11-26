@@ -45,25 +45,6 @@ sub iter($canvas, $f) {
     return;
 }
 
-# writes $str into $x,$y position in $canvas, does clipping by default
-sub cwrite($canvas, $x,$y, $str) {
-    my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
-    my $skip           = $x < 0 ? abs($x) : 0;
-    $x                 = $x < 0 ? 0 : $x;
-    my $start          = ($ch * $y) + $x;
-    my $max_stop       = ($ch * ($y+1)) - 1;
-    my $needed_stop    = ($ch * $y) + $x + (length($str) - $skip - 1);
-    my $stop           = $max_stop < $needed_stop ? $max_stop : $needed_stop;
-
-    my @str = split //, $str;
-    my $idx = 0;
-    for my $offset ( $start .. $stop ) {
-        $data->[$offset] = $str[$skip + $idx++];
-    }
-
-    return;
-}
-
 # completely fills a canvas with a character
 sub fill($canvas, $char) {
     my $data = $canvas->{data};
@@ -249,21 +230,19 @@ is(
     ".....\n",
     'to_string 2');
 
-my $canvas = create_canvas(10,10);
-cwrite($canvas, 0,0, "a");
-cwrite($canvas, 1,0, "a");
-cwrite($canvas, 2,0, "a");
-
-cwrite($canvas, 0,1, "a");
-cwrite($canvas, 1,1, "a");
-cwrite($canvas, 1,1, "a");
-
-cwrite($canvas,  3,3, "xxxxxxxxxxxxxx");
-cwrite($canvas, -3,0, "abcdefghijkl");
-cwrite($canvas, -3,0, "TTTT");
-cwrite($canvas, -3,4, "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT");
 is(
-    to_string($canvas),
+    to_string(c_run(10,10,' ',
+        c_char( 0,0, "a"),
+        c_char( 1,0, "a"),
+        c_char( 2,0, "a"),
+        c_char( 0,1, "a"),
+        c_char( 1,1, "a"),
+        c_char( 1,1, "a"),
+        c_str ( 3,3, "xxxxxxxxxxxxxx"),
+        c_str (-3,0, "abcdefghijkl"),
+        c_str (-3,0, "TTTT"),
+        c_str (-3,4, "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"),
+    )),
     "Tefghijkl \n".
     "aa        \n".
     "          \n".
@@ -276,11 +255,8 @@ is(
     "          \n",
     'canvas 1');
 
-# show_canvas($canvas);
-
-fill($canvas, 'a');
 is(
-    to_string($canvas),
+    to_string(c_run(10,10,'.', c_fill('a'))),
     "aaaaaaaaaa\n".
     "aaaaaaaaaa\n".
     "aaaaaaaaaa\n".
@@ -293,12 +269,14 @@ is(
     "aaaaaaaaaa\n",
     'canvas 2');
 
-setChar($canvas, 0,0, 'b');
-setChar($canvas, 9,0, 'b');
-setChar($canvas, 0,9, 'b');
-setChar($canvas, 9,9, 'b');
 is(
-    to_string($canvas),
+    to_string(c_run(10,10,'.',
+        c_fill('a'),
+        c_char(0,0, 'b'),
+        c_char(9,0, 'b'),
+        c_char(0,9, 'b'),
+        c_char(9,9, 'b'),
+    )),
     "baaaaaaaab\n".
     "aaaaaaaaaa\n".
     "aaaaaaaaaa\n".
@@ -311,13 +289,19 @@ is(
     "baaaaaaaab\n",
     'canvas 3');
 
-setChar($canvas, -1,0, 'c');
-setChar($canvas, 10,0, 'c');
-setChar($canvas, 5,-1, 'c');
-setChar($canvas, 5,10, 'c');
 
 is(
-    to_string($canvas),
+    to_string(c_run(10,10,'.',
+        c_fill('a'),
+        c_char(0,0, 'b'),
+        c_char(9,0, 'b'),
+        c_char(0,9, 'b'),
+        c_char(9,9, 'b'),
+        c_char(-1,0, 'c'),
+        c_char(10,0, 'c'),
+        c_char(5,-1, 'c'),
+        c_char(5,10, 'c'),
+    )),
     "baaaaaaaab\n".
     "aaaaaaaaaa\n".
     "aaaaaaaaaa\n".
@@ -330,11 +314,21 @@ is(
     "baaaaaaaab\n",
     'canvas 4');
 
-my $box = create_canvas(4,4, "X");
-insert($canvas, 3,3, $box);
+my $box = c_canvas(4,4,'X');
 
 is(
-    to_string($canvas),
+    to_string(c_run(10,10,'.',
+        c_fill('a'),
+        c_char(0,0, 'b'),
+        c_char(9,0, 'b'),
+        c_char(0,9, 'b'),
+        c_char(9,9, 'b'),
+        c_char(-1,0, 'c'),
+        c_char(10,0, 'c'),
+        c_char(5,-1, 'c'),
+        c_char(5,10, 'c'),
+        c_offset(3,3, $box),
+    )),
     "baaaaaaaab\n".
     "aaaaaaaaaa\n".
     "aaaaaaaaaa\n".
@@ -347,13 +341,23 @@ is(
     "baaaaaaaab\n",
     'canvas 5');
 
-insert($canvas,  3,-3, $box); # top
-insert($canvas, -3, 3, $box); # left
-insert($canvas,  9, 3, $box); # right
-insert($canvas,  3, 9, $box); # bottom
-
 is(
-    to_string($canvas),
+    to_string(c_run(10,10,'.',
+        c_fill('a'),
+        c_char(0,0, 'b'),
+        c_char(9,0, 'b'),
+        c_char(0,9, 'b'),
+        c_char(9,9, 'b'),
+        c_char(-1,0, 'c'),
+        c_char(10,0, 'c'),
+        c_char(5,-1, 'c'),
+        c_char(5,10, 'c'),
+        c_offset( 3, 3, $box),
+        c_offset( 3,-3, $box), # top
+        c_offset(-3, 3, $box), # left
+        c_offset( 9, 3, $box), # right
+        c_offset( 3, 9, $box), # bottom
+    )),
     "baaXXXXaab\n".
     "aaaaaaaaaa\n".
     "aaaaaaaaaa\n".
