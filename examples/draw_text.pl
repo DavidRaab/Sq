@@ -6,6 +6,8 @@ use Sq -sig => 1;
 use Sq::Test;
 
 sub create_canvas($width, $height, $default=" ") {
+    Carp::croak "width  must be > 0" if $width  <= 0;
+    Carp::croak "height must be > 0" if $height <= 0;
     return sq {
         width  => $width,
         height => $height,
@@ -19,8 +21,7 @@ sub setChar($canvas, $x,$y, $char) {
     my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
     return if $x < 0 || $x >= $cw;
     return if $y < 0 || $y >= $ch;
-    my $offset = ($y * $ch) + $x;
-    $data->[$offset] = $char;
+    $data->[$cw * $y + $x] = $char;
     return;
 }
 
@@ -91,7 +92,7 @@ sub to_string($canvas) {
     my $str;
     for my $y ( 0 .. ($ch-1) ) {
         for my $x ( 0 .. ($cw-1) ) {
-            $str .= $data->[$ch * $y + $x];
+            $str .= $data->[$cw * $y + $x];
         }
         $str .= "\n";
     }
@@ -105,8 +106,19 @@ sub show_canvas($canvas) {
 ### Combinator API
 
 sub c_char($x,$y,$char) {
+    Carp::croak "c_char: must be a single char." if length($char) != 1;
     return sub($setChar) {
         $setChar->($x,$y,$char);
+        return;
+    }
+}
+
+sub c_str($x,$y,$str) {
+    return sub($setChar) {
+        my $idx = 0;
+        for my $char ( split //, $str ) {
+            $setChar->(($x+$idx++), $y, $char);
+        }
         return;
     }
 }
@@ -154,6 +166,28 @@ sub c_canvas($width, $height, $default, @draws) {
 }
 
 ### Tests
+
+is(
+    to_string({
+        data   => [1,2,3,4,5,".",".",".",".",".",".",".",".",".","."],
+        height => 3,
+        width  => 5
+    }),
+    "12345\n".
+    ".....\n".
+    ".....\n",
+    'to_string 1');
+
+is(
+    to_string({
+        data   => [".",1,2,3,4,5,".",".",".",".",".",".",".",".","."],
+        height => 3,
+        width  => 5
+    }),
+    ".1234\n".
+    "5....\n".
+    ".....\n",
+    'to_string 2');
 
 my $canvas = create_canvas(10,10);
 cwrite($canvas, 0,0, "a");
@@ -340,3 +374,24 @@ is(
         "XoX...XoX\n",
         'c_canvas 1');
 }
+
+is(
+    to_string(c_run(8,3,".", c_str(0,0,"12345"))),
+    "12345...\n".
+    "........\n".
+    "........\n",
+    'c_str 1');
+
+is(
+    to_string(c_run(8,3,".", c_str(0,1,"12345"))),
+    "........\n".
+    "12345...\n".
+    "........\n",
+    'c_str 2');
+
+is(
+    to_string(c_run(8,3,".", c_str(0,2,"12345"))),
+    "........\n".
+    "........\n".
+    "12345...\n",
+    'c_str 3');
