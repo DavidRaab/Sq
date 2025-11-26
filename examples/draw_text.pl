@@ -77,9 +77,7 @@ sub show_canvas($canvas) {
 # Build on top of the five basic functions
 
 sub c_run($width, $height, $default, @draws) {
-    my $canvas  = create_canvas($width, $height, $default);
-    my $setChar = sub($x,$y,$char) { setChar($canvas, $x,$y, $char) };
-    my $getChar = sub($x,$y)       { getChar($canvas, $x,$y)        };
+    my $canvas = create_canvas($width, $height, $default);
     for my $draw ( @draws ) {
         $draw->($canvas);
     }
