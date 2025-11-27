@@ -87,6 +87,15 @@ BEGIN {
           : fn setChar => $set_complex;
 }
 
+# TODO
+# Writes $str into $canvas but does a word wrap when space is not enough
+sub setCharWrap($canvas, $x,$y, $str) {
+    my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
+    my ($ox,$oy)       = $canvas->{offset}->@*;
+
+    ...
+}
+
 sub getChar($canvas, $x,$y) {
     my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
     my ($ox,$oy)       = $canvas->{offset}->@*;
@@ -944,5 +953,34 @@ is(
     "...................\n".
     "...................\n",
     'vsplit 4');
+
+is(
+    c_string(19,3,'.', c_vsplit(
+        c_vsplit(
+            c_set(0,0,"aaaaaaaaaaaa"),
+            c_set(0,0,"bbbbbbbbbbbb"),
+        ),
+        c_vsplit(
+            c_set(0,0,"cccccccccccc"),
+            c_set(0,0,"dddddddddddd"),
+        )
+    )),
+    "aaaabbbbbcccccddddd\n".
+    "...................\n".
+    "...................\n",
+    'vsplit 5');
+
+is(
+    c_string(19,3,'.', c_vsplit(
+        c_vsplit(
+            c_set(0,0,"aaaaaaaaaaaa"),
+            c_set(0,0,"bbbbbbbbbbbb"),
+        ),
+        c_set(0,0,"cccccccccccc"),
+    )),
+    "aaaabbbbbcccccccccc\n".
+    "...................\n".
+    "...................\n",
+    'vsplit 6');
 
 done_testing;
