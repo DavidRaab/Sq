@@ -20,40 +20,48 @@ sub create_canvas($width, $height, $default=" ") {
     };
 }
 
-# sub setChar($canvas, $x,$y, $str) {
-#     my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
-#     $x += $canvas->{ox};
-#     $y += $canvas->{oy};
+BEGIN {
+    # When this is true. Then $set_easy is used as setChar function.
+    my $easy = 1;
 
-#     my $skip           = $x < 0 ? abs($x) : 0;
-#     $x                 = $x < 0 ? 0 : $x;
-#     my $start          = ($cw * $y) + $x;
-#     my $max_stop       = ($cw * ($y+1)) - 1;
-#     my $needed_stop    = ($cw * $y) + $x + (length($str) - $skip - 1);
-#     my $stop           = $max_stop < $needed_stop ? $max_stop : $needed_stop;
+    my $set_complex = sub($canvas, $x,$y, $str) {
+        my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
+        $x += $canvas->{offset}->[0];
+        $y += $canvas->{offset}->[1];
 
-#     my @str = split //, $str;
-#     my $idx = 0;
-#     for my $offset ( $start .. $stop ) {
-#         $data->[$offset] = $str[$skip + $idx++];
-#     }
-#     return;
-# }
+        my $skip           = $x < 0 ? abs($x) : 0;
+        $x                 = $x < 0 ? 0 : $x;
+        my $start          = ($cw * $y) + $x;
+        my $max_stop       = ($cw * ($y+1)) - 1;
+        my $needed_stop    = ($cw * $y) + $x + (length($str) - $skip - 1);
+        my $stop           = $max_stop < $needed_stop ? $max_stop : $needed_stop;
 
-# data is a single array that emulates a 2D Array, so $x,$y must be converted
-# into an offset. Position outside canvas are ignored
-sub setChar($canvas, $x,$y, $str) {
-    my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
-    my ($ox,$oy)       = $canvas->{offset}->@*;
-    my ($rx,$ry)       = ($ox+$x, $oy+$y);
+        my @str = split //, $str;
+        my $idx = 0;
+        for my $offset ( $start .. $stop ) {
+            $data->[$offset] = $str[$skip + $idx++];
+        }
+        return;
+    };
 
-    for my $char ( split //, $str ) {
-        $rx++, next if $rx < 0 || $rx >= $cw;
-        $rx++, next if $ry < 0 || $ry >= $ch;
-        $data->[$cw * $ry + $rx] = $char;
-        $rx++;
-    }
-    return;
+    # data is a single array that emulates a 2D Array, so $x,$y must be converted
+    # into an offset. Position outside canvas are ignored
+    my $set_easy = sub($canvas, $x,$y, $str) {
+        my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
+        my ($ox,$oy)       = $canvas->{offset}->@*;
+        my ($rx,$ry)       = ($ox+$x, $oy+$y);
+
+        for my $char ( split //, $str ) {
+            $rx++, next if $rx < 0 || $rx >= $cw;
+            $rx++, next if $ry < 0 || $ry >= $ch;
+            $data->[$cw * $ry + $rx] = $char;
+            $rx++;
+        }
+        return;
+    };
+
+    $easy ? fn setChar => $set_easy
+          : fn setChar => $set_complex;
 }
 
 sub getChar($canvas, $x,$y) {
