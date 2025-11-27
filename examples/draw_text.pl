@@ -121,7 +121,7 @@ sub iterLine($canvas, $f) {
 
     my $y = 0;
     for my $line ( $data =~ m/(.{1,$w})/g ) {
-        $f->($ox,$y-$oy, $line);
+        $f->(-$ox,$y-$oy, $line);
         $y++;
     }
     return;
@@ -146,7 +146,7 @@ sub cmap($canvas, $f) {
 }
 
 sub fill($canvas, $char) {
-    my ($w,$h) = $canvas->@{qw/width height/};
+    my ($w,$h)      = $canvas->@{qw/width height/};
     $canvas->{data} = $char x ($w*$h);
     return;
 }
@@ -166,7 +166,7 @@ sub line($canvas, $xs,$ys, $xe,$ye, $char) {
     my $e2; # error value e_xy
 
     while (1) {
-        setChar($canvas, $xs, $ys, $char);
+        setChar($canvas, $xs,$ys, $char);
         last if $xs == $xe && $ys == $ye;
         $e2 = 2 * $err;
         if ($e2 > $dy) { $err += $dy; $xs += $sx; }
@@ -277,8 +277,7 @@ sub c_canvas($width, $height, $default, @draws) {
     Carp::croak 'c_canvas($width,$height,$char,@draws)' if ref $default ne "";
     return sub($canvas) {
         # generates a new canvas, and does all drawing operation on it
-        my $new  = c_run($width, $height, $default, @draws);
-        # my $data = $new->{data};
+        my $new = c_run($width, $height, $default, @draws);
 
         # than merge new canvas in current one
         iterLine($new, sub($x,$y,$line) {
@@ -357,6 +356,16 @@ is(
     is(getChar($canvas, 0,1), undef, 'getChar 10');
 }
 
+# offset with negative writes
+{
+    my $canvas = create_canvas(3,3,'.');
+    addOffset($canvas, 1,1);
+    setChar($canvas, -1,-1, 'X');
+    is(
+        to_string($canvas), "X..\n...\n...\n",
+        'setChar still writes in negative offset when inside canvas');
+}
+
 # check iter(), also if it correctly handles offset
 {
     my $canvas = create_canvas(3,3,'.');
@@ -371,6 +380,23 @@ is(
             [-1,  1, "."], [0,  1, "." ], [1,  1, "." ],
         ],
         'iter after offset');
+}
+
+# check iterLine
+{
+    my $canvas = create_canvas(3,3,'.');
+    addOffset($canvas, 1,1);
+
+    my @sizes;
+    iterLine($canvas, sub { push @sizes, [@_] });
+    is(
+        \@sizes,
+        [
+            [-1, -1, "..."],
+            [-1,  0, "..."],
+            [-1,  1, "..."],
+        ],
+        'iterLine with offset');
 }
 
 # check map(), also if it correctly handles offset
