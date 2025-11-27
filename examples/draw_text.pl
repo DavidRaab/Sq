@@ -21,6 +21,26 @@ sub create_canvas($width, $height, $default=" ") {
     };
 }
 
+# sub setChar($canvas, $x,$y, $str) {
+#     my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
+#     $x += $canvas->{ox};
+#     $y += $canvas->{oy};
+
+#     my $skip           = $x < 0 ? abs($x) : 0;
+#     $x                 = $x < 0 ? 0 : $x;
+#     my $start          = ($cw * $y) + $x;
+#     my $max_stop       = ($cw * ($y+1)) - 1;
+#     my $needed_stop    = ($cw * $y) + $x + (length($str) - $skip - 1);
+#     my $stop           = $max_stop < $needed_stop ? $max_stop : $needed_stop;
+
+#     my @str = split //, $str;
+#     my $idx = 0;
+#     for my $offset ( $start .. $stop ) {
+#         $data->[$offset] = $str[$skip + $idx++];
+#     }
+#     return;
+# }
+
 # data is a single array that emulates a 2D Array, so $x,$y must be converted
 # into an offset. Position outside canvas are ignored
 sub setChar($canvas, $x,$y, $str) {
