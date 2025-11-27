@@ -15,8 +15,7 @@ sub create_canvas($width, $height, $default=" ") {
         width   => $width,
         height  => $height,
         default => $default,
-        ox      => 0,        # Offset X
-        oy      => 0,        # Offset Y
+        offset  => [0,0],
         data    => [($default) x ($width * $height)],
     };
 }
@@ -44,8 +43,9 @@ sub create_canvas($width, $height, $default=" ") {
 # data is a single array that emulates a 2D Array, so $x,$y must be converted
 # into an offset. Position outside canvas are ignored
 sub setChar($canvas, $x,$y, $str) {
-    my ($cw,$ch,$data,$ox,$oy) = $canvas->@{qw/width height data/};
-    my ($rx,$ry)               = ($canvas->{ox}+$x, $canvas->{oy}+$y);
+    my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
+    my ($ox,$oy)       = $canvas->{offset}->@*;
+    my ($rx,$ry)       = ($ox+$x, $oy+$y);
 
     for my $char ( split //, $str ) {
         $rx++, next if $rx < 0 || $rx >= $cw;
@@ -65,8 +65,9 @@ sub getChar($canvas, $x,$y) {
 }
 
 sub addOffset($canvas, $x,$y) {
-    $canvas->{ox} = $canvas->{ox} + $x;
-    $canvas->{oy} = $canvas->{oy} + $y;
+    my $offset = $canvas->{offset};
+    $offset->[0] += $x;
+    $offset->[1] += $y;
     return;
 }
 
