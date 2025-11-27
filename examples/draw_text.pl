@@ -71,8 +71,9 @@ BEGIN {
 }
 
 sub getChar($canvas, $x,$y) {
-    my ($cw,$ch,$data,$ox,$oy) = $canvas->@{qw/width height data/};
-    my ($rx,$ry) = ($canvas->{ox} + $x, $canvas->{oy}+$y);
+    my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
+    my ($ox,$oy)       = $canvas->{offset}->@*;
+    my ($rx,$ry)       = ($ox+$x, $oy+$y);
     return if $rx < 0 || $rx >= $cw;
     return if $ry < 0 || $ry >= $ch;
     return $data->[$cw * $ry + $rx];
@@ -87,9 +88,24 @@ sub addOffset($canvas, $x,$y) {
 
 sub iter($canvas, $f) {
     my ($data, $w, $h) = $canvas->@{qw/data width height/};
+    my ($ox,$oy)       = $canvas->{offset}->@*;
     for my $y ( 0 .. ($h-1) ) {
         for my $x ( 0 .. ($w-1) ) {
-            $f->($x,$y, $data->[$y*$w + $x]);
+            $f->($x-$ox, $y-$oy, $data->[$y*$w + $x]);
+        }
+    }
+    return;
+}
+
+sub cmap($canvas, $f) {
+    my ($data, $w, $h) = $canvas->@{qw/data width height/};
+    my ($ox,$oy)       = $canvas->{offset}->@*;
+
+    my $idx = 0;
+    for my $y ( 0 .. ($h-1) ) {
+        for my $x ( 0 .. ($w-1) ) {
+            $idx          = $y*$w + $x;
+            $data->[$idx] = $f->($x-$ox, $y-$oy, $data->[$idx]);
         }
     }
     return;
@@ -251,15 +267,7 @@ sub c_canvas($width, $height, $default, @draws) {
 }
 
 sub c_iter($f) {
-    return sub($canvas) {
-        my ($data,$cw,$ch) = $canvas->@{qw/data width height/};
-        for my $y ( 0 .. ($ch-1) ) {
-            for my $x ( 0 .. ($cw-1) ) {
-                setChar($canvas, $x,$y, $f->($x,$y,$data->[$cw*$y+$x]));
-            }
-        }
-        return;
-    }
+    return sub($canvas) { iter($canvas, $f) }
 }
 
 sub c_fill($def) {
@@ -304,6 +312,68 @@ is(
     "5....\n".
     ".....\n",
     'to_string 2');
+
+# check getChar, also if it correctly handles offset
+{
+    my $canvas = create_canvas(10, 2, '.');
+    setChar($canvas, 0,0, "0123456789");
+    setChar($canvas, 0,1, "abcdefghij");
+
+    is(getChar($canvas, 0,0), '0', 'getChar 1');
+    is(getChar($canvas, 5,0), '5', 'getChar 2');
+    is(getChar($canvas, 9,0), '9', 'getChar 3');
+    is(getChar($canvas, 0,1), 'a', 'getChar 4');
+    is(getChar($canvas, 5,1), 'f', 'getChar 5');
+    is(getChar($canvas, 9,1), 'j', 'getChar 6');
+
+    addOffset($canvas, 1,1);
+
+    is(getChar($canvas, 0,0),   'b', 'getChar 7');
+    is(getChar($canvas, 5,0),   'g', 'getChar 8');
+    is(getChar($canvas, 8,0),   'j', 'getChar 9');
+    is(getChar($canvas, 0,1), undef, 'getChar 10');
+}
+
+# check iter(), also if it correctly handles offset
+{
+    my $canvas = create_canvas(3,3,'.');
+    addOffset($canvas, 1,1);
+    my @iters;
+    iter($canvas, sub { push @iters, [@_] });
+    is(
+        \@iters,
+        [
+            [-1, -1, "."], [0, -1, "." ], [1, -1, "." ],
+            [-1,  0, "."], [0,  0, "." ], [1,  0, "." ],
+            [-1,  1, "."], [0,  1, "." ], [1,  1, "." ],
+        ],
+        'iter after offset');
+}
+
+# check map(), also if it correctly handles offset
+{
+    my $canvas = create_canvas(3,3,'.');
+    setChar($canvas, 0,0, "012");
+    setChar($canvas, 0,1, "345");
+    setChar($canvas, 0,2, "678");
+    addOffset($canvas, 1,1);
+
+    my @iters;
+    cmap($canvas, sub($x,$y,$char) {
+        push @iters, [$x,$y];
+        return $char + 1;
+    });
+    is(
+        \@iters,
+        [
+            [-1, -1], [0, -1], [1, -1],
+            [-1,  0], [0,  0], [1,  0],
+            [-1,  1], [0,  1], [1,  1],
+        ],
+        'map handles offset');
+
+    is(to_string($canvas), "123\n456\n789\n", 'string after canvas');
+}
 
 is(
     to_string(c_run(5,5,'.', c_set(3,3,'X') )),
