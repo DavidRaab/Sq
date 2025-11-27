@@ -111,12 +111,12 @@ sub getOffset($canvas) {
 }
 
 # Draws $other canvas into $canvas
-sub merge($canvas, $other) {
-    my ($src,$ow,$oh) = $other->@{qw/data width height/};
-    my ($ox,$oy)      = $other->{offset}->@*;
+sub merge($canvas, $x,$y, $other) {
+    my ($src,$w,$h) = $other->@{qw/data width height/};
+    my ($ox,$oy)    = $other->{offset}->@*;
 
-    for my $y ( 0 .. $oh ) {
-        setChar($canvas, 0-$ox,$y-$oy, substr($src, $y*$oh, $ow));
+    for my $row ( 0 .. ($h-1) ) {
+        setChar($canvas, $x-$ox,$y+$row-$oy, substr($src, $row*$w, $w));
     }
     return;
 }
@@ -218,9 +218,7 @@ sub vsplit($canvas, @draws) {
         my $width = $widths->[$idx];
         my $new   = create_canvas($width, $ch, $def);
         $draws[$idx]->($new);
-        iterLine($new, sub($x,$y,$line) {
-            setChar($canvas, $x+$offset,$y, $line);
-        });
+        merge($canvas, $offset,0, $new);
         $offset += $width;
     }
     return;
@@ -300,10 +298,8 @@ sub c_canvas($width, $height, $default, @draws) {
     return sub($canvas) {
         # generates a new canvas, and does all drawing operation on it
         my $new = c_run($width, $height, $default, @draws);
-
         # than merge new canvas in current one
-        merge($canvas, $new);
-
+        merge($canvas, 0,0, $new);
         return;
     }
 }
@@ -355,9 +351,24 @@ is(
     ".....\n",
     'to_string 2');
 
+# offset testing
+{
+    my $canvas = create_canvas(10, 2, '.');
+
+    is([getOffset($canvas)], [0,0], 'getOffset');
+    addOffset($canvas, 1,1);
+    is([getOffset($canvas)], [1,1], 'addOffset 1');
+    clearOffset($canvas);
+    is([getOffset($canvas)], [0,0], 'clearOffset');
+    addOffset($canvas, 1,1);
+    addOffset($canvas, 1,1);
+    is([getOffset($canvas)], [2,2], 'addOffset 2');
+}
+
 # check getChar, also if it correctly handles offset
 {
     my $canvas = create_canvas(10, 2, '.');
+
     setChar($canvas, 0,0, "0123456789");
     setChar($canvas, 0,1, "abcdefghij");
 
@@ -374,15 +385,6 @@ is(
     is(getChar($canvas, 5,0),   'g', 'getChar 8');
     is(getChar($canvas, 8,0),   'j', 'getChar 9');
     is(getChar($canvas, 0,1), undef, 'getChar 10');
-
-    # check getOffset / clearOffset
-    is([getOffset($canvas)], [1,1], 'getOffset');
-    clearOffset($canvas);
-    is([getOffset($canvas)], [0,0], 'clearOffset');
-    addOffset($canvas, 1,1);
-    is([getOffset($canvas)], [1,1], 'addOffset 1');
-    addOffset($canvas, 1,1);
-    is([getOffset($canvas)], [2,2], 'addOffset 2');
 }
 
 # offset with negative writes
@@ -458,18 +460,18 @@ is(
     my $first  = create_canvas(5,5,'.');
     my $second = create_canvas(3,3,'x');
 
-    merge($first, $second);
+    merge($first, 0,0, $second);
     is(to_string($first), "xxx..\nxxx..\nxxx..\n.....\n.....\n", "merge 1");
 
     fill($first, '.');
     addOffset($first, 1,1);
-    merge($first, $second);
+    merge($first, 0,0, $second);
     is(to_string($first), ".....\n.xxx.\n.xxx.\n.xxx.\n.....\n", "merge 2");
 
     fill($first, '.');
     clearOffset($first);
     addOffset($second, 1,1);
-    merge($first, $second);
+    merge($first, 0,0, $second);
     is(to_string($first), "xx...\nxx...\n.....\n.....\n.....\n", "merge 3");
 
     fill($first, '.');
@@ -477,7 +479,7 @@ is(
     clearOffset($second);
     addOffset($first,2,2);
     addOffset($second,1,1);
-    merge($first, $second);
+    merge($first, 0,0, $second);
     is(to_string($first), ".....\n.xxx.\n.xxx.\n.xxx.\n.....\n", "merge 4");
 }
 
