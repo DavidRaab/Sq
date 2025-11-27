@@ -111,12 +111,13 @@ static divide_even_spread => sub($k,$n) {
     my @widths;
     my $ideal = $k / $n;
     my $accum = 0;
-    for ( 1 .. $k ) {
+    for ( 1 .. $n ) {
         $accum   += $ideal;
         my $value = int $accum;
         push @widths, $value;
         $accum -= $value;
     }
+    if ( $accum > 0.5 ) { $widths[-1]++ }
     bless(\@widths, 'Array');
 };
 

@@ -182,4 +182,21 @@ use Sq::Test;
         'to_hex vs to_num_system');
 }
 
+# even_spread
+{
+    my $div = Sq->math->divide_even_spread;
+    is($div->(10,2), [5,5],     'div 1');
+    is($div->(19,4), [4,5,5,5], 'div 2');
+    is($div->(9,3),  [3,3,3],   'div 3');
+    is($div->(10,4), [2,3,2,3], 'div 4');
+    is($div->(11,3), [3,4,4],   'div 5');
+    is($div->(14,3), [4,5,5],   'div 6');
+
+    Seq::cartesian(Seq->range(10,30), Seq->range(1,7))->iter(sub($tuple) {
+        my ($k,$n) = @$tuple;
+        my $sum = $div->($k,$n)->sum;
+        is($sum, $k, "div -- $k/$n -> $k == $sum");
+    })
+}
+
 done_testing;
