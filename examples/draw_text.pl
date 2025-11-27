@@ -73,9 +73,9 @@ BEGIN {
         my ($ox,$oy)       = $canvas->{offset}->@*;
         my ($rx,$ry)       = ($ox+$x, $oy+$y);
 
+        return if $ry < 0 || $ry >= $ch;
         for my $char ( split //, $str ) {
             $rx++, next if $rx < 0 || $rx >= $cw;
-            $rx++, next if $ry < 0 || $ry >= $ch;
             substr $data, ($cw*$ry+$rx), 1, $char;
             $rx++;
         }
