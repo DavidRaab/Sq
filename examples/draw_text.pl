@@ -24,7 +24,7 @@ sub create_canvas($width, $height, $default=" ") {
 BEGIN {
     # When this is true. Then $set_easy is used as setChar function.
     # Otherwise $set_complex is used.
-    my $easy = 0;
+    my $easy = 1;
 
     # This does an "intelligent" computation to only copy those characters
     # from string into $canvas that are visible. So clipping and strings
@@ -46,19 +46,9 @@ BEGIN {
         my $stop        = $max_stop < $needed_stop ? $max_stop : $needed_stop;
         my $length      = $stop - $start;
 
-        # return if $start >= length($data) || $start < 0;
-        # dump([$data, [$x,$y,$str], $start,$stop,$skip,$length]);
         return if $length < 0 || $y >= $ch || $stop < 0;
         substr($data, $start, $length, substr($str, $skip, $length));
-        # dump([$data]);
         $canvas->{data} = $data;
-
-        # my @str = split //, $str;
-        # my $idx = 0;
-        # for my $offset ( $start .. $stop ) {
-        #     substr($data, $offset, 1, substr($str, ($skip+$idx++), 1));
-        #     # $data->[$offset] = $str[$skip + $idx++];
-        # }
         return;
     };
 
