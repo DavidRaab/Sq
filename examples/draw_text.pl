@@ -142,12 +142,11 @@ sub iter($canvas, $f) {
 }
 
 sub iterLine($canvas, $f) {
-    my ($data,$w) = $canvas->@{qw/data width height/};
-    my ($ox,$oy)  = $canvas->{offset}->@*;
+    my ($data,$w,$h) = $canvas->@{qw/data width height/};
+    my ($ox,$oy)     = $canvas->{offset}->@*;
 
-    my $y = 0;
-    for my $line ( $data =~ m/(.{1,$w})/g ) {
-        $f->(-$ox,$y-$oy, $line);
+    for my $y ( 0 .. ($h-1) ) {
+        $f->(-$ox,$y-$oy, substr($data, $w*$y, $w) );
         $y++;
     }
     return;
