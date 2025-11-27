@@ -24,7 +24,7 @@ sub create_canvas($width, $height, $default=" ") {
 BEGIN {
     # When this is true. Then $set_easy is used as setChar function.
     # Otherwise $set_complex is used.
-    my $easy = 1;
+    my $easy = 0;
 
     # This does an "intelligent" computation to only copy those characters
     # from string into $canvas that are visible. So clipping and strings
