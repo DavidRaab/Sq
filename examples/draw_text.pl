@@ -216,8 +216,10 @@ sub vsplit($canvas, @draws) {
     my $offset = 0;
     for (my $idx=0; $idx<@draws; $idx++) {
         my $width = $widths->[$idx];
-        my $new   = create_canvas($width, $ch, $def);
-        $draws[$idx]->($new);
+        my $draw  = $draws[$idx];
+
+        my $new = create_canvas($width, $ch, $def);
+        $draw->($new);
         merge($canvas, $offset,0, $new);
         $offset += $width;
     }
