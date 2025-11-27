@@ -37,23 +37,33 @@ BEGIN {
         $x += $ox;
         $y += $oy;
 
+        # when $x is negative, we must skip characters to print in $str
+        # $x is set to zero because that's the virtual position we write
         my $skip           = $x < 0 ? abs($x) : 0;
         $x                 = $x < 0 ? 0 : $x;
-        my $start          = ($cw * $y) + $x;
+        # $offset is the offset in $data we need to write
+        my $offset         = ($cw * $y) + $x;
 
+        # this is the maximum position of the current line
         my $max_stop    = ($cw * ($y+1));
+        # the end offset we need to write. This can be lower than $max_stop
+        # when string is shorter than remaining space. Or bigger when
+        # $str is much larger than remaining space
         my $needed_stop = ($cw * $y) + $x + (length($str) - $skip);
+        # as we clip, we must use the lower $stop
         my $stop        = $max_stop < $needed_stop ? $max_stop : $needed_stop;
-        my $length      = $stop - $start;
+        # now calculate real characters we need to write
+        my $length      = $stop - $offset;
 
+        # different aborts when nothing is to write, or we are outside canvas
         return if $length < 0 || $y >= $ch || $stop < 0;
-        substr($data, $start, $length, substr($str, $skip, $length));
+        substr($data, $offset, $length, substr($str, $skip, $length));
         $canvas->{data} = $data;
         return;
     };
 
-    # data is a single array that emulates a 2D Array, so $x,$y must be converted
-    # into an offset. Position outside canvas are ignored
+    # data is a single string that is used like a 2D Array, so $x,$y must
+    # be converted into an offset. Position outside canvas are ignored
     my $set_easy = sub($canvas, $x,$y, $str) {
         my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
         my ($ox,$oy)       = $canvas->{offset}->@*;
