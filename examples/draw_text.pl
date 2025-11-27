@@ -5,8 +5,12 @@ use open ':std', ':encoding(UTF-8)';
 use Sq -sig => 1;
 use Sq::Test;
 
-# Most basic mutable implementation:
-# create_canvas, setChar, getChar, to_string, show_canvas
+# First i create a mutable implementation. The first implementation just
+# provided basic set/get and to_string. Everything else was implemented
+# in combinator. But i changed implementation and put more into the
+# mutable implementation. This makes some stuff easier and more extendable.
+# Combinator API is just a wrapper around the mutable one. This is also
+# a little bit faster.
 
 sub create_canvas($width, $height, $default=" ") {
     Carp::croak "width  must be > 0"               if $width  <= 0;
@@ -39,10 +43,10 @@ BEGIN {
 
         # when $x is negative, we must skip characters to print in $str
         # $x is set to zero because that's the virtual position we write
-        my $skip           = $x < 0 ? abs($x) : 0;
-        $x                 = $x < 0 ? 0 : $x;
+        my $skip        = $x < 0 ? abs($x) : 0;
+        $x              = $x < 0 ? 0 : $x;
         # $offset is the offset in $data we need to write
-        my $offset         = ($cw * $y) + $x;
+        my $offset      = ($cw * $y) + $x;
 
         # this is the maximum position of the current line
         my $max_stop    = ($cw * ($y+1));
