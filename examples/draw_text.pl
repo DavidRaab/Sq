@@ -9,21 +9,22 @@ use Sq::Test;
 # create_canvas, setChar, getChar, to_string, show_canvas
 
 sub create_canvas($width, $height, $default=" ") {
-    Carp::croak "width  must be > 0" if $width  <= 0;
-    Carp::croak "height must be > 0" if $height <= 0;
+    Carp::croak "width  must be > 0"               if $width  <= 0;
+    Carp::croak "height must be > 0"               if $height <= 0;
+    Carp::croak "default must be single character" if length($default) != 1;
     return sq {
         width   => $width,
         height  => $height,
         default => $default,
         offset  => [0,0],
-        data    => [($default) x ($width * $height)],
+        data    => $default x ($width * $height),
     };
 }
 
 BEGIN {
     # When this is true. Then $set_easy is used as setChar function.
     # Otherwise $set_complex is used.
-    my $easy = 1;
+    my $easy = 0;
 
     # This does an "intelligent" computation to only copy those characters
     # from string into $canvas that are visible. So clipping and strings
@@ -32,21 +33,32 @@ BEGIN {
     # calculation instead of just copying everything.
     my $set_complex = sub($canvas, $x,$y, $str) {
         my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
-        $x += $canvas->{offset}->[0];
-        $y += $canvas->{offset}->[1];
+        my ($ox,$oy)       = $canvas->{offset}->@*;
+        $x += $ox;
+        $y += $oy;
 
         my $skip           = $x < 0 ? abs($x) : 0;
         $x                 = $x < 0 ? 0 : $x;
         my $start          = ($cw * $y) + $x;
-        my $max_stop       = ($cw * ($y+1)) - 1;
-        my $needed_stop    = ($cw * $y) + $x + (length($str) - $skip - 1);
-        my $stop           = $max_stop < $needed_stop ? $max_stop : $needed_stop;
 
-        my @str = split //, $str;
-        my $idx = 0;
-        for my $offset ( $start .. $stop ) {
-            $data->[$offset] = $str[$skip + $idx++];
-        }
+        my $max_stop    = ($cw * ($y+1));
+        my $needed_stop = ($cw * $y) + $x + (length($str) - $skip);
+        my $stop        = $max_stop < $needed_stop ? $max_stop : $needed_stop;
+        my $length      = $stop - $start;
+
+        # return if $start >= length($data) || $start < 0;
+        # dump([$data, [$x,$y,$str], $start,$stop,$skip,$length]);
+        return if $length < 0 || $y >= $ch || $stop < 0;
+        substr($data, $start, $length, substr($str, $skip, $length));
+        # dump([$data]);
+        $canvas->{data} = $data;
+
+        # my @str = split //, $str;
+        # my $idx = 0;
+        # for my $offset ( $start .. $stop ) {
+        #     substr($data, $offset, 1, substr($str, ($skip+$idx++), 1));
+        #     # $data->[$offset] = $str[$skip + $idx++];
+        # }
         return;
     };
 
@@ -60,9 +72,10 @@ BEGIN {
         for my $char ( split //, $str ) {
             $rx++, next if $rx < 0 || $rx >= $cw;
             $rx++, next if $ry < 0 || $ry >= $ch;
-            $data->[$cw * $ry + $rx] = $char;
+            substr $data, ($cw*$ry+$rx), 1, $char;
             $rx++;
         }
+        $canvas->{data} = $data;
         return;
     };
 
@@ -76,7 +89,7 @@ sub getChar($canvas, $x,$y) {
     my ($rx,$ry)       = ($ox+$x, $oy+$y);
     return if $rx < 0 || $rx >= $cw;
     return if $ry < 0 || $ry >= $ch;
-    return $data->[$cw * $ry + $rx];
+    return substr $data, ($cw*$ry+$rx), 1;
 }
 
 sub addOffset($canvas, $x,$y) {
@@ -89,10 +102,27 @@ sub addOffset($canvas, $x,$y) {
 sub iter($canvas, $f) {
     my ($data, $w, $h) = $canvas->@{qw/data width height/};
     my ($ox,$oy)       = $canvas->{offset}->@*;
-    for my $y ( 0 .. ($h-1) ) {
-        for my $x ( 0 .. ($w-1) ) {
-            $f->($x-$ox, $y-$oy, $data->[$y*$w + $x]);
+
+    my ($x,$y) = (0,0);
+    for my $char ( split //, $data ) {
+        $f->($x-$ox, $y-$oy, $char);
+        $x++;
+        if ( $x >= $w ) {
+            $x = 0;
+            $y++;
         }
+    }
+    return;
+}
+
+sub iterLine($canvas, $f) {
+    my ($data,$w) = $canvas->@{qw/data width height/};
+    my ($ox,$oy)  = $canvas->{offset}->@*;
+
+    my $y = 0;
+    for my $line ( $data =~ m/(.{1,$w})/g ) {
+        $f->($ox,$y-$oy, $line);
+        $y++;
     }
     return;
 }
@@ -101,35 +131,30 @@ sub cmap($canvas, $f) {
     my ($data, $w, $h) = $canvas->@{qw/data width height/};
     my ($ox,$oy)       = $canvas->{offset}->@*;
 
-    my $idx = 0;
-    for my $y ( 0 .. ($h-1) ) {
-        for my $x ( 0 .. ($w-1) ) {
-            $idx          = $y*$w + $x;
-            $data->[$idx] = $f->($x-$ox, $y-$oy, $data->[$idx]);
+    my $new = "";
+    my ($x,$y) = (0,0);
+    for my $char ( split //, $data ) {
+        $new .= $f->($x-$ox, $y-$oy, $char);
+        $x++;
+        if ( $x >= $w ) {
+            $x = 0;
+            $y++;
         }
     }
+    $canvas->{data} = $new;
     return;
 }
 
 sub fill($canvas, $char) {
-    for my $x ( $canvas->{data}->@* ) {
-        $x = $char;
-    }
+    my ($w,$h) = $canvas->@{qw/width height/};
+    $canvas->{data} = $char x ($w*$h);
     return;
 }
 
 # creates string out of $canvas
 sub to_string($canvas) {
-    my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
-
-    my $str;
-    for my $y ( 0 .. ($ch-1) ) {
-        for my $x ( 0 .. ($cw-1) ) {
-            $str .= $data->[$cw * $y + $x];
-        }
-        $str .= "\n";
-    }
-    return $str;
+    my ($cw, $data) = $canvas->@{qw/width data/};
+    return $data =~ s/(.{$cw})/$1\n/gr;
 }
 
 sub line($canvas, $xs,$ys, $xe,$ye, $char) {
@@ -171,8 +196,8 @@ sub vsplit($canvas, @draws) {
         my $width = $widths->[$idx];
         my $new   = create_canvas($width, $ch, $def);
         $draws[$idx]->($new);
-        iter($new, sub($x,$y,$char) {
-            setChar($canvas, $x+$offset,$y, $char);
+        iterLine($new, sub($x,$y,$line) {
+            setChar($canvas, $x+$offset,$y, $line);
         });
         $offset += $width;
     }
@@ -210,9 +235,10 @@ sub c_and(@draws) {
 # from Array of Array
 sub c_fromAoA($aoa) {
     return sub($canvas) {
-        Array::iter2d($aoa, sub($char, $x,$y) {
-            setChar($canvas, $x,$y, $char);
-        });
+        my $y = 0;
+        for my $inner ( @$aoa ) {
+            setChar($canvas, 0,$y++, join('', @$inner));
+        }
         return;
     }
 }
@@ -252,15 +278,12 @@ sub c_canvas($width, $height, $default, @draws) {
     return sub($canvas) {
         # generates a new canvas, and does all drawing operation on it
         my $new  = c_run($width, $height, $default, @draws);
-        my $data = $new->{data};
+        # my $data = $new->{data};
 
         # than merge new canvas in current one
-        my $idx = 0;
-        for my $x ( 0 .. ($width-1) ) {
-            for my $y ( 0 .. ($height-1) ) {
-                setChar($canvas, $x,$y, $data->[$idx++]);
-            }
-        }
+        iterLine($new, sub($x,$y,$line) {
+            setChar($canvas, $x,$y, $line);
+        });
 
         return;
     }
@@ -293,7 +316,7 @@ sub c_vsplit(@draws) {
 
 is(
     to_string({
-        data   => [1,2,3,4,5,".",".",".",".",".",".",".",".",".","."],
+        data   => "12345..........",
         height => 3,
         width  => 5
     }),
@@ -304,7 +327,7 @@ is(
 
 is(
     to_string({
-        data   => [".",1,2,3,4,5,".",".",".",".",".",".",".",".","."],
+        data   => ".12345.........",
         height => 3,
         width  => 5
     }),
@@ -418,7 +441,7 @@ is(
     'c_fill 1');
 
 is(
-    c_string(10,10,' ',
+    c_string(10,6,'.',
         c_set( 0,0, "a"),
         c_set( 1,0, "a"),
         c_set( 2,0, "a"),
@@ -430,18 +453,13 @@ is(
         c_set(-3,0, "TTTT"),
         c_set(-3,4, "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"),
     ),
-    "Tefghijkl \n".
-    "aa        \n".
-    "          \n".
-    "   xxxxxxx\n".
+    "Tefghijkl.\n".
+    "aa........\n".
+    "..........\n".
+    "...xxxxxxx\n".
     "TTTTTTTTTT\n".
-    "          \n".
-    "          \n".
-    "          \n".
-    "          \n".
-    "          \n",
+    "..........\n",
     'canvas 1');
-
 
 my $canvas = c_canvas(20,20,".",c_fill('a'));
 is(
