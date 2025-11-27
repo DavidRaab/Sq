@@ -219,7 +219,7 @@ sub rect($canvas, $tx,$ty, $bx,$by, $char) {
 }
 
 sub vsplit($canvas, @draws) {
-    state $div = Sq->math->divide_even_spread;
+    state $div = Sq->math->divide_spread;
 
     my $spaces        = @draws;
     my ($cw,$ch,$def) = $canvas->@{qw/width height default/};
