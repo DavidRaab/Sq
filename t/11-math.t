@@ -184,19 +184,54 @@ use Sq::Test;
 
 # even_spread
 {
-    my $div = Sq->math->divide_even_spread;
-    is($div->(10,2), [5,5],     'div 1');
-    is($div->(19,4), [4,5,5,5], 'div 2');
-    is($div->(9,3),  [3,3,3],   'div 3');
-    is($div->(10,4), [2,3,2,3], 'div 4');
-    is($div->(11,3), [3,4,4],   'div 5');
-    is($div->(14,3), [4,5,5],   'div 6');
+    my $div = Sq->math->divide_spread;
+    is($div->(10,2), [5,5],         'spread 1');
+    is($div->(19,4), [4,5,5,5],     'spread 2');
+    is($div->(9,3),  [3,3,3],       'spread 3');
+    is($div->(10,4), [2,3,2,3],     'spread 4');
+    is($div->(11,3), [3,4,4],       'spread 5');
+    is($div->(14,3), [4,5,5],       'spread 6');
+    is($div->(20,6), [3,3,4,3,3,4], 'spread 7');
 
-    Seq::cartesian(Seq->range(10,30), Seq->range(1,7))->iter(sub($tuple) {
-        my ($k,$n) = @$tuple;
-        my $sum = $div->($k,$n)->sum;
-        is($sum, $k, "div -- $k/$n -> $k == $sum");
-    })
+    check(
+        Array::cartesian([10..30], [1..7])->map(sub($tuple) {
+            my ($k,$n) = @$tuple;
+            [$k,$n,$div->($k,$n)]
+        }),
+        sub ($array) {
+            for my $tuple ( @$array ) {
+                my ($k,$n,$array) = @$tuple;
+                return 0 if $tuple->[0] != Array::sum($array);
+            }
+            return 1;
+        },
+        'spread examples');
+}
+
+# even_symmetric
+{
+    my $div = Sq->math->divide_symmetric;
+    is($div->(10,2), [5,5],         'symmetric 1');
+    is($div->(19,4), [5,5,5,4],     'symmetric 2');
+    is($div->(9,3),  [3,3,3],       'symmetric 3');
+    is($div->(10,4), [2,3,3,2],     'symmetric 4');
+    is($div->(11,3), [3,4,4],       'symmetric 5');
+    is($div->(14,3), [4,5,5],       'symmetric 6');
+    is($div->(20,6), [3,3,4,4,3,3], 'symmetric 7');
+
+    check(
+        Array::cartesian([10..30], [1..7])->map(sub($tuple) {
+            my ($k,$n) = @$tuple;
+            [$k,$n,$div->($k,$n)]
+        }),
+        sub ($array) {
+            for my $tuple ( @$array ) {
+                my ($k,$n,$array) = @$tuple;
+                return 0 if $tuple->[0] != Array::sum($array);
+            }
+            return 1;
+        },
+        'symmetric examples');
 }
 
 done_testing;

@@ -107,7 +107,7 @@ static to_num_system => sub($str_places, $num) {
 static to_binary => sub($num) { sprintf "%b", $num };
 static to_hex    => sub($num) { sprintf "%x", $num };
 
-static divide_even_spread => sub($k,$n) {
+static divide_spread => sub($k,$n) {
     my @widths;
     my $ideal = $k / $n;
     my $accum = 0;
@@ -119,6 +119,30 @@ static divide_even_spread => sub($k,$n) {
     }
     if ( $accum > 0.5 ) { $widths[-1]++ }
     bless(\@widths, 'Array');
+};
+
+static divide_symmetric => sub($n,$k) {
+    my $base = int($n / $k);
+    my $rest = $n % $k;
+
+    my @result = ($base) x $k;
+
+    # Positionen für den Rest bestimmen – symmetrisch um das Zentrum
+    my @positions;
+    my $left  = int(($k - 1) / 2);
+    my $right = $left + 1;
+
+    while (@positions < $rest) {
+        push @positions, $left  if $left  >= 0     && @positions < $rest;
+        push @positions, $right if $right < $k     && @positions < $rest;
+        $left--;
+        $right++;
+    }
+
+    # +1 an den symmetrischen Positionen
+    $result[$_]++ for @positions;
+
+    return bless(\@result, 'Array');
 };
 
 1;

@@ -11,6 +11,7 @@ sig('Sq::Math::permute_count_up',   $aint,        t_bool);
 sig('Sq::Math::to_num_system',      t_str, t_int,  t_str);
 sig('Sq::Math::to_binary',          t_int,         t_str);
 sig('Sq::Math::to_hex',             t_int,         t_str);
-sig('Sq::Math::divide_even_spread', t_int, t_int,  $aint);
+sig('Sq::Math::divide_spread',      t_int, t_int,  $aint);
+sig('Sq::Math::divide_symmetric',   t_int, t_int,  $aint);
 
 1;
