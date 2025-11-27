@@ -99,6 +99,28 @@ sub addOffset($canvas, $x,$y) {
     return;
 }
 
+sub clearOffset($canvas) {
+    my $offset = $canvas->{offset};
+    $offset->[0] = 0;
+    $offset->[1] = 0;
+    return;
+}
+
+sub getOffset($canvas) {
+    return $canvas->{offset}->@*;
+}
+
+# Draws $other canvas into $canvas
+sub merge($canvas, $other) {
+    my ($src,$ow,$oh) = $other->@{qw/data width height/};
+    my ($ox,$oy)      = $other->{offset}->@*;
+
+    for my $y ( 0 .. $oh ) {
+        setChar($canvas, 0-$ox,$y-$oy, substr($src, $y*$oh, $ow));
+    }
+    return;
+}
+
 sub iter($canvas, $f) {
     my ($data, $w, $h) = $canvas->@{qw/data width height/};
     my ($ox,$oy)       = $canvas->{offset}->@*;
@@ -280,9 +302,7 @@ sub c_canvas($width, $height, $default, @draws) {
         my $new = c_run($width, $height, $default, @draws);
 
         # than merge new canvas in current one
-        iterLine($new, sub($x,$y,$line) {
-            setChar($canvas, $x,$y, $line);
-        });
+        merge($canvas, $new);
 
         return;
     }
@@ -354,6 +374,15 @@ is(
     is(getChar($canvas, 5,0),   'g', 'getChar 8');
     is(getChar($canvas, 8,0),   'j', 'getChar 9');
     is(getChar($canvas, 0,1), undef, 'getChar 10');
+
+    # check getOffset / clearOffset
+    is([getOffset($canvas)], [1,1], 'getOffset');
+    clearOffset($canvas);
+    is([getOffset($canvas)], [0,0], 'clearOffset');
+    addOffset($canvas, 1,1);
+    is([getOffset($canvas)], [1,1], 'addOffset 1');
+    addOffset($canvas, 1,1);
+    is([getOffset($canvas)], [2,2], 'addOffset 2');
 }
 
 # offset with negative writes
@@ -422,6 +451,34 @@ is(
         'map handles offset');
 
     is(to_string($canvas), "123\n456\n789\n", 'string after canvas');
+}
+
+# check merge, and how it handles offsets
+{
+    my $first  = create_canvas(5,5,'.');
+    my $second = create_canvas(3,3,'x');
+
+    merge($first, $second);
+    is(to_string($first), "xxx..\nxxx..\nxxx..\n.....\n.....\n", "merge 1");
+
+    fill($first, '.');
+    addOffset($first, 1,1);
+    merge($first, $second);
+    is(to_string($first), ".....\n.xxx.\n.xxx.\n.xxx.\n.....\n", "merge 2");
+
+    fill($first, '.');
+    clearOffset($first);
+    addOffset($second, 1,1);
+    merge($first, $second);
+    is(to_string($first), "xx...\nxx...\n.....\n.....\n.....\n", "merge 3");
+
+    fill($first, '.');
+    clearOffset($first);
+    clearOffset($second);
+    addOffset($first,2,2);
+    addOffset($second,1,1);
+    merge($first, $second);
+    is(to_string($first), ".....\n.xxx.\n.xxx.\n.xxx.\n.....\n", "merge 4");
 }
 
 is(
