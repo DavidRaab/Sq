@@ -109,9 +109,14 @@ overview of the functionality of Sq itself.
 
 =head2 Sq->math
 
-    Sq->math->fac     ($int)
-    Sq->math->is_prime($number)
-    Sq->math->permute_count_up
+    my $num       = Sq->math->fac     ($int)
+    my $bool      = Sq->math->is_prime($number)
+    my $array     = Sq->math->permute_count_up($array)
+    my $str       = Sq->math->to_num_system($str_places, $num)
+    my $str       = Sq->math->to_binary($num)
+    my $str       = Sq->math->to_hex($num)
+    my $int_array = Sq->math->divide_spread($n,$d)
+    my $int_array = Sq->math->divide_symmetric($n,$d)
 
 =head2 Sq->fmt
 
@@ -127,6 +132,7 @@ overview of the functionality of Sq itself.
 
     my $seq = Sq->rand->int($min, $max)             # sequence of random integer from $min to $max
     my $seq = Sq->rand->num($min, $max)             # sequence of random number from $min to $max
+    my $seq = Sq->rand->str($amount)                # sequence of random strings of length $amount
     my $seq = Sq->rand->str($min, $max)             # sequence of random strings of length $min-$max
     my $seq = Sq->rand->str($min, $max, $str_chars) # sequence of random strings of length $min-$max that uses characters from $str_chars
 
