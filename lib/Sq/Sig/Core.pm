@@ -149,7 +149,7 @@ sig ('Array::replicate',  $pint, $any,                     $array);
 sig ('Array::bless',      $str_array, $array,              $array);
 sig ('Array::from_array', $str_array, $array,              $array);
 sig ('Array::init',       $pint, $any,                     $array);
-sig ('Array::init2d',     $pint, $pint, $sub,              $array);
+sig ('Array::init2d',     $pint, $pint, $any,              $array);
 # Second argument is 'State, would be good to back-reference the type
 sig ('Array::unfold',     $str_array, $any, $sub,          $array);
 sig ('Array::range_step', $str_array, $num, $num, $num,    $array);

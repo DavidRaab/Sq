@@ -71,12 +71,12 @@ Sq::Reflection::static(init => sub($count, $init) {
     return CORE::bless(\@new, 'Array');
 });
 
-Sq::Reflection::static(init2d => sub($width, $height, $f) {
+Sq::Reflection::static(init2d => sub($width, $height, $init) {
     my @new;
     for my $y ( 0 .. $height-1 ) {
         my @inner;
         for my $x ( 0 .. $width-1 ) {
-            push @inner, (scalar $f->($x,$y));
+            push @inner, (scalar Sq::init($init,$x,$y));
         }
         push @new, CORE::bless(\@inner, 'Array');
     }

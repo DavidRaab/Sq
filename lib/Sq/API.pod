@@ -196,7 +196,7 @@ Variables that start with C<$f_> are functions.
     Array->from_hash ($hash, $f)
     Array->replicate ($count, $init)
     Array->init      ($count, $init)
-    Array->init2d    ($width, $height, $f)
+    Array->init2d    ($width, $height, $init)
     Array->unfold    ($state, $f_opt)
     Array->range     ($start, $stop)
     Array->range_step($start, $step, $stop)

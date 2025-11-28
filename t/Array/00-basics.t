@@ -1461,7 +1461,17 @@ is(
             [0,0,0,0],
             [0,0,0,0],
         ],
-        'init2d 1');
+        'init2d 1-1');
+
+    is(
+        Array->init2d(4, 4, 0),
+        [
+            [0,0,0,0],
+            [0,0,0,0],
+            [0,0,0,0],
+            [0,0,0,0],
+        ],
+        'init2d 1-2');
 
     is(
         Array->init2d(4, 4, sub($x,$y) { "$y,$x" }),
@@ -1508,7 +1518,34 @@ is(
         ],
         'init2d 5');
 
+    # check if values are copies when init2d is used with a value
+    {
+        my $init = Array->init2d(3,3, [0,0]);
+        is($init,
+        [
+            [[0,0], [0,0], [0,0]],
+            [[0,0], [0,0], [0,0]],
+            [[0,0], [0,0], [0,0]],
+        ],
+        'init2d with array-ref 1');
 
+        # change value to check if every array is independet
+        my $count = 0;
+        for my $z ( 0 .. 2 ) {
+            for my $y ( 0 .. 2 ) {
+                for my $x ( 0 .. 1 ) {
+                    $init->[$z][$y][$x] = $count++;
+                }
+            }
+        }
+        is($init,
+        [
+            [[ 0, 1], [ 2, 3], [ 4, 5]],
+            [[ 6, 7], [ 8, 9], [10,11]],
+            [[12,13], [14,15], [16,17]],
+        ],
+        'init2d with array-ref 2');
+    }
 
     my @iter;
     Array
