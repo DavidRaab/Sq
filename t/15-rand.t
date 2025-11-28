@@ -77,6 +77,11 @@ check(
     call(all => sub($x) { my $l = length($x); $l >= 3 && $l <= 10 }),
     'No checking if $max is greater than $min -- 2');
 
+check(
+    Sq->rand->str(10)->take(100),
+    call(all => sub($str) { length($str) == 10 }),
+    'rand->str($exact)');
+
 fn rstr => Sq->rand->str;
 is(rstr(1,10, "abc") ->take(100)->rx(qr/\A[abc]+\z/) ->length, 100, 'str 4');
 is(rstr(1,10, "CGTA")->take(100)->rx(qr/\A[CGTA]+\z/)->length, 100, 'str 5');

@@ -28,6 +28,19 @@ static num => sub($min,$max) {
 #       it still always return the minimum amount?
 #       Currently str(10,7) resolves into returning a string from 3-10 characters.
 static str => with_dispatch(
+    type [tuple => ['int']] => sub($amount) {
+        state @chars = ('a' .. 'z', 'A' .. 'Z', 0 .. 9, ' ');
+        state $count = @chars;
+        return bless(sub {
+            return sub {
+                my $str;
+                for ( 1 .. $amount ) {
+                    $str .= $chars[rand $count];
+                }
+                return $str;
+            }
+        }, 'Seq');
+    },
     type [tuple => ['int'],['int']] => sub($min,$max) {
         state @chars = ('a' .. 'z', 'A' .. 'Z', 0 .. 9, ' ');
         state $count = @chars;
