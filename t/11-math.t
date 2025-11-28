@@ -192,6 +192,7 @@ use Sq::Test;
     is($div->(11,3), [3,4,4],       'spread 5');
     is($div->(14,3), [4,5,5],       'spread 6');
     is($div->(20,6), [3,3,4,3,3,4], 'spread 7');
+    is($div->(16,5), [3,3,3,3,4],   'spread 8');
 
     check(
         Array::cartesian([10..30], [1..7])->map(sub($tuple) {
@@ -218,6 +219,7 @@ use Sq::Test;
     is($div->(11,3), [3,4,4],       'symmetric 5');
     is($div->(14,3), [4,5,5],       'symmetric 6');
     is($div->(20,6), [3,3,4,4,3,3], 'symmetric 7');
+    is($div->(16,5), [3,3,4,3,3],   'symmetric 8');
 
     check(
         Array::cartesian([10..30], [1..7])->map(sub($tuple) {

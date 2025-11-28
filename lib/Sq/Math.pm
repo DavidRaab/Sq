@@ -107,40 +107,58 @@ static to_num_system => sub($str_places, $num) {
 static to_binary => sub($num) { sprintf "%b", $num };
 static to_hex    => sub($num) { sprintf "%x", $num };
 
-static divide_spread => sub($k,$n) {
+static divide_spread => sub($n,$d) {
     my @widths;
-    my $ideal = $k / $n;
+    # algorithm works like line drawing. We have an ideal, but this can be
+    # a floating point. But we only can use integer. So we use $accum and
+    # always add the floating point to it. The integer from that is saved,
+    # and later subtracted from $accum. So sometimes the increase becomes one
+    # more than ideal.
+    my $ideal = $n / $d;
     my $accum = 0;
-    for ( 1 .. $n ) {
-        $accum   += $ideal;
-        my $value = int $accum;
+    my $value;
+    for ( 1 .. $d ) {
+        $accum += $ideal;
+        $value  = int $accum;
         push @widths, $value;
         $accum -= $value;
     }
+    # The problem with this approach is floating point crappness. Sometimes
+    # at the end, the $accum could be 0.99999999987 whatever. So +1 is missing
+    # at the very end. This is a hack. When $accum is greater 0.5, then last
+    # value is increased. From tests so far, this seemed more correct.
     if ( $accum > 0.5 ) { $widths[-1]++ }
     bless(\@widths, 'Array');
 };
 
-static divide_symmetric => sub($n,$k) {
-    my $base = int($n / $k);
-    my $rest = $n % $k;
+static divide_symmetric => sub($n,$d) {
+    my $base = int($n / $d);
+    my $rest = $n % $d;
 
-    my @result = ($base) x $k;
+    # first we create an array with the base values
+    my @result = ($base) x $d;
 
-    # Positionen für den Rest bestimmen – symmetrisch um das Zentrum
-    my @positions;
-    my $left  = int(($k - 1) / 2);
-    my $right = $left + 1;
+    # $rest says how much values in @result must be increment by 1.
+    # we want to spread +1 symmetrically. So we need to calculate two positions
+    # a $left and $right from the center. For example when $d was 6 we initialize
+    # $left = 2; $right = 3
 
-    while (@positions < $rest) {
-        push @positions, $left  if $left  >= 0     && @positions < $rest;
-        push @positions, $right if $right < $k     && @positions < $rest;
+    # then we increment values inside @result from center as long we need
+    my $left      = int(($d - 1) / 2);
+    my $right     = $left + 1;
+    my $increased = 0;
+    while ($increased < $rest) {
+        if ( $left >= 0 ) {
+            $result[$left]++;
+            $increased++;
+        }
+        if ( $right < $d && $increased < $rest ) {
+            $result[$right]++;
+            $increased++;
+        }
         $left--;
         $right++;
     }
-
-    # +1 an den symmetrischen Positionen
-    $result[$_]++ for @positions;
 
     return bless(\@result, 'Array');
 };
