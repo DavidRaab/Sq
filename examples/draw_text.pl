@@ -21,6 +21,7 @@ sub create_canvas($width, $height, $default=" ") {
         height  => $height,
         default => $default,
         offset  => [0,0],
+        pos     => [0,0],
         data    => Array->init($height, ($default x $width)),
     };
 }
@@ -88,6 +89,40 @@ BEGIN {
 
     $easy ? fn setChar => $set_easy
           : fn setChar => $set_complex;
+}
+
+sub setPos($canvas, $x,$y) {
+    $canvas->{pos}[0] = $x;
+    $canvas->{pos}[1] = $y;
+    return;
+}
+
+sub put($canvas, $str) {
+    my ($data,$pos,$w,$h,$def) = $canvas->@{qw/data pos width height default/};
+    my ($ox,$oy)               = $canvas->{offset}->@*;
+
+    my $x     = $pos->[0];
+    my $ry    = $oy + $pos->[1];
+    my $line  = $data->[$ry];
+    for my $char ( split //, $str ) {
+        if ( $ox+$x >= $w ) {
+            $x = 0;
+            $data->[$ry] = $line;
+            $ry++;
+            if ( $ry >= $h ) {
+                $h++;
+                $canvas->{height}++;
+                push @$data, ($def x $w);
+            }
+            $line = $data->[$ry];
+        }
+        substr $line, ($ox+$x), 1, $char;
+        $x++;
+    }
+    $pos ->[0]   = $x;
+    $pos ->[1]   = $ry;
+    $data->[$ry] = $line;
+    return;
 }
 
 # TODO
@@ -368,6 +403,114 @@ is(
     "5....\n".
     ".....\n",
     'to_string 2');
+
+# put
+{
+    my $canvas = create_canvas(4,3,'.');
+
+    put($canvas, 'X');
+    is(
+        to_string($canvas),
+        "X...\n".
+        "....\n".
+        "....\n",
+        "put 1");
+
+    put($canvas, 'X');
+    is(
+        to_string($canvas),
+        "XX..\n".
+        "....\n".
+        "....\n",
+        "put 2");
+
+    setPos($canvas, 1,1);
+    put($canvas, 'X');
+    is(
+        to_string($canvas),
+        "XX..\n".
+        ".X..\n".
+        "....\n",
+        "put 3");
+
+    put($canvas, 'X');
+    is(
+        to_string($canvas),
+        "XX..\n".
+        ".XX.\n".
+        "....\n",
+        "put 4");
+
+    put($canvas, 'X');
+    is(
+        to_string($canvas),
+        "XX..\n".
+        ".XXX\n".
+        "....\n",
+        "put 5");
+
+    put($canvas, 'X');
+    is(
+        to_string($canvas),
+        "XX..\n".
+        ".XXX\n".
+        "X...\n",
+        "put 6");
+
+    put($canvas, 'XXX');
+    is(
+        to_string($canvas),
+        "XX..\n".
+        ".XXX\n".
+        "XXXX\n",
+        "put 7");
+
+    put($canvas, 'AAA');
+    is(
+        to_string($canvas),
+        "XX..\n".
+        ".XXX\n".
+        "XXXX\n".
+        "AAA.\n",
+        "put 8");
+
+    put($canvas, 'Whatever');
+    is(
+        to_string($canvas),
+        "XX..\n".
+        ".XXX\n".
+        "XXXX\n".
+        "AAAW\n".
+        "hate\n".
+        "ver.\n",
+        "put 9");
+}
+
+# put + setPos
+{
+    my $canvas = create_canvas(5,3,'.');
+    addOffset($canvas, 1,1);
+    put($canvas, 'XXXXXX');
+
+    is(
+        to_string($canvas),
+        ".....\n".
+        ".XXXX\n".
+        ".XX..\n",
+        'put with offset');
+
+    fill($canvas, '.');
+    setPos($canvas, 3,1);
+    put($canvas, "AAAA");
+
+    is(
+        to_string($canvas),
+        ".....\n".
+        ".....\n".
+        "....A\n".
+        ".AAA.\n",
+        'setPos with offset');
+}
 
 # offset testing
 {
