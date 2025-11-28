@@ -21,14 +21,14 @@ sub create_canvas($width, $height, $default=" ") {
         height  => $height,
         default => $default,
         offset  => [0,0],
-        data    => $default x ($width * $height),
+        data    => Array->init($height, ($default x $width)),
     };
 }
 
 BEGIN {
     # When this is true. Then $set_easy is used as setChar function.
     # Otherwise $set_complex is used.
-    my $easy = 0;
+    my $easy = 1;
 
     # This does an "intelligent" computation to only copy those characters
     # from string into $canvas that are visible. So clipping and strings
@@ -66,20 +66,23 @@ BEGIN {
         return;
     };
 
-    # data is a single string that is used like a 2D Array, so $x,$y must
-    # be converted into an offset. Position outside canvas are ignored
+    # data is now array of strings. setChar() does clipping by default.
+    # positions outside canvas are not drawn. Offset still must be applied.
+    # so negative indexes still can draw on canvas.
     my $set_easy = sub($canvas, $x,$y, $str) {
-        my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
-        my ($ox,$oy)       = $canvas->{offset}->@*;
-        my ($rx,$ry)       = ($ox+$x, $oy+$y);
+        my ($w,$h,$data) = $canvas->@{qw/width height data/};
+        my ($ox,$oy)     = $canvas->{offset}->@*;
+        my ($rx,$ry)     = ($ox+$x, $oy+$y);
 
-        return if $ry < 0 || $ry >= $ch;
+        return if $ry < 0 || $ry >= $h;
+        my $line = $data->[$ry];
         for my $char ( split //, $str ) {
-            $rx++, next if $rx < 0 || $rx >= $cw;
-            substr $data, ($cw*$ry+$rx), 1, $char;
+            last        if $rx >= $w;
+            $rx++, next if $rx < 0;
+            substr($line, $rx, 1, $char);
             $rx++;
         }
-        $canvas->{data} = $data;
+        $data->[$ry] = $line;
         return;
     };
 
@@ -102,7 +105,7 @@ sub getChar($canvas, $x,$y) {
     my ($rx,$ry)       = ($ox+$x, $oy+$y);
     return if $rx < 0 || $rx >= $cw;
     return if $ry < 0 || $ry >= $ch;
-    return substr $data, ($cw*$ry+$rx), 1;
+    return substr $data->[$ry], $rx, 1;
 }
 
 sub addOffset($canvas, $x,$y) {
@@ -129,66 +132,67 @@ sub merge($canvas, $x,$y, $other) {
     my ($ox,$oy)    = $other->{offset}->@*;
 
     for my $row ( 0 .. ($h-1) ) {
-        setChar($canvas, $x-$ox,$y+$row-$oy, substr($src, $row*$w, $w));
+        setChar($canvas, $x-$ox,$y+$row-$oy, $src->[$row]);
     }
     return;
 }
 
 sub iter($canvas, $f) {
-    my ($data, $w, $h) = $canvas->@{qw/data width height/};
-    my ($ox,$oy)       = $canvas->{offset}->@*;
+    my ($data)   = $canvas->{data};
+    my ($ox,$oy) = $canvas->{offset}->@*;
 
     my ($x,$y) = (0,0);
-    for my $char ( split //, $data ) {
-        $f->($x-$ox, $y-$oy, $char);
-        $x++;
-        if ( $x >= $w ) {
-            $x = 0;
-            $y++;
+    for my $line ( @$data ) {
+        for my $char ( split //, $line ) {
+            $f->($x-$ox, $y-$oy, $char);
+            $x++;
         }
+        $y++;
+        $x=0;
     }
     return;
 }
 
 sub iterLine($canvas, $f) {
-    my ($data,$w,$h) = $canvas->@{qw/data width height/};
-    my ($ox,$oy)     = $canvas->{offset}->@*;
+    my ($data,$h) = $canvas->@{qw/data height/};
+    my ($ox,$oy)  = $canvas->{offset}->@*;
 
     for my $y ( 0 .. ($h-1) ) {
-        $f->(-$ox,$y-$oy, substr($data, $w*$y, $w) );
-        $y++;
+        $f->(-$ox,$y-$oy, $data->[$y]);
     }
     return;
 }
 
 sub cmap($canvas, $f) {
-    my ($data, $w, $h) = $canvas->@{qw/data width height/};
-    my ($ox,$oy)       = $canvas->{offset}->@*;
+    my ($data)   = $canvas->{data};
+    my ($ox,$oy) = $canvas->{offset}->@*;
 
-    my $new = "";
+    my @new;
     my ($x,$y) = (0,0);
-    for my $char ( split //, $data ) {
-        $new .= $f->($x-$ox, $y-$oy, $char);
-        $x++;
-        if ( $x >= $w ) {
-            $x = 0;
-            $y++;
+    for my $line ( @$data ) {
+        my $new = "";
+        for my $char ( split //, $line ) {
+            $new .= $f->($x-$ox, $y-$oy, $char);
+            $x++;
         }
+        push @new, $new;
+        $y++;
+        $x=0;
     }
-    $canvas->{data} = $new;
+    $canvas->{data} = bless(\@new, 'Array');
     return;
 }
 
 sub fill($canvas, $char) {
-    my ($w,$h)      = $canvas->@{qw/width height/};
-    $canvas->{data} = $char x ($w*$h);
+    my ($w,$h) = $canvas->@{qw/width height/};
+    $canvas->{data} = Array->init($h, ($char x $w));
     return;
 }
 
 # creates string out of $canvas
 sub to_string($canvas) {
     my ($cw, $data) = $canvas->@{qw/width data/};
-    return $data =~ s/(.{$cw})/$1\n/gr;
+    return join("\n", @$data). "\n";
 }
 
 sub line($canvas, $xs,$ys, $xe,$ye, $char) {
@@ -345,7 +349,7 @@ sub c_vsplit(@draws) {
 
 is(
     to_string({
-        data   => "12345..........",
+        data   => ["12345",".....","....."],
         height => 3,
         width  => 5
     }),
@@ -356,7 +360,7 @@ is(
 
 is(
     to_string({
-        data   => ".12345.........",
+        data   => [".1234","5....","....."],
         height => 3,
         width  => 5
     }),
