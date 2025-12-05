@@ -95,16 +95,14 @@ sub setChar($canvas, $x,$y, $str) {
     return;
 }
 
-sub add_line($canvas) {
-    $canvas->{height}++;
-    push $canvas->{data}->@*, ($canvas->{default} x $canvas->{width});
-    return;
-}
-
+# TODO:
+#   canvas is just one line. setPos(0,10) is called to write into line 10.
+#   then put is called. So it must extend multiple lines.
 sub put($canvas, $str) {
     my ($data,$pos,$w,$h,$def) = $canvas->@{qw/data pos width height default/};
     my ($ox,$oy)               = $canvas->{offset}->@*;
 
+    my $ord    = 0;
     my ($x,$y) = @$pos;
     my $line   = $data->[$y+$oy];
     for my $char ( split //, $str ) {
@@ -121,17 +119,23 @@ sub put($canvas, $str) {
             }
             $line = $data->[$y+$oy];
         }
-        if    ( $char eq "\r" ) { $x = 0; }
-        elsif ( $char eq "\n" ) {
-            $data->[$y+$oy] = $line;
-            $x = 0;
-            $y++;
-            if ( $y+$oy >= $h ) {
-                $h++;
-                $canvas->{height}++;
-                push @$data, ($def x $w);
+
+        $ord = ord $char;
+        if ( $ord < 32 ) {
+            # newline
+            if ( $ord == 10 ) {
+                $data->[$y+$oy] = $line;
+                $x = 0;
+                $y++;
+                if ( $y+$oy >= $h ) {
+                    $h++;
+                    $canvas->{height}++;
+                    push @$data, ($def x $w);
+                }
+                $line = $data->[$y+$oy];
             }
-            $line = $data->[$y+$oy];
+            # \r
+            elsif ( $ord == 13 ) { $x = 0 }
         }
         else {
             substr $line, ($ox+$x), 1, $char;
@@ -141,6 +145,12 @@ sub put($canvas, $str) {
     $pos ->[0]      = $x;
     $pos ->[1]      = $y;
     $data->[$y+$oy] = $line;
+    return;
+}
+
+sub add_line($canvas) {
+    $canvas->{height}++;
+    push $canvas->{data}->@*, ($canvas->{default} x $canvas->{width});
     return;
 }
 
