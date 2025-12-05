@@ -119,27 +119,26 @@ sub put($canvas, $str) {
     my ($data,$pos,$w,$h,$def) = $canvas->@{qw/data pos width height default/};
     my ($ox,$oy)               = $canvas->{offset}->@*;
 
-    my $x     = $pos->[0];
-    my $ry    = $oy + $pos->[1];
-    my $line  = $data->[$ry];
+    my ($x,$y) = @$pos;
+    my $line   = $data->[$y+$oy];
     for my $char ( split //, $str ) {
         if ( $ox+$x >= $w ) {
             $x = 0;
-            $data->[$ry] = $line;
-            $ry++;
-            if ( $ry >= $h ) {
+            $data->[$y+$oy] = $line;
+            $y++;
+            if ( $y+$oy >= $h ) {
                 $h++;
                 $canvas->{height}++;
                 push @$data, ($def x $w);
             }
-            $line = $data->[$ry];
+            $line = $data->[$y+$oy];
         }
         substr $line, ($ox+$x), 1, $char;
         $x++;
     }
-    $pos ->[0]   = $x;
-    $pos ->[1]   = $ry;
-    $data->[$ry] = $line;
+    $pos ->[0]      = $x;
+    $pos ->[1]      = $y;
+    $data->[$y+$oy] = $line;
     return;
 }
 
@@ -572,8 +571,8 @@ is(
 
     is(to_array($canvas), [
         '.....',
-        '.dec.',
-        '.....',
+        '.abcd',
+        '.e...',
     ], 'put ext 2');
 }
 
