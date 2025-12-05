@@ -559,21 +559,36 @@ is(
 {
     my $canvas = create_canvas(5,3,'.');
     addOffset($canvas, 1,1);
-    put($canvas, "abc");
 
+    put($canvas, "abc");
     is(to_array($canvas), [
         '.....',
         '.abc.',
         '.....',
     ], 'put ext 1');
 
+    # with this test i found another bug. Even if it didn't
+    # test \r or \n. So this test should not be deleted.
     put($canvas, "de");
-
     is(to_array($canvas), [
         '.....',
         '.abcd',
         '.e...',
     ], 'put ext 2');
+
+    put($canvas, "fg");
+    is(to_array($canvas), [
+        '.....',
+        '.abcd',
+        '.efg.',
+    ], 'put ext 3');
+
+    put($canvas, "\rh");
+    is(to_array($canvas), [
+        '.....',
+        '.abcd',
+        '.hfg.',
+    ], 'put ext 4');
 }
 
 # offset testing
