@@ -670,7 +670,14 @@ is(
         '.....',
         '.dbc.',
         '.ef..',
-    ], 'setChar - does not expand height');
+    ], 'setChar - does not expand height 1');
+
+    setChar($canvas, 0,0, "j\nklm\rn\nop");
+    is(to_array($canvas), [
+        '.....',
+        '.jbc.',
+        '.nlm.',
+    ], 'setChar - does not expand height 2');
 }
 
 # offset testing
