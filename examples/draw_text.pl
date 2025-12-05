@@ -31,6 +31,16 @@ BEGIN {
     # Otherwise $set_complex is used.
     my $easy = 1;
 
+    # TODO: Or not. The complex version was an "optimization". Instead of
+    #       writing every single character with a substr(), i try to
+    #       write/replace as much as possible with a single substr() call. But
+    #       managing this function is quite hard. Calculation are hard, logic
+    #       is hard, and it becomes extremely hard to add new features because
+    #       of this. And so far i never had seen any performance improvements
+    #       at all. Just a time waste so far. But this was what i wanted to
+    #       "test". Just writing absolutele "dump/stupid" code seems a lot
+    #       better.
+    #
     # This does an "intelligent" computation to only copy those characters
     # from string into $canvas that are visible. So clipping and strings
     # outside canvas should be faster. But this increases the calculation
@@ -43,9 +53,11 @@ BEGIN {
         $y += $oy;
 
         # when $x is negative, we must skip characters to print in $str
-        # $x is set to zero because that's the virtual position we write
+        # $x is set to zero because there is no negative string position
+        # with substr(). The negative position is just "virtual"
         my $skip        = $x < 0 ? abs($x) : 0;
         $x              = $x < 0 ? 0 : $x;
+
         # $offset is the offset in $data we need to write
         my $offset      = ($cw * $y) + $x;
 
