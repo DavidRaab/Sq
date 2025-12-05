@@ -556,6 +556,27 @@ is(
         'setPos with offset');
 }
 
+# put supports "\r" and "\n"
+{
+    my $canvas = create_canvas(5,3,'.');
+    addOffset($canvas, 1,1);
+    put($canvas, "abc");
+
+    is(to_array($canvas), [
+        '.....',
+        '.abc.',
+        '.....',
+    ], 'put ext 1');
+
+    put($canvas, "de");
+
+    is(to_array($canvas), [
+        '.....',
+        '.dec.',
+        '.....',
+    ], 'put ext 2');
+}
+
 # offset testing
 {
     my $canvas = create_canvas(10, 2, '.');
