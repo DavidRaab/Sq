@@ -249,7 +249,8 @@ sub to_string($canvas) {
 }
 
 # creates array of string from $canvas. Optimal to use in other
-# functions like Sq->fs->write_text or Sq->fmt->table
+# functions like Sq->fs->write_text or Sq->fmt->table or just
+# for testing
 sub to_array($canvas) {
     return $canvas->{data};
 }
@@ -431,22 +432,20 @@ is(
 # add_line
 {
     my $canvas = create_canvas(5,3,'.');
-    is(
-        to_array($canvas), [
-            ".....",
-            ".....",
-            ".....",
-        ], 'to_array');
+    is(to_array($canvas), [
+        ".....",
+        ".....",
+        ".....",
+    ], 'to_array');
 
     add_line($canvas);
 
-    is(
-        to_array($canvas), [
-            ".....",
-            ".....",
-            ".....",
-            ".....",
-        ], 'add_line');
+    is(to_array($canvas), [
+        ".....",
+        ".....",
+        ".....",
+        ".....",
+    ], 'add_line');
 }
 
 # put
