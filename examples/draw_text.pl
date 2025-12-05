@@ -99,8 +99,8 @@ sub setChar($canvas, $x,$y, $str) {
 #   canvas is just one line. setPos(0,10) is called to write into line 10.
 #   then put is called. So it must extend multiple lines.
 sub put($canvas, $str) {
-    my ($data,$pos,$w,$h,$def) = $canvas->@{qw/data pos width height default/};
-    my ($ox,$oy)               = $canvas->{offset}->@*;
+    my ($data,$pos,$w,$h,$def,$ht) = $canvas->@{qw/data pos width height default tab_spacing/};
+    my ($ox,$oy)                   = $canvas->{offset}->@*;
 
     my $ord    = 0;
     my ($x,$y) = @$pos;
@@ -134,17 +134,53 @@ sub put($canvas, $str) {
                 }
                 $line = $data->[$y+$oy];
             }
+            # horizontal tab
+            elsif ( $ord == 9 ) {
+                # save everything done so far
+                $data->[$y+$oy] = $line;
+                $pos->[0]       = $x;
+                $pos->[1]       = $y;
+
+                # do recursive call
+                put($canvas, $def x $ht);
+
+                # update current state
+                $h      = $canvas->{height};
+                ($x,$y) = $canvas->{pos}->@*;
+                $line   = $data  ->[$y+$oy];
+            }
             # \r
-            elsif ( $ord == 13 ) { $x = 0 }
+            elsif ( $ord == 13 ) {
+                $x = 0
+            }
+            # backspace
+            elsif ( $ord == 8 ) {
+                $x = $x > 0 ? $x-1 : 0;
+            }
+            # vertical tab
+            elsif ( $ord == 11 ) {
+                $data->[$y+$oy] = $line;
+                $y++;
+                if ( $y+$oy >= $h ) {
+                    $h++;
+                    $canvas->{height}++;
+                    push @$data, ($def x $w);
+                }
+                $line = $data->[$y+$oy];
+            }
+            # other special character
+            else {
+                $x++;
+            }
         }
         else {
             substr $line, ($ox+$x), 1, $char;
             $x++;
         }
     }
+    $data->[$y+$oy] = $line;
     $pos ->[0]      = $x;
     $pos ->[1]      = $y;
-    $data->[$y+$oy] = $line;
     return;
 }
 
@@ -600,7 +636,7 @@ is(
         '.....',
         '.abcd',
         '.hfg.',
-    ], 'put ext 4');
+    ], 'put - check \r');
 
     put($canvas, "\nij");
     is(to_array($canvas), [
@@ -608,7 +644,94 @@ is(
         '.abcd',
         '.hfg.',
         '.ij..',
-    ], 'put ext 5');
+    ], 'put - check \n');
+
+    put($canvas, "\t1");
+    is(to_array($canvas), [
+        '.....',
+        '.abcd',
+        '.hfg.',
+        '.ij..',
+        '...1.',
+    ], 'put - check \t 1');
+
+    put($canvas, "\t1");
+    is(to_array($canvas), [
+        '.....',
+        '.abcd',
+        '.hfg.',
+        '.ij..',
+        '...1.',
+        '....1',
+    ], 'put - check \t 2');
+
+    set_spacing($canvas, 2);
+    put($canvas, "\t1\t2\t3");
+    is(to_array($canvas), [
+        '.....',
+        '.abcd',
+        '.hfg.',
+        '.ij..',
+        '...1.',
+        '....1',
+        '...1.',
+        '..2..',
+        '.3...',
+    ], 'put - set_spacing and \t');
+
+    put($canvas, "\b4");
+    is(to_array($canvas), [
+        '.....',
+        '.abcd',
+        '.hfg.',
+        '.ij..',
+        '...1.',
+        '....1',
+        '...1.',
+        '..2..',
+        '.4...',
+    ], 'put - backspace 1');
+
+    put($canvas, "\b5");
+    is(to_array($canvas), [
+        '.....',
+        '.abcd',
+        '.hfg.',
+        '.ij..',
+        '...1.',
+        '....1',
+        '...1.',
+        '..2..',
+        '.5...',
+    ], 'put - backspace 2');
+
+    put($canvas, "\b\b\b0");
+    is(to_array($canvas), [
+        '.....',
+        '.abcd',
+        '.hfg.',
+        '.ij..',
+        '...1.',
+        '....1',
+        '...1.',
+        '..2..',
+        '.0...',
+    ], 'put - backspace 3');
+
+    put($canvas, "12\x0b34");
+    is(to_array($canvas), [
+        '.....',
+        '.abcd',
+        '.hfg.',
+        '.ij..',
+        '...1.',
+        '....1',
+        '...1.',
+        '..2..',
+        '.012.',
+        '....3',
+        '.4...',
+    ], 'put - vertical tab');
 }
 
 # check if setChar() supports \r and \n
