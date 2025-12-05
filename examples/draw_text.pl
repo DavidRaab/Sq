@@ -103,6 +103,12 @@ BEGIN {
           : fn setChar => $set_complex;
 }
 
+sub add_line($canvas) {
+    $canvas->{height}++;
+    push $canvas->{data}->@*, ($canvas->{default} x $canvas->{width});
+    return;
+}
+
 sub setPos($canvas, $x,$y) {
     $canvas->{pos}[0] = $x;
     $canvas->{pos}[1] = $y;
@@ -240,6 +246,12 @@ sub fill($canvas, $char) {
 sub to_string($canvas) {
     my ($cw, $data) = $canvas->@{qw/width data/};
     return join("\n", @$data). "\n";
+}
+
+# creates array of string from $canvas. Optimal to use in other
+# functions like Sq->fs->write_text or Sq->fmt->table
+sub to_array($canvas) {
+    return $canvas->{data};
 }
 
 sub line($canvas, $xs,$ys, $xe,$ye, $char) {
@@ -415,6 +427,27 @@ is(
     "5....\n".
     ".....\n",
     'to_string 2');
+
+# add_line
+{
+    my $canvas = create_canvas(5,3,'.');
+    is(
+        to_array($canvas), [
+            ".....",
+            ".....",
+            ".....",
+        ], 'to_array');
+
+    add_line($canvas);
+
+    is(
+        to_array($canvas), [
+            ".....",
+            ".....",
+            ".....",
+            ".....",
+        ], 'add_line');
+}
 
 # put
 {
