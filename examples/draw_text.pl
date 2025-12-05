@@ -16,23 +16,24 @@ sub create_canvas($width, $height, $default=" ") {
     Carp::croak "width  must be > 0"               if $width  <= 0;
     Carp::croak "height must be > 0"               if $height <= 0;
     Carp::croak "default must be single character" if length($default) != 1;
-    return sq {
-        width   => $width,
-        height  => $height,
-        default => $default,
-        offset  => [0,0],
-        pos     => [0,0],
-        data    => Array->init($height, ($default x $width)),
-    };
+    return hash(
+        width       => $width,
+        height      => $height,
+        default     => $default,
+        offset      => array(0,0),
+        pos         => array(0,0),
+        tab_spacing => 4,
+        data        => Array->init($height, ($default x $width)),
+    );
 }
 
 # setChar() does clipping by default. Positions outside canvas are not
 # drawn. Offset still must be applied. \r and \n are handled like
 # expected and have an effect even when outside canvas.
 sub setChar($canvas, $x,$y, $str) {
-    my ($w,$h,$data) = $canvas->@{qw/width height data/};
-    my ($ox,$oy)     = $canvas->{offset}->@*;
-    my ($rx,$ry)     = ($ox+$x, $oy+$y);
+    my ($w,$h,$data,$ht,$def) = $canvas->@{qw/width height data tab_spacing default/};
+    my ($ox,$oy)              = $canvas->{offset}->@*;
+    my ($rx,$ry)              = ($ox+$x, $oy+$y);
 
     return if $ry >= $h;
     my $ord  = 0;
@@ -47,6 +48,15 @@ sub setChar($canvas, $x,$y, $str) {
                 $rx = $ox;
                 return if ++$ry >= $h;
                 $line = $data->[$ry];
+            }
+            # horizontal tab
+            elsif ( $ord == 9 ) {
+                for ( 1 .. $ht ) {
+                    $rx++, next if $rx < 0 || $rx >= $w;
+                    $rx++, next if $ry < 0;
+                    substr($line, $rx, 1, $def);
+                    $rx++;
+                }
             }
             # \r
             elsif ( $ord == 13 ) { $rx = $ox }
@@ -694,6 +704,13 @@ is(
         '...ab',
         '.....',
     ], 'setChar - vertical tab');
+
+    setChar($canvas, 0,0, "\n\t1234");
+    is(to_array($canvas), [
+        '...12',
+        '...ab',
+        '.....',
+    ], 'setChar - horizontal tab');
 }
 
 # offset testing
