@@ -90,7 +90,6 @@ BEGIN {
         return if $ry < 0 || $ry >= $h;
         my $line = $data->[$ry];
         for my $char ( split //, $str ) {
-            last        if $rx >= $w;
             $rx++, next if $rx < 0;
             if    ( $char eq "\r" ) { $rx = $ox }
             elsif ( $char eq "\n" ) {
@@ -101,6 +100,7 @@ BEGIN {
                 $line = $data->[$ry];
             }
             else {
+                next if $rx >= $w;
                 substr($line, $rx, 1, $char);
                 $rx++;
             }
@@ -678,6 +678,20 @@ is(
         '.jbc.',
         '.nlm.',
     ], 'setChar - does not expand height 2');
+
+    setChar($canvas, 0,0, "111111\r22");
+    is(to_array($canvas), [
+        '.....',
+        '.2211',
+        '.nlm.',
+    ], 'setChar - \\r outside width');
+
+    setChar($canvas, 0,0, "33333\r2222222\n3");
+    is(to_array($canvas), [
+        '.....',
+        '.2222',
+        '.3lm.',
+    ], 'setChar - \\n outside width');
 }
 
 # offset testing
