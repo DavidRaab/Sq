@@ -39,22 +39,31 @@ sub setChar($canvas, $x,$y, $str) {
     my $line = $data->[$ry];
     for my $char ( split //, $str ) {
         $ord = ord $char;
-        if    ( $ord == 13 ) { $rx = $ox } # \r
-        elsif ( $ord == 8  ) { $rx--     } # backspace
-        elsif ( $ord == 10 ) {             # \n
+        # \r
+        if    ( $ord == 13 ) { $rx = $ox }
+        # backspace
+        elsif ( $ord == 8  ) { $rx--     }
+        # vertical tab
+        elsif ( $ord == 11 ) {
+            $data->[$ry] = $line;
+            $ry++;
+            return if $ry >= $h;
+            $line = $data->[$ry];
+        }
+        # newline
+        elsif ( $ord == 10 ) {
             $data->[$ry] = $line;
             $rx = $ox;
             $ry++;
             return if $ry >= $h;
             $line = $data->[$ry];
         }
+        # any other character
         else {
             $rx++, next if $rx < 0 || $rx >= $w;
-            next        if $ry < 0;
+            $rx++, next if $ry < 0;
             # only printable characters
-            if ( $ord > 31 ) {
-                substr($line, $rx, 1, $char);
-            }
+            substr($line, $rx, 1, $char) if $ord > 31;
             $rx++;
         }
     }
@@ -675,6 +684,13 @@ is(
         '.....',
         '.....',
     ], 'setChar - backspace handling');
+
+    setChar($canvas, 0,0, "\n12345\r6789\b0\x0bab");
+    is(to_array($canvas), [
+        '7805.',
+        '...ab',
+        '.....',
+    ], 'setChar - vertical tab');
 }
 
 # offset testing
