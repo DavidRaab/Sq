@@ -27,6 +27,17 @@ sub create_canvas($width, $height, $default=" ") {
     );
 }
 
+sub setPos($canvas, $x,$y) {
+    $canvas->{pos}[0] = $x;
+    $canvas->{pos}[1] = $y;
+    return;
+}
+
+sub set_spacing($canvas, $count) {
+    $canvas->{tab_spacing} = $count;
+    return;
+}
+
 # setChar() does clipping by default. Positions outside canvas are not
 # drawn. Offset still must be applied. \r and \n are handled like
 # expected and have an effect even when outside canvas.
@@ -87,12 +98,6 @@ sub setChar($canvas, $x,$y, $str) {
 sub add_line($canvas) {
     $canvas->{height}++;
     push $canvas->{data}->@*, ($canvas->{default} x $canvas->{width});
-    return;
-}
-
-sub setPos($canvas, $x,$y) {
-    $canvas->{pos}[0] = $x;
-    $canvas->{pos}[1] = $y;
     return;
 }
 
@@ -711,6 +716,46 @@ is(
         '...ab',
         '.....',
     ], 'setChar - horizontal tab');
+}
+
+# spacing
+{
+    my $canvas = create_canvas(10,3,'.');
+    is(to_array($canvas), [
+        '..........',
+        '..........',
+        '..........',
+    ], 'spacing 1');
+
+    setChar($canvas, 0,0, "\t1");
+    is(to_array($canvas), [
+        '....1.....',
+        '..........',
+        '..........',
+    ], 'spacing 2');
+
+    set_spacing($canvas, 2);
+    setChar($canvas, 0,0, "\t1");
+    is(to_array($canvas), [
+        '..1.1.....',
+        '..........',
+        '..........',
+    ], 'spacing 3');
+
+    setChar($canvas, 0,0, "\t1\t1");
+    is(to_array($canvas), [
+        '..1..1....',
+        '..........',
+        '..........',
+    ], 'spacing 4');
+
+    set_spacing($canvas, -5);
+    setChar($canvas, 0,0, "\t1\t1");
+    is(to_array($canvas), [
+        '111..1....',
+        '..........',
+        '..........',
+    ], 'spacing 5');
 }
 
 # offset testing
