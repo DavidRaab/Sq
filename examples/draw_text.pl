@@ -92,8 +92,18 @@ BEGIN {
         for my $char ( split //, $str ) {
             last        if $rx >= $w;
             $rx++, next if $rx < 0;
-            substr($line, $rx, 1, $char);
-            $rx++;
+            if    ( $char eq "\r" ) { $rx = $ox }
+            elsif ( $char eq "\n" ) {
+                $data->[$ry] = $line;
+                $rx = $ox;
+                $ry++;
+                return if $ry >= $h;
+                $line = $data->[$ry];
+            }
+            else {
+                substr($line, $rx, 1, $char);
+                $rx++;
+            }
         }
         $data->[$ry] = $line;
         return;
@@ -571,7 +581,7 @@ is(
         'setPos with offset');
 }
 
-# put supports "\r" and "\n"
+# put() supports "\r" and "\n"
 {
     my $canvas = create_canvas(5,3,'.');
     addOffset($canvas, 1,1);
@@ -613,6 +623,54 @@ is(
         '.hfg.',
         '.ij..',
     ], 'put ext 5');
+}
+
+# check if setChar() supports \r and \n
+{
+    my $canvas = create_canvas(5,3,'.');
+    addOffset($canvas, 1,1);
+
+    setChar($canvas, 0,0, "abc");
+    is(to_array($canvas), [
+        '.....',
+        '.abc.',
+        '.....',
+    ], 'setChar - just fill to start');
+
+    put($canvas, "de");
+    is(to_array($canvas), [
+        '.....',
+        '.dec.',
+        '.....',
+    ], 'setChar - check if overwrites 1');
+
+    setChar($canvas, 0,0, "abc");
+    is(to_array($canvas), [
+        '.....',
+        '.abc.',
+        '.....',
+    ], 'setChar - check if overwrites 2');
+
+    setChar($canvas, 0,0, "abc\rd");
+    is(to_array($canvas), [
+        '.....',
+        '.dbc.',
+        '.....',
+    ], 'setChar - implements \\r');
+
+    setChar($canvas, 0,0, "abc\rd\ne");
+    is(to_array($canvas), [
+        '.....',
+        '.dbc.',
+        '.e...',
+    ], 'setChar - implements \\n');
+
+    setChar($canvas, 0,0, "abc\rd\nef\nghi");
+    is(to_array($canvas), [
+        '.....',
+        '.dbc.',
+        '.ef..',
+    ], 'setChar - does not expand height');
 }
 
 # offset testing
