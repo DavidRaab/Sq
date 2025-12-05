@@ -46,16 +46,14 @@ sub setChar($canvas, $x,$y, $str) {
         # vertical tab
         elsif ( $ord == 11 ) {
             $data->[$ry] = $line;
-            $ry++;
-            return if $ry >= $h;
+            return if ++$ry >= $h;
             $line = $data->[$ry];
         }
         # newline
         elsif ( $ord == 10 ) {
             $data->[$ry] = $line;
             $rx = $ox;
-            $ry++;
-            return if $ry >= $h;
+            return if ++$ry >= $h;
             $line = $data->[$ry];
         }
         # any other character
