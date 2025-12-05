@@ -122,9 +122,11 @@ sub put($canvas, $str) {
     my ($x,$y) = @$pos;
     my $line   = $data->[$y+$oy];
     for my $char ( split //, $str ) {
+        # when position is outside canvas width. Then we must go to next line.
+        # Maybe add another new line when height is exceeded.
         if ( $ox+$x >= $w ) {
-            $x = 0;
             $data->[$y+$oy] = $line;
+            $x = 0;
             $y++;
             if ( $y+$oy >= $h ) {
                 $h++;
@@ -133,8 +135,22 @@ sub put($canvas, $str) {
             }
             $line = $data->[$y+$oy];
         }
-        substr $line, ($ox+$x), 1, $char;
-        $x++;
+        if    ( $char eq "\r" ) { $x = 0; }
+        elsif ( $char eq "\n" ) {
+            $data->[$y+$oy] = $line;
+            $x = 0;
+            $y++;
+            if ( $y+$oy >= $h ) {
+                $h++;
+                $canvas->{height}++;
+                push @$data, ($def x $w);
+            }
+            $line = $data->[$y+$oy];
+        }
+        else {
+            substr $line, ($ox+$x), 1, $char;
+            $x++;
+        }
     }
     $pos ->[0]      = $x;
     $pos ->[1]      = $y;
@@ -589,6 +605,14 @@ is(
         '.abcd',
         '.hfg.',
     ], 'put ext 4');
+
+    put($canvas, "\nij");
+    is(to_array($canvas), [
+        '.....',
+        '.abcd',
+        '.hfg.',
+        '.ij..',
+    ], 'put ext 5');
 }
 
 # offset testing
