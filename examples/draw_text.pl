@@ -26,91 +26,40 @@ sub create_canvas($width, $height, $default=" ") {
     };
 }
 
-BEGIN {
-    # When this is true. Then $set_easy is used as setChar function.
-    # Otherwise $set_complex is used.
-    my $easy = 1;
+# setChar() does clipping by default. Positions outside canvas are not
+# drawn. Offset still must be applied. \r and \n are handled like
+# expected and have an effect even when outside canvas.
+sub setChar($canvas, $x,$y, $str) {
+    my ($w,$h,$data) = $canvas->@{qw/width height data/};
+    my ($ox,$oy)     = $canvas->{offset}->@*;
+    my ($rx,$ry)     = ($ox+$x, $oy+$y);
 
-    # TODO: Or not. The complex version was an "optimization". Instead of
-    #       writing every single character with a substr(), i try to
-    #       write/replace as much as possible with a single substr() call. But
-    #       managing this function is quite hard. Calculation are hard, logic
-    #       is hard, and it becomes extremely hard to add new features because
-    #       of this. And so far i never had seen any performance improvements
-    #       at all. Just a time waste so far. But this was what i wanted to
-    #       "test". Just writing absolutele "dump/stupid" code seems a lot
-    #       better.
-    #
-    # This does an "intelligent" computation to only copy those characters
-    # from string into $canvas that are visible. So clipping and strings
-    # outside canvas should be faster. But this increases the calculation
-    # of every setChar() call. Without much clipping it just does more
-    # calculation instead of just copying everything.
-    my $set_complex = sub($canvas, $x,$y, $str) {
-        my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
-        my ($ox,$oy)       = $canvas->{offset}->@*;
-        $x += $ox;
-        $y += $oy;
-
-        # when $x is negative, we must skip characters to print in $str
-        # $x is set to zero because there is no negative string position
-        # with substr(). The negative position is just "virtual"
-        my $skip        = $x < 0 ? abs($x) : 0;
-        $x              = $x < 0 ? 0 : $x;
-
-        # $offset is the offset in $data we need to write
-        my $offset      = ($cw * $y) + $x;
-
-        # this is the maximum position of the current line
-        my $max_stop    = ($cw * ($y+1));
-        # the end offset we need to write. This can be lower than $max_stop
-        # when string is shorter than remaining space. Or bigger when
-        # $str is much larger than remaining space
-        my $needed_stop = ($cw * $y) + $x + (length($str) - $skip);
-        # as we clip, we must use the lower $stop
-        my $stop        = $max_stop < $needed_stop ? $max_stop : $needed_stop;
-        # now calculate real characters we need to write
-        my $length      = $stop - $offset;
-
-        # different aborts when nothing is to write, or we are outside canvas
-        return if $length < 0 || $y >= $ch || $stop < 0;
-        substr($data, $offset, $length, substr($str, $skip, $length));
-        $canvas->{data} = $data;
-        return;
-    };
-
-    # data is now array of strings. setChar() does clipping by default.
-    # positions outside canvas are not drawn. Offset still must be applied.
-    # so negative indexes still can draw on canvas.
-    my $set_easy = sub($canvas, $x,$y, $str) {
-        my ($w,$h,$data) = $canvas->@{qw/width height data/};
-        my ($ox,$oy)     = $canvas->{offset}->@*;
-        my ($rx,$ry)     = ($ox+$x, $oy+$y);
-
-        return if $ry >= $h;
-        my $line = $data->[$ry];
-        for my $char ( split //, $str ) {
-            if    ( $char eq "\r" ) { $rx = $ox }
-            elsif ( $char eq "\n" ) {
-                $data->[$ry] = $line;
-                $rx = $ox;
-                $ry++;
-                return if $ry >= $h;
-                $line = $data->[$ry];
-            }
-            else {
-                $rx++, next if $rx < 0 || $rx >= $w;
-                next        if $ry < 0;
-                substr($line, $rx, 1, $char);
-                $rx++;
-            }
+    return if $ry >= $h;
+    my $ord  = 0;
+    my $line = $data->[$ry];
+    for my $char ( split //, $str ) {
+        $ord = ord $char;
+        if    ( $ord == 13 ) { $rx = $ox } # \r
+        elsif ( $ord == 8  ) { $rx--     } # backspace
+        elsif ( $ord == 10 ) {             # \n
+            $data->[$ry] = $line;
+            $rx = $ox;
+            $ry++;
+            return if $ry >= $h;
+            $line = $data->[$ry];
         }
-        $data->[$ry] = $line;
-        return;
-    };
-
-    $easy ? fn setChar => $set_easy
-          : fn setChar => $set_complex;
+        else {
+            $rx++, next if $rx < 0 || $rx >= $w;
+            next        if $ry < 0;
+            # only printable characters
+            if ( $ord > 31 ) {
+                substr($line, $rx, 1, $char);
+            }
+            $rx++;
+        }
+    }
+    $data->[$ry] = $line;
+    return;
 }
 
 sub add_line($canvas) {
@@ -719,6 +668,13 @@ is(
         '.....',
         '.....',
     ], 'setChar - negative offset with \\n and \\r');
+
+    setChar($canvas, 0,0, "\n12345\r6789\b0");
+    is(to_array($canvas), [
+        '7805.',
+        '.....',
+        '.....',
+    ], 'setChar - backspace handling');
 }
 
 # offset testing
