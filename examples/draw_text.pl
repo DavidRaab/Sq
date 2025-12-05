@@ -95,15 +95,19 @@ sub setChar($canvas, $x,$y, $str) {
     return;
 }
 
-# TODO:
-#   canvas is just one line. setPos(0,10) is called to write into line 10.
-#   then put is called. So it must extend multiple lines.
 sub put($canvas, $str) {
     my ($data,$pos,$w,$h,$def,$ht) = $canvas->@{qw/data pos width height default tab_spacing/};
     my ($ox,$oy)                   = $canvas->{offset}->@*;
+    my ($x,$y)                     = @$pos;
+
+    # when setPos was set far outside canvas height, then we need to create lines
+    while ( $y+$oy >= $h ) {
+        $h++;
+        $canvas->{height}++;
+        push @$data, ($def x $w);
+    }
 
     my $ord    = 0;
-    my ($x,$y) = @$pos;
     my $line   = $data->[$y+$oy];
     for my $char ( split //, $str ) {
         # when position is outside canvas width. Then we must go to next line.
@@ -173,6 +177,7 @@ sub put($canvas, $str) {
                 $x++;
             }
         }
+        # any other char
         else {
             substr $line, ($ox+$x), 1, $char;
             $x++;
@@ -732,6 +737,20 @@ is(
         '....3',
         '.4...',
     ], 'put - vertical tab');
+}
+
+{
+    my $canvas = create_canvas(10,1,'.');
+    setPos($canvas, 0,5);
+    put($canvas, "1234");
+    is(to_array($canvas), [
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '1234......',
+    ], 'setPos outside canvas hight, then put');
 }
 
 # check if setChar() supports \r and \n
