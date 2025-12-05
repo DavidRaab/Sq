@@ -751,6 +751,17 @@ is(
         '..........',
         '1234......',
     ], 'setPos outside canvas hight, then put');
+
+    setPos($canvas, 20,2);
+    put($canvas, "1234");
+    is(to_array($canvas), [
+        '..........',
+        '..........',
+        '..........',
+        '1234......',
+        '..........',
+        '1234......',
+    ], 'setPos outside canvas width, then put');
 }
 
 # check if setChar() supports \r and \n
