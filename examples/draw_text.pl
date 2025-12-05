@@ -39,29 +39,34 @@ sub setChar($canvas, $x,$y, $str) {
     my $line = $data->[$ry];
     for my $char ( split //, $str ) {
         $ord = ord $char;
-        # \r
-        if    ( $ord == 13 ) { $rx = $ox }
-        # backspace
-        elsif ( $ord == 8  ) { $rx--     }
-        # vertical tab
-        elsif ( $ord == 11 ) {
-            $data->[$ry] = $line;
-            return if ++$ry >= $h;
-            $line = $data->[$ry];
-        }
-        # newline
-        elsif ( $ord == 10 ) {
-            $data->[$ry] = $line;
-            $rx = $ox;
-            return if ++$ry >= $h;
-            $line = $data->[$ry];
+        # when special character
+        if ( $ord < 32 ) {
+            # newline
+            if ( $ord == 10 ) {
+                $data->[$ry] = $line;
+                $rx = $ox;
+                return if ++$ry >= $h;
+                $line = $data->[$ry];
+            }
+            # \r
+            elsif ( $ord == 13 ) { $rx = $ox }
+            # backspace
+            elsif ( $ord == 8  ) { $rx--     }
+            # vertical tab
+            elsif ( $ord == 11 ) {
+                $data->[$ry] = $line;
+                return if ++$ry >= $h;
+                $line = $data->[$ry];
+            }
+            else {
+                $rx++;
+            }
         }
         # any other character
         else {
             $rx++, next if $rx < 0 || $rx >= $w;
             $rx++, next if $ry < 0;
-            # only printable characters
-            substr($line, $rx, 1, $char) if $ord > 31;
+            substr($line, $rx, 1, $char);
             $rx++;
         }
     }
