@@ -87,10 +87,9 @@ BEGIN {
         my ($ox,$oy)     = $canvas->{offset}->@*;
         my ($rx,$ry)     = ($ox+$x, $oy+$y);
 
-        return if $ry < 0 || $ry >= $h;
+        return if $ry >= $h;
         my $line = $data->[$ry];
         for my $char ( split //, $str ) {
-            $rx++, next if $rx < 0;
             if    ( $char eq "\r" ) { $rx = $ox }
             elsif ( $char eq "\n" ) {
                 $data->[$ry] = $line;
@@ -100,7 +99,8 @@ BEGIN {
                 $line = $data->[$ry];
             }
             else {
-                next if $rx >= $w;
+                $rx++, next if $rx < 0 || $rx >= $w;
+                next        if $ry < 0;
                 substr($line, $rx, 1, $char);
                 $rx++;
             }
@@ -692,6 +692,33 @@ is(
         '.2222',
         '.3lm.',
     ], 'setChar - \\n outside width');
+}
+
+# \r and \n with negative offsets
+{
+    my $canvas = create_canvas(5,3,'.');
+    addOffset($canvas, -1,-1);
+
+    setChar($canvas, 0,0, "11111");
+    is(to_array($canvas), [
+        '.....',
+        '.....',
+        '.....',
+    ], 'setChar - write outside canvas');
+
+    setChar($canvas, 0,0, "\n12345");
+    is(to_array($canvas), [
+        '2345.',
+        '.....',
+        '.....',
+    ], 'setChar - negative offset with \\n');
+
+    setChar($canvas, 0,0, "\n12345\r67");
+    is(to_array($canvas), [
+        '7345.',
+        '.....',
+        '.....',
+    ], 'setChar - negative offset with \\n and \\r');
 }
 
 # offset testing
