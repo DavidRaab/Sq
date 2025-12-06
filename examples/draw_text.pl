@@ -195,13 +195,16 @@ sub add_line($canvas) {
     return;
 }
 
-# TODO
 # Writes $str into $canvas but does a word wrap when space is not enough
-sub setCharWrap($canvas, $x,$y, $str) {
-    my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
-    my ($ox,$oy)       = $canvas->{offset}->@*;
-
-    ...
+sub write_str_wrap($canvas, $x,$y, $str) {
+    my $pos      = $canvas->{pos};
+    my ($px,$py) = @$pos;
+    $pos->[0]    = $x;
+    $pos->[1]    = $y;
+    put($canvas, $str);
+    $pos->[0]    = $px;
+    $pos->[1]    = $py;
+    return;
 }
 
 sub getChar($canvas, $x,$y) {
@@ -1023,6 +1026,47 @@ is(
         'map handles offset');
 
     is(to_string($canvas), "123\n456\n789\n", 'string after canvas');
+}
+
+# write_str_wrap
+{
+    my $canvas = create_canvas(10,3,'.');
+
+    write_str_wrap($canvas, 0,1, "1234567890abcde");
+    is(to_array($canvas), [
+        '..........',
+        '1234567890',
+        'abcde.....',
+    ], 'write_str_wrap 1');
+
+    put($canvas, 'fghi');
+    is(to_array($canvas), [
+        'fghi......',
+        '1234567890',
+        'abcde.....',
+    ], 'write_str_wrap 2');
+
+    write_str_wrap($canvas, 5,1, "xxx");
+    is(to_array($canvas), [
+        'fghi......',
+        '12345xxx90',
+        'abcde.....',
+    ], 'write_str_wrap 3');
+
+    put($canvas, "zzz");
+    is(to_array($canvas), [
+        'fghizzz...',
+        '12345xxx90',
+        'abcde.....',
+    ], 'write_str_wrap 4');
+
+    write_str_wrap($canvas, 5,2, "yyyyyy");
+    is(to_array($canvas), [
+        'fghizzz...',
+        '12345xxx90',
+        'abcdeyyyyy',
+        'y.........',
+    ], 'write_str_wrap 5');
 }
 
 # check merge, and how it handles offsets
