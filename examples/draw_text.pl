@@ -345,12 +345,24 @@ sub line($canvas, $xs,$ys, $xe,$ye, $char) {
     return;
 }
 
+# sx,sy -> start
+# ex,ey -> end
+sub rect($canvas, $sx,$sy, $ex,$ey, $char) {
+    my $lx = $sx < $ex ? $sx : $ex;
+    my $rx = $sx < $ex ? $ex : $sx;
+    my $ty = $sy < $ey ? $sy : $ey;
+    my $by = $sy < $ey ? $ey : $sy;
 
-sub rect($canvas, $tx,$ty, $bx,$by, $char) {
-    line($canvas, $tx,$ty, $bx,$ty, $char); # top
-    line($canvas, $tx,$ty, $tx,$by, $char); # left
-    line($canvas, $bx,$ty, $bx,$by, $char); # right
-    line($canvas, $tx,$by, $bx,$by, $char); # bottom
+    # top / bottom
+    for my $x ( $lx .. $rx ) {
+        set_char($canvas, $x,$ty, $char);
+        set_char($canvas, $x,$by, $char);
+    }
+    # left / right
+    for my $y ( $ty .. $by ) {
+        set_char($canvas, $lx,$y, $char);
+        set_char($canvas, $rx,$y, $char);
+    }
     return;
 }
 
