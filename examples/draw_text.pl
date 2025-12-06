@@ -38,6 +38,23 @@ sub set_spacing($canvas, $count) {
     return;
 }
 
+# set_char() only writes a single character at position and handles offset.
+sub set_char($canvas, $x,$y, $char) {
+    my ($w,$h,$data) = $canvas->@{qw/width height data/};
+    my ($ox,$oy)     = $canvas->{offset}->@*;
+    my ($rx,$ry)     = ($ox+$x, $oy+$y);
+
+    return if $rx < 0 || $rx >= $w;
+    return if $ry < 0 || $ry >= $h;
+    if ( length($char) == 1 ) {
+        substr($data->[$ry], $rx, 1, $char);
+    }
+    else {
+        substr($data->[$ry], $rx, 1, substr($char,0,1));
+    }
+    return;
+}
+
 # write_str() does clipping by default. Positions outside canvas are not
 # drawn. Offset still must be applied. \r and \n are handled like
 # expected and have an effect even when outside canvas.
@@ -319,7 +336,7 @@ sub line($canvas, $xs,$ys, $xe,$ye, $char) {
     my $e2; # error value e_xy
 
     while (1) {
-        write_str($canvas, $xs,$ys, $char);
+        set_char($canvas, $xs,$ys, $char);
         last if $xs == $xe && $ys == $ye;
         $e2 = 2 * $err;
         if ($e2 > $dy) { $err += $dy; $xs += $sx; }
