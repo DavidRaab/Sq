@@ -366,6 +366,13 @@ sub rect($canvas, $sx,$sy, $ex,$ey, $char) {
     return;
 }
 
+sub border($canvas, $char) {
+    my ($w,$h) = $canvas->@{qw/width height/};
+    $char = length($char) == 1 ? $char : substr($char,0,1);
+    rect($canvas, 0,0, ($w-1),($h-1), $char);
+    return;
+}
+
 sub vsplit($canvas, @draws) {
     state $div = Sq->math->divide_spread;
 
@@ -487,6 +494,10 @@ sub c_vsplit(@draws) {
     my $spaces = @draws;
     Carp::croak "vsplit: Needs at least one drawing operation" if $spaces == 0;
     return sub($canvas) { vsplit($canvas, @draws) }
+}
+
+sub c_border($char) {
+    return sub($canvas) { border($canvas,$char) }
 }
 
 ### Tests
@@ -1098,6 +1109,18 @@ is(
     ], 'write_str_wrap 5');
 }
 
+# border
+{
+    my $canvas = create_canvas(10,3, '.');
+    border($canvas, '+');
+    write_str($canvas, 2,1, 'Hello');
+    is(to_array($canvas), [
+        '++++++++++',
+        '+.Hello..+',
+        '++++++++++',
+    ], 'border');
+}
+
 # check merge, and how it handles offsets
 {
     my $first  = create_canvas(5,5,'.');
@@ -1536,6 +1559,15 @@ is(
     ".+++.\n".
     ".....\n",
     'c_rect 2');
+
+is(
+    c_string(5,5,".", c_border('+')),
+    "+++++\n".
+    "+...+\n".
+    "+...+\n".
+    "+...+\n".
+    "+++++\n",
+    'c_border 1');
 
 is(
     c_string(20,3,'.', c_vsplit(
