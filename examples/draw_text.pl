@@ -12,18 +12,23 @@ use Sq::Test;
 # Combinator API is just a wrapper around the mutable one. This is also
 # a little bit faster.
 
-sub create_canvas($width, $height, $default=" ") {
+sub create_canvas($width, $height, $def=" ") {
     Carp::croak "width  must be > 0"               if $width  <= 0;
     Carp::croak "height must be > 0"               if $height <= 0;
-    Carp::croak "default must be single character" if length($default) != 1;
+    Carp::croak "default must be single character" if length($def) != 1;
     return hash(
         width       => $width,
         height      => $height,
-        default     => $default,
+        default     => $def,
         offset      => array(0,0),
         pos         => array(0,0),
         tab_spacing => 4,
-        data        => Array->init($height, ($default x $width)),
+        borders     => [
+            ['┌', '─',  '┐'],
+            ['│', $def, '│'],
+            ['└', '─',  '┘'],
+        ],
+        data => Array->init($height, ($def x $width)),
     );
 }
 
@@ -400,29 +405,39 @@ sub line($canvas, $xs,$ys, $xe,$ye, $char) {
 
 # sx,sy -> start
 # ex,ey -> end
-sub rect($canvas, $sx,$sy, $ex,$ey, $char) {
+sub rect($canvas, $sx,$sy, $ex,$ey) {
     my $lx = $sx < $ex ? $sx : $ex;
     my $rx = $sx < $ex ? $ex : $sx;
     my $ty = $sy < $ey ? $sy : $ey;
     my $by = $sy < $ey ? $ey : $sy;
 
     # top / bottom
+    my $borders = $canvas->{borders};
+    my $top    = $borders->[0][1];
+    my $bottom = $borders->[2][1];
     for my $x ( $lx .. $rx ) {
-        set_char($canvas, $x,$ty, $char);
-        set_char($canvas, $x,$by, $char);
+        set_char($canvas, $x,$ty, $top);
+        set_char($canvas, $x,$by, $bottom);
     }
     # left / right
+    my $left  = $borders->[1][0];
+    my $right = $borders->[1][2];
     for my $y ( $ty .. $by ) {
-        set_char($canvas, $lx,$y, $char);
-        set_char($canvas, $rx,$y, $char);
+        set_char($canvas, $lx,$y, $left);
+        set_char($canvas, $rx,$y, $right);
     }
+
+    # corners
+    set_char($canvas, $lx,$ty, $borders->[0][0]);
+    set_char($canvas, $rx,$ty, $borders->[0][2]);
+    set_char($canvas, $lx,$by, $borders->[2][0]);
+    set_char($canvas, $rx,$by, $borders->[2][2]);
     return;
 }
 
-sub border($canvas, $char) {
+sub border($canvas) {
     my ($w,$h) = $canvas->@{qw/width height/};
-    $char = length($char) == 1 ? $char : substr($char,0,1);
-    rect($canvas, 0,0, ($w-1),($h-1), $char);
+    rect($canvas, 0,0, ($w-1),($h-1));
     return;
 }
 
@@ -538,8 +553,8 @@ sub c_line($xs,$ys, $xe,$ye, $char) {
     return sub($canvas) { line($canvas, $xs,$ys, $xe,$ye, $char) }
 }
 
-sub c_rect($tx,$ty, $bx,$by, $char) {
-    return sub($canvas) { rect($canvas, $tx,$ty, $bx,$by, $char) }
+sub c_rect($tx,$ty, $bx,$by) {
+    return sub($canvas) { rect($canvas, $tx,$ty, $bx,$by) }
 }
 
 # vertically splits space into same amounts
@@ -549,8 +564,8 @@ sub c_vsplit(@draws) {
     return sub($canvas) { vsplit($canvas, @draws) }
 }
 
-sub c_border($char) {
-    return sub($canvas) { border($canvas,$char) }
+sub c_border() {
+    return sub($canvas) { border($canvas) }
 }
 
 ### Tests
@@ -1165,12 +1180,12 @@ is(
 # border
 {
     my $canvas = create_canvas(10,3, '.');
-    border($canvas, '+');
+    border($canvas);
     write_str($canvas, 2,1, 'Hello');
     is(to_array($canvas), [
-        '++++++++++',
-        '+.Hello..+',
-        '++++++++++',
+        '┌────────┐',
+        '│.Hello..│',
+        '└────────┘',
     ], 'border');
 }
 
@@ -1659,32 +1674,40 @@ is(
     'c_line 7');
 
 is(
-    c_string(5,5,'.', c_rect(0,0, 4,4, '+')),
+    c_string(5,5,'.', c_rect(0,0, 4,4)),
     c_string(5,5,'.', c_fromArray([
-        "+++++",
-        "+...+",
-        "+...+",
-        "+...+",
-        "+++++",
+        "┌───┐",
+        "│...│",
+        "│...│",
+        "│...│",
+        "└───┘",
     ])),
     'c_rect 1');
 
 is(
-    c_string(5,5,".", c_rect(1,1, 3,3, '+')),
+    c_string(5,5,".", c_rect(1,1, 3,3)),
     ".....\n".
-    ".+++.\n".
-    ".+.+.\n".
-    ".+++.\n".
+    ".┌─┐.\n".
+    ".│.│.\n".
+    ".└─┘.\n".
     ".....\n",
     'c_rect 2');
 
 is(
-    c_string(5,5,".", c_border('+')),
-    "+++++\n".
-    "+...+\n".
-    "+...+\n".
-    "+...+\n".
-    "+++++\n",
+    c_string(4,4,".", c_rect(1,1, 2,2)),
+    "....\n".
+    ".┌┐.\n".
+    ".└┘.\n".
+    "....\n",
+    'c_rect 3');
+
+is(
+    c_string(5,5,".", c_border),
+    "┌───┐\n".
+    "│...│\n".
+    "│...│\n".
+    "│...│\n".
+    "└───┘\n",
     'c_border 1');
 
 is(
