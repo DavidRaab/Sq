@@ -260,7 +260,6 @@ sub write_str($canvas, $x,$y, $str) {
 }
 
 sub put($canvas, $str) {
-    check_position($canvas);
     my ($pos, $def, $ht) = $canvas->@{qw/pos default tab_spacing/};
 
     my $ord = 0;
