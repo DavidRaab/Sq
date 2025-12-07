@@ -45,6 +45,12 @@ sub set_spacing($canvas, $count) {
     return;
 }
 
+sub clear_canvas($canvas) {
+    my ($w,$h,$def) = $canvas->@{qw/width height default/};
+    $canvas->{data} = Array->init($h, ($def x $w));
+    return;
+}
+
 # set_char() only writes a single character at position and handles offset.
 sub set_char($canvas, $x,$y, $char) {
     my ($w,$h,$data) = $canvas->@{qw/width height data/};
@@ -1308,9 +1314,30 @@ is(
 
     vline($canvas, 1, 1,3);
     vline($canvas, 3, 1,3);
+    is(to_array($canvas), [
+        '.....',
+        '.│.│.',
+        '.│.│.',
+        '.│.│.',
+        '.....',
+    ], 'vline');
+
+    clear_canvas($canvas);
     hline($canvas, 1, 1,3);
     hline($canvas, 3, 1,3);
+    is(to_array($canvas), [
+        '.....',
+        '.───.',
+        '.....',
+        '.───.',
+        '.....',
+    ], 'hline');
 
+    clear_canvas($canvas);
+    vline($canvas, 1, 1,3);
+    vline($canvas, 3, 1,3);
+    hline($canvas, 1, 1,3);
+    hline($canvas, 3, 1,3);
     is(to_array($canvas), [
         '.....',
         '.───.',
@@ -1319,11 +1346,11 @@ is(
         '.....',
     ], 'hline & vline 1');
 
+    clear_canvas($canvas);
     hline($canvas, 1, 1,3);
     hline($canvas, 3, 1,3);
     vline($canvas, 1, 1,3);
     vline($canvas, 3, 1,3);
-
     is(to_array($canvas), [
         '.....',
         '.│─│.',
