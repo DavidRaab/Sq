@@ -131,6 +131,41 @@ sub show_canvas($canvas) {
     print to_string($canvas);
 }
 
+# A user is able to manualy set character position. The position can be set
+# outside width/height. When this happens position must be updated, maybe
+# new lines must be created. This function does all of this handling. But
+# it also allows to easily just change position, and after a call to this
+# function it does what needs to be done.
+sub check_position($canvas) {
+    my ($data,$w,$h,$pos,$def) = $canvas->@{qw/data width height pos default/};
+    my ($ox,$oy)               = $canvas->{offset}->@*;
+    my ($px,$py)               = $pos->@*;
+    my ($x,$y)                 = ($ox+$px, $oy+$py);
+
+    # when pos was outside canvas height, then we need to create lines
+    while ( $y >= $h ) {
+        $h++;
+        push @$data, ($def x $w);
+    }
+    $canvas->{height} = $h;
+
+    # when $x is outside width
+    if ( $x >= $w ) {
+        $px = 0;
+        $py++;
+        $x = $ox;
+        $y++;
+        if ( $y >= $h ) {
+            $h++;
+            $canvas->{height}++;
+            push @$data, ($def x $w);
+        }
+    }
+
+    $pos->[0] = $px;
+    $pos->[1] = $py;
+    return;
+}
 
 ###-----------------------
 ### Basic Write operations
@@ -155,41 +190,20 @@ sub set_char($canvas, $x,$y, $char) {
     return;
 }
 
+# put_char() writes a single character to the currently defined position set
+# in canvas. check_position() does the position handling and line jumping
+# or line adding when needed.
 sub put_char($canvas, $char) {
     Carp::croak "put_char only can write a single char" if length($char) != 1;
-    my ($data,$w,$h,$pos,$def) = $canvas->@{qw/data width height pos default/};
-    my ($ox,$oy)               = $canvas->{offset}->@*;
-    my ($px,$py)               = $pos->@*;
-    my ($x,$y)                 = ($ox+$px, $oy+$py);
 
-    # when set_pos was set far outside canvas height, then we need to create lines
-    while ( $y >= $h ) {
-        $h++;
-        $canvas->{height}++;
-        push @$data, ($def x $w);
-    }
-
-    my $line = $data->[$y];
-    # when position is outside canvas width. Then we must go to next line.
-    # Maybe add another new line when height is exceeded.
-    if ( $x >= $w ) {
-        $px = 0;
-        $py++;
-        $x = $ox;
-        $y++;
-        if ( $y >= $h ) {
-            $h++;
-            $canvas->{height}++;
-            push @$data, ($def x $w);
-        }
-        $line = $data->[$y];
-    }
+    check_position($canvas);
+    my ($pos,$offset) = $canvas->@{qw/pos offset/};
+    my ($ox,$oy)      = $offset->@*;
+    my ($x,$y)        = $pos->@*;
 
     # replace character and update state
-    substr $line, $x, 1, $char;
-    $data->[$y] = $line;
-    $pos->[0]   = $px + 1;
-    $pos->[1]   = $py;
+    substr $canvas->{data}[$y+$oy], ($x+$ox), 1, $char;
+    $pos->[0] = $x + 1;
     return;
 }
 
@@ -251,96 +265,47 @@ sub write_str($canvas, $x,$y, $str) {
 }
 
 sub put($canvas, $str) {
-    my ($data,$pos,$w,$h,$def,$ht) = $canvas->@{qw/data pos width height default tab_spacing/};
-    my ($ox,$oy)                   = $canvas->{offset}->@*;
-    my ($x,$y)                     = @$pos;
+    check_position($canvas);
+    my ($pos, $def, $ht) = $canvas->@{qw/pos default tab_spacing/};
 
-    # when set_pos was set far outside canvas height, then we need to create lines
-    while ( $y+$oy >= $h ) {
-        $h++;
-        $canvas->{height}++;
-        push @$data, ($def x $w);
-    }
-
-    my $ord    = 0;
-    my $line   = $data->[$y+$oy];
+    my $ord = 0;
     for my $char ( split //, $str ) {
-        # when position is outside canvas width. Then we must go to next line.
-        # Maybe add another new line when height is exceeded.
-        if ( $ox+$x >= $w ) {
-            $data->[$y+$oy] = $line;
-            $x = 0;
-            $y++;
-            if ( $y+$oy >= $h ) {
-                $h++;
-                $canvas->{height}++;
-                push @$data, ($def x $w);
-            }
-            $line = $data->[$y+$oy];
-        }
-
         $ord = ord $char;
         if ( $ord < 32 ) {
             # newline
             if ( $ord == 10 ) {
-                $data->[$y+$oy] = $line;
-                $x = 0;
-                $y++;
-                if ( $y+$oy >= $h ) {
-                    $h++;
-                    $canvas->{height}++;
-                    push @$data, ($def x $w);
-                }
-                $line = $data->[$y+$oy];
+                $pos->[0] = 0;
+                $pos->[1]++;
             }
             # horizontal tab
             elsif ( $ord == 9 ) {
-                # save everything done so far
-                $data->[$y+$oy] = $line;
-                $pos->[0]       = $x;
-                $pos->[1]       = $y;
-
-                # do recursive call
-                put($canvas, $def x $ht);
-
-                # update current state
-                $h      = $canvas->{height};
-                ($x,$y) = $canvas->{pos}->@*;
-                $line   = $data  ->[$y+$oy];
+                for ( 1 .. $ht ) {
+                    put_char($canvas, $def);
+                }
             }
             # \r
             elsif ( $ord == 13 ) {
-                $x = 0
+                $pos->[0] = 0
             }
             # backspace
             elsif ( $ord == 8 ) {
-                $x = $x > 0 ? $x-1 : 0;
+                my $x     = $pos->[0];
+                $pos->[0] = $x > 0 ? $x-1 : 0;
             }
             # vertical tab
             elsif ( $ord == 11 ) {
-                $data->[$y+$oy] = $line;
-                $y++;
-                if ( $y+$oy >= $h ) {
-                    $h++;
-                    $canvas->{height}++;
-                    push @$data, ($def x $w);
-                }
-                $line = $data->[$y+$oy];
+                $pos->[1]++;
             }
             # other special character
             else {
-                $x++;
+                $pos->[0]++;
             }
         }
         # any other char
         else {
-            substr $line, ($ox+$x), 1, $char;
-            $x++;
+            put_char($canvas, $char);
         }
     }
-    $data->[$y+$oy] = $line;
-    $pos ->[0]      = $x;
-    $pos ->[1]      = $y;
     return;
 }
 
