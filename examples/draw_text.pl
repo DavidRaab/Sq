@@ -202,10 +202,10 @@ sub put_char($canvas, $char) {
     return;
 }
 
-# write_str() does clipping by default. Positions outside canvas are not
+# set() does clipping by default. Positions outside canvas are not
 # drawn. Offset still must be applied. \r and \n are handled like
 # expected and have an effect even when outside canvas.
-sub write_str($canvas, $x,$y, $str) {
+sub set($canvas, $x,$y, $str) {
     my ($w,$h,$data,$ht,$def) = $canvas->@{qw/width height data tab_spacing default/};
     my ($ox,$oy)              = $canvas->{offset}->@*;
     my ($rx,$ry)              = ($ox+$x, $oy+$y);
@@ -309,7 +309,7 @@ sub put($canvas, $str) {
 ###--------------------------
 
 # Writes $str into $canvas but does a word wrap when space is not enough
-sub write_str_wrap($canvas, $x,$y, $str) {
+sub set_wrap($canvas, $x,$y, $str) {
     my $pos      = $canvas->{pos};
     my ($px,$py) = @$pos;
     $pos->[0]    = $x;
@@ -369,7 +369,7 @@ sub place($canvas, $x,$y, $length, $where, $str) {
         }
     }
 
-    write_str($canvas, $x,$y, $str_to_place);
+    set($canvas, $x,$y, $str_to_place);
     return;
 }
 
@@ -379,7 +379,7 @@ sub merge($canvas, $x,$y, $other) {
     my ($ox,$oy)    = $other->{offset}->@*;
 
     for my $row ( 0 .. ($h-1) ) {
-        write_str($canvas, $x-$ox,$y+$row-$oy, $src->[$row]);
+        set($canvas, $x-$ox,$y+$row-$oy, $src->[$row]);
     }
     return;
 }
@@ -529,7 +529,7 @@ sub c_fromAoA($aoa) {
     return sub($canvas) {
         my $y = 0;
         for my $inner ( @$aoa ) {
-            write_str($canvas, 0,$y++, join('', @$inner));
+            set($canvas, 0,$y++, join('', @$inner));
         }
         return;
     }
@@ -540,14 +540,14 @@ sub c_fromArray($array) {
     return sub($canvas) {
         my $y = 0;
         for my $line ( @$array ) {
-            write_str($canvas, 0,$y++, $line);
+            set($canvas, 0,$y++, $line);
         }
         return;
     }
 }
 
 sub c_set($x,$y,$str) {
-    return sub($canvas) { write_str($canvas, $x,$y, $str) }
+    return sub($canvas) { set($canvas, $x,$y, $str) }
 }
 
 sub c_offset($ox,$oy, @draws) {
@@ -910,12 +910,12 @@ is(
     ], 'set_pos outside canvas width, then put');
 }
 
-# check if write_str() supports \r and \n
+# check if set() supports \r and \n
 {
     my $canvas = create_canvas(5,3,'.');
     add_offset($canvas, 1,1);
 
-    write_str($canvas, 0,0, "abc");
+    set($canvas, 0,0, "abc");
     is(to_array($canvas), [
         '.....',
         '.abc.',
@@ -929,49 +929,49 @@ is(
         '.....',
     ], 'write_str - check if overwrites 1');
 
-    write_str($canvas, 0,0, "abc");
+    set($canvas, 0,0, "abc");
     is(to_array($canvas), [
         '.....',
         '.abc.',
         '.....',
     ], 'write_str - check if overwrites 2');
 
-    write_str($canvas, 0,0, "abc\rd");
+    set($canvas, 0,0, "abc\rd");
     is(to_array($canvas), [
         '.....',
         '.dbc.',
         '.....',
     ], 'write_str - implements \\r');
 
-    write_str($canvas, 0,0, "abc\rd\ne");
+    set($canvas, 0,0, "abc\rd\ne");
     is(to_array($canvas), [
         '.....',
         '.dbc.',
         '.e...',
     ], 'write_str - implements \\n');
 
-    write_str($canvas, 0,0, "abc\rd\nef\nghi");
+    set($canvas, 0,0, "abc\rd\nef\nghi");
     is(to_array($canvas), [
         '.....',
         '.dbc.',
         '.ef..',
     ], 'write_str - does not expand height 1');
 
-    write_str($canvas, 0,0, "j\nklm\rn\nop");
+    set($canvas, 0,0, "j\nklm\rn\nop");
     is(to_array($canvas), [
         '.....',
         '.jbc.',
         '.nlm.',
     ], 'write_str - does not expand height 2');
 
-    write_str($canvas, 0,0, "111111\r22");
+    set($canvas, 0,0, "111111\r22");
     is(to_array($canvas), [
         '.....',
         '.2211',
         '.nlm.',
     ], 'write_str - \\r outside width');
 
-    write_str($canvas, 0,0, "33333\r2222222\n3");
+    set($canvas, 0,0, "33333\r2222222\n3");
     is(to_array($canvas), [
         '.....',
         '.2222',
@@ -984,42 +984,42 @@ is(
     my $canvas = create_canvas(5,3,'.');
     add_offset($canvas, -1,-1);
 
-    write_str($canvas, 0,0, "11111");
+    set($canvas, 0,0, "11111");
     is(to_array($canvas), [
         '.....',
         '.....',
         '.....',
     ], 'write_str - write outside canvas');
 
-    write_str($canvas, 0,0, "\n12345");
+    set($canvas, 0,0, "\n12345");
     is(to_array($canvas), [
         '2345.',
         '.....',
         '.....',
     ], 'write_str - negative offset with \\n');
 
-    write_str($canvas, 0,0, "\n12345\r67");
+    set($canvas, 0,0, "\n12345\r67");
     is(to_array($canvas), [
         '7345.',
         '.....',
         '.....',
     ], 'write_str - negative offset with \\n and \\r');
 
-    write_str($canvas, 0,0, "\n12345\r6789\b0");
+    set($canvas, 0,0, "\n12345\r6789\b0");
     is(to_array($canvas), [
         '7805.',
         '.....',
         '.....',
     ], 'write_str - backspace handling');
 
-    write_str($canvas, 0,0, "\n12345\r6789\b0\x0bab");
+    set($canvas, 0,0, "\n12345\r6789\b0\x0bab");
     is(to_array($canvas), [
         '7805.',
         '...ab',
         '.....',
     ], 'write_str - vertical tab');
 
-    write_str($canvas, 0,0, "\n\t1234");
+    set($canvas, 0,0, "\n\t1234");
     is(to_array($canvas), [
         '...12',
         '...ab',
@@ -1036,7 +1036,7 @@ is(
         '..........',
     ], 'spacing 1');
 
-    write_str($canvas, 0,0, "\t1");
+    set($canvas, 0,0, "\t1");
     is(to_array($canvas), [
         '....1.....',
         '..........',
@@ -1044,14 +1044,14 @@ is(
     ], 'spacing 2');
 
     set_spacing($canvas, 2);
-    write_str($canvas, 0,0, "\t1");
+    set($canvas, 0,0, "\t1");
     is(to_array($canvas), [
         '..1.1.....',
         '..........',
         '..........',
     ], 'spacing 3');
 
-    write_str($canvas, 0,0, "\t1\t1");
+    set($canvas, 0,0, "\t1\t1");
     is(to_array($canvas), [
         '..1..1....',
         '..........',
@@ -1059,7 +1059,7 @@ is(
     ], 'spacing 4');
 
     set_spacing($canvas, -5);
-    write_str($canvas, 0,0, "\t1\t1");
+    set($canvas, 0,0, "\t1\t1");
     is(to_array($canvas), [
         '111..1....',
         '..........',
@@ -1085,8 +1085,8 @@ is(
 {
     my $canvas = create_canvas(10, 2, '.');
 
-    write_str($canvas, 0,0, "0123456789");
-    write_str($canvas, 0,1, "abcdefghij");
+    set($canvas, 0,0, "0123456789");
+    set($canvas, 0,1, "abcdefghij");
 
     is(get_char($canvas, 5,0), '5', 'getChar 2');
     is(get_char($canvas, 9,0), '9', 'getChar 3');
@@ -1107,7 +1107,7 @@ is(
 {
     my $canvas = create_canvas(3,3,'.');
     add_offset($canvas, 1,1);
-    write_str($canvas, -1,-1, 'X');
+    set($canvas, -1,-1, 'X');
     is(
         to_string($canvas), "X..\n...\n...\n",
         'write_str still writes in negative offset when inside canvas');
@@ -1149,9 +1149,9 @@ is(
 # check map(), also if it correctly handles offset
 {
     my $canvas = create_canvas(3,3,'.');
-    write_str($canvas, 0,0, "012");
-    write_str($canvas, 0,1, "345");
-    write_str($canvas, 0,2, "678");
+    set($canvas, 0,0, "012");
+    set($canvas, 0,1, "345");
+    set($canvas, 0,2, "678");
     add_offset($canvas, 1,1);
 
     my @iters;
@@ -1175,7 +1175,7 @@ is(
 {
     my $canvas = create_canvas(10,3,'.');
 
-    write_str_wrap($canvas, 0,1, "1234567890abcde");
+    set_wrap($canvas, 0,1, "1234567890abcde");
     is(to_array($canvas), [
         '..........',
         '1234567890',
@@ -1189,7 +1189,7 @@ is(
         'abcde.....',
     ], 'write_str_wrap 2');
 
-    write_str_wrap($canvas, 5,1, "xxx");
+    set_wrap($canvas, 5,1, "xxx");
     is(to_array($canvas), [
         'fghi......',
         '12345xxx90',
@@ -1203,7 +1203,7 @@ is(
         'abcde.....',
     ], 'write_str_wrap 4');
 
-    write_str_wrap($canvas, 5,2, "yyyyyy");
+    set_wrap($canvas, 5,2, "yyyyyy");
     is(to_array($canvas), [
         'fghizzz...',
         '12345xxx90',
@@ -1216,7 +1216,7 @@ is(
 {
     my $canvas = create_canvas(10,3, '.');
     border($canvas);
-    write_str($canvas, 2,1, 'Hello');
+    set($canvas, 2,1, 'Hello');
     is(to_array($canvas), [
         '┌────────┐',
         '│.Hello..│',
