@@ -144,18 +144,52 @@ sub fill($canvas, $char) {
 
 # set_char() only writes a single character at position and handles offset.
 sub set_char($canvas, $x,$y, $char) {
+    Carp::croak "set_char only can write single char" if length($char) != 1;
     my ($w,$h,$data) = $canvas->@{qw/width height data/};
     my ($ox,$oy)     = $canvas->{offset}->@*;
     my ($rx,$ry)     = ($ox+$x, $oy+$y);
 
     return if $rx < 0 || $rx >= $w;
     return if $ry < 0 || $ry >= $h;
-    if ( length($char) == 1 ) {
-        substr($data->[$ry], $rx, 1, $char);
+    substr($data->[$ry], $rx, 1, $char);
+    return;
+}
+
+sub put_char($canvas, $char) {
+    Carp::croak "put_char only can write a single char" if length($char) != 1;
+    my ($data,$w,$h,$pos,$def) = $canvas->@{qw/data width height pos default/};
+    my ($ox,$oy)               = $canvas->{offset}->@*;
+    my ($px,$py)               = $pos->@*;
+    my ($x,$y)                 = ($ox+$px, $oy+$py);
+
+    # when set_pos was set far outside canvas height, then we need to create lines
+    while ( $y >= $h ) {
+        $h++;
+        $canvas->{height}++;
+        push @$data, ($def x $w);
     }
-    else {
-        substr($data->[$ry], $rx, 1, substr($char,0,1));
+
+    my $line = $data->[$y];
+    # when position is outside canvas width. Then we must go to next line.
+    # Maybe add another new line when height is exceeded.
+    if ( $x >= $w ) {
+        $px = 0;
+        $py++;
+        $x = $ox;
+        $y++;
+        if ( $y >= $h ) {
+            $h++;
+            $canvas->{height}++;
+            push @$data, ($def x $w);
+        }
+        $line = $data->[$y];
     }
+
+    # replace character and update state
+    substr $line, $x, 1, $char;
+    $data->[$y] = $line;
+    $pos->[0]   = $px + 1;
+    $pos->[1]   = $py;
     return;
 }
 
@@ -657,7 +691,7 @@ is(
 {
     my $canvas = create_canvas(4,3,'.');
 
-    put($canvas, 'X');
+    put_char($canvas, 'X');
     is(
         to_string($canvas),
         "X...\n".
@@ -665,7 +699,7 @@ is(
         "....\n",
         "put 1");
 
-    put($canvas, 'X');
+    put_char($canvas, 'X');
     is(
         to_string($canvas),
         "XX..\n".
@@ -674,7 +708,7 @@ is(
         "put 2");
 
     set_pos($canvas, 1,1);
-    put($canvas, 'X');
+    put_char($canvas, 'X');
     is(
         to_string($canvas),
         "XX..\n".
@@ -682,7 +716,7 @@ is(
         "....\n",
         "put 3");
 
-    put($canvas, 'X');
+    put_char($canvas, 'X');
     is(
         to_string($canvas),
         "XX..\n".
@@ -690,7 +724,7 @@ is(
         "....\n",
         "put 4");
 
-    put($canvas, 'X');
+    put_char($canvas, 'X');
     is(
         to_string($canvas),
         "XX..\n".
@@ -698,7 +732,7 @@ is(
         "....\n",
         "put 5");
 
-    put($canvas, 'X');
+    put_char($canvas, 'X');
     is(
         to_string($canvas),
         "XX..\n".
