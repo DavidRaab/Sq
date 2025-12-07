@@ -255,8 +255,7 @@ sub place($canvas, $x,$y, $length, $where, $str) {
     # otherwise we need to shorten $str
     else {
         if ( $where =~ m/\Al|left\z/i ) {
-            my $rl = $str_length - $length;
-            $str_to_place = substr($str, 0, $rl);
+            $str_to_place = substr($str, 0, $length);
         }
         elsif ( $where =~ m/\Ac|center\z/i ) {
             my $cutaway = $str_length - $length;
@@ -1192,7 +1191,7 @@ is(
         '..Hello...',
         '.....Hello',
         '.....Hello',
-    ], 'place 1');
+    ], 'place - $str < $length');
 
     place($canvas, 0,0, 10, 'R',      'Hello');
     place($canvas, 0,1, 10, 'Right',  'Hello');
@@ -1207,7 +1206,37 @@ is(
         '..Hello...',
         'Hello.....',
         'Hello.....',
-    ], 'place 2');
+    ], 'place - check ignorecase of $where');
+
+    place($canvas, 0,0, 10, 'l',      '1234567890abcdef');
+    place($canvas, 0,1, 10, 'left',   '1234567890abcdef');
+    place($canvas, 0,2, 10, 'c',      '1234567890abcdef');
+    place($canvas, 0,3, 10, 'center', '1234567890abcdef');
+    place($canvas, 0,4, 10, 'r',      '1234567890abcdef');
+    place($canvas, 0,5, 10, 'right',  '1234567890abcdef');
+    is(to_array($canvas), [
+        '1234567890',
+        '1234567890',
+        '4567890abc',
+        '4567890abc',
+        '7890abcdef',
+        '7890abcdef',
+    ], 'place - $str > $length and even cutoff');
+
+    place($canvas, 0,0, 10, 'l',      '1234567890abcde');
+    place($canvas, 0,1, 10, 'left',   '1234567890abcde');
+    place($canvas, 0,2, 10, 'c',      '1234567890abcde');
+    place($canvas, 0,3, 10, 'center', '1234567890abcde');
+    place($canvas, 0,4, 10, 'r',      '1234567890abcde');
+    place($canvas, 0,5, 10, 'right',  '1234567890abcde');
+    is(to_array($canvas), [
+        '1234567890',
+        '1234567890',
+        '34567890ab',
+        '34567890ab',
+        '67890abcde',
+        '67890abcde',
+    ], 'place - $str > $length and uneven cutoff');
 }
 
 # check merge, and how it handles offsets
