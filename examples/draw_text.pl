@@ -34,6 +34,10 @@ sub create_canvas($width, $height, $def=" ") {
     );
 }
 
+###--------------------------
+### Basic get/set operations
+###--------------------------
+
 sub set_pos($canvas, $x,$y) {
     $canvas->{pos}[0] = $x;
     $canvas->{pos}[1] = $y;
@@ -48,6 +52,93 @@ sub set_spacing($canvas, $count) {
 sub clear_canvas($canvas) {
     my ($w,$h,$def) = $canvas->@{qw/width height default/};
     $canvas->{data} = Array->init($h, ($def x $w));
+    return;
+}
+
+sub add_offset($canvas, $x,$y) {
+    my $offset = $canvas->{offset};
+    $offset->[0] += $x;
+    $offset->[1] += $y;
+    return;
+}
+
+sub clear_offset($canvas) {
+    my $offset = $canvas->{offset};
+    $offset->[0] = 0;
+    $offset->[1] = 0;
+    return;
+}
+
+sub get_offset($canvas) {
+    return $canvas->{offset}->@*;
+}
+
+sub add_line($canvas) {
+    $canvas->{height}++;
+    push $canvas->{data}->@*, ($canvas->{default} x $canvas->{width});
+    return;
+}
+
+sub get_char($canvas, $x,$y) {
+    my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
+    my ($ox,$oy)       = $canvas->{offset}->@*;
+    my ($rx,$ry)       = ($ox+$x, $oy+$y);
+    return if $rx < 0 || $rx >= $cw;
+    return if $ry < 0 || $ry >= $ch;
+    return substr $data->[$ry], $rx, 1;
+}
+
+sub iter($canvas, $f) {
+    my ($data)   = $canvas->{data};
+    my ($ox,$oy) = $canvas->{offset}->@*;
+
+    my ($x,$y) = (0,0);
+    for my $line ( @$data ) {
+        for my $char ( split //, $line ) {
+            $f->($x-$ox, $y-$oy, $char);
+            $x++;
+        }
+        $y++;
+        $x=0;
+    }
+    return;
+}
+
+sub iter_line($canvas, $f) {
+    my ($data,$h) = $canvas->@{qw/data height/};
+    my ($ox,$oy)  = $canvas->{offset}->@*;
+
+    for my $y ( 0 .. ($h-1) ) {
+        $f->(-$ox,$y-$oy, $data->[$y]);
+    }
+    return;
+}
+
+# creates string out of $canvas
+sub to_string($canvas) {
+    my ($cw, $data) = $canvas->@{qw/width data/};
+    return join("\n", @$data). "\n";
+}
+
+# creates array of string from $canvas. Optimal to use in other
+# functions like Sq->fs->write_text or Sq->fmt->table or just
+# for testing
+sub to_array($canvas) {
+    return $canvas->{data};
+}
+
+sub show_canvas($canvas) {
+    print to_string($canvas);
+}
+
+
+###-----------------------
+### Basic Write operations
+###-----------------------
+
+sub fill($canvas, $char) {
+    my ($w,$h) = $canvas->@{qw/width height/};
+    $canvas->{data} = Array->init($h, ($char x $w));
     return;
 }
 
@@ -219,11 +310,10 @@ sub put($canvas, $str) {
     return;
 }
 
-sub add_line($canvas) {
-    $canvas->{height}++;
-    push $canvas->{data}->@*, ($canvas->{default} x $canvas->{width});
-    return;
-}
+
+###--------------------------
+### Extended Canvas operation
+###--------------------------
 
 # Writes $str into $canvas but does a word wrap when space is not enough
 sub write_str_wrap($canvas, $x,$y, $str) {
@@ -290,33 +380,6 @@ sub place($canvas, $x,$y, $length, $where, $str) {
     return;
 }
 
-sub get_char($canvas, $x,$y) {
-    my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
-    my ($ox,$oy)       = $canvas->{offset}->@*;
-    my ($rx,$ry)       = ($ox+$x, $oy+$y);
-    return if $rx < 0 || $rx >= $cw;
-    return if $ry < 0 || $ry >= $ch;
-    return substr $data->[$ry], $rx, 1;
-}
-
-sub add_offset($canvas, $x,$y) {
-    my $offset = $canvas->{offset};
-    $offset->[0] += $x;
-    $offset->[1] += $y;
-    return;
-}
-
-sub clear_offset($canvas) {
-    my $offset = $canvas->{offset};
-    $offset->[0] = 0;
-    $offset->[1] = 0;
-    return;
-}
-
-sub get_offset($canvas) {
-    return $canvas->{offset}->@*;
-}
-
 # Draws $other canvas into $canvas
 sub merge($canvas, $x,$y, $other) {
     my ($src,$w,$h) = $other->@{qw/data width height/};
@@ -324,32 +387,6 @@ sub merge($canvas, $x,$y, $other) {
 
     for my $row ( 0 .. ($h-1) ) {
         write_str($canvas, $x-$ox,$y+$row-$oy, $src->[$row]);
-    }
-    return;
-}
-
-sub iter($canvas, $f) {
-    my ($data)   = $canvas->{data};
-    my ($ox,$oy) = $canvas->{offset}->@*;
-
-    my ($x,$y) = (0,0);
-    for my $line ( @$data ) {
-        for my $char ( split //, $line ) {
-            $f->($x-$ox, $y-$oy, $char);
-            $x++;
-        }
-        $y++;
-        $x=0;
-    }
-    return;
-}
-
-sub iter_line($canvas, $f) {
-    my ($data,$h) = $canvas->@{qw/data height/};
-    my ($ox,$oy)  = $canvas->{offset}->@*;
-
-    for my $y ( 0 .. ($h-1) ) {
-        $f->(-$ox,$y-$oy, $data->[$y]);
     }
     return;
 }
@@ -372,25 +409,6 @@ sub cmap($canvas, $f) {
     }
     $canvas->{data} = bless(\@new, 'Array');
     return;
-}
-
-sub fill($canvas, $char) {
-    my ($w,$h) = $canvas->@{qw/width height/};
-    $canvas->{data} = Array->init($h, ($char x $w));
-    return;
-}
-
-# creates string out of $canvas
-sub to_string($canvas) {
-    my ($cw, $data) = $canvas->@{qw/width data/};
-    return join("\n", @$data). "\n";
-}
-
-# creates array of string from $canvas. Optimal to use in other
-# functions like Sq->fs->write_text or Sq->fmt->table or just
-# for testing
-sub to_array($canvas) {
-    return $canvas->{data};
 }
 
 sub line($canvas, $xs,$ys, $xe,$ye, $char) {
@@ -487,12 +505,10 @@ sub vsplit($canvas, @draws) {
     return;
 }
 
-sub show_canvas($canvas) {
-    print to_string($canvas);
-}
 
+###-----------------------
 ### Combinator API
-# Build on top of the basic functions
+###-----------------------
 
 sub c_run($width, $height, $default, @draws) {
     my $canvas = create_canvas($width, $height, $default);
