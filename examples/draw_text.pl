@@ -41,6 +41,7 @@ sub create_canvas($width, $height, $def=" ") {
 sub set_pos($canvas, $x,$y) {
     $canvas->{pos}[0] = $x;
     $canvas->{pos}[1] = $y;
+    check_position($canvas);
     return;
 }
 
@@ -142,25 +143,19 @@ sub check_position($canvas) {
     my ($px,$py)               = $pos->@*;
     my ($x,$y)                 = ($ox+$px, $oy+$py);
 
+    # when we are outside max width, then jump to next line
+    if ( $x >= $w ) {
+        $px = 0;
+        $py++;
+        $y++;
+    }
+
     # when pos was outside canvas height, then we need to create lines
     while ( $y >= $h ) {
         $h++;
         push @$data, ($def x $w);
     }
     $canvas->{height} = $h;
-
-    # when $x is outside width
-    if ( $x >= $w ) {
-        $px = 0;
-        $py++;
-        $x = $ox;
-        $y++;
-        if ( $y >= $h ) {
-            $h++;
-            $canvas->{height}++;
-            push @$data, ($def x $w);
-        }
-    }
 
     $pos->[0] = $px;
     $pos->[1] = $py;
