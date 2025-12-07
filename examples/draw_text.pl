@@ -23,7 +23,7 @@ sub create_canvas($width, $height, $def=" ") {
         offset      => array(0,0),
         pos         => array(0,0),
         tab_spacing => 4,
-        borders     => [
+        rect        => [
             ['┌', '─',  '┐'],
             ['│', $def, '│'],
             ['└', '─',  '┘'],
@@ -412,26 +412,26 @@ sub rect($canvas, $sx,$sy, $ex,$ey) {
     my $by = $sy < $ey ? $ey : $sy;
 
     # top / bottom
-    my $borders = $canvas->{borders};
-    my $top    = $borders->[0][1];
-    my $bottom = $borders->[2][1];
+    my $rect   = $canvas->{rect};
+    my $top    = $rect->[0][1];
+    my $bottom = $rect->[2][1];
     for my $x ( $lx .. $rx ) {
         set_char($canvas, $x,$ty, $top);
         set_char($canvas, $x,$by, $bottom);
     }
     # left / right
-    my $left  = $borders->[1][0];
-    my $right = $borders->[1][2];
+    my $left  = $rect->[1][0];
+    my $right = $rect->[1][2];
     for my $y ( $ty .. $by ) {
         set_char($canvas, $lx,$y, $left);
         set_char($canvas, $rx,$y, $right);
     }
 
     # corners
-    set_char($canvas, $lx,$ty, $borders->[0][0]);
-    set_char($canvas, $rx,$ty, $borders->[0][2]);
-    set_char($canvas, $lx,$by, $borders->[2][0]);
-    set_char($canvas, $rx,$by, $borders->[2][2]);
+    set_char($canvas, $lx,$ty, $rect->[0][0]);
+    set_char($canvas, $rx,$ty, $rect->[0][2]);
+    set_char($canvas, $lx,$by, $rect->[2][0]);
+    set_char($canvas, $rx,$by, $rect->[2][2]);
     return;
 }
 
