@@ -41,7 +41,6 @@ sub create_canvas($width, $height, $def=" ") {
 sub set_pos($canvas, $x,$y) {
     $canvas->{pos}[0] = $x;
     $canvas->{pos}[1] = $y;
-    check_position($canvas);
     return;
 }
 
@@ -734,24 +733,42 @@ is(
     add_offset($canvas, 1,1);
     put($canvas, 'XXXXXX');
 
-    is(
-        to_string($canvas),
-        ".....\n".
-        ".XXXX\n".
-        ".XX..\n",
-        'put with offset');
+    is(to_array($canvas), [
+        ".....",
+        ".XXXX",
+        ".XX..",
+    ], 'put with offset');
 
     fill($canvas, '.');
     set_pos($canvas, 3,1);
     put($canvas, "AAAA");
+    is(to_array($canvas), [
+        ".....",
+        ".....",
+        "....A",
+        ".AAA.",
+    ], 'set_pos with offset');
 
-    is(
-        to_string($canvas),
-        ".....\n".
-        ".....\n".
-        "....A\n".
-        ".AAA.\n",
-        'set_pos with offset');
+    fill($canvas, '.');
+    set_pos($canvas, 20,5);
+    is(to_array($canvas), [
+        ".....",
+        ".....",
+        ".....",
+        ".....",
+    ], 'set_pos should not expand until put()');
+
+    put($canvas, 'X');
+    is(to_array($canvas), [
+        ".....",
+        ".....",
+        ".....",
+        ".....",
+        ".....",
+        ".....",
+        ".....",
+        ".X...",
+    ], 'put expands, and uses offset');
 }
 
 # put() supports "\r" and "\n"
