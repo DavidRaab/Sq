@@ -23,6 +23,8 @@ sub create_canvas($width, $height, $def=" ") {
         offset      => array(0,0),
         pos         => array(0,0),
         tab_spacing => 4,
+        hline       => '─',
+        vline       => '│',
         rect        => [
             ['┌', '─',  '┐'],
             ['│', $def, '│'],
@@ -399,6 +401,24 @@ sub line($canvas, $xs,$ys, $xe,$ye, $char) {
         $e2 = 2 * $err;
         if ($e2 > $dy) { $err += $dy; $xs += $sx; }
         if ($e2 < $dx) { $err += $dx; $ys += $sy; }
+    }
+    return;
+}
+
+# draws horizontal line
+sub hline($canvas, $y, $xs,$xe) {
+    my $char = $canvas->{hline};
+    for my $x ( $xs .. $xe ) {
+        set_char($canvas, $x,$y, $char);
+    }
+    return;
+}
+
+# draws vertical line
+sub vline($canvas, $x, $ys,$ye) {
+    my $char = $canvas->{vline};
+    for my $y ( $ys .. $ye ) {
+        set_char($canvas, $x,$y, $char);
     }
     return;
 }
@@ -1280,6 +1300,37 @@ is(
     add_offset($second,1,1);
     merge($first, 0,0, $second);
     is(to_string($first), ".....\n.xxx.\n.xxx.\n.xxx.\n.....\n", "merge 4");
+}
+
+# horizontal/vertical lines
+{
+    my $canvas = create_canvas(5,5,'.');
+
+    vline($canvas, 1, 1,3);
+    vline($canvas, 3, 1,3);
+    hline($canvas, 1, 1,3);
+    hline($canvas, 3, 1,3);
+
+    is(to_array($canvas), [
+        '.....',
+        '.───.',
+        '.│.│.',
+        '.───.',
+        '.....',
+    ], 'hline & vline 1');
+
+    hline($canvas, 1, 1,3);
+    hline($canvas, 3, 1,3);
+    vline($canvas, 1, 1,3);
+    vline($canvas, 3, 1,3);
+
+    is(to_array($canvas), [
+        '.....',
+        '.│─│.',
+        '.│.│.',
+        '.│─│.',
+        '.....',
+    ], 'hline & vline 2');
 }
 
 is(
