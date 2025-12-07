@@ -224,6 +224,60 @@ sub write_str_wrap($canvas, $x,$y, $str) {
     return;
 }
 
+# places a string into a selection defined by $x,$y and $length
+#
+# $where = (l)eft, (c)enter, (r)ight
+sub place($canvas, $x,$y, $length, $where, $str) {
+    my $def = $canvas->{default};
+
+    my $str_length = length $str;
+    # Build real string to place
+    my $str_to_place;
+    # when $str is shorter, then we need to expand string
+    if ( $str_length < $length ) {
+        if ( $where =~ m/\Al|left\z/i ) {
+            my $missing = $length - $str_length;
+            $str_to_place = $str . ($def x $missing);
+        }
+        elsif ( $where =~ m/\Ac|center\z/i ) {
+            my $missing = $length - $str_length;
+            my $left    = int($missing / 2);
+            my $right   = $left;
+            $right++ if $missing % 2 == 1;
+            $str_to_place = ($def x $left) . $str . ($def x $right);
+        }
+        # right
+        else {
+            my $missing = $length - $str_length;
+            $str_to_place = ($def x $missing) . $str;
+        }
+    }
+    # otherwise we need to shorten $str
+    else {
+        if ( $where =~ m/\Al|left\z/i ) {
+            my $rl = $str_length - $length;
+            $str_to_place = substr($str, 0, $rl);
+        }
+        elsif ( $where =~ m/\Ac|center\z/i ) {
+            my $cutaway = $str_length - $length;
+            my $left    = int($cutaway / 2);
+            my $right   = $left;
+            $right++ if $cutaway % 2 == 1;
+
+            $str_to_place = substr($str, 0, ($str_length-$right));
+            $str_to_place = substr($str_to_place, $left);
+        }
+        # right
+        else {
+            my $offset = $str_length - $length;
+            $str_to_place = substr($str, $offset);
+        }
+    }
+
+    write_str($canvas, $x,$y, $str_to_place);
+    return;
+}
+
 sub get_char($canvas, $x,$y) {
     my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
     my ($ox,$oy)       = $canvas->{offset}->@*;
@@ -1119,6 +1173,41 @@ is(
         '+.Hello..+',
         '++++++++++',
     ], 'border');
+}
+
+# place
+{
+    my $canvas = create_canvas(10,6, '.');
+
+    place($canvas, 0,0, 10, 'l',      'Hello');
+    place($canvas, 0,1, 10, 'left',   'Hello');
+    place($canvas, 0,2, 10, 'c',      'Hello');
+    place($canvas, 0,3, 10, 'center', 'Hello');
+    place($canvas, 0,4, 10, 'r',      'Hello');
+    place($canvas, 0,5, 10, 'right',  'Hello');
+    is(to_array($canvas), [
+        'Hello.....',
+        'Hello.....',
+        '..Hello...',
+        '..Hello...',
+        '.....Hello',
+        '.....Hello',
+    ], 'place 1');
+
+    place($canvas, 0,0, 10, 'R',      'Hello');
+    place($canvas, 0,1, 10, 'Right',  'Hello');
+    place($canvas, 0,2, 10, 'C',      'Hello');
+    place($canvas, 0,3, 10, 'Center', 'Hello');
+    place($canvas, 0,4, 10, 'L',      'Hello');
+    place($canvas, 0,5, 10, 'Left',   'Hello');
+    is(to_array($canvas), [
+        '.....Hello',
+        '.....Hello',
+        '..Hello...',
+        '..Hello...',
+        'Hello.....',
+        'Hello.....',
+    ], 'place 2');
 }
 
 # check merge, and how it handles offsets
