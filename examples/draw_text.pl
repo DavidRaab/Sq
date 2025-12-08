@@ -20,8 +20,8 @@ sub create_canvas($width, $height, $def=" ") {
         width       => $width,
         height      => $height,
         default     => $def,
-        offset      => array(0,0),
-        pos         => array(0,0),
+        clip        => [0,0],
+        pos         => [0,0],
         tab_spacing => 4,
         hline       => '─',
         vline       => '│',
@@ -35,8 +35,52 @@ sub create_canvas($width, $height, $def=" ") {
 }
 
 ###--------------------------
-### Basic get/set operations
+### Basic Canvas operations
 ###--------------------------
+
+# Clipping is the idea that draw operations are moved with an offset
+# and can be limited to either the width, or width & height. Both
+# set_char() and put_char() respect clipping options.
+#
+# When limited to just width:
+#   - set_char() does not draw beyond the width.
+#   - put_char() grows the canvas in height as needed.
+#
+# When limited to width & height
+#   - set_char() now also does not draw outside specifed rectangle
+#   - put_char() can grow content, but like set_char() not outside specifed rect
+
+sub clear_clipping($canvas) {
+    $canvas->{clip} = [0,0];
+    return;
+}
+sub set_clip_width($canvas, $x,$y, $width) {
+    $canvas->{clip} = [$x,$y, $width];
+    return;
+}
+sub set_clip_rect($canvas, $x,$y, $width,$height) {
+    $canvas->{clip} = [$x,$y, $width,$height];
+    return;
+}
+
+sub clear_offset($canvas) {
+    my $clip = $canvas->{clip};
+    $clip->[0] = 0;
+    $clip->[1] = 0;
+    return;
+}
+sub add_offset($canvas, $x,$y) {
+    my $clip = $canvas->{clip};
+    $clip->[0] += $x;
+    $clip->[1] += $y;
+    return;
+}
+sub get_offset($canvas) {
+    my $clip = $canvas->{clip};
+    return $clip->@[0,1];
+}
+
+
 
 sub set_pos($canvas, $x,$y) {
     $canvas->{pos}[0] = $x;
@@ -55,24 +99,6 @@ sub clear_canvas($canvas) {
     return;
 }
 
-sub add_offset($canvas, $x,$y) {
-    my $offset = $canvas->{offset};
-    $offset->[0] += $x;
-    $offset->[1] += $y;
-    return;
-}
-
-sub clear_offset($canvas) {
-    my $offset = $canvas->{offset};
-    $offset->[0] = 0;
-    $offset->[1] = 0;
-    return;
-}
-
-sub get_offset($canvas) {
-    return $canvas->{offset}->@*;
-}
-
 sub add_line($canvas) {
     $canvas->{height}++;
     push $canvas->{data}->@*, ($canvas->{default} x $canvas->{width});
@@ -81,7 +107,7 @@ sub add_line($canvas) {
 
 sub get_char($canvas, $x,$y) {
     my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
-    my ($ox,$oy)       = $canvas->{offset}->@*;
+    my ($ox,$oy)       = get_offset($canvas);
     my ($rx,$ry)       = ($ox+$x, $oy+$y);
     return if $rx < 0 || $rx >= $cw;
     return if $ry < 0 || $ry >= $ch;
@@ -90,7 +116,7 @@ sub get_char($canvas, $x,$y) {
 
 sub iter($canvas, $f) {
     my ($data)   = $canvas->{data};
-    my ($ox,$oy) = $canvas->{offset}->@*;
+    my ($ox,$oy) = get_offset($canvas);
 
     my ($x,$y) = (0,0);
     for my $line ( @$data ) {
@@ -106,7 +132,7 @@ sub iter($canvas, $f) {
 
 sub iter_line($canvas, $f) {
     my ($data,$h) = $canvas->@{qw/data height/};
-    my ($ox,$oy)  = $canvas->{offset}->@*;
+    my ($ox,$oy)  = get_offset($canvas);
 
     for my $y ( 0 .. ($h-1) ) {
         $f->(-$ox,$y-$oy, $data->[$y]);
@@ -138,7 +164,7 @@ sub show_canvas($canvas) {
 # function it does what needs to be done.
 sub check_position($canvas) {
     my ($data,$w,$h,$pos,$def) = $canvas->@{qw/data width height pos default/};
-    my ($ox,$oy)               = $canvas->{offset}->@*;
+    my ($ox,$oy)               = get_offset($canvas);
     my ($px,$py)               = $pos->@*;
     my ($x,$y)                 = ($ox+$px, $oy+$py);
 
@@ -175,7 +201,7 @@ sub fill($canvas, $char) {
 sub set_char($canvas, $x,$y, $char) {
     Carp::croak "set_char only can write single char" if length($char) != 1;
     my ($w,$h,$data) = $canvas->@{qw/width height data/};
-    my ($ox,$oy)     = $canvas->{offset}->@*;
+    my ($ox,$oy)     = get_offset($canvas);
     my ($rx,$ry)     = ($ox+$x, $oy+$y);
 
     return if $rx < 0 || $rx >= $w;
@@ -191,8 +217,8 @@ sub put_char($canvas, $char) {
     Carp::croak "put_char only can write a single char" if length($char) != 1;
 
     check_position($canvas);
-    my ($pos,$offset) = $canvas->@{qw/pos offset/};
-    my ($ox,$oy)      = $offset->@*;
+    my ($pos,$offset) = $canvas->{pos};
+    my ($ox,$oy)      = get_offset($canvas);
     my ($x,$y)        = $pos->@*;
 
     # replace character and update state
@@ -206,7 +232,7 @@ sub put_char($canvas, $char) {
 # expected and have an effect even when outside canvas.
 sub set($canvas, $x,$y, $str) {
     my ($w,$h,$data,$ht,$def) = $canvas->@{qw/width height data tab_spacing default/};
-    my ($ox,$oy)              = $canvas->{offset}->@*;
+    my ($ox,$oy)              = get_offset($canvas);
     my ($rx,$ry)              = ($ox+$x, $oy+$y);
 
     return if $ry >= $h;
@@ -375,7 +401,7 @@ sub place($canvas, $x,$y, $length, $where, $str) {
 # Draws $other canvas into $canvas
 sub merge($canvas, $x,$y, $other) {
     my ($src,$w,$h) = $other->@{qw/data width height/};
-    my ($ox,$oy)    = $other->{offset}->@*;
+    my ($ox,$oy)    = get_offset($other);
 
     for my $row ( 0 .. ($h-1) ) {
         set($canvas, $x-$ox,$y+$row-$oy, $src->[$row]);
@@ -385,7 +411,7 @@ sub merge($canvas, $x,$y, $other) {
 
 sub cmap($canvas, $f) {
     my ($data)   = $canvas->{data};
-    my ($ox,$oy) = $canvas->{offset}->@*;
+    my ($ox,$oy) = get_offset($canvas);
 
     my @new;
     my ($x,$y) = (0,0);
