@@ -955,6 +955,17 @@ sub transpose_map($aoa, $f) {
     return CORE::bless(Sq::sq(\@new), 'Array');
 }
 
+sub dimensions2d($aoa) {
+    my $height = @$aoa;
+    my $width  = 0;
+    my $cur    = 0;
+    for my $array ( @$aoa ) {
+        $cur   = @$array;
+        $width = $cur > $width ? $cur : $width;
+    }
+    return ($width,$height);
+}
+
 #-----------------------------------------------------------------------------#
 # SIDE-EFFECTS                                                                #
 #    functions that have side-effects or produce side-effects. Those are      #

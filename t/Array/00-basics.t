@@ -2786,4 +2786,44 @@ is(
     is($new, [{ id => 1, tags => [['foo'],['foo'],['foo'],['foo']]}], 'combine 4');
 }
 
+# dimensions2d
+{
+    is([Array::dimensions2d([])],    [0,0], 'dimensions2d 1');
+    is([Array::dimensions2d([[1]])], [1,1], 'dimensions2d 2');
+    is(
+        [Array::dimensions2d([
+            [1,2,3],
+        ])],
+        [3,1], 'dimensions2d 3');
+    is(
+        [Array::dimensions2d([
+            [1,2,3],
+            [1,2,3],
+            [1,2,3],
+        ])],
+        [3,3], 'dimensions2d 4');
+    is(
+        [Array::dimensions2d([
+            [1],
+            [1,2],
+            [1,2,3],
+        ])],
+        [3,3], 'dimensions2d 5');
+    is(
+        [Array::dimensions2d([
+            [1,2,3,4],
+            [1,2],
+            [1,2,3],
+        ])],
+        [4,3], 'dimensions2d 6');
+    is(
+        [Array::dimensions2d([
+            [1,2,3,4],
+            [],
+            [1,2,3],
+            [],
+        ])],
+        [4,4], 'dimensions2d 7');
+}
+
 done_testing;
