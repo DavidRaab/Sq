@@ -20,7 +20,6 @@ sub create_canvas($width, $height, $def=" ") {
         width       => $width,
         height      => $height,
         default     => $def,
-        clip        => [0,0],
         pos         => [0,0],
         tab_spacing => 4,
         hline       => '─',
@@ -34,53 +33,22 @@ sub create_canvas($width, $height, $def=" ") {
     );
 }
 
+# This creates a canvas where every character is a zero byte. Because
+# i handle special characters in set() and put() and most of them are
+# just skipped. This acts like a transparent empty image.
+sub empty($width, $height) {
+    return create_canvas($width, $height, "\x00");
+}
+
 ###--------------------------
 ### Basic Canvas operations
 ###--------------------------
 
-# Clipping is the idea that draw operations are moved with an offset
-# and can be limited to either the width, or width & height. Both
-# set_char() and put_char() respect clipping options.
-#
-# When limited to just width:
-#   - set_char() does not draw beyond the width.
-#   - put_char() grows the canvas in height as needed.
-#
-# When limited to width & height
-#   - set_char() now also does not draw outside specifed rectangle
-#   - put_char() can grow content, but like set_char() not outside specifed rect
-
-sub clear_clipping($canvas) {
-    $canvas->{clip} = [0,0];
+sub make_transparent($canvas) {
+    my ($w,$h)      = $canvas->@{qw/width height/};
+    $canvas->{data} = Array->init($h, ("\x00" x $w));
     return;
 }
-sub set_clip_width($canvas, $x,$y, $width) {
-    $canvas->{clip} = [$x,$y, $width];
-    return;
-}
-sub set_clip_rect($canvas, $x,$y, $width,$height) {
-    $canvas->{clip} = [$x,$y, $width,$height];
-    return;
-}
-
-sub clear_offset($canvas) {
-    my $clip = $canvas->{clip};
-    $clip->[0] = 0;
-    $clip->[1] = 0;
-    return;
-}
-sub add_offset($canvas, $x,$y) {
-    my $clip = $canvas->{clip};
-    $clip->[0] += $x;
-    $clip->[1] += $y;
-    return;
-}
-sub get_offset($canvas) {
-    my $clip = $canvas->{clip};
-    return $clip->@[0,1];
-}
-
-
 
 sub set_pos($canvas, $x,$y) {
     $canvas->{pos}[0] = $x;
@@ -106,22 +74,18 @@ sub add_line($canvas) {
 }
 
 sub get_char($canvas, $x,$y) {
-    my ($cw,$ch,$data) = $canvas->@{qw/width height data/};
-    my ($ox,$oy)       = get_offset($canvas);
-    my ($rx,$ry)       = ($ox+$x, $oy+$y);
-    return if $rx < 0 || $rx >= $cw;
-    return if $ry < 0 || $ry >= $ch;
-    return substr $data->[$ry], $rx, 1;
+    my ($w,$h,$data) = $canvas->@{qw/width height data/};
+    return if $x < 0 || $x >= $w;
+    return if $y < 0 || $y >= $h;
+    return substr $data->[$y], $x, 1;
 }
 
 sub iter($canvas, $f) {
-    my ($data)   = $canvas->{data};
-    my ($ox,$oy) = get_offset($canvas);
-
+    my ($data) = $canvas->{data};
     my ($x,$y) = (0,0);
     for my $line ( @$data ) {
         for my $char ( split //, $line ) {
-            $f->($x-$ox, $y-$oy, $char);
+            $f->($x,$y, $char);
             $x++;
         }
         $y++;
@@ -132,10 +96,8 @@ sub iter($canvas, $f) {
 
 sub iter_line($canvas, $f) {
     my ($data,$h) = $canvas->@{qw/data height/};
-    my ($ox,$oy)  = get_offset($canvas);
-
     for my $y ( 0 .. ($h-1) ) {
-        $f->(-$ox,$y-$oy, $data->[$y]);
+        $f->(0,$y, $data->[$y]);
     }
     return;
 }
@@ -164,14 +126,11 @@ sub show_canvas($canvas) {
 # function it does what needs to be done.
 sub check_position($canvas) {
     my ($data,$w,$h,$pos,$def) = $canvas->@{qw/data width height pos default/};
-    my ($ox,$oy)               = get_offset($canvas);
-    my ($px,$py)               = $pos->@*;
-    my ($x,$y)                 = ($ox+$px, $oy+$py);
+    my ($x,$y)                 = $pos->@*;
 
     # when we are outside max width, then jump to next line
     if ( $x >= $w ) {
-        $px = 0;
-        $py++;
+        $x = 0;
         $y++;
     }
 
@@ -182,8 +141,8 @@ sub check_position($canvas) {
     }
     $canvas->{height} = $h;
 
-    $pos->[0] = $px;
-    $pos->[1] = $py;
+    $pos->[0] = $x;
+    $pos->[1] = $y;
     return;
 }
 
@@ -201,12 +160,10 @@ sub fill($canvas, $char) {
 sub set_char($canvas, $x,$y, $char) {
     Carp::croak "set_char only can write single char" if length($char) != 1;
     my ($w,$h,$data) = $canvas->@{qw/width height data/};
-    my ($ox,$oy)     = get_offset($canvas);
-    my ($rx,$ry)     = ($ox+$x, $oy+$y);
 
-    return if $rx < 0 || $rx >= $w;
-    return if $ry < 0 || $ry >= $h;
-    substr($data->[$ry], $rx, 1, $char);
+    return if $x < 0 || $x >= $w;
+    return if $y < 0 || $y >= $h;
+    substr($data->[$y], $x, 1, $char);
     return;
 }
 
@@ -217,12 +174,13 @@ sub put_char($canvas, $char) {
     Carp::croak "put_char only can write a single char" if length($char) != 1;
 
     check_position($canvas);
-    my ($pos,$offset) = $canvas->{pos};
-    my ($ox,$oy)      = get_offset($canvas);
-    my ($x,$y)        = $pos->@*;
+    my ($pos)  = $canvas->{pos};
+    my ($x,$y) = $pos->@*;
 
     # replace character and update state
-    substr $canvas->{data}[$y+$oy], ($x+$ox), 1, $char;
+    if ( $x >= 0 && $y >= 0 ) {
+        substr $canvas->{data}[$y], $x, 1, $char;
+    }
     $pos->[0] = $x + 1;
     return;
 }
@@ -232,55 +190,55 @@ sub put_char($canvas, $char) {
 # expected and have an effect even when outside canvas.
 sub set($canvas, $x,$y, $str) {
     my ($w,$h,$data,$ht,$def) = $canvas->@{qw/width height data tab_spacing default/};
-    my ($ox,$oy)              = get_offset($canvas);
-    my ($rx,$ry)              = ($ox+$x, $oy+$y);
 
-    return if $ry >= $h;
+    return if $y >= $h;
     my $ord  = 0;
-    my $line = $data->[$ry];
+    my $line = $data->[$y];
     for my $char ( split //, $str ) {
         $ord = ord $char;
         # when special character
         if ( $ord < 32 ) {
             # newline
             if ( $ord == 10 ) {
-                $data->[$ry] = $line;
-                $rx = $ox;
-                return if ++$ry >= $h;
-                $line = $data->[$ry];
+                $data->[$y] = $line;
+                $x = 0;
+                return if ++$y >= $h;
+                $line = $data->[$y];
             }
             # horizontal tab
             elsif ( $ord == 9 ) {
                 for ( 1 .. $ht ) {
-                    $rx++, next if $rx < 0 || $rx >= $w;
-                    $rx++, next if $ry < 0;
-                    substr($line, $rx, 1, $def);
-                    $rx++;
+                    $x++, next if $x < 0 || $x >= $w;
+                    $x++, next if $y < 0;
+                    substr($line, $x, 1, $def);
+                    $x++;
                 }
             }
             # \r
-            elsif ( $ord == 13 ) { $rx = $ox }
+            elsif ( $ord == 13 ) { $x = 0 }
             # backspace
-            elsif ( $ord == 8  ) { $rx--     }
+            elsif ( $ord == 8  ) {
+                $x = $x > 0 ? $x-1 : 0;
+            }
             # vertical tab
             elsif ( $ord == 11 ) {
-                $data->[$ry] = $line;
-                return if ++$ry >= $h;
-                $line = $data->[$ry];
+                $data->[$y] = $line;
+                return if ++$y >= $h;
+                $line = $data->[$y];
             }
             else {
-                $rx++;
+                $x++;
             }
         }
         # any other character
         else {
-            $rx++, next if $rx < 0 || $rx >= $w;
-            $rx++, next if $ry < 0;
-            substr($line, $rx, 1, $char);
-            $rx++;
+            $x++, next if $x < 0 || $x >= $w;
+            $x++, next if $y < 0;
+            substr($line, $x, 1, $char);
+            $x++;
         }
     }
-    $data->[$ry] = $line;
+    $data->[$y] = $line;
     return;
 }
 
@@ -400,25 +358,38 @@ sub place($canvas, $x,$y, $length, $where, $str) {
 
 # Draws $other canvas into $canvas
 sub merge($canvas, $x,$y, $other) {
-    my ($src,$w,$h) = $other->@{qw/data width height/};
-    my ($ox,$oy)    = get_offset($other);
+    my ($src,$h) = $other->@{qw/data height/};
+    for my $row ( 0 .. ($h-1) ) {
+        set_wrap($canvas, $x,$y+$row, $src->[$row]);
+    }
+    return;
+}
+
+sub clip($canvas, $x,$y, $other) {
+    my ($src)    = $other->{data};
+    my ($cw,$ch) = $canvas->@{qw/width height/};
+    my ($ow,$oh) = $other ->@{qw/width height/};
+
+    my $max_w = $cw - $x;
+    my $max_h = $ch - $y;
+    my $w     = $ow < $max_w ? $ow : $max_w;
+    my $h     = $oh < $max_h ? $oh : $max_h;
 
     for my $row ( 0 .. ($h-1) ) {
-        set($canvas, $x-$ox,$y+$row-$oy, $src->[$row]);
+        set($canvas, $x,$y+$row, substr($src->[$row], 0, $w));
     }
     return;
 }
 
 sub cmap($canvas, $f) {
-    my ($data)   = $canvas->{data};
-    my ($ox,$oy) = get_offset($canvas);
+    my ($data) = $canvas->{data};
 
     my @new;
     my ($x,$y) = (0,0);
     for my $line ( @$data ) {
         my $new = "";
         for my $char ( split //, $line ) {
-            $new .= $f->($x-$ox, $y-$oy, $char);
+            $new .= $f->($x,$y, $char);
             $x++;
         }
         push @new, $new;
@@ -528,6 +499,8 @@ sub vsplit($canvas, @draws) {
 ### Combinator API
 ###-----------------------
 
+### Runners
+
 sub c_run($width, $height, $default, @draws) {
     my $canvas = create_canvas($width, $height, $default);
     for my $draw ( @draws ) {
@@ -536,8 +509,54 @@ sub c_run($width, $height, $default, @draws) {
     return $canvas;
 }
 
+sub c_empty($w,$h, @draws) {
+    my $canvas = empty($w,$h);
+    for my $draw ( @draws ) {
+        $draw->($canvas);
+    }
+    return $canvas;
+}
+
+# from Array of Array
+sub c_fromAoA($aoa) {
+    my ($w,$h) = Array::dimensions2d($aoa);
+    my $canvas = empty($w,$h);
+    my $y = 0;
+    for my $inner ( @$aoa ) {
+        set($canvas, 0,$y++, join('', @$inner));
+    }
+    return $canvas;
+}
+
+# from Array of Strings
+sub c_fromArray($array) {
+    my $h   = @$array;
+    my $w   = 0;
+    my $len = 0;
+    for my $str ( @$array ) {
+        $len = length($str);
+        $w   = $len > $w ? $len : $w;
+    }
+
+    my $canvas = empty($w,$h);
+    my $y = 0;
+    for my $line ( @$array ) {
+        set($canvas, 0,$y++, $line);
+    }
+    return $canvas;
+}
+
 sub c_string($width, $height, $default, @draws) {
     return to_string(c_run($width, $height, $default, @draws));
+}
+
+### Combinators
+
+sub c_make_transparent() {
+    return sub($canvas) {
+        make_transparent($canvas);
+        return;
+    }
 }
 
 sub c_and(@draws) {
@@ -549,54 +568,24 @@ sub c_and(@draws) {
     }
 }
 
-# from Array of Array
-sub c_fromAoA($aoa) {
-    return sub($canvas) {
-        my $y = 0;
-        for my $inner ( @$aoa ) {
-            set($canvas, 0,$y++, join('', @$inner));
-        }
-        return;
-    }
-}
-
-# from Array of Strings
-sub c_fromArray($array) {
-    return sub($canvas) {
-        my $y = 0;
-        for my $line ( @$array ) {
-            set($canvas, 0,$y++, $line);
-        }
-        return;
-    }
-}
-
 sub c_set($x,$y,$str) {
     return sub($canvas) { set($canvas, $x,$y, $str) }
-}
-
-sub c_offset($ox,$oy, @draws) {
-    return sub($canvas) {
-        add_offset($canvas, $ox,$oy);
-        for my $draw ( @draws ) {
-            $draw->($canvas);
-        }
-        add_offset($canvas, -$ox,-$oy);
-        return;
-    }
 }
 
 # creates a new canvas. So all @draw commands write into a new canvas. Then
 # this canvas is merged into current one. Maybe the merging should be done
 # explicitly, so more advanced effects are possible. Currently it is nearly
 # the same as calling c_offset(). But here you can set another background.
-sub c_canvas($width, $height, $default, @draws) {
-    Carp::croak 'c_canvas($width,$height,$char,@draws)' if ref $default ne "";
-    return sub($canvas) {
-        # generates a new canvas, and does all drawing operation on it
-        my $new = c_run($width, $height, $default, @draws);
-        # than merge new canvas in current one
-        merge($canvas, 0,0, $new);
+sub c_merge($x,$y, $canvas) {
+    return sub($c) {
+        merge($c, $x,$y, $canvas);
+        return;
+    }
+}
+
+sub c_clip($x,$y, $canvas) {
+    return sub($c) {
+        clip($c, $x,$y, $canvas);
         return;
     }
 }
@@ -756,18 +745,21 @@ is(
 # put + set_pos
 {
     my $canvas = create_canvas(5,3,'.');
-    add_offset($canvas, 1,1);
-    put($canvas, 'XXXXXX');
 
+    my $inner = create_canvas(4,2,'.');
+    put($inner, 'XXXXXX');
+
+    merge($canvas, 1,1, $inner);
     is(to_array($canvas), [
         ".....",
         ".XXXX",
         ".XX..",
     ], 'put with offset');
 
-    fill($canvas, '.');
-    set_pos($canvas, 3,1);
-    put($canvas, "AAAA");
+    fill($inner, '.');
+    set_pos($inner, 3,1);
+    put($inner, "AAAA");
+    merge($canvas, 1,1, $inner);
     is(to_array($canvas), [
         ".....",
         ".....",
@@ -775,8 +767,9 @@ is(
         ".AAA.",
     ], 'set_pos with offset');
 
-    fill($canvas, '.');
-    set_pos($canvas, 20,5);
+    fill($inner, '.');
+    set_pos($inner, 20,5);
+    merge($canvas, 1,1, $inner);
     is(to_array($canvas), [
         ".....",
         ".....",
@@ -784,7 +777,8 @@ is(
         ".....",
     ], 'set_pos should not expand until put()');
 
-    put($canvas, 'X');
+    put($inner, 'X');
+    merge($canvas, 1,1, $inner);
     is(to_array($canvas), [
         ".....",
         ".....",
@@ -800,9 +794,10 @@ is(
 # put() supports "\r" and "\n"
 {
     my $canvas = create_canvas(5,3,'.');
-    add_offset($canvas, 1,1);
 
-    put($canvas, "abc");
+    my $inner = create_canvas(4,2,'.');
+    put($inner, "abc");
+    merge($canvas, 1,1, $inner);
     is(to_array($canvas), [
         '.....',
         '.abc.',
@@ -811,28 +806,32 @@ is(
 
     # with this test i found another bug. Even if it didn't
     # test \r or \n. So this test should not be deleted.
-    put($canvas, "de");
+    put($inner, "de");
+    merge($canvas, 1,1, $inner);
     is(to_array($canvas), [
         '.....',
         '.abcd',
         '.e...',
     ], 'put ext 2');
 
-    put($canvas, "fg");
+    put($inner, "fg");
+    merge($canvas, 1,1, $inner);
     is(to_array($canvas), [
         '.....',
         '.abcd',
         '.efg.',
     ], 'put ext 3');
 
-    put($canvas, "\rh");
+    put($inner, "\rh");
+    merge($canvas, 1,1, $inner);
     is(to_array($canvas), [
         '.....',
         '.abcd',
         '.hfg.',
     ], 'put - check \r');
 
-    put($canvas, "\nij");
+    put($inner, "\nij");
+    merge($canvas, 1,1, $inner);
     is(to_array($canvas), [
         '.....',
         '.abcd',
@@ -840,7 +839,8 @@ is(
         '.ij..',
     ], 'put - check \n');
 
-    put($canvas, "\t1");
+    put($inner, "\t1");
+    merge($canvas, 1,1, $inner);
     is(to_array($canvas), [
         '.....',
         '.abcd',
@@ -849,7 +849,8 @@ is(
         '...1.',
     ], 'put - check \t 1');
 
-    put($canvas, "\t1");
+    put($inner, "\t1");
+    merge($canvas, 1,1, $inner);
     is(to_array($canvas), [
         '.....',
         '.abcd',
@@ -859,8 +860,9 @@ is(
         '....1',
     ], 'put - check \t 2');
 
-    set_spacing($canvas, 2);
-    put($canvas, "\t1\t2\t3");
+    set_spacing($inner, 2);
+    put($inner, "\t1\t2\t3");
+    merge($canvas, 1,1, $inner);
     is(to_array($canvas), [
         '.....',
         '.abcd',
@@ -873,7 +875,8 @@ is(
         '.3...',
     ], 'put - set_spacing and \t');
 
-    put($canvas, "\b4");
+    put($inner, "\b4");
+    merge($canvas, 1,1, $inner);
     is(to_array($canvas), [
         '.....',
         '.abcd',
@@ -886,7 +889,8 @@ is(
         '.4...',
     ], 'put - backspace 1');
 
-    put($canvas, "\b5");
+    put($inner, "\b5");
+    merge($canvas, 1,1, $inner);
     is(to_array($canvas), [
         '.....',
         '.abcd',
@@ -899,7 +903,8 @@ is(
         '.5...',
     ], 'put - backspace 2');
 
-    put($canvas, "\b\b\b0");
+    put($inner, "\b\b\b0");
+    merge($canvas, 1,1, $inner);
     is(to_array($canvas), [
         '.....',
         '.abcd',
@@ -912,7 +917,8 @@ is(
         '.0...',
     ], 'put - backspace 3');
 
-    put($canvas, "12\x0b34");
+    put($inner, "12\x0b34");
+    merge($canvas, 1,1, $inner);
     is(to_array($canvas), [
         '.....',
         '.abcd',
@@ -956,65 +962,74 @@ is(
 # check if set() supports \r and \n
 {
     my $canvas = create_canvas(5,3,'.');
-    add_offset($canvas, 1,1);
+    my $inner  = create_canvas(4,2,'.');
 
-    set($canvas, 0,0, "abc");
+    set($inner, 0,0, "abc");
+    merge($canvas, 1,1, $inner);
     is(to_array($canvas), [
         '.....',
         '.abc.',
         '.....',
     ], 'write_str - just fill to start');
 
-    put($canvas, "de");
+    put($inner, "de");
+    merge($canvas, 1,1, $inner);
     is(to_array($canvas), [
         '.....',
         '.dec.',
         '.....',
     ], 'write_str - check if overwrites 1');
 
-    set($canvas, 0,0, "abc");
+    set($inner, 0,0, "abc");
+    merge($canvas, 1,1, $inner);
     is(to_array($canvas), [
         '.....',
         '.abc.',
         '.....',
     ], 'write_str - check if overwrites 2');
 
-    set($canvas, 0,0, "abc\rd");
+    set($inner, 0,0, "abc\rd");
+    merge($canvas, 1,1, $inner);
     is(to_array($canvas), [
         '.....',
         '.dbc.',
         '.....',
     ], 'write_str - implements \\r');
 
-    set($canvas, 0,0, "abc\rd\ne");
+    set($inner, 0,0, "abc\rd\ne");
+    merge($canvas, 1,1, $inner);
     is(to_array($canvas), [
         '.....',
         '.dbc.',
         '.e...',
     ], 'write_str - implements \\n');
 
-    set($canvas, 0,0, "abc\rd\nef\nghi");
+    set($inner, 0,0, "abc\rd\nef\nghi");
+    merge($canvas, 1,1, $inner);
     is(to_array($canvas), [
         '.....',
         '.dbc.',
         '.ef..',
     ], 'write_str - does not expand height 1');
 
-    set($canvas, 0,0, "j\nklm\rn\nop");
+    set($inner, 0,0, "j\nklm\rn\nop");
+    merge($canvas, 1,1, $inner);
     is(to_array($canvas), [
         '.....',
         '.jbc.',
         '.nlm.',
     ], 'write_str - does not expand height 2');
 
-    set($canvas, 0,0, "111111\r22");
+    set($inner, 0,0, "111111\r22");
+    merge($canvas, 1,1, $inner);
     is(to_array($canvas), [
         '.....',
         '.2211',
         '.nlm.',
     ], 'write_str - \\r outside width');
 
-    set($canvas, 0,0, "33333\r2222222\n3");
+    set($inner, 0,0, "33333\r2222222\n3");
+    merge($canvas, 1,1, $inner);
     is(to_array($canvas), [
         '.....',
         '.2222',
@@ -1025,44 +1040,50 @@ is(
 # \r and \n with negative offsets
 {
     my $canvas = create_canvas(5,3,'.');
-    add_offset($canvas, -1,-1);
+    my $inner  = create_canvas(6,4,'.');
 
-    set($canvas, 0,0, "11111");
+    set($inner, 0,0, "11111");
+    merge($canvas, -1,-1, $inner);
     is(to_array($canvas), [
         '.....',
         '.....',
         '.....',
     ], 'write_str - write outside canvas');
 
-    set($canvas, 0,0, "\n12345");
+    set($inner, 0,0, "\n12345");
+    merge($canvas, -1,-1, $inner);
     is(to_array($canvas), [
         '2345.',
         '.....',
         '.....',
     ], 'write_str - negative offset with \\n');
 
-    set($canvas, 0,0, "\n12345\r67");
+    set($inner, 0,0, "\n12345\r67");
+    merge($canvas, -1,-1, $inner);
     is(to_array($canvas), [
         '7345.',
         '.....',
         '.....',
     ], 'write_str - negative offset with \\n and \\r');
 
-    set($canvas, 0,0, "\n12345\r6789\b0");
+    set($inner, 0,0, "\n12345\r6789\b0");
+    merge($canvas, -1,-1, $inner);
     is(to_array($canvas), [
         '7805.',
         '.....',
         '.....',
     ], 'write_str - backspace handling');
 
-    set($canvas, 0,0, "\n12345\r6789\b0\x0bab");
+    set($inner, 0,0, "\n12345\r6789\b0\x0bab");
+    merge($canvas, -1,-1, $inner);
     is(to_array($canvas), [
         '7805.',
         '...ab',
         '.....',
     ], 'write_str - vertical tab');
 
-    set($canvas, 0,0, "\n\t1234");
+    set($inner, 0,0, "\n\t1234");
+    merge($canvas, -1,-1, $inner);
     is(to_array($canvas), [
         '...12',
         '...ab',
@@ -1110,20 +1131,6 @@ is(
     ], 'spacing 5');
 }
 
-# offset testing
-{
-    my $canvas = create_canvas(10, 2, '.');
-
-    is([get_offset($canvas)], [0,0], 'get_offset');
-    add_offset($canvas, 1,1);
-    is([get_offset($canvas)], [1,1], 'add_offset 1');
-    clear_offset($canvas);
-    is([get_offset($canvas)], [0,0], 'clear_offset');
-    add_offset($canvas, 1,1);
-    add_offset($canvas, 1,1);
-    is([get_offset($canvas)], [2,2], 'add_offset 2');
-}
-
 # check getChar, also if it correctly handles offset
 {
     my $canvas = create_canvas(10, 2, '.');
@@ -1137,37 +1144,28 @@ is(
     is(get_char($canvas, 0,1), 'a', 'getChar 4');
     is(get_char($canvas, 5,1), 'f', 'getChar 5');
     is(get_char($canvas, 9,1), 'j', 'getChar 6');
-
-    add_offset($canvas, 1,1);
-
-    is(get_char($canvas, 0,0),   'b', 'getChar 7');
-    is(get_char($canvas, 5,0),   'g', 'getChar 8');
-    is(get_char($canvas, 8,0),   'j', 'getChar 9');
-    is(get_char($canvas, 0,1), undef, 'getChar 10');
 }
 
-# offset with negative writes
+# set with negative writes
 {
     my $canvas = create_canvas(3,3,'.');
-    add_offset($canvas, 1,1);
-    set($canvas, -1,-1, 'X');
+    set($canvas, -1,-1, "XXX\nX");
     is(
         to_string($canvas), "X..\n...\n...\n",
-        'write_str still writes in negative offset when inside canvas');
+        'set with negative offset');
 }
 
-# check iter(), also if it correctly handles offset
+# check iter()
 {
     my $canvas = create_canvas(3,3,'.');
-    add_offset($canvas, 1,1);
     my @iters;
     iter($canvas, sub { push @iters, [@_] });
     is(
         \@iters,
         [
-            [-1, -1, "."], [0, -1, "." ], [1, -1, "." ],
-            [-1,  0, "."], [0,  0, "." ], [1,  0, "." ],
-            [-1,  1, "."], [0,  1, "." ], [1,  1, "." ],
+            [0,0, "."], [1,0, "." ], [2,0, "." ],
+            [0,1, "."], [1,1, "." ], [2,1, "." ],
+            [0,2, "."], [1,2, "." ], [2,2, "." ],
         ],
         'iter after offset');
 }
@@ -1175,27 +1173,25 @@ is(
 # check iter_line
 {
     my $canvas = create_canvas(3,3,'.');
-    add_offset($canvas, 1,1);
 
     my @sizes;
     iter_line($canvas, sub { push @sizes, [@_] });
     is(
         \@sizes,
         [
-            [-1, -1, "..."],
-            [-1,  0, "..."],
-            [-1,  1, "..."],
+            [0,0, "..."],
+            [0,1, "..."],
+            [0,2, "..."],
         ],
         'iter_line with offset');
 }
 
-# check map(), also if it correctly handles offset
+# check map()
 {
     my $canvas = create_canvas(3,3,'.');
     set($canvas, 0,0, "012");
     set($canvas, 0,1, "345");
     set($canvas, 0,2, "678");
-    add_offset($canvas, 1,1);
 
     my @iters;
     cmap($canvas, sub($x,$y,$char) {
@@ -1205,16 +1201,16 @@ is(
     is(
         \@iters,
         [
-            [-1, -1], [0, -1], [1, -1],
-            [-1,  0], [0,  0], [1,  0],
-            [-1,  1], [0,  1], [1,  1],
+            [0,0], [1,0], [2,0],
+            [0,1], [1,1], [2,1],
+            [0,2], [1,2], [2,2],
         ],
-        'map handles offset');
+        'map');
 
     is(to_string($canvas), "123\n456\n789\n", 'string after canvas');
 }
 
-# write_str_wrap
+# set_wrap
 {
     my $canvas = create_canvas(10,3,'.');
 
@@ -1223,28 +1219,28 @@ is(
         '..........',
         '1234567890',
         'abcde.....',
-    ], 'write_str_wrap 1');
+    ], 'set_wrap 1');
 
     put($canvas, 'fghi');
     is(to_array($canvas), [
         'fghi......',
         '1234567890',
         'abcde.....',
-    ], 'write_str_wrap 2');
+    ], 'set_wrap 2');
 
     set_wrap($canvas, 5,1, "xxx");
     is(to_array($canvas), [
         'fghi......',
         '12345xxx90',
         'abcde.....',
-    ], 'write_str_wrap 3');
+    ], 'set_wrap 3');
 
     put($canvas, "zzz");
     is(to_array($canvas), [
         'fghizzz...',
         '12345xxx90',
         'abcde.....',
-    ], 'write_str_wrap 4');
+    ], 'set_wrap 4');
 
     set_wrap($canvas, 5,2, "yyyyyy");
     is(to_array($canvas), [
@@ -1252,7 +1248,7 @@ is(
         '12345xxx90',
         'abcdeyyyyy',
         'y.........',
-    ], 'write_str_wrap 5');
+    ], 'set_wrap 5');
 }
 
 # border
@@ -1341,23 +1337,12 @@ is(
     is(to_string($first), "xxx..\nxxx..\nxxx..\n.....\n.....\n", "merge 1");
 
     fill($first, '.');
-    add_offset($first, 1,1);
-    merge($first, 0,0, $second);
+    merge($first, 1,1, $second);
     is(to_string($first), ".....\n.xxx.\n.xxx.\n.xxx.\n.....\n", "merge 2");
 
     fill($first, '.');
-    clear_offset($first);
-    add_offset($second, 1,1);
-    merge($first, 0,0, $second);
+    merge($first, -1,-1, $second);
     is(to_string($first), "xx...\nxx...\n.....\n.....\n.....\n", "merge 3");
-
-    fill($first, '.');
-    clear_offset($first);
-    clear_offset($second);
-    add_offset($first,2,2);
-    add_offset($second,1,1);
-    merge($first, 0,0, $second);
-    is(to_string($first), ".....\n.xxx.\n.xxx.\n.xxx.\n.....\n", "merge 4");
 }
 
 # horizontal/vertical lines
@@ -1475,9 +1460,9 @@ is(
     "..........\n",
     'canvas 1');
 
-my $canvas = c_canvas(20,20,".",c_fill('a'));
+my $canvas = c_empty(20,20, c_fill('a'));
 is(
-    c_string(10,10,'.', $canvas),
+    c_string(10,10,'.', c_clip(0,0, $canvas)),
     "aaaaaaaaaa\n".
     "aaaaaaaaaa\n".
     "aaaaaaaaaa\n".
@@ -1490,14 +1475,15 @@ is(
     "aaaaaaaaaa\n",
     'canvas 2');
 
-my $with_corner = c_and($canvas,
+my $with_corner = c_empty(10,10,
+    c_merge(0,0, $canvas),
     c_set(0,0, 'b'),
     c_set(9,0, 'b'),
     c_set(0,9, 'b'),
-    c_set(9,9, 'b'),
+    c_set(9,9, 'b')
 );
 is(
-    c_string(10,10,'.',$with_corner),
+    c_string(10,10,'.', c_clip(0,0, $with_corner)),
     "baaaaaaaab\n".
     "aaaaaaaaaa\n".
     "aaaaaaaaaa\n".
@@ -1512,12 +1498,11 @@ is(
 
 is(
     c_string(10,10,'.',
-        $with_corner,
+        c_clip(0,0, $with_corner),
         c_set(-1,0, 'c'),
         c_set(10,0, 'c'),
         c_set(5,-1, 'c'),
-        c_set(5,10, 'c'),
-    ),
+        c_set(5,10, 'c')),
     "baaaaaaaab\n".
     "aaaaaaaaaa\n".
     "aaaaaaaaaa\n".
@@ -1530,15 +1515,15 @@ is(
     "baaaaaaaab\n",
     'canvas 4');
 
-my $box = c_canvas(4,4,'X');
+my $box = c_run(4,4,'X');
 is(
     c_string(10,10,'.',
-        $with_corner,
+        c_clip(0,0, $with_corner),
         c_set(-1,0, 'c'),
         c_set(10,0, 'c'),
         c_set(5,-1, 'c'),
         c_set(5,10, 'c'),
-        c_offset(3,3, $box),
+        c_clip(3,3, $box),
     ),
     "baaaaaaaab\n".
     "aaaaaaaaaa\n".
@@ -1554,16 +1539,16 @@ is(
 
 is(
     c_string(10,10,'.',
-        $with_corner,
+        c_clip(0,0, $with_corner),
         c_set(-1,0, 'c'),
         c_set(10,0, 'c'),
         c_set(5,-1, 'c'),
         c_set(5,10, 'c'),
-        c_offset( 3, 3, $box), # middle
-        c_offset( 3,-3, $box), # top
-        c_offset(-3, 3, $box), # left
-        c_offset( 9, 3, $box), # right
-        c_offset( 3, 9, $box), # bottom
+        c_clip( 3, 3, $box), # middle
+        c_clip( 3,-3, $box), # top
+        c_clip(-3, 3, $box), # left
+        c_clip( 9, 3, $box), # right
+        c_clip( 3, 9, $box), # bottom
     ),
     "baaXXXXaab\n".
     "aaaaaaaaaa\n".
@@ -1578,14 +1563,15 @@ is(
     'c_offset 2');
 
 my $cbox =
-    c_and(
+    c_run(4,4,' ',
+        c_make_transparent,
         c_set(0,0,'a'),
         c_set(3,0,'a'),
         c_set(0,3,'a'),
         c_set(3,3,'a'));
 
 is(
-    c_string(4,4," ",$cbox),
+    c_string(4,4," ",c_clip(0,0,$cbox)),
     "a  a\n".
     "    \n".
     "    \n".
@@ -1593,7 +1579,7 @@ is(
     'c_and 1');
 
 is(
-    c_string(4,4,".",$cbox),
+    c_string(4,4,".",c_clip(0,0, $cbox)),
     "a..a\n".
     "....\n".
     "....\n".
@@ -1601,7 +1587,7 @@ is(
     'c_and 2');
 
 is(
-    c_string(6,6,".",$cbox),
+    c_string(6,6,".",c_clip(0,0, $cbox)),
     "a..a..\n".
     "......\n".
     "......\n".
@@ -1611,7 +1597,7 @@ is(
     'c_and 3');
 
 is(
-    c_string(8,6,".", c_offset(2,2,$cbox)),
+    c_string(8,6,".", c_clip(2,2,$cbox)),
     "........\n".
     "........\n".
     "..a..a..\n".
@@ -1622,16 +1608,16 @@ is(
 
 {
     my $box =
-        c_canvas(3,3, "o",
+        c_run(3,3, "o",
             c_set(0,0, "X"), c_set(2,0, "X"),
             c_set(0,2, "X"), c_set(2,2, "X"));
 
     is(
         c_string(9,9,".",
-            c_offset(0,0, $box),
-            c_offset(6,0, $box),
-            c_offset(0,6, $box),
-            c_offset(6,6, $box)),
+            c_clip(0,0, $box),
+            c_clip(6,0, $box),
+            c_clip(0,6, $box),
+            c_clip(6,6, $box)),
         "XoX...XoX\n".
         "ooo...ooo\n".
         "XoX...XoX\n".
@@ -1646,12 +1632,13 @@ is(
 
 is(
     c_string(4,4,".",
-        c_fromAoA([
-            [qw/o o o o/],
-            [qw/o o o o/],
-            [qw/o o o o/],
-            [qw/o o o o/],
-        ])),
+        c_merge(0,0,
+            c_fromAoA([
+                [qw/o o o o/],
+                [qw/o o o o/],
+                [qw/o o o o/],
+                [qw/o o o o/],
+            ]))),
     "oooo\n".
     "oooo\n".
     "oooo\n".
@@ -1660,12 +1647,13 @@ is(
 
 is(
     c_string(4,4,".",
-        c_fromAoA([
-            [qw/o o o o/],
-            [qw/o o o o/],
-            [qw/o o o o/],
-            [qw/o o o o/],
-        ]),
+        c_merge(0,0,
+            c_fromAoA([
+                [qw/o o o o/],
+                [qw/o o o o/],
+                [qw/o o o o/],
+                [qw/o o o o/],
+            ])),
         c_set(0,0, 'X'),
         c_set(1,1, 'X'),
         c_set(2,2, 'X'),
@@ -1678,12 +1666,13 @@ is(
 
 is(
     c_string(4,4,".",
-        c_fromArray([
-            "oooo",
-            "oooo",
-            "oooo",
-            "oooo",
-        ])),
+        c_merge(0,0,
+            c_fromArray([
+                "oooo",
+                "oooo",
+                "oooo",
+                "oooo",
+            ]))),
     "oooo\n".
     "oooo\n".
     "oooo\n".
@@ -1692,12 +1681,13 @@ is(
 
 is(
     c_string(4,4,'.',
-        c_fromArray([
-            "oooo",
-            "oooo",
-            "oooo",
-            "oooo",
-        ]),
+        c_merge(0,0,
+            c_fromArray([
+                "oooo",
+                "oooo",
+                "oooo",
+                "oooo",
+            ])),
         c_set(0,0, 'X'),
         c_set(1,1, 'X'),
         c_set(2,2, 'X'),
@@ -1710,29 +1700,19 @@ is(
 
 is(
     c_string(9,5,".",
-        c_offset(0,0,
-            c_fromAoA([
-                [qw/o o o o/],
-                [qw/o o o o/],
-                [qw/o o o o/],
-                [qw/o o o o/],
-            ]),
-            c_set(0,0, 'X'),
-            c_set(1,1, 'X'),
-            c_set(2,2, 'X'),
-            c_set(3,3, 'X')),
+        c_merge(0,0, c_fromAoA([
+            [qw/X o o o/],
+            [qw/o X o o/],
+            [qw/o o X o/],
+            [qw/o o o X/],
+        ])),
 
-        c_offset(5,0,
-            c_fromArray([
-                "oooo",
-                "oooo",
-                "oooo",
-                "oooo",
-            ]),
-            c_set(0,0, 'X'),
-            c_set(1,1, 'X'),
-            c_set(2,2, 'X'),
-            c_set(3,3, 'X'))),
+        c_merge(5,0, c_fromArray([
+            "Xooo",
+            "oXoo",
+            "ooXo",
+            "oooX",
+        ]))),
     "Xooo.Xooo\n".
     "oXoo.oXoo\n".
     "ooXo.ooXo\n".
@@ -1805,13 +1785,13 @@ is(
 
 is(
     c_string(5,5,'.', c_rect(0,0, 4,4)),
-    c_string(5,5,'.', c_fromArray([
+    c_string(5,5,'.', c_merge(0,0, c_fromArray([
         "┌───┐",
         "│...│",
         "│...│",
         "│...│",
         "└───┘",
-    ])),
+    ]))),
     'c_rect 1');
 
 is(
