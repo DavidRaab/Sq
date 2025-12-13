@@ -17,3 +17,8 @@ cmpthese(-1, {
         }
     },
 });
+
+__END__
+          Rate    mod binary
+mod    27306/s     --   -46%
+binary 50243/s    84%     --

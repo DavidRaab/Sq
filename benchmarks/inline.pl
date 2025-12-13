@@ -17,3 +17,7 @@ Sq->bench->compare(-1, {
     },
 });
 
+__END__
+            Rate no_inline    inline
+no_inline  931/s        --      -65%
+inline    2669/s      187%        --

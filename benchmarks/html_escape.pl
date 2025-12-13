@@ -4,12 +4,11 @@ use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Sq;
 use Sq::Gen;
-# use Sq::Sig;
 use HTML::Escape;
 use HTML::Entities;
 
 # getting the function first from a static is faster
-my $escape = Sq->fmt->escape_html;
+my $escape = Str->escape_html;
 
 # generates 1000 random strings with size 10-100
 my $txts = gen_run gen [repeat => 1000 => [str_from => 10, 100, 'a'..'z', qw/< > & { } ' `/]];
@@ -31,3 +30,9 @@ Sq->bench->compare(-3, {
         }
     },
 });
+
+__END__
+                 Rate HTML::Entities        current   HTML::Escape
+HTML::Entities 40.5/s             --           -63%           -88%
+current         109/s           168%             --           -67%
+HTML::Escape    333/s           724%           207%             --

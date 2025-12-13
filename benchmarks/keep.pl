@@ -3,15 +3,18 @@ use 5.036;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Sq;
-use Sq::Sig;
 
-# It started by bechmarking and looking at different filtering implementation
-# especially looking at the performance of a full mutable version that
-# mutates an array and removes entries instead of createing a new on. This
-# version is `by_splice`. Because it mutates and correct benchmarking behaviour
-# must be ensured there are versions that copies the array first to really
-# compare the difference of the algorithms. But there are also version without
-# copies that shows a more practical version.
+# In this benchmark i check different implementations for Array::keep. Basically
+# a grep {}. But i also wanted to look into a mutable version. Even the Perl
+# built-in creates a new array. And often people think that creating new data
+# instead of mutation always must be slower. But in the case of filtering
+# implemting a mutable version is not really easy.
+#
+# The version that mutates an array is `by_splice`. Because it mutates the array
+# i always must start on a fresh new array. So i make a copy first. But for
+# correct comparison i just do a copy in all different versions even if that
+# is not needed. So the overhead of copying does not effect relative performance
+# to the different solutions.
 
 # creates array with 10_000 random integer numbers
 my $amount  = 10_000;
@@ -21,14 +24,14 @@ my $numbers = Array->init($amount, sub($idx) {
 
 # evens with perl built-in grep
 sub by_grep {
-    my $numbers = $numbers->copy;
+    my $numbers = copy($numbers);
     my @evens   = grep { $_ % 2 == 0 } @$numbers;
     return;
 }
 
 # same but c-style
 sub by_manual {
-    my $numbers = $numbers->copy;
+    my $numbers = copy($numbers);
     my @evens;
     for my $num ( @$numbers ) {
         if ( $num % 2 == 0 ) {
@@ -40,7 +43,7 @@ sub by_manual {
 
 # full mutable version that changes array
 sub by_splice {
-    my $numbers = $numbers->copy;
+    my $numbers = copy($numbers);
     my $idx     = 0;
     while ( $idx < @$numbers ) {
         if ( $numbers->[$idx] % 2 == 1 ) {
@@ -53,7 +56,7 @@ sub by_splice {
 }
 
 sub by_seq {
-    my $numbers = $numbers->copy;
+    my $numbers = copy($numbers);
     my $evens =
         Seq
         ->from_array($numbers)
@@ -109,7 +112,7 @@ sub list_filter_nm {
 
 # only getting first 5 even numbers
 sub first_5_manual {
-    my $numbers = $numbers->copy;
+    my $numbers = copy($numbers);
     my $count   = 0;
     my @evens;
     for my $x ( @$numbers ) {
@@ -123,7 +126,7 @@ sub first_5_manual {
 
 # getting first 5 even numbers, but code is still abstract like using grep
 sub first_5_seq {
-    my $numbers = $numbers->copy;
+    my $numbers = copy($numbers);
     my $evens =
         Seq
         ->from_array($numbers)
@@ -212,3 +215,30 @@ print(
     ? "\nok - correct \$numbers count\n"
     : "\nnot ok - \$numbers length should be $amount but got ". $numbers->length . "\n"
 );
+
+__END__
+Benchmarking versions with array copies.
+                Rate      seq  splice  manual    grep first_5_manual first_5_seq
+seq            251/s       --     -8%    -52%    -53%           -62%        -62%
+splice         272/s       8%      --    -48%    -50%           -59%        -59%
+manual         523/s     108%     92%      --     -3%           -22%        -22%
+grep           540/s     115%     98%      3%      --           -19%        -19%
+first_5_manual 667/s     165%    145%     27%     24%             --         -0%
+first_5_seq    667/s     165%    145%     27%     24%            -0%          --
+
+Keep all with different data-structures. No Array copies.
+          Rate    list list_nm     seq   array    grep array_e
+list     298/s      --      0%    -25%    -59%    -89%    -89%
+list_nm  298/s      0%      --    -25%    -59%    -89%    -89%
+seq      399/s     34%     34%      --    -45%    -85%    -85%
+array    731/s    145%    145%     83%      --    -73%    -73%
+grep    2669/s    795%    795%    569%    265%      --     -2%
+array_e 2715/s    811%    811%    580%    271%      2%      --
+
+Getting only first 5 even numbers.
+                       Rate first_5_list first_5_array first_5_grep first_5_seq first_5_manual_nc
+first_5_list          294/s           --          -59%         -89%       -100%             -100%
+first_5_array         725/s         147%            --         -72%       -100%             -100%
+first_5_grep         2619/s         791%          261%           --        -99%             -100%
+first_5_seq        229681/s       78060%        31590%        8668%          --              -88%
+first_5_manual_nc 1971879/s      670927%       271969%       75179%        759%                --

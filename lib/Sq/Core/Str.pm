@@ -15,7 +15,7 @@ static ord     => sub($str) { ord $str         };
 static chr     => sub($str) { chr $str         };
 static hex     => sub($str) { hex $str         };
 
-static trim   => sub($str) {
+static trim => sub($str) {
     $str =~ s/\A\s+//;
     $str =~ s/\s+\z//;
     return $str;

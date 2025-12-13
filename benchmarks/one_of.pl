@@ -64,3 +64,10 @@ cmpthese(-1, {
         die "\$count not 3000: $count\n" if $count != 3000;
     },
 });
+
+__END__
+              Rate       array       regex hash_exists        hash
+array        923/s          --        -10%        -67%        -67%
+regex       1028/s         11%          --        -63%        -64%
+hash_exists 2765/s        200%        169%          --         -2%
+hash        2829/s        206%        175%          2%          --

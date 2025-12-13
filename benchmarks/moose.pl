@@ -244,3 +244,33 @@ Sq->bench->compare(-1, {
         }
     },
 });
+
+__END__
+Benchmarking initialization
+                    Rate sq_func_locked sq_func_inlined moose   sq sq_bless_locked sq_locked perl_class Hash->new Hash->bless hash() manual_hash_bless perl_hash
+sq_func_locked     411/s             --            -12%  -27% -51%            -68%      -75%       -77%      -79%        -87%   -87%              -90%      -92%
+sq_func_inlined    469/s            14%              --  -16% -45%            -63%      -71%       -74%      -76%        -85%   -85%              -89%      -91%
+moose              560/s            36%             19%    -- -34%            -56%      -66%       -69%      -71%        -82%   -83%              -87%      -89%
+sq                 845/s           106%             80%   51%   --            -34%      -49%       -53%      -56%        -72%   -74%              -80%      -83%
+sq_bless_locked   1274/s           210%            172%  128%  51%              --      -23%       -30%      -34%        -59%   -61%              -70%      -75%
+sq_locked         1644/s           300%            250%  194%  94%             29%        --        -9%      -15%        -46%   -49%              -61%      -67%
+perl_class        1810/s           341%            286%  223% 114%             42%       10%         --       -6%        -41%   -44%              -57%      -64%
+Hash->new         1932/s           370%            312%  245% 129%             52%       18%         7%        --        -37%   -40%              -54%      -62%
+Hash->bless       3070/s           647%            554%  449% 263%            141%       87%        70%       59%          --    -5%              -27%      -39%
+hash()            3229/s           686%            588%  477% 282%            153%       96%        78%       67%          5%     --              -23%      -36%
+manual_hash_bless 4186/s           919%            792%  648% 395%            229%      155%       131%      117%         36%    30%                --      -17%
+perl_hash         5024/s          1123%            971%  798% 494%            294%      206%       178%      160%         64%    56%               20%        --
+
+Reading just title
+              Rate      moose perl_class  perl_hash  sq_locked
+moose       6981/s         --        -5%       -72%       -72%
+perl_class  7313/s         5%         --       -71%       -71%
+perl_hash  24888/s       257%       240%         --        -1%
+sq_locked  25048/s       259%       242%         1%         --
+
+Setting title to a new value
+              Rate      moose perl_class  sq_locked  perl_hash
+moose       5119/s         --       -42%       -80%       -81%
+perl_class  8805/s        72%         --       -65%       -67%
+sq_locked  25121/s       391%       185%         --        -5%
+perl_hash  26305/s       414%       199%         5%         --
