@@ -17,7 +17,7 @@ use Benchmark qw(cmpthese);
 #
 # With more elements the Array scanning becomes even more worse.
 
-my @words = qw/yes hello world cool no what shakira maybe whatever/;
+my @words = qw/yes yep hello world cool no what shakira maybe whatever/;
 cmpthese(-1, {
     array => sub {
         my $count  = 0;
@@ -50,6 +50,15 @@ cmpthese(-1, {
         for ( 1 .. 1_000 ) {
             for my $word ( @words ) {
                 $count++ if exists $valid{$word};
+            }
+        }
+        die "\$count not 3000: $count\n" if $count != 3000;
+    },
+    regex => sub {
+        my $count = 0;
+        for ( 1 .. 1_000 ) {
+            for my $word ( @words ) {
+                $count++ if $word =~ m/\A(?>yes|no|maybe)\z/;
             }
         }
         die "\$count not 3000: $count\n" if $count != 3000;
