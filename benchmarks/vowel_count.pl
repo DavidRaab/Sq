@@ -66,10 +66,9 @@ sub vowel_regexi($text) {
 
 # this uses tr//, it is specialiased to just replace characters. it
 # returns how many replacements are made. This avoid building an array
-# of matches
+# of matches. With no replacement it just counts the specified characters.
 sub vowel_tr($text) {
-    my $count = $text =~ tr/aeiouAEIOU/aeiouAEIOU/;
-    return $count;
+    return $text =~ tr/aeiouAEIOU//;
 }
 
 my $words = Array::repeat(
@@ -119,15 +118,24 @@ Sq->bench->compare(-1, {
         }
         die "\$count not correct" if $count != 1000;
     },
+    # this just shows the overhead of calling 1 function in a loop
+    tr_inline => sub {
+        my $count = 0;
+        for my $word ( @$words ) {
+            $count += $word =~ tr/aeiouAEIOU//;
+        }
+        die "\$count not correct" if $count != 1000;
+    },
 });
 
 __END__
 Result on my system.
 
-            Rate        cs cs_inline      hash     regex    regexi        tr
-cs        75.5/s        --      -91%      -97%      -98%      -98%      -99%
-cs_inline  852/s     1030%        --      -71%      -77%      -77%      -91%
-hash      2955/s     3816%      247%        --      -20%      -21%      -69%
-regex     3691/s     4792%      333%       25%        --       -1%      -61%
-regexi    3725/s     4837%      337%       26%        1%        --      -60%
-tr        9394/s    12351%     1002%      218%      155%      152%        --
+             Rate      cs cs_inline     hash  regexi    regex       tr tr_inline
+cs         74.5/s      --      -91%     -98%    -98%     -98%     -99%     -100%
+cs_inline   853/s   1045%        --     -73%    -77%     -77%     -92%      -97%
+hash       3110/s   4074%      264%       --    -16%     -17%     -72%      -90%
+regexi     3692/s   4855%      333%      19%      --      -2%     -67%      -89%
+regex      3759/s   4945%      341%      21%      2%       --     -66%      -88%
+tr        11061/s  14745%     1196%     256%    200%     194%       --      -66%
+tr_inline 32119/s  43008%     3664%     933%    770%     754%     190%        --
