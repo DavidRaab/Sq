@@ -102,17 +102,24 @@ sub iter_line($canvas, $f) {
     return;
 }
 
-# creates string out of $canvas
-sub to_string($canvas) {
-    my ($cw, $data) = $canvas->@{qw/width data/};
-    return join("\n", @$data). "\n";
+# creates array of string from $canvas. Best to use in other functions
+# like Sq->fs->write_text or Sq->fmt->table or just for testing
+sub to_array($canvas) {
+    my @out = map {
+        # removes zero-bytes at end of every line
+        my $line = s/\x00++\z//r;
+        # replaces zero bytes with whitespace
+        $line =~ s/\x00/ /g;
+        $line;
+    } $canvas->{data}->@*;
+    # removes empty lines at end of array
+    pop @out while @out && $out[-1] eq "";
+    return bless(\@out, 'Array');
 }
 
-# creates array of string from $canvas. Optimal to use in other
-# functions like Sq->fs->write_text or Sq->fmt->table or just
-# for testing
-sub to_array($canvas) {
-    return $canvas->{data};
+# creates string out of $canvas
+sub to_string($canvas) {
+    return join("\n", to_array($canvas)->@*). "\n";
 }
 
 sub show_canvas($canvas) {
@@ -702,6 +709,25 @@ is(
     "5....\n".
     ".....\n",
     'to_string 2');
+
+# empty handling
+{
+    my $empty = empty(5,3);
+    is(to_string($empty), "\n", 'to_string on empty');
+    is(to_array($empty),  [],   'to_array on empty');
+
+    set($empty, 3,0, "a");
+    is(to_string($empty), "   a\n", 'empty 1');
+    is(to_array($empty),  ["   a"], 'empty 2');
+
+    set($empty, 3,1, "b");
+    is(to_string($empty), "   a\n   b\n",   'empty 3');
+    is(to_array($empty),  ["   a", "   b"], 'empty 4');
+
+    set($empty, 0,2, "c");
+    is(to_string($empty), "   a\n   b\nc\n",     'empty 5');
+    is(to_array($empty),  ["   a", "   b", "c"], 'empty 6');
+}
 
 # add_line
 {
