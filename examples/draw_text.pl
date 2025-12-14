@@ -181,7 +181,7 @@ sub set_char($canvas, $x,$y, $char) {
             }
         }
     }
-    # all chars above >32
+    # all chars >= 32
     else {
         substr($data->[$y], $x, 1, $char);
     }
@@ -193,16 +193,57 @@ sub set_char($canvas, $x,$y, $char) {
 # or line adding when needed.
 sub put_char($canvas, $char) {
     Carp::croak "put_char only can write a single char" if length($char) != 1;
-
     check_position($canvas);
     my ($pos)  = $canvas->{pos};
     my ($x,$y) = $pos->@*;
 
-    # replace character and update state
-    if ( $x >= 0 && $y >= 0 ) {
-        substr $canvas->{data}[$y], $x, 1, $char;
+    my $ord = ord $char;
+    if ( $ord < 32 ) {
+        # zero-byte
+        if ( $ord == 0 ) {
+            substr $canvas->{data}[$y], $x, 1, $char;
+            $pos->[0] = $x + 1;
+        }
+        # newline
+        elsif ( $ord == 10 ) {
+            $pos->[0] = 0;
+            $pos->[1]++;
+        }
+        # horizontal tab: \t
+        elsif ( $ord == 9 ) {
+            my ($def, $ht) = $canvas->@{qw/default tab_spacing/};
+            for ( 1 .. $ht ) {
+                # replace character and update state
+                substr $canvas->{data}[$y], $x, 1, $def;
+                $pos->[0] = $x + $ht;
+                check_position($canvas);
+            }
+        }
+        # \r
+        elsif ( $ord == 13 ) {
+            $pos->[0] = 0;
+        }
+        # backspace
+        elsif ( $ord == 8 ) {
+            my $x     = $pos->[0];
+            $pos->[0] = $x > 0 ? $x-1 : 0;
+        }
+        # vertical tab
+        elsif ( $ord == 11 ) {
+            $pos->[1]++;
+        }
+        # other special character. no write but advance position
+        else {
+            $pos->[0]++;
+        }
     }
-    $pos->[0] = $x + 1;
+    else {
+        # replace character and update state
+        if ( $x >= 0 && $y >= 0 ) {
+            substr $canvas->{data}[$y], $x, 1, $char;
+        }
+        $pos->[0] = $x + 1;
+    }
     return;
 }
 
@@ -228,7 +269,6 @@ sub set($canvas, $x,$y, $str) {
             }
             # horizontal tab
             elsif ( $ord == 9 ) {
-                set_char($canvas, $x,$y, $char);
                 for ( 1 .. $ht ) {
                     $x++, next if $x < 0 || $x >= $w;
                     $x++, next if $y < 0;
@@ -682,7 +722,7 @@ is(
     ], 'add_line');
 }
 
-# set_char
+# set_char handles special characters
 {
     my $canvas = create_canvas(5,3,' ');
     fill($canvas, '.');
@@ -706,6 +746,44 @@ is(
         'xxxxx',
         'xxxxx',
     ], 'set_char supports zero-byte');
+}
+
+# put_char handles special characters
+{
+    my $canvas = create_canvas(5,3,'.');
+    put_char($canvas, "1");
+    put_char($canvas, "2");
+    put_char($canvas, "3");
+    put_char($canvas, "\b");
+    put_char($canvas, "a");
+    put_char($canvas, "\n");
+    put_char($canvas, "f");
+    put_char($canvas, "g");
+    put_char($canvas, "h");
+    put_char($canvas, "i");
+    put_char($canvas, "\r");
+    put_char($canvas, "0");
+    put_char($canvas, "\b");
+    put_char($canvas, "\b");
+    put_char($canvas, "\b");
+    put_char($canvas, "1");
+    put_char($canvas, "2");
+    put_char($canvas, "\x0b"); # vertical tab
+    put_char($canvas, "3");
+    put_char($canvas, "4");
+    put_char($canvas, "5");
+    put_char($canvas, "6");
+    put_char($canvas, "7");
+    set_pos($canvas, 0,4);
+    put_char($canvas, "a");
+
+    is(to_array($canvas), [
+        '12a..',
+        '12hi.',
+        '..345',
+        '67...',
+        'a....',
+    ], 'put_char with special-characters');
 }
 
 # put
@@ -1018,7 +1096,7 @@ is(
         '.....',
         '.abc.',
         '.....',
-    ], 'write_str - just fill to start');
+    ], 'set - just fill to start');
 
     put($inner, "de");
     merge($canvas, 1,1, $inner);
@@ -1026,7 +1104,7 @@ is(
         '.....',
         '.dec.',
         '.....',
-    ], 'write_str - check if overwrites 1');
+    ], 'set - check if overwrites 1');
 
     set($inner, 0,0, "abc");
     merge($canvas, 1,1, $inner);
@@ -1034,7 +1112,7 @@ is(
         '.....',
         '.abc.',
         '.....',
-    ], 'write_str - check if overwrites 2');
+    ], 'set - check if overwrites 2');
 
     set($inner, 0,0, "abc\rd");
     merge($canvas, 1,1, $inner);
@@ -1042,7 +1120,7 @@ is(
         '.....',
         '.dbc.',
         '.....',
-    ], 'write_str - implements \\r');
+    ], 'set - implements \\r');
 
     set($inner, 0,0, "abc\rd\ne");
     merge($canvas, 1,1, $inner);
@@ -1050,7 +1128,7 @@ is(
         '.....',
         '.dbc.',
         '.e...',
-    ], 'write_str - implements \\n');
+    ], 'set - implements \\n');
 
     set($inner, 0,0, "abc\rd\nef\nghi");
     merge($canvas, 1,1, $inner);
@@ -1058,7 +1136,7 @@ is(
         '.....',
         '.dbc.',
         '.ef..',
-    ], 'write_str - does not expand height 1');
+    ], 'set - does not expand height 1');
 
     set($inner, 0,0, "j\nklm\rn\nop");
     merge($canvas, 1,1, $inner);
@@ -1066,7 +1144,7 @@ is(
         '.....',
         '.jbc.',
         '.nlm.',
-    ], 'write_str - does not expand height 2');
+    ], 'set - does not expand height 2');
 
     set($inner, 0,0, "111111\r22");
     merge($canvas, 1,1, $inner);
@@ -1074,7 +1152,7 @@ is(
         '.....',
         '.2211',
         '.nlm.',
-    ], 'write_str - \\r outside width');
+    ], 'set - \\r outside width');
 
     set($inner, 0,0, "33333\r2222222\n3");
     merge($canvas, 1,1, $inner);
@@ -1082,7 +1160,7 @@ is(
         '.....',
         '.2222',
         '.3lm.',
-    ], 'write_str - \\n outside width');
+    ], 'set - \\n outside width');
 }
 
 # \r and \n with negative offsets
@@ -1096,7 +1174,7 @@ is(
         '.....',
         '.....',
         '.....',
-    ], 'write_str - write outside canvas');
+    ], 'set - write outside canvas');
 
     set($inner, 0,0, "\n12345");
     merge($canvas, -1,-1, $inner);
@@ -1104,7 +1182,7 @@ is(
         '2345.',
         '.....',
         '.....',
-    ], 'write_str - negative offset with \\n');
+    ], 'set - negative offset with \\n');
 
     set($inner, 0,0, "\n12345\r67");
     merge($canvas, -1,-1, $inner);
@@ -1112,7 +1190,7 @@ is(
         '7345.',
         '.....',
         '.....',
-    ], 'write_str - negative offset with \\n and \\r');
+    ], 'set - negative offset with \\n and \\r');
 
     set($inner, 0,0, "\n12345\r6789\b0");
     merge($canvas, -1,-1, $inner);
@@ -1120,7 +1198,7 @@ is(
         '7805.',
         '.....',
         '.....',
-    ], 'write_str - backspace handling');
+    ], 'set - backspace handling');
 
     set($inner, 0,0, "\n12345\r6789\b0\x0bab");
     merge($canvas, -1,-1, $inner);
@@ -1128,7 +1206,7 @@ is(
         '7805.',
         '...ab',
         '.....',
-    ], 'write_str - vertical tab');
+    ], 'set - vertical tab');
 
     set($inner, 0,0, "\n\t1234");
     merge($canvas, -1,-1, $inner);
@@ -1136,7 +1214,7 @@ is(
         '...12',
         '...ab',
         '.....',
-    ], 'write_str - horizontal tab');
+    ], 'set - horizontal tab');
 }
 
 # spacing
