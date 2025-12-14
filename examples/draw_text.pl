@@ -161,9 +161,30 @@ sub set_char($canvas, $x,$y, $char) {
     Carp::croak "set_char only can write single char" if length($char) != 1;
     my ($w,$h,$data) = $canvas->@{qw/width height data/};
 
+    # abort writing when outside canvas
     return if $x < 0 || $x >= $w;
     return if $y < 0 || $y >= $h;
-    substr($data->[$y], $x, 1, $char);
+
+    my $ord = ord $char;
+    if ( $ord < 32 ) {
+        # allow writing zero byte
+        if ( $ord == 0 ) {
+            substr($data->[$y], $x, 1, $char);
+        }
+        # horizontal tab: \t
+        elsif ( $ord == 9 ) {
+            my $def = $canvas->{default};
+            for ( 1 .. $canvas->{tab_spacing} ) {
+                return if $x < 0 || $x >= $w;
+                substr($data->[$y], $x, 1, $def);
+                $x++;
+            }
+        }
+    }
+    # all chars above >32
+    else {
+        substr($data->[$y], $x, 1, $char);
+    }
     return;
 }
 
@@ -207,6 +228,7 @@ sub set($canvas, $x,$y, $str) {
             }
             # horizontal tab
             elsif ( $ord == 9 ) {
+                set_char($canvas, $x,$y, $char);
                 for ( 1 .. $ht ) {
                     $x++, next if $x < 0 || $x >= $w;
                     $x++, next if $y < 0;
@@ -658,6 +680,32 @@ is(
         ".....",
         ".....",
     ], 'add_line');
+}
+
+# set_char
+{
+    my $canvas = create_canvas(5,3,' ');
+    fill($canvas, '.');
+    set_char($canvas, 0,0, "\t");
+    is(to_array($canvas), [
+        '    .',
+        '.....',
+        '.....',
+    ], 'set_char supports \t');
+
+    my $c2 = create_canvas(5,3,'x');
+    set_char($c2, 0,0, "\x00");
+    set_char($c2, 1,0, "\x00");
+    set_char($c2, 2,0, "\x00");
+    set_char($c2, 3,0, "\x00");
+    set_char($c2, 4,0, "\x00");
+
+    merge($canvas, 0,0, $c2);
+    is(to_array($canvas), [
+        '    .',
+        'xxxxx',
+        'xxxxx',
+    ], 'set_char supports zero-byte');
 }
 
 # put
@@ -1344,6 +1392,44 @@ is(
     merge($first, -1,-1, $second);
     is(to_string($first), "xx...\nxx...\n.....\n.....\n.....\n", "merge 3");
 }
+
+# merge/clip empty canvas
+{
+    my $c1 = create_canvas(5,5,'.');
+    my $c2 = empty(5,5);
+
+    my $new = copy($c1);
+    merge($new, 0,0, $c2);
+    is(to_string($new), to_string($c1), 'merging empty canvas has no effect 1');
+
+    $new = copy($c2);
+    merge($new, 0,0, $c1);
+    is(to_string($new), to_string($c1), 'merging empty canvas has no effect 2');
+
+    $new = copy($c1);
+    clip($new, 0,0, $c2);
+    is(to_string($new), to_string($c1), 'cliping empty canvas has no effect 1');
+
+    $new = copy($c2);
+    clip($new, 0,0, $c1);
+    is(to_string($new), to_string($c1), 'cliping empty canvas has no effect 2');
+
+    # if this tests fails then the above copy instructions are not correct.
+    # merge or clip does mutation on second value, or transparent values are not
+    # correctly handled
+    is(to_array($c1), [
+        '.....',
+        '.....',
+        '.....',
+        '.....',
+        '.....',
+    ], 'check if $c1 is still the same');
+}
+
+
+########################
+### Combinator API Tests
+########################
 
 # horizontal/vertical lines
 {
