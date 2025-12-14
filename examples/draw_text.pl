@@ -108,6 +108,8 @@ sub to_array($canvas) {
     my @out = map {
         # removes zero-bytes at end of every line
         my $line = s/\x00++\z//r;
+        # also removes whitespace at end of string
+        $line =~ s/\s++\z//;
         # replaces zero bytes with whitespace
         $line =~ s/\x00/ /g;
         $line;
@@ -727,6 +729,14 @@ is(
     set($empty, 0,2, "c");
     is(to_string($empty), "   a\n   b\nc\n",     'empty 5');
     is(to_array($empty),  ["   a", "   b", "c"], 'empty 6');
+}
+
+# bigger canvas with a lot of whitespace
+{
+    my $canvas = create_canvas(10,5," ");
+    put($canvas, "a\nb");
+    is(to_string($canvas), "a\nb\n",  'canvas with whitespace 1');
+    is(to_array ($canvas), ["a","b"], 'canvas with whitespace 2');
 }
 
 # add_line
@@ -1763,8 +1773,8 @@ my $cbox =
 is(
     c_string(4,4," ",c_clip(0,0,$cbox)),
     "a  a\n".
-    "    \n".
-    "    \n".
+    "\n".
+    "\n".
     "a  a\n",
     'c_and 1');
 
