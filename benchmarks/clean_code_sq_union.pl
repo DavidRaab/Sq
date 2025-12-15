@@ -10,7 +10,7 @@ use Benchmark;
 # close to those. The idea of a simple Array and the first element a
 # string distinguish the types is somehow LISP-Like. A hash with a type
 # is maybe more like an C-struct. But all of them have in common that
-# the are data and have a field to distinguish them.
+# they are data and have a field to distinguish them.
 #
 # At the moment, this code is the slowest, this is because of its
 # implementation that is very flexible, but cost much performance.
