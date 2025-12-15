@@ -48,7 +48,7 @@ sub totalArea(@shapes) {
 }
 
 my @shapes;
-my $time = timeit(10, sub {
+my $time = timeit(500, sub {
     @shapes = ();
     for ( 1 .. 10_000 ) {
         my $rng = int rand 4;
@@ -70,7 +70,11 @@ my $time = timeit(10, sub {
 printf "Creation 10K: %s\n", timestr($time);
 
 my $area = 0;
-$time = timeit(100, sub {
+$time = timeit(1000, sub {
     $area = totalArea(@shapes);
 });
 printf "Area 10K: %f %s\n", $area, timestr($time);
+
+__END__
+Creation 10K:  2 wallclock secs ( 2.00 usr +  0.00 sys =  2.00 CPU) @ 250.00/s (n=500)
+Area 10K: 98891.750702  2 wallclock secs ( 1.24 usr +  0.00 sys =  1.24 CPU) @ 806.45/s (n=1000)

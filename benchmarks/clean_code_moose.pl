@@ -97,3 +97,7 @@ $time = timeit(100, sub {
     $area = totalArea(@shapes);
 });
 printf "Area 10K: %f %s\n", $area, timestr($time);
+
+__END__
+Creation 10K:  0 wallclock secs ( 0.14 usr +  0.01 sys =  0.15 CPU) @ 66.67/s (n=10)
+Area 10K: 100166.175389  0 wallclock secs ( 0.37 usr +  0.00 sys =  0.37 CPU) @ 270.27/s (n=100)
