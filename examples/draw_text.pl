@@ -160,7 +160,7 @@ sub check_position($canvas) {
 ###-----------------------
 
 sub fill($canvas, $char) {
-    my ($w,$h) = $canvas->@{qw/width height/};
+    my ($w,$h)      = $canvas->@{qw/width height/};
     $canvas->{data} = Array->init($h, ($char x $w));
     return;
 }
