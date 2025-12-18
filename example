@@ -2,8 +2,7 @@
 use 5.036;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
-use Sq;
-use Sq::Sig;
+use Sq -sig => 1;
 
 # read info about examples - when file doesn't exists $info will be empty hash
 my $info =
@@ -18,7 +17,7 @@ my $examples =
     Sq->fs
     ->children('examples')
     ->keep    (call 'is_file')
-    ->keep    (sub($str) { Str->ends_with($str, '.pl') })
+    ->keep    (sub($str) { Str->ends_with($str->stringify, '.pl') })
     ->sort    (by_str)
     ->choose  (sub($file) {
         my $name = $file->basename;
