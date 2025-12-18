@@ -10,11 +10,16 @@ print "This program just prints every test file and the amount of lines ",
 my $files =
     Sq->fs->recurse('t')->choose(sub($file) {
         if ( -f $file && $file->basename =~ m/\.t$/ ) {
-            return Some [$file->stringify, Sq->fs->read_text($file)->length ]
+            return Some [
+                $file->stringify,
+
+                Sq->fs->read_text($file)
+                ->remove(sub($line) { $line =~ m/\A\s*+#/  }) # remove comments
+                ->remove(sub($line) { $line =~ m/\A\s*+\z/ }) # remove empty lines
+                ->length
+            ]
         }
-        else {
-            return None
-        }
+        return None;
     })
     ->sort_by(by_num, idx 1)
     ->rev;
