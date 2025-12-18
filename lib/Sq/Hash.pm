@@ -35,6 +35,7 @@ sub init($, $amount, $f) {
     return $hash;
 }
 
+# TODO: the lambda in Array::mapi() get ($x,$idx) here it is ($idx,$x) this is inconsistent.
 sub from_array($, $array, $f) {
     my $new  = CORE::bless({}, 'Hash');
     my $stop = @$array;
@@ -216,6 +217,15 @@ sub get($hash, $key) {
     my $value = $hash->{$key};
     return $value if ref $value eq 'Option';
     return Option::Some($value);
+}
+
+sub get_init($hash, $key, $init) {
+    my $x = $hash->{$key};
+    return $x if defined $x;
+
+    my $value = Sq::init($init, $key);
+    $hash->{$key} = $value;
+    return $value;
 }
 
 # Hash<'a> -> ListContext<string> -> Array<Option<'a>>

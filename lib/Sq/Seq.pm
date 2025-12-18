@@ -76,7 +76,7 @@ sub replicate($, $count, $initial) {
         my $amount = 0;
         return sub {
             return undef if $abort;
-            return $initial if ++$amount <= $count;
+            return _copy($initial) if ++$amount <= $count;
             $abort = 1;
             return undef;
         }
@@ -1570,6 +1570,17 @@ sub index($seq, $idx, $default=undef) {
         }
     }
     return defined $default ? $default : Option::None();
+}
+
+sub get_init($seq, $idx, $init) {
+    my $it            = $seq->();
+    my ($current, $x) = (0);
+    while ( defined($x = $it->()) ) {
+        if ( $idx == $current++ ) {
+            return $x;
+        }
+    }
+    return Sq::init($init, $idx);
 }
 
 sub count($seq) {

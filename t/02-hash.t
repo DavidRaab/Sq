@@ -1060,4 +1060,36 @@ one_of(
     is($new,  { aaa => [1,2,3],    bbb => [4,5,6] }, "rename_keys don't share data");
 }
 
+# get_init
+{
+    my $data   = hash;
+    my $cities = array(qw/Essen Hamburg Berlin Essen Berlin Dortmund/);
+
+    for my $city_str ( @$cities ) {
+        my $city = $data->get_init($city_str, {count => 0});
+        $city->{count}++;
+    }
+    is($data, {
+        Essen    => {count => 2},
+        Hamburg  => {count => 1},
+        Berlin   => {count => 2},
+        Dortmund => {count => 1},
+    }, 'get_init with values');
+
+    # new hash
+    $data = hash;
+    for my $city_str ( @$cities ) {
+        my $city = $data->get_init($city_str, sub($city){
+            {city => $city, count => 0}
+        });
+        $city->{count}++;
+    }
+    is($data, {
+        Essen    => { city => "Essen"    => count => 2},
+        Hamburg  => { city => "Hamburg"  => count => 1},
+        Berlin   => { city => "Berlin"   => count => 2},
+        Dortmund => { city => "Dortmund" => count => 1},
+    }, 'get_init with function');
+}
+
 done_testing;

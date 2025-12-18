@@ -2801,4 +2801,54 @@ is(
         'mean_by 5');
 }
 
+# get_init
+{
+    my $data = array;
+    for my $idx ( 1,3,5,3 ) {
+        my $array = $data->get_init($idx, [0,0,0]);
+        $array->[0]++;
+        $array->[1] += 10;
+        $array->[2] += 100;
+    }
+    is($data, [
+        undef,
+        [1,10,100],
+        undef,
+        [2,20,200],
+        undef,
+        [1,10,100],
+    ], 'get_init with values');
+
+
+    $data = array;
+    for my $idx ( 1,3,5,3 ) {
+        my $array = $data->get_init($idx, sub($idx) { [$idx,0,0] });
+        $array->[1] += 10;
+        $array->[2] += 100;
+    }
+    is($data, [
+        undef,
+        [1,10,100],
+        undef,
+        [3,20,200],
+        undef,
+        [5,10,100],
+    ], 'get_init with function');
+}
+
+# replicate makes copies
+{
+    my $array = Array->replicate(5, [0,0]);
+    $array->iter2d(sub($value,$x,$y) {
+        $array->[$y][$x] = "$y,$x";
+    });
+    is($array, [
+        ["0,0", "0,1"],
+        ["1,0", "1,1"],
+        ["2,0", "2,1"],
+        ["3,0", "3,1"],
+        ["4,0", "4,1"],
+    ], 'replicate does copy');
+}
+
 done_testing;

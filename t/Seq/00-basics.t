@@ -1819,4 +1819,66 @@ is(
         'mean_by 5');
 }
 
+# get_init on a sequence should anyway not really be used because
+# it is very inefficent. It has to iterate through each element until
+# it gets the index, so it can become very slow. It is still here
+# because of API compatibility with Array.
+#
+# a real initialization also doesn't exist because there are no undef
+# values for a sequence. Either there is a value for the index, or the
+# index is outside the length of the sequence.
+#
+# The only thing a get_init() can provide is doing an initialization
+# when the index is out of the sequence length. But then the value
+# only can be returned. The sequence doesn't store that value.
+{
+    my $internal = Array->replicate(5, [0,0,0]);
+    my $data     = Seq->from_array($internal);
+    for my $idx ( 1,3,5,3 ) {
+        my $array = $data->get_init($idx, [0,0,0]);
+        $array->[0]++;
+        $array->[1] += 10;
+        $array->[2] += 100;
+    }
+    is($data, seq {
+        [0,0,0],
+        [1,10,100],
+        [0,0,0],
+        [2,20,200],
+        [0,0,0],
+    }, 'get_init with values');
+
+
+
+    $data = Seq->from_array(Array->replicate(5, [0,0,0]));
+    for my $idx ( 1,3,5,3 ) {
+        my $array = $data->get_init($idx, sub($idx) { [$idx,0,0] });
+        $array->[1] += 10;
+        $array->[2] += 100;
+    }
+    is($data, seq {
+        [0,0,0],
+        [0,10,100],
+        [0,0,0],
+        [0,20,200],
+        [0,0,0],
+    }, 'get_init with function');
+}
+
+# replicate makes copies
+{
+    my $array = Seq->replicate(5, [0,0])->to_array;
+    $array->iter2d(sub($value,$x,$y) {
+        $array->[$y][$x] = "$y,$x";
+    });
+    is($array, [
+        ["0,0", "0,1"],
+        ["1,0", "1,1"],
+        ["2,0", "2,1"],
+        ["3,0", "3,1"],
+        ["4,0", "4,1"],
+    ], 'replicate does copy');
+}
+
+
 done_testing;

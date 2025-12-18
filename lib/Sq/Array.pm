@@ -17,7 +17,7 @@ sub empty($) {
 }
 
 Sq::Reflection::static(replicate => sub($count, $initial) {
-    return CORE::bless([($initial) x $count], 'Array');
+    return CORE::bless([map { _copy($initial) } 1 .. $count], 'Array');
 });
 
 sub one($, $x) { CORE::bless([$x], 'Array') }
@@ -1045,6 +1045,15 @@ sub index($array, $idx, $default=undef) {
         return defined $default ? $default : Option::None();
     }
     return defined $default ? $array->[$idx] : Option::Some($array->[$idx]);
+}
+
+sub get_init($array, $index, $init) {
+    my $x = $array->[$index];
+    return $x if defined $x;
+
+    my $value = Sq::init($init, $index);
+    $array->[$index] = $value;
+    return $value;
 }
 
 sub reduce($array, $f) {
