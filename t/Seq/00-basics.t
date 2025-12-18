@@ -1804,9 +1804,9 @@ is(
 {
     # some values for the mean
     my $values = seq { 10, 20, 30, 40, 9, 3, 12, 40 };
-    # this generates an Seq of hashes where each value is the price, and
+    # this generates a seq of hashes where each value is the price, and
     # the index is used as the id field.
-    my $data   = Seq::mapi($values, record(qw/price id/));
+    my $data   = Seq::mapi($values, record(qw/price id/))->cache;
 
     is(
         Seq::mean   ($values),
