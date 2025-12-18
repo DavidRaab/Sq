@@ -2,11 +2,7 @@
 use 5.036;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
-use Sq;
-use Sq::Sig;
-use Sq::Type;
-use Sq::Test;
-use Benchmark qw(cmpthese);
+use Sq -sig => 1;
 use Getopt::Long::Descriptive;
 
 my ($opt, $usage) = describe_options(
