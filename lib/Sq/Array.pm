@@ -1117,6 +1117,31 @@ sub average_by($array, $f_map) {
     return $sum / @$array;
 }
 
+# This does the same as average() but with a different algorithm. This
+# algorithm has a better numerical stability and can handle sum of big numbers
+# a lot better.
+sub mean($array) {
+    return 0           if @$array == 0;
+    return $array->[0] if @$array == 1;
+    my $mean  = 0;
+    my $count = 1;
+    for my $x ( @$array ) {
+        $mean += (($x - $mean) / $count++);
+    }
+    return $mean;
+}
+
+sub mean_by($array, $map) {
+    return 0           if @$array == 0;
+    return $array->[0] if @$array == 1;
+    my $mean  = 0;
+    my $count = 1;
+    for my $x ( @$array ) {
+        $mean += (($map->($x) - $mean) / $count++);
+    }
+    return $mean;
+}
+
 sub join($array, $sep='') {
     return CORE::join($sep, @$array);
 }

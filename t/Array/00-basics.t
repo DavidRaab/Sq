@@ -2749,4 +2749,56 @@ is(
     is($new, [{ id => 1, tags => [['foo'],['foo'],['foo'],['foo']]}], 'combine 4');
 }
 
+is(Array::mean([]),      0, 'mean 1');
+is(Array::mean([100]), 100, 'mean 2');
+is(
+    Array->init(10, sub($i) { Array->range(1,$i+1) })->map(call 'mean'),
+    [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5],
+    'mean 3');
+
+# mean with big numbers
+{
+    my $big  = 12345678901234567;
+    my $a    = Array->replicate(1000, $big);
+    my $mean = $a->mean;
+    is($mean, $big, "mean of big num");
+
+    # sum / amount
+    my $sum_mean = $a->sum / 1_000;
+    ok($sum_mean != $big,  'sum and divide is not accurate enough');
+    ok($sum_mean != $mean, 'different means');
+}
+
+is(
+    Array::mean   ([]),
+    Array::mean_by([], \&id),
+    'mean_by 1');
+
+is(
+    Array::mean   ([100]),
+    Array::mean_by([100], \&id),
+    'mean_by 2');
+is(
+    Array->init(10, sub($i) { Array->range(1,$i+1) })->map(call 'mean'),
+    Array->init(10, sub($i) { Array->range(1,$i+1) })->map(call 'mean_by', \&id),
+    'mean_by 3');
+
+{
+    # some values for the mean
+    my $values = [10, 20, 30, 40, 9, 3, 12, 40];
+    # this generates an array of hashes where each value is the price, and
+    # the index is used as the id field.
+    my $data   = Array::mapi($values, record(qw/price id/));
+
+    is(
+        Array::mean   ($values),
+        Array::mean_by($data, key 'price'),
+        'mean_by 4');
+
+    is(
+        Array::mean   ([0 .. @$values-1]),
+        Array::mean_by($data, key 'id'),
+        'mean_by 5');
+}
+
 done_testing;
