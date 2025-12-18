@@ -75,8 +75,6 @@ sub path_tiny($obj, $other) {
 }
 
 my $dispatch = {
-    'Result'             => \&result,
-    'Seq'                => \&seq,
     'Sq::Core::DU'       => \&du,
     'Sq::Core::DU::Case' => \&du_case,
     'Path::Tiny'         => \&path_tiny,
@@ -122,12 +120,30 @@ sub equal($any1, $any2) {
             }
             return 1;
         }
+        elsif ( $t1 eq 'Seq' ) {
+            my $itA = $any1->();
+            my $itB = $any2->();
+            my ($x,$y);
+            NEXT:
+            $x = $itA->();
+            $y = $itB->();
+            if ( defined $x && defined $y ) {
+                return 0 if equal($x,$y) == 0;
+                goto NEXT;
+            }
+            return 1 if !defined($x) && !defined($y);
+            return 0;
+        }
         elsif ( $t1 eq 'Option' ) {
             return 0 if @$any1 != @$any2;
             for ( my $idx=0; $idx < @$any1; $idx++ ) {
                 return 0 if equal($any1->[$idx], $any2->[$idx]) == 0;
             }
             return 1;
+        }
+        elsif ( $t1 eq 'Result' ) {
+            return 0 if $any1->[0] != $any2->[0];
+            return equal($any1->[1], $any2->[1]);
         }
         elsif ( $t1 eq 'Regexp' ) {
             return $any1 eq $any2 ? 1 : 0;
