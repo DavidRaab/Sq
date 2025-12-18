@@ -2,6 +2,7 @@
 use 5.036;
 use List::Util qw(reduce);
 use Sq -sig => 1;
+use Sq::List;
 use Sq::Test;
 
 # TODO:

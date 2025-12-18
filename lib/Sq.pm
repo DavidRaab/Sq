@@ -146,7 +146,6 @@ use Sq::Array;
 use Sq::Hash;
 use Sq::Seq;
 use Sq::Queue;
-use Sq::List;
 use Sq::Heap;
 
 # Access to submodules
