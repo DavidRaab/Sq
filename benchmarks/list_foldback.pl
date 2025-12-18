@@ -1,16 +1,9 @@
 #!/usr/bin/env perl
 use v5.36;
 use open ':std', ':encoding(UTF-8)';
-use Getopt::Long::Descriptive;
 use Sq;
-use Test2::V0 qw(is done_testing);
-
-my ($opt, $usage) = describe_options(
-    'Usage: %c %o',
-    ['help|h', 'Print this message', {shortcircuit => 1}],
-);
-
-$usage->die if $opt->help;
+use Sq::List;
+use Sq::Test;
 
 my $list = List->range(1,1000);
 

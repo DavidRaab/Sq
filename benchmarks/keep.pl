@@ -3,6 +3,7 @@ use 5.036;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Sq;
+use Sq::List;
 
 # In this benchmark i check different implementations for Array::keep. Basically
 # a grep {}. But i also wanted to look into a mutable version. Even the Perl
