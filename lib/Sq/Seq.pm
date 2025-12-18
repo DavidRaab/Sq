@@ -1456,6 +1456,30 @@ sub average_by($seq, $f_map) {
     return $sum / $count;
 }
 
+sub mean($seq) {
+    my $it = $seq->();
+    my $x  = $it->();
+    return 0 if !defined $x;
+    my $mean  = $x;
+    my $count = 1;
+    while ( defined($x = $it->()) ) {
+        $mean += (($x - $mean) / $count++);
+    }
+    return $mean;
+}
+
+sub mean_by($seq, $map) {
+    my $it = $seq->();
+    my $x  = $it->();
+    return 0 if !defined $x;
+    my $mean  = $x;
+    my $count = 1;
+    while ( defined($x = $it->()) ) {
+        $mean += (($map->($x) - $mean) / $count++);
+    }
+    return $mean;
+}
+
 # group_fold :
 #   Seq<'a>
 #   -> (unit -> 'State)

@@ -1786,4 +1786,37 @@ is(
     is($new, [{ id => 1, tags => [['foo'],['foo'],['foo'],['foo']]}], 'combine 4');
 }
 
+
+is(
+    Seq::mean   (Seq->empty),
+    Seq::mean_by(Seq->empty, \&id),
+    'mean_by 1');
+
+is(
+    Seq::mean   (seq {100 }),
+    Seq::mean_by(seq {100 }, \&id),
+    'mean_by 2');
+is(
+    Seq->init(10, sub($i) { Seq->range(1,$i+1) })->map(call 'mean'),
+    Seq->init(10, sub($i) { Seq->range(1,$i+1) })->map(call 'mean_by', \&id),
+    'mean_by 3');
+
+{
+    # some values for the mean
+    my $values = seq { 10, 20, 30, 40, 9, 3, 12, 40 };
+    # this generates an Seq of hashes where each value is the price, and
+    # the index is used as the id field.
+    my $data   = Seq::mapi($values, record(qw/price id/));
+
+    is(
+        Seq::mean   ($values),
+        Seq::mean_by($data, key 'price'),
+        'mean_by 4');
+
+    is(
+        Seq::mean   (Seq->range(0, Seq::length($values)-1)),
+        Seq::mean_by($data, key 'id'),
+        'mean_by 5');
+}
+
 done_testing;
