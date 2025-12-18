@@ -222,6 +222,7 @@ sub to_string($any, $depth=0) {
 }
 
 sub dumps($any) {
+    local $COLOR = 0;
     return to_string($any, 0);
 }
 
