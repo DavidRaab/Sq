@@ -80,12 +80,12 @@ is(
     ],
     'map_rec');
 
-# seq {} syntax
+# seq()
 # Useful for directly defining a sequence with some values - undef is used internally
 # in a sequence for aborting the sequence. So no value after an undef will be used.
 is(
-    seq {1,2,3,undef,4,5,6},
-    seq {1,2,3},
+    seq(1,2,3,undef,4,5,6),
+    seq(1,2,3),
     'same with undef');
 
 {
@@ -94,14 +94,14 @@ is(
     #
     # But there is no yielding possible. It just executes the code and
     # puts its return values into a sequence.
-    my $fib = seq {
+    my $fib = assign {
         my @fibs = (1,1);
         for ( 1 .. 10 ) {
             push @fibs, $fibs[-2] + $fibs[-1];
         }
-        return @fibs;
+        return seq(@fibs);
     };
-    is($fib, seq { 1,1,2,3,5,8,13,21,34,55,89,144 }, 'fibs');
+    is($fib, seq(1,1,2,3,5,8,13,21,34,55,89,144), 'fibs');
 }
 
 # For a lazy fibonacci sequence you can write
@@ -112,7 +112,7 @@ is(
     # you have an float-overlflow
     my $fib =
         Seq->concat(
-            seq { 1,1 },
+            seq(1,1),
             Seq->unfold([1,1], sub($state) {
                 # fst() is same as $array->[0]
                 # snd() is same as $array->[1]
@@ -125,7 +125,7 @@ is(
     # sequences and can compare them!
     is(
         $fib->take(20),
-        seq { 1,1,2,3,5,8,13,21,34,55,89,144,233,377,610,987,1597,2584,4181,6765 },
+        seq(1,1,2,3,5,8,13,21,34,55,89,144,233,377,610,987,1597,2584,4181,6765),
         'First 20 Fibonacci numbers 1');
 
     # to_array() will immediately calculate the 20 values and creates an array
@@ -287,8 +287,8 @@ is(
 
 # new
 {
-    is((new Array => (1,2,3)),     [1,2,3], 'new Array');
-    is((new Seq   => (1,2,3)), seq {1,2,3}, 'new Seq');
+    is((new Array => (1,2,3)),    [1,2,3], 'new Array');
+    is((new Seq   => (1,2,3)), seq(1,2,3), 'new Seq');
     is(
         (new Hash  => (foo => 1, bar => 2)),
         {foo => 1, bar => 2},

@@ -19,7 +19,7 @@ my $only10 = $zipped->take(10);
 # compare
 is(
     $only10,
-    seq {
+    seq(
         [  2,   1 ],
         [  4,   4 ],
         [  6,   9 ],
@@ -30,7 +30,7 @@ is(
         [ 16,  64 ],
         [ 18,  81 ],
         [ 20, 100 ]
-    },
+    ),
     'build something small 1');
 
 # or functional-style
@@ -40,7 +40,7 @@ is(
         Seq->range(1,1_000_000_000)->map(sub($x) { $x * 2  }),
         Seq->range(1,1_000_000_000)->map(sub($x) { $x * $x }),
     )->take(10),
-    seq {
+    seq(
         [  2,   1 ],
         [  4,   4 ],
         [  6,   9 ],
@@ -51,7 +51,7 @@ is(
         [ 16,  64 ],
         [ 18,  81 ],
         [ 20, 100 ]
-    },
+    ),
     'build something small 2');
 
 done_testing;

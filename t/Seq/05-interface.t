@@ -7,17 +7,15 @@ use Sq::Test;
 
 # chained
 is(
-    Seq
-    ->new(1,2,3)
-    ->append(seq { 4,5,6 }),
-    seq {1 .. 6},
+    Seq->new(1,2,3)->append(seq(4,5,6)),
+    seq(1 .. 6),
     'append with chaining');
 
 # nested
 is(
     Seq::append(
-        seq { 1,2,3 },
-        seq { 4,5,6 },
+        seq(1,2,3),
+        seq(4,5,6),
     ),
     Seq->range(1,6),
     'append as function');

@@ -10,18 +10,18 @@ my $time = p_matchf(qr/(\d\d?):(\d\d?)/,  sub($hour,$min) {
     $hour < 24 && $min < 60 ? ($hour,$min) : ();
 });
 
-my $data = seq { "0xff", "00:00", "0x00", "23:40", "0xaf", "12:12", "99:99" };
+my $data = seq("0xff", "00:00", "0x00", "23:40", "0xaf", "12:12", "99:99");
 
 # But consider that type only checks for success of a parser, it doesn't use
 # it results.
 is(
     $data->keep_type(type [parser => $hex]),
-    seq { "0xff", "0x00", "0xaf" },
+    seq ( "0xff", "0x00", "0xaf" ),
     'keep_type with hex');
 
 is(
     $data->keep_type(type [parser => $time]),
-    seq { "00:00", "23:40", "12:12" },
+    seq ( "00:00", "23:40", "12:12" ),
     'keep_type with time');
 
 # but we can first run the parser against any string.
@@ -29,12 +29,12 @@ is(
 
 is(
     $data->map(sub($str) { p_run $hex, $str })->keep_some->merge,
-    seq { 255, 0, 175 },
+    seq ( 255, 0, 175 ),
     'parse hex and keep');
 
 is(
     $data->map(sub($str) { p_run $time, $str })->keep_some,
-    seq {  [0,0], [23,40], [12,12] },
+    seq (  [0,0], [23,40], [12,12] ),
     'parse time and keep');
 
 is(

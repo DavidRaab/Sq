@@ -29,7 +29,7 @@ use Sq::Test;
 {
     my $fib =
         Seq->concat(
-            seq { 1,1 },
+            seq(1,1),
             Seq->unfold([1,1], sub($state) {
                 my $next = Array::sum($state);
                 return $next, [$state->[1], $next];
@@ -51,7 +51,7 @@ use Sq::Test;
 {
     my $fib =
         Seq->concat(
-            seq { 1,1 },
+            seq(1,1),
             Seq->unfold({x => 1, y => 1}, sub($state) {
                 my $next = $state->{x} + $state->{y};
                 return $next, {x => $state->{y}, y => $next };
@@ -74,7 +74,7 @@ use Sq::Test;
 {
     my $fib =
         Seq->concat(
-            seq { 1,1 },
+            seq(1,1),
             Seq->from_sub(sub{
                 # State of the sequence comes here
                 my @queue = (1,1);

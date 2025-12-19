@@ -50,7 +50,7 @@ use Sq::Test;
     my @data = (1..10);
 
     # makes a copy at that time
-    my $data1 = seq { @data };
+    my $data1 = seq(@data);
     # just refers to the array
     my $data2 = Seq->from_array(\@data);
 

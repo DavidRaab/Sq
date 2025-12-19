@@ -68,7 +68,7 @@ sub option($opt, $depth=0) {
 }
 
 sub seq($seq, $depth=0) {
-    my $str    = $COLOR ? "${COLOR_SPECIAL}seq${COLOR_RESET} {\n" : "seq {\n";
+    my $str    = $COLOR ? "${COLOR_SPECIAL}seq${COLOR_RESET} (\n" : "seq (\n";
     my $indent = " " x ($depth + 2);
     my $array  = $seq->to_array($SEQ_AMOUNT+1);
     my $max    = @$array == ($SEQ_AMOUNT+1) ? $SEQ_AMOUNT : @$array;
@@ -78,11 +78,11 @@ sub seq($seq, $depth=0) {
     }
     # when they are more than 20 elements
     if ( @$array == ($SEQ_AMOUNT+1) ) {
-        $str .= $indent . '...' . "\n" . $indent . "}";
+        $str .= $indent . '...' . "\n" . $indent . ")";
     }
     else {
         $str =~ s/,\n\z/\n/;
-        $str .= (" " x $depth) . '}';
+        $str .= (" " x $depth) . ')';
     }
     return $str;
 }

@@ -66,34 +66,34 @@ is($calls, 33, '$calls stay at 33');
 
     is($calls,  0, 'not yet run');
 
-    is($cache->take(1), seq { 0 }, 'take 1');
+    is($cache->take(1), seq(0), 'take 1');
     is($calls,  1, '$calls at one');
 
-    is($cache->take(1), seq { 0 }, 'take 1');
+    is($cache->take(1), seq(0), 'take 1');
     is($calls,  1, 'still at one');
 
-    is($cache->take(2), seq { 0,1 }, 'take 2');
+    is($cache->take(2), seq(0,1), 'take 2');
     is($calls,  2, '$calls at 2');
 
-    is($cache->take(2), seq { 0,1 }, 'take 2');
+    is($cache->take(2), seq(0,1), 'take 2');
     is($calls,  2, '$calls at 2');
 
-    is($cache->take(5), seq { 0,1,2,3,4 }, 'take 5');
+    is($cache->take(5), seq(0,1,2,3,4), 'take 5');
     is($calls,  5, '$calls at 5');
 
-    is($cache->take(3), seq { 0,1,2 }, 'take 3');
+    is($cache->take(3), seq(0,1,2), 'take 3');
     is($calls,  5, '$calls at 5');
 
-    is($cache->take(8), seq { 0..7 }, 'take 8');
+    is($cache->take(8), seq(0..7), 'take 8');
     is($calls,  8, '$calls at 8');
 
-    is($cache->take(2), seq { 0,1 }, 'take 2');
+    is($cache->take(2), seq(0,1), 'take 2');
     is($calls,  8, '$calls at 8');
 
-    is($cache, seq { 0..9 }, 'full compare');
+    is($cache, seq(0..9), 'full compare');
     is($calls,  10, '$calls at 10');
 
-    is($cache, seq { 0..9 }, 'full compare again');
+    is($cache, seq(0..9), 'full compare again');
     is($calls,  10, '$calls at 10');
 }
 
@@ -102,7 +102,7 @@ is($calls, 33, '$calls stay at 33');
     my $calls = 0;
     # a possible infinite sequence
     my $fib = Seq->concat(
-        seq { 1,1 },
+        seq(1,1),
         Seq->unfold([1,1], sub($state) {
             $calls++;
             my $next = $state->[0] + $state->[1];
@@ -118,12 +118,12 @@ is($calls, 33, '$calls stay at 33');
     is($calls, 0, 'not yet runned');
     is(
         $cache->take(10),
-        seq { 1, 1, 2, 3, 5, 8, 13, 21, 34, 55 },
+        seq(1, 1, 2, 3, 5, 8, 13, 21, 34, 55),
         'first 10 fibs');
     is($calls, (10-2), '8 calls');
     is(
         $cache->take(80),
-        seq {
+        seq(
             1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987,
             1597, 2584, 4181, 6765, 10946, 17711, 28657, 46368, 75025,
             121393, 196418, 317811, 514229, 832040, 1346269, 2178309, 3524578,
@@ -137,13 +137,13 @@ is($calls, 33, '$calls stay at 33');
             308061521170129, 498454011879264, 806515533049393, 1304969544928657,
             2111485077978050, 3416454622906707, 5527939700884757, 8944394323791464,
             14472334024676221, 23416728348467685,
-        },
+        ),
         'first 80 fibs');
     is($calls, (80-2), '78 calls');
 
     is(
         $cache->take(80),
-        seq {
+        seq(
             1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987,
             1597, 2584, 4181, 6765, 10946, 17711, 28657, 46368, 75025,
             121393, 196418, 317811, 514229, 832040, 1346269, 2178309, 3524578,
@@ -157,7 +157,7 @@ is($calls, 33, '$calls stay at 33');
             308061521170129, 498454011879264, 806515533049393, 1304969544928657,
             2111485077978050, 3416454622906707, 5527939700884757, 8944394323791464,
             14472334024676221, 23416728348467685,
-        },
+        ),
         'first 80 fibs');
     is($calls, (80-2), '78 calls');
 }

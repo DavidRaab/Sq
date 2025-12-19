@@ -23,7 +23,7 @@ is(Seq->empty->max,                   None, 'max on empty');
 is(Seq->empty->max(0),                   0, 'max on empty with default');
 is(Seq->empty->max->or(0),               0, 'max on empty with option::or');
 
-my $words = seq { qw/Hello World you Are welcome/ };
+my $words = seq(qw/Hello World you Are welcome/);
 
 # min_str
 is($words->min_str,              Some('Are'), 'min_str');
@@ -38,11 +38,11 @@ is(Seq->empty->max_str,                None, 'max_str on empty');
 is(Seq->empty->max_str->or('A'),        'A', 'max_str on empty with option::or');
 
 
-my $data = seq {
+my $data = seq(
     { id => 1, name => 'A' },
     { id => 2, name => 'B' },
     { id => 3, name => 'C' },
-};
+);
 
 my $by_id   = key "id";
 my $by_name = key "name";

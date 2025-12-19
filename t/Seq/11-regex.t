@@ -12,43 +12,43 @@ T                                 # T
 
 # rx
 {
-    my $lines = seq {
+    my $lines = seq(
         '2023-11-25T15:10:00',
         '2023-11-20T10:05:29',
         'xxxx-xx-xxT00:00:00',
         '1900-01-01T00:00:01',
         '12345678901234567890',
-    };
+    );
 
     is(
         $lines->rx($time),
-        seq {
+        seq(
             '2023-11-25T15:10:00',
             '2023-11-20T10:05:29',
             '1900-01-01T00:00:01',
-        },
+        ),
         'rx');
 }
 
 # rxm
 {
-    my $lines = seq {
+    my $lines = seq(
         '2023-11-25T15:10:00',
         '2023-11-20T10:05:29',
         'xxxx-xx-xxT00:00:00',
         '1900-01-01T00:00:01',
         '12345678901234567890',
-    };
+    );
 
     my $matches = $lines->rxm($time)->map(call 'slice', 2,1,0,3,4,5);
 
     is(
         $matches,
-        seq {
+        seq(
             [qw/25 11 2023 15 10 00/],
             [qw/20 11 2023 10 05 29/],
             [qw/01 01 1900 00 00 01/],
-        },
+        ),
         'rxm');
 
     is(
@@ -59,30 +59,28 @@ T                                 # T
             (.)(.)(.)(.)
             (.)(.)(.)(.)
         \z/xms),
-        seq {
-            [1 .. 9, 0, 1 .. 9, 0],
-        },
+        seq([1 .. 9, 0, 1 .. 9, 0]),
         'check 20 matches');
 }
 
 # rxs
 {
-    my $stuff = seq {
+    my $stuff = seq(
         "  one   two    three",
         " with     whitespace    ",
         "test",
-    };
+    );
 
     is(
         $stuff
         ->rxs(qr/\A\s+/, sub { ''  }) # remove leading ws
         ->rxs(qr/\s+\z/, sub { ''  }) # remove trailing ws
         ->rxs(qr/\s+/,   sub { ' ' }), # replace multiple ws with single one
-        seq {
+        seq(
             "one two    three",
             "with whitespace",
             "test",
-        },
+        ),
         'rxs');
 
     is(
@@ -90,35 +88,35 @@ T                                 # T
         ->rxs (qr/\A\s+/, sub { ''  })  # remove leading ws
         ->rxs (qr/\s+\z/, sub { ''  })  # remove trailing ws
         ->rxsg(qr/\s+/,   sub { ' ' }), # replace multiple ws with single one
-        seq {
+        seq(
             "one two three",
             "with whitespace",
             "test",
-        },
+        ),
         'rxs');
 }
 
 # rxsg
 {
-    my $encoding = seq {
+    my $encoding = seq(
         'hello%20world',
         'I%20am%20so%20powerful',
-    };
+    );
 
     is(
         $encoding->rxsg(qr/\%(\d\d)/, sub { chr(hex($1)) }),
-        seq {
+        seq(
             'hello world',
             'I am so powerful',
-        },
+        ),
         'URL decoding');
 
     is(
         $encoding->rxsg(qr/\%(\d\d)/, sub($hex) { chr(hex($hex)) }),
-        seq {
+        seq(
             'hello world',
             'I am so powerful',
-        },
+        ),
         'URL decoding');
 }
 

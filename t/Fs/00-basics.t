@@ -4,10 +4,11 @@ use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Sq -sig => 1;
 use Sq::Test;
-use FindBin qw($Dir);
 use Path::Tiny;
 
-# TODO: temp-file, current working dir, forlder of binary
+# TODO: temp-file, folder of binary
+
+my $Dir = Sq->sys->dir;
 
 ok(Sq->fs->compare_text(
     path($Dir, 'data', 'hop-preface.txt'),
@@ -33,18 +34,18 @@ ok((Sq->fs->recurse($Dir)->length > Sq->fs->children($Dir)->length),
 
 is(
     Sq->fs->read_raw(10, $Dir, 'data', 'hop-preface.txt')->take(5),
-    seq {
+    seq(
         "# Preface\n",
         "\nA well-kn",
         "own saying",
         " in the pr",
         "ogramming "
-    },
+    ),
     'read_raw');
 
 is(
     Sq->fs->read_text_gz($Dir, 'data', 'hop-preface.md.gz')->take(1),
-    seq { "# Preface" },
+    seq("# Preface"),
     'read one line from gz');
 
 is(
@@ -54,29 +55,29 @@ is(
 
 is(
     Sq->fs->read_text($Dir, 'data', 'utf8.txt'),
-    seq {
+    seq(
         "# Höder",
         "",
         "Töxt with söme höder.",
-    },
+    ),
     'read utf8.txt');
 
 is(
     Sq->fs->read_text_gz($Dir, 'data', 'utf8.txt.gz'),
-    seq {
+    seq(
         "# Höder",
         "",
         "Töxt with söme höder.",
-    },
+    ),
     'read utf8.txt.gz');
 
 is(
     Sq->fs->read_text($Dir, 'data', 'utf8.txt'),
-    seq {
+    seq(
         "# Höder",
         "",
         "Töxt with söme höder.",
-    },
+    ),
     'read utf8.txt');
 
 is(
@@ -106,7 +107,7 @@ is(
     ok(utf8::is_utf8($txt),            'string stays unicode');
     is(
         Sq->fs->read_text($tmp),
-        seq { "hällö" },         # newlines are auto-removed when reading a file
+        seq("hällö"),         # newlines are auto-removed when reading a file
         'written file same as string');
 }
 
@@ -132,7 +133,7 @@ is(
 # write_text(file,seq)
 {
     my $content = Seq->concat(
-        seq { "# Hälö" },
+        seq("# Hälö"),
         Seq->init(10, sub($idx) { "1" x $idx }),
     );
 
@@ -153,7 +154,7 @@ is(
     ok(utf8::is_utf8($txt),               'gz string stays unicode');
     is(
         Sq->fs->read_text_gz($tmp),
-        seq { "hällö" },         # newlines are auto-removed when reading a file
+        seq("hällö"),         # newlines are auto-removed when reading a file
         'written file same as string');
 }
 
@@ -179,7 +180,7 @@ is(
 # write_text_gz(file,seq)
 {
     my $content = Seq->concat(
-        seq { "# Hälö" },
+        seq("# Hälö"),
         Seq->init(10, sub($idx) { "1" x $idx }),
     );
 

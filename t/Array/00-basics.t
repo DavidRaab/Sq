@@ -2528,39 +2528,39 @@ is(array(1)->is_empty, 0, 'is_empty 2');
 # to_arrays
 is(
     # Got
-    Array::to_arrays(seq {
-        foo => seq {1,2,3},
-        bar => seq {
+    Array::to_arrays(seq(
+        foo => seq(1,2,3),
+        bar => seq(
             file1  => "whatever",
-            folder1 => seq {
+            folder1 => seq(
                 file2 => "blub",
                 file3 => "Whaaaagh!",
-            },
-            folder2 => seq {
-                folder3 => seq {
+            ),
+            folder2 => seq(
+                folder3 => seq(
                     file4 => "For The Emporer!",
-                },
-            },
-        },
+                ),
+            ),
+        ),
         "test",
-        maz => seq {
-            Ok (seq{qw/foo bar/}),
-            Err(seq{qw/foo bar/}),
-        },
+        maz => seq(
+            Ok (seq(qw/foo bar/)),
+            Err(seq(qw/foo bar/)),
+        ),
         folder4 => [
-            seq {4,5,6},
+            seq(4,5,6),
             "foo",
-            seq {7,8,9},
+            seq(7,8,9),
         ],
         {
-            content1 => seq {6,6,6},
+            content1 => seq(6,6,6),
             content2 => [
-                seq {1,1,1},
-                seq {2,2,2},
+                seq(1,1,1),
+                seq(2,2,2),
                 Some([Seq->range(1,3), Seq->range(3,1)]),
             ],
         }
-    }),
+    )),
     # Expected
     [
         foo => [1,2,3],

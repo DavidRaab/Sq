@@ -4,10 +4,10 @@ use Sq -sig => 1;
 use Sq::Test;
 
 # lazy
-my $data1 = seq {
-    seq { 1,1 },
-    seq { 2,3,5,8,13 },
-};
+my $data1 = seq(
+    seq(1,1),
+    seq(2,3,5,8,13),
+);
 
 # non-lazy
 my $data2 = [

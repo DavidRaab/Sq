@@ -72,11 +72,11 @@ my $file     = from_file($test_dir->child('text.txt'));
 
 is(
     $file,
-    seq {
+    seq(
         "Testing\n",
         "File\n",
         "Handle\n",
-    },
+    ),
     'check content of file');
 
 is($file->length, 3, 'line count');
@@ -149,7 +149,7 @@ my $always = Seq->from_sub(sub {
     }
 });
 
-is($always->take(10), seq { (1) x 10 }, '10 times 1');
+is($always->take(10), seq((1) x 10), '10 times 1');
 
 
 #------ Check if from_sub stops on first undef ------#
@@ -165,8 +165,8 @@ my $contains_undef = Seq->from_sub(sub {
     }
 });
 
-is($contains_undef,         seq {1,2,3}, 'contains undef 1');
-is($contains_undef->skip(2),    seq {3}, 'contains undef 2');
+is($contains_undef,          seq(1,2,3), 'contains undef 1');
+is($contains_undef->skip(2),     seq(3), 'contains undef 2');
 is($contains_undef->skip(3), Seq->empty, 'contains undef 3');
 is($contains_undef->skip(4), Seq->empty, 'contains undef 4');
 is($contains_undef->skip(5), Seq->empty, 'contains undef 5');

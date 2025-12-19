@@ -211,40 +211,40 @@ is(
     ->range(0,99)
     ->keep(sub($num) { $num % 2 == 0 })
     ->take(10),
-    seq { 0,2,4,6,8,10,12,14,16,18 },
+    seq(0,2,4,6,8,10,12,14,16,18),
     'struct 46');
 
 nok(equal(
-    seq { 1,2,3 },
-    seq { 4,5,6 },
+    seq(1,2,3),
+    seq(4,5,6),
 ), 'struct 48');
 
 nok(equal(
     Seq->init(1_000_000_000, sub($idx) { $idx }),
-    seq { 3 },
+    seq(3),
 ), 'struct 49');
 
 is(
     sq({
         Artist => 'Queen',
         Title  => 'Greatest Hits',
-        Tracks => seq {
+        Tracks => seq(
             { Title => 'We will Rock You'          },
             { Title => 'Radio Gaga'                },
             { Title => 'Who Wants To Life Forever' },
             { Title => "You Don't Fool Me"         },
-        },
+        ),
         Tags => Some(qw/80/),
     }),
     {
         Artist => 'Queen',
         Title  => 'Greatest Hits',
-        Tracks => seq {
+        Tracks => seq(
             { Title => 'We will Rock You'          },
             { Title => 'Radio Gaga'                },
             { Title => 'Who Wants To Life Forever' },
             { Title => "You Don't Fool Me"         },
-        },
+        ),
         Tags => Some(qw/80/),
     },
     'struct 50');
@@ -253,23 +253,23 @@ nok(equal(
     sq({
         Artist => 'Queen',
         Title  => 'Greatest Hits',
-        Tracks => seq {
+        Tracks => seq(
             { Title => 'We will Rock You'          },
             { Title => 'Radio Gaga'                },
             { Title => 'Who Wants To Life Forever' },
             { Title => "You Don't Fool Me"         },
-        },
+        ),
         Tags => Some(qw/80/),
     }),
     {
         Artist => 'Queen',
         Title  => 'Greatest Hits',
-        Tracks => seq {
+        Tracks => seq(
             { Title => 'We will Rock You'          },
             { Title => 'Radio Gaga!'               },
             { Title => 'Who Wants To Life Forever' },
             { Title => "You Don't Fool Me"         },
-        },
+        ),
         Tags => Some(qw/80/),
     }),
     'struct 51');
@@ -279,23 +279,23 @@ ok(
         sq({
             Artist => 'Queen',
             Title  => 'Greatest Hits',
-            Tracks => seq {
+            Tracks => seq(
                 { Title => 'We will Rock You'          },
                 { Title => 'Radio Gaga'                },
                 { Title => 'Who Wants To Life Forever' },
                 { Title => "You Don't Fool Me"         },
-            },
+            ),
             Tags => Some(qw/80/),
         }),
         {
             Artist => 'Queen',
             Title  => 'Greatest Hits',
-            Tracks => seq {
+            Tracks => seq(
                 { Title => 'We will Rock You'          },
                 { Title => 'Radio Gaga'                },
                 { Title => 'Who Wants To Life Forever' },
                 { Title => "You Don't Fool Me"         },
-            },
+            ),
             Tags => Some(qw/80/),
         }),
         'struct 52');

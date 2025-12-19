@@ -5,25 +5,25 @@ use Sq::Test;
 
 my $cards =
     Seq::cartesian(
-        seq {qw/clubs spades hearts diamond/ },
-        seq {qw/7 8 9 10 B D K A/ },
+        seq(qw/clubs spades hearts diamond/),
+        seq(qw/7 8 9 10 B D K A/),
     );
 
 # check cartesian first -- is used by join/select
 is(
     $cards,
-    seq {
+    seq(
         (map { [clubs   => $_ ] } qw/7 8 9 10 B D K A/),
         (map { [spades  => $_ ] } qw/7 8 9 10 B D K A/),
         (map { [hearts  => $_ ] } qw/7 8 9 10 B D K A/),
         (map { [diamond => $_ ] } qw/7 8 9 10 B D K A/),
-    },
+    ),
     'cartesian 1');
 
 # testing full output
 is(
     $cards,
-    seq {
+    seq(
         ['clubs'  ,'7'],['clubs'  ,'8'],['clubs'  ,'9'],['clubs'  ,'10'],
         ['clubs'  ,'B'],['clubs'  ,'D'],['clubs'  ,'K'],['clubs'  ,'A' ],
         ['spades' ,'7'],['spades' ,'8'],['spades' ,'9'],['spades' ,'10'],
@@ -32,7 +32,7 @@ is(
         ['hearts' ,'B'],['hearts' ,'D'],['hearts' ,'K'],['hearts' ,'A' ],
         ['diamond','7'],['diamond','8'],['diamond','9'],['diamond','10'],
         ['diamond','B'],['diamond','D'],['diamond','K'],['diamond','A' ],
-    },
+    ),
     'cartesian 2');
 
 is(
@@ -47,24 +47,24 @@ is(
 
 
 # Some data tables
-my $objects = seq {
+my $objects = seq(
     {id => 1, name => 'David'},
     {id => 2, name => 'Bob'  },
     {id => 3, name => 'Alex' },
-};
+);
 
-my $tags = seq {
+my $tags = seq(
     {id => 1, name => 'WoW'     },
     {id => 2, name => 'Super'   },
     {id => 3, name => 'Awesome' },
-};
+);
 
-my $objects_to_tags = seq {
+my $objects_to_tags = seq(
     {id => 1, object_id => 1, tag_id => 1},
     {id => 2, object_id => 1, tag_id => 2},
     {id => 3, object_id => 2, tag_id => 3},
     {is => 4, object_id => 3, tag_id => 2},
-};
+);
 
 # A query to join the data together
 # my $query =
