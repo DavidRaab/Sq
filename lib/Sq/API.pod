@@ -263,6 +263,8 @@ Variables that start with C<$f_> are functions.
     max_by           ($array, $f_num)
     max_str          ($array, $f_str)
     max_str_by       ($array, $f_str)
+    mean             ($array_of_nums)
+    mean_by          ($array, $f_num)
     min              ($array, $default=undef)
     min_by           ($array, $f_num)
     min_str          ($array, $default=undef)
@@ -310,11 +312,12 @@ Variables that start with C<$f_> are functions.
     transpose_map($aoa, $f)
 
     # Mutation
-    push   ($array, @values)
-    pop    ($array)
-    shift  ($array)
-    unshift($array, @values)
-    blit   ($source_array, $source_index, $target_array, $target_index, $amount)
+    get_init($array, $idx, $init)
+    push    ($array, @values)
+    pop     ($array)
+    shift   ($array)
+    unshift ($array, @values)
+    blit    ($source_array, $source_index, $target_array, $target_index, $amount)
 
     # Side-Effects
     iter     ($array, $f)
@@ -370,10 +373,11 @@ Variables that start with C<$f_> are functions.
     on       ($hash, %kfs)
 
     # Mutations
-    change($hash, %kfs)
-    delete($hash, @keys)
-    push  ($hash, $key, @values)
-    set   ($hash, @kvs)
+    change  ($hash, %kfs)
+    delete  ($hash, @keys)
+    get_init($hash, $key, $init)
+    push    ($hash, $key, @values)
+    set     ($hash, @kvs)
 
 =head2 Seq
 
@@ -432,6 +436,7 @@ Variables that start with C<$f_> are functions.
     fold             ($seq, $state, $folder)
     fold_mut         ($seq, $state, $folder)
     fsts             ($seq)
+    get_init         ($seq, $idx, $init)
     group_by         ($seq, $f_key)
     group_fold       ($seq, $f_init, $f_str, $f_state)
     head             ($seq)
@@ -455,6 +460,8 @@ Variables that start with C<$f_> are functions.
     max_str          ($seq, $f_str)
     max_str_by       ($seq, $f_str)
     merge            ($seq_of_array)
+    mean             ($seq_of_nums)
+    mean_by          ($seq, $f_num)
     min              ($seq, $default=undef)
     min_by           ($seq, $f_num)
     min_str          ($seq, $default=undef)
