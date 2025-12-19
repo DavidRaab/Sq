@@ -51,8 +51,8 @@ overview of the functionality of Sq itself.
                         # returned only expects one input argument. Because of
                         # this the type don't start as an array. This makes some
                         # type definition shorter.
-    dispatch($f_key,$hash) -> sub($x)              # creates a function that uses $f_key to create a key
-                                                   # that is used in $hash to select a function to dispatch to
+    my $sub = dispatch($f_key, $hash)  # creates a function that uses $f_key to create a key
+                                       # that is used in $hash to select a function to dispatch to
     dispatch($key, Key1 => SUB, Key2 => SUB, ...) # Uses $key to select the correct dispatch.
 
     id($any)    -> $any          # returning $any as-is
@@ -168,18 +168,21 @@ description of what static means.
 
 =head1 Data Structures
 
-=head2 ARRAY
-
-Variables that start with C<$f_> are functions.
+Througout the API documentation i use variable names to also specify a
+given type you must supply. Variables that start with C<$f_> are functions.
 
     $f         # a function
     $f_num     # must return a number
     $f_str     # must return a string
     $f_map     # can return any value of any type
     $f_opt     # must return an option
-    $f_key     # must return a key that is used as a key in a hash. So it must be a string.
+    $f_key     # must return a key that is used as a key in a hash. So it must
+               # be a string. But it should be a string that dtermines uniqueness
+               # for the given element.
     $predicate # A function that either returns 0 or 1
     $init      # A sub-ref to initialize a value, or a value
+
+=head2 ARRAY
 
     # CONSTRUCTORS
     Array->empty     ()
@@ -380,17 +383,6 @@ Variables that start with C<$f_> are functions.
     set     ($hash, @kvs)
 
 =head2 Seq
-
-Variables that start with C<$f_> are functions.
-
-    $f         # a function
-    $f_num     # must return a number
-    $f_str     # must return a string
-    $f_map     # can return any value of any type
-    $f_opt     # must return an option
-    $f_key     # must return a key that is used as a key in a hash. So it must be a string.
-    $predicate # A function that either returns 0 or 1
-    $init      # A sub-ref to initialize a value, or a value
 
     # CONSTRUCTORS
     Seq->empty     ()
