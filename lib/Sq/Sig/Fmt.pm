@@ -5,7 +5,7 @@ use Sq::Signature;
 
 my $any   = t_any;
 my $array = t_array;
-my $aoa   = t_array(t_of t_array);
+my $aoa   = t_aoa;
 
 # Fmt::Table uses with_dispatch() so here we just use t_any
 sig('Sq::Fmt::html',        $any,   t_tuple(t_eq('HTML'), t_str));

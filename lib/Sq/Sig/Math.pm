@@ -3,11 +3,15 @@ use 5.036;
 use Sq::Type;
 use Sq::Signature;
 
-sig('Sq::Math::is_prime',         t_int,               t_bool);
-sig('Sq::Math::fac',              t_int,                t_int);
-sig('Sq::Math::permute_count_up', t_array(t_of t_int), t_bool);
-sig('Sq::Math::to_num_system',    t_str, t_int,         t_str);
-sig('Sq::Math::to_binary',        t_int,                t_str);
-sig('Sq::Math::to_hex',           t_int,                t_str);
+my $int  = t_int;
+my $str  = t_str;
+my $bool = t_bool;
+
+sig('Sq::Math::is_prime',         $int,               $bool);
+sig('Sq::Math::fac',              $int,                $int);
+sig('Sq::Math::permute_count_up', t_array(t_of $int), $bool);
+sig('Sq::Math::to_num_system',    $str, $int,          $str);
+sig('Sq::Math::to_binary',        $int,                $str);
+sig('Sq::Math::to_hex',           $int,                $str);
 
 1;
