@@ -7,6 +7,6 @@ use Sq -sig => 1;
 
 print "Generating file 'permute_10.cache.gz'\n";
 Sq->bench->it(sub {
-    my $permute = seq { 0 .. 9 }->permute->map(call 'join', ',');
+    my $permute = seq(0 .. 9)->permute->map(call 'join', ',');
     Sq->fs->write_text_gz('permute_10.cache.gz', $permute);
 });

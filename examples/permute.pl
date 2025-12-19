@@ -7,7 +7,7 @@ use Sq;
 
 my $count = 0;
 Sq->bench->it(sub {
-    seq { qw/A B C D E F G H I J/ }->permute->iter(sub($array) {
+    seq(qw/A B C D E F G H I J/)->permute->iter(sub($array) {
         $count++;
         say $array->join("");
     });

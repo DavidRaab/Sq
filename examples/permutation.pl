@@ -19,7 +19,7 @@ use Sq;
 # and starts immediately without waiting or creating memory problems.
 
 # keys for permutation
-my $keys = seq { qw/A B C D E F G H I J/ };
+my $keys = seq(qw/A B C D E F G H I J/);
 
 # only picks permutation so far
 my $permutation = sub ($x) {
