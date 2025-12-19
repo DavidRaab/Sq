@@ -132,8 +132,8 @@ overview of the functionality of Sq itself.
 
 =head2 Sq->sys
 
-    my $path    = Sq->sys->sys->dir()     # Path::Tiny object from directory executable is in
-    my $env     = Sq->sys->env;           # Enhanced version of %ENV. Hash blessing added and for example PATH is already split into an Array of Path::Tiny objects
+    my $path    = Sq->sys->dir            # Path::Tiny object from directory executable is in
+    my $env     = Sq->sys->env            # Enhanced version of %ENV. Hash blessing added and for example PATH is already split into an Array of Path::Tiny objects
     my $opt_bin = Sq->sys->find_bin($exe) # Tries to find executable from PATH environtment variable
     my $result  = Sq->sys->capture(@args) # Executes program. Returns Ok([$stdout,$stderr]) or Err([$exit,$stdout,$stderr])
 
