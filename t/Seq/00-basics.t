@@ -1065,6 +1065,16 @@ is(
     },
     'permute 6');
 
+is(Seq->empty->cartesian(seq {1,2,3}),      Seq->empty, 'cartesian with empty 1');
+is(Seq::cartesian(Seq->empty, seq {1,2,3}), Seq->empty, 'cartesian with empty 2');
+is(
+    seq {7,8,9,10}->cartesian(seq {"Hearth", "Spades"}),
+    seq {
+        [7,"Hearth"], [7,"Spades"],  [8,"Hearth"],  [8,"Spades"],
+        [9,"Hearth"], [9,"Spades"], [10,"Hearth"], [10,"Spades"],
+    },
+    'cartesian');
+
 is(
     Seq::cartesian(
         seq { qw/A B/   }->permute,

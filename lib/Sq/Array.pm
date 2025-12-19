@@ -187,6 +187,12 @@ sub cartesian(@arrays) {
         return 1;
     };
 
+    # when we don't have arrays or some array contains no items then result is empty
+    return CORE::bless([], 'Array') if @arrays == 0;
+    for my $array ( @arrays ) {
+        return CORE::bless([], 'Array') if @$array == 0;
+    }
+
     my $maxs    = [map { scalar @$_ } @arrays];
     my $counter = [(0) x (scalar @arrays)];
     my @new     = [map { $_->[0] } @arrays];

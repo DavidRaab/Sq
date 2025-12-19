@@ -1006,23 +1006,26 @@ is(
 }
 
 is($range->keep($is_even), $range->keep_e('$_ % 2 == 0'), 'keep_e');
+
+is(array->cartesian([1,2,3]),     [], 'cartesian with empty 1');
+is(Array::cartesian([], [1,2,3]), [], 'cartesian with empty 2');
 is(
-    sq([ 7,8,9,10 ])->cartesian([ "Hearth", "Spades" ]),
+    array(7,8,9,10)->cartesian([ "Hearth", "Spades" ]),
     [
         [7,"Hearth"], [7,"Spades"],  [8,"Hearth"],  [8,"Spades"],
         [9,"Hearth"], [9,"Spades"], [10,"Hearth"], [10,"Spades"],
     ],
     'cartesian');
 
+
 # split and join
 {
-    my $words = sq(["Foo+Bar+Baz", "maz+faz"])->split(qr/\+/);
+    my $words = array("Foo+Bar+Baz", "maz+faz")->split(qr/\+/);
 
-    is(
-        $words,
-        [[qw/Foo Bar Baz/], [qw/maz faz/]],
+    is($words,          [[qw/Foo Bar Baz/], [qw/maz faz/]],
         'strings splitted into arrays');
-
+    is($words->flatten, [qw/Foo Bar Baz maz faz/],
+        'split with flatten');
     is(
         $words->map(call join => '+'),
         ["Foo+Bar+Baz", "maz+faz"],

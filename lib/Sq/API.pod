@@ -667,6 +667,9 @@ is expected.
     t_tuplev    (@types, $type)
     t_even_sized()
 
+    # 2D Array
+    t_aoa(@types)
+
     # Basic Types
     t_any   ()
     t_sub   ()

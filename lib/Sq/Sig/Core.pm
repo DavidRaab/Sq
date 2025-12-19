@@ -18,7 +18,7 @@ my $str       = t_str;
 my $regex     = t_regex;
 my $pint      = t_int(t_positive);
 
-my $aoa        = t_array(t_of $array);
+my $aoa        = t_aoa;
 my $aoh        = t_array(t_of $hash);
 my $aint       = t_array(t_of $int);
 my $anum       = t_array(t_of $num);
@@ -162,7 +162,7 @@ sig ('Array::one',        $str_array, $any,                $array);
 sig ('Array::bind',          $array, $sub,                         $array);
 sig ('Array::flatten',       $aoa,                                 $array);
 sig ('Array::merge',         $aoa,                                 $array);
-sigt('Array::cartesian',     t_array(t_of t_array(t_min 1)),         $aoa);
+sigt('Array::cartesian',     t_aoa,                                  $aoa);
 sigt('Array::combine',       t_tuplev($aoh, $sub, $astr),          $array);
 sig ('Array::append',        $array, $array,                       $array);
 sig ('Array::rev',           $array,                               $array);

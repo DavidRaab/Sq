@@ -9,7 +9,7 @@ our @EXPORT = (
     qw(t_str t_enum t_match t_matchf t_parser t_eq),            # String
     qw(t_num t_int t_positive t_negative t_range),              # Numbers
     qw(t_hash t_with_keys t_keys t_as_hash t_key_is),           # Hash
-    qw(t_array t_idx t_tuple t_tuplev t_even_sized),            # Array
+    qw(t_array t_idx t_tuple t_tuplev t_even_sized t_aoa),      # Array
     qw(t_any t_opt t_sub t_regex t_bool t_seq t_void t_result), # Basic Types
     qw(t_of t_min t_max t_length),
     qw(t_ref t_isa t_can),                                      # Objects
@@ -173,6 +173,46 @@ sub t_array(@checks) {
                 return $valid;
             }
             return "array: Not an Array";
+        }
+    }
+    else {
+        return $no_checks;
+    }
+}
+
+sub t_aoa(@types) {
+    state $no_checks = sub($any) {
+        my $ref = ref $any;
+        return "aoa: Not Array" if not ($ref eq 'Array' || $ref eq 'ARRAY');
+        return $valid if @$any == 0;
+        my $index = 0;
+        for my $inner ( @$any ) {
+            $ref = ref $inner;
+            return "aoa: index $index not an Array" if not ($ref eq 'Array' || $ref eq 'ARRAY');
+            $index++;
+        }
+        return $valid;
+    };
+
+    if ( @types ) {
+        return sub($any) {
+            my $ref = ref $any;
+            return "aoa: Not Array" if not ($ref eq 'Array' || $ref eq 'ARRAY');
+            return $valid if @$any == 0;
+            my $err;
+            my $index = 0;
+            for my $inner ( @$any ) {
+                $ref = ref $inner;
+                return "aoa: index $index not an Array" if not ($ref eq 'Array' || $ref eq 'ARRAY');
+                for my $x ( @$inner ) {
+                    for my $type ( @types ) {
+                        $err = $type->($inner);
+                        return "aoa: $err" if defined $err;
+                    }
+                }
+                $index++;
+            }
+            return $valid;
         }
     }
     else {
