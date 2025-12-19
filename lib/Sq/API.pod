@@ -625,9 +625,71 @@ is expected.
 
 =head1 Sq::Type
 
-Type-System
+    # Runners
+    t_run   ($type, @values)
+    t_valid ($type, @values)
+    t_assert($type, @values)
 
-TODO
+    # Combinators
+    t_and  (@types)
+    t_or   (@types)
+    t_is   ($predicate)
+    t_not  (@types)
+    t_rec  ($f_type)
+    t_maybe($type)
+
+    # String
+    t_str   (@types)
+    t_enum  (@strings)
+    t_match ($regex)
+    t_matchf($regex, $predicate)
+    t_parser($parser)            # Sq::Parser
+    t_eq    ($str)
+
+    # Numbers
+    t_num     (@types)
+    t_int     (@types)
+    t_positive()          # includes 0
+    t_negative()          # includes 0
+    t_range   ($min,$max)
+
+    # Hash
+    t_hash     (@types)
+    t_with_keys(@keys)
+    t_keys     (%key_type)
+    t_as_hash  (@types)
+    t_key_is   (@types)   # runs type-check on the keys (string) of a hash
+
+    # Array
+    t_array     (@types)
+    t_idx       ($index, @types)
+    t_tuple     (@types)
+    t_tuplev    (@types, $type)
+    t_even_sized()
+
+    # Basic Types
+    t_any   ()
+    t_sub   ()
+    t_regex ()
+    t_bool  ()
+    t_seq   ()
+    t_void  ()
+    t_opt   (@types)
+    t_result($type_ok, $type_err)
+    t_union ($union)
+    t_runion($f_union)
+
+    # Multi Use
+    t_of    (@types)    # Array & Hash: Checks if all values are of @types
+    t_min   ($min)      # Num, String Length, Array Count, Hash Count
+    t_max   ($max)      # Num, String Length, Array Count, Hash Count
+    t_length($min,$max) # String, Array, Hash
+
+    # Objects
+    t_ref($ref,   @types)
+    t_isa($class, @types)
+    t_can(@methods)
+);
 
 =head1 Sq::Gen
 
