@@ -198,30 +198,30 @@ sigt('Array::to_array',
     ),
     $array
 );
-sig ('Array::to_array_of_array', $aoa,                       $aoa);
-sig ('Array::distinct',          $array,                   $array);
-sig ('Array::distinct_by',       $array, $sub,             $array);
-sig ('Array::rx',                $astr,  $regex,           $astr);
-sig ('Array::rxm',               $astr,  $regex,          t_array(t_of $astr));
-sig ('Array::rxs',               $astr,  $regex, $sub,     $astr);
-sig ('Array::rxsg',              $astr,  $regex, $sub,     $astr);
-sig ('Array::chunked',           $array, $pint,              $aoa);
-sig ('Array::windowed',          $array, $pint,              $aoa);
-sig ('Array::intersperse',       $array, $any,             $array);
-sig ('Array::repeat',            $array, $pint,            $array);
-sig ('Array::take_while',        $array, $sub,             $array);
-sig ('Array::skip_while',        $array, $sub,             $array);
-sigt('Array::slice',             t_tuplev($array, $aint), $array);
-sig ('Array::extract',           $array, $pint, $pint,     $array);
-sig ('Array::diff',              $array, $array, $sub,     $array);
-sig ('Array::intersect',         $array, $array, $sub,     $array);
-sig ('Array::shuffle',           $array,                   $array);
-sig ('Array::trim',              $astr,                     $astr);
-sig ('Array::cache',             $array,                   $array);
-sig ('Array::fill',              $array, $pint, $sub,      $array);
-sig ('Array::permute',           $array,                     $aoa);
-sig ('Array::chunked_size',      $array, $pint, $sub,      $array);
-sig ('Array::tail',              t_array(t_min 1),         $array);
+sig ('Array::to_array_of_array', $aoa,                         $aoa);
+sig ('Array::distinct',          $array,                     $array);
+sig ('Array::distinct_by',       $array, $sub,               $array);
+sig ('Array::rx',                $astr,  $regex,              $astr);
+sig ('Array::rxm',               $astr,  $regex,       t_aoa(t_str));
+sig ('Array::rxs',               $astr,  $regex, $sub,        $astr);
+sig ('Array::rxsg',              $astr,  $regex, $sub,        $astr);
+sig ('Array::chunked',           $array, $pint,                $aoa);
+sig ('Array::windowed',          $array, $pint,                $aoa);
+sig ('Array::intersperse',       $array, $any,               $array);
+sig ('Array::repeat',            $array, $pint,              $array);
+sig ('Array::take_while',        $array, $sub,               $array);
+sig ('Array::skip_while',        $array, $sub,               $array);
+sigt('Array::slice',             t_tuplev($array, $aint),    $array);
+sig ('Array::extract',           $array, $pint, $pint,       $array);
+sig ('Array::diff',              $array, $array, $sub,       $array);
+sig ('Array::intersect',         $array, $array, $sub,       $array);
+sig ('Array::shuffle',           $array,                     $array);
+sig ('Array::trim',              $astr,                       $astr);
+sig ('Array::cache',             $array,                     $array);
+sig ('Array::fill',              $array, $pint, $sub,        $array);
+sig ('Array::permute',           $array,                       $aoa);
+sig ('Array::chunked_size',      $array, $pint, $sub,        $array);
+sig ('Array::tail',              t_array(t_min 1),           $array);
 
 
 ### ARRAY 2D
@@ -271,7 +271,7 @@ sigt('Array::join',
         t_tuple($astr),
         t_tuple($astr, $str),
     ), $str);
-sig('Array::split',      $astr, $regex,      t_array(t_of $astr));
+sig('Array::split',      $astr, $regex, t_aoa(t_str));
 sigt('Array::min',
     t_tuple($anum)       => t_opt($num),
     t_tuple($anum, $num) => $num,
@@ -366,7 +366,7 @@ sigt('Hash::concat',       t_tuplev($hash, $aoh), $hash);
 sig ('Hash::is_subset_of', $hash, $hash,          $int);
 sig ('Hash::get',          $hash, $str,           $opt);
 sigt('Hash::rename_keys',  t_tuplev($hash, t_as_hash(t_of t_str)),         $hash);
-sigt('Hash::extract',      t_tuplev($hash, t_array(t_min(1), t_of $str)),  t_array(t_of t_opt));
+sigt('Hash::extract',      t_tuplev($hash, t_array(t_min(1), t_of $str)),  $aopt);
 sigt('Hash::slice',        t_tuplev($hash, t_array(t_min(1), t_of $str)),  $hash);
 sigt('Hash::with',         t_tuplev($hash, $even_sized),                   $hash); # can be improved
 sigt('Hash::withf',        t_tuplev($hash, $even_sized),                   $hash); # can be improved

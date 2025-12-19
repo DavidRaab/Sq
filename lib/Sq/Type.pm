@@ -206,7 +206,7 @@ sub t_aoa(@types) {
                 return "aoa: index $index not an Array" if not ($ref eq 'Array' || $ref eq 'ARRAY');
                 for my $x ( @$inner ) {
                     for my $type ( @types ) {
-                        $err = $type->($inner);
+                        $err = $type->($x);
                         return "aoa: $err" if defined $err;
                     }
                 }
