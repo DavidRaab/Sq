@@ -366,25 +366,18 @@ sub sq :prototype($) {
 
 # creating a sequence out of values: seq(1,2,3)
 sub seq(@data) {
-    if ( @data == 0 ) {
-        return bless(sub {
-            return sub { undef }
-        }, 'Seq');
-    }
-    else {
-        return bless(sub {
-            my $abort = 0;
-            my $idx   = 0;
-            my $value;
-            return sub {
-                return undef if $abort;
-                $value = $data[$idx++];
-                return $value if defined $value;
-                $abort = 1;
-                return undef;
-            }
-        }, 'Seq');
-    }
+    return bless(sub {
+        my $abort = 0;
+        my $idx   = 0;
+        my $value;
+        return sub {
+            return undef if $abort;
+            $value = $data[$idx++];
+            return $value if defined $value;
+            $abort = 1;
+            return undef;
+        }
+    }, 'Seq');
 }
 
 # try out a new() function
