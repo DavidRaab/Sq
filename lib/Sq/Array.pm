@@ -354,6 +354,12 @@ sub chunked_size($array, $max_size, $f_size) {
     return CORE::bless(\@new, 'Array');
 }
 
+# + Input is an Array of hashes
+# + $f_key is a function that defines uniquness for every hash. The idea is
+#     that multiple hashes have the same key, otherwise this function is useless.
+# + It then combines every hash with the same $key into a single new hash, all
+#     fields from a new hash are overwritten, expect @fields. @fields are the fields
+#     of the hashes that are combined into an array.
 sub combine($array_of_hash, $f_key, @fields) {
     my %to_array = map { $_ => 1 } @fields;
     my %new;
