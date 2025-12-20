@@ -602,27 +602,20 @@ is(Hash::concat({}, {}, {})->is_empty,                           1, 'is_empty 9'
 # to_array / from_array
 {
     my $h = hash(foo => 1, bar => 2, baz => 3);
-    my $a =
-        $h
-        ->to_array(sub($k,$v) { [$k,$v] })
-        ->sort(sub($x,$y) { $x->[0] cmp $y->[0] });
 
+    my $a = $h->to_array(\&array)->sort_by(by_str, idx 0);
     is($a, [["bar",2],["baz",3],["foo",1]], 'to_array');
 
-    my $j = Hash->from_array($a, sub($i,$v) {
-        return $v->[0], $v->[1];
-    });
+    my $j = Hash->from_array($a, sub($x,$i) { $x->[0], $x->[1] });
     is($j, $h, 'from_array 1');
 
-    my $k = Hash->from_array($a, sub($i,$v) {
-        return $i, $v;
-    });
+    my $k = Hash->from_array($a, sub($x,$i) { $i, $x });
     is($k, {0 => [bar=>2], 1 => [baz=>3], 2 => [foo=>1]}, 'from_array 2');
 
     is(
-        Hash->from_array([qw/Alice Anny Sola Candy Lilly/], sub($idx, $name) { $name => $idx }),
+        Hash->from_array([qw/Alice Anny Sola Candy Lilly/], sub($name, $idx) { $name => $idx }),
         {Alice => 0, Anny => 1, Sola => 2, Candy => 3, Lilly => 4},
-        'pod example');
+        'pod example 1');
 }
 
 # equal

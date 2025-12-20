@@ -35,13 +35,12 @@ sub init($, $amount, $f) {
     return $hash;
 }
 
-# TODO: the lambda in Array::mapi() get ($x,$idx) here it is ($idx,$x) this is inconsistent.
 sub from_array($, $array, $f) {
     my $new  = CORE::bless({}, 'Hash');
     my $stop = @$array;
     my ($k,$v);
     for (my $i=0; $i < $stop; $i++) {
-        ($k,$v) = $f->($i,$array->[$i]);
+        ($k,$v) = $f->($array->[$i], $i);
         $new->{$k} = $v;
     }
     return $new;
