@@ -337,7 +337,7 @@ static recurse => sub(@paths) {
 };
 
 static children => sub(@paths) {
-    return seq { path(@paths)->children };
+    return seq(path(@paths)->children);
 };
 
 static sha512 => sub(@paths) {
