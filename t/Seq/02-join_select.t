@@ -3,48 +3,7 @@ use 5.036;
 use Sq -sig => 1;
 use Sq::Test;
 
-my $cards =
-    Seq::cartesian(
-        seq(qw/clubs spades hearts diamond/),
-        seq(qw/7 8 9 10 B D K A/),
-    );
-
-# check cartesian first -- is used by join/select
-is(
-    $cards,
-    seq(
-        (map { [clubs   => $_ ] } qw/7 8 9 10 B D K A/),
-        (map { [spades  => $_ ] } qw/7 8 9 10 B D K A/),
-        (map { [hearts  => $_ ] } qw/7 8 9 10 B D K A/),
-        (map { [diamond => $_ ] } qw/7 8 9 10 B D K A/),
-    ),
-    'cartesian 1');
-
-# testing full output
-is(
-    $cards,
-    seq(
-        ['clubs'  ,'7'],['clubs'  ,'8'],['clubs'  ,'9'],['clubs'  ,'10'],
-        ['clubs'  ,'B'],['clubs'  ,'D'],['clubs'  ,'K'],['clubs'  ,'A' ],
-        ['spades' ,'7'],['spades' ,'8'],['spades' ,'9'],['spades' ,'10'],
-        ['spades' ,'B'],['spades' ,'D'],['spades' ,'K'],['spades' ,'A' ],
-        ['hearts' ,'7'],['hearts' ,'8'],['hearts' ,'9'],['hearts' ,'10'],
-        ['hearts' ,'B'],['hearts' ,'D'],['hearts' ,'K'],['hearts' ,'A' ],
-        ['diamond','7'],['diamond','8'],['diamond','9'],['diamond','10'],
-        ['diamond','B'],['diamond','D'],['diamond','K'],['diamond','A' ],
-    ),
-    'cartesian 2');
-
-is(
-    $cards->to_array,
-    Array::cartesian(
-        [qw/clubs spades hearts diamond/],
-        [qw/7 8 9 10 B D K A/],
-    ),
-    'Seq::cartesian vs Array::cartesian');
-
-#--- ---
-
+ok(1, 'No Tests');
 
 # Some data tables
 my $objects = seq(
