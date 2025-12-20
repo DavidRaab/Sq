@@ -164,7 +164,13 @@ sub bind($array, $f) {
 }
 
 sub flatten($array_of_array) {
-    return bind($array_of_array, \&Sq::id);
+    my @new;
+    for my $inner ( @$array_of_array ) {
+        for my $x ( @$inner ) {
+            push @new, $x;
+        }
+    }
+    CORE::bless(\@new, 'Array');
 }
 
 # create merge as alias to flatten
