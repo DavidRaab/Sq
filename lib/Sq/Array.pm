@@ -1053,15 +1053,6 @@ sub index($array, $idx, $default=undef) {
     return defined $default ? $array->[$idx] : Option::Some($array->[$idx]);
 }
 
-sub get_init($array, $index, $init) {
-    my $x = $array->[$index];
-    return $x if defined $x;
-
-    my $value = Sq::init($init, $index);
-    $array->[$index] = $value;
-    return $value;
-}
-
 sub reduce($array, $f) {
     return Option::None()            if @$array == 0;
     return Option::Some($array->[0]) if @$array == 1;
@@ -1452,6 +1443,15 @@ sub all_some_by($array, $f) {
 # MUTATION                                                                    #
 #         Those are functions mutating an array                               #
 #-----------------------------------------------------------------------------#
+
+sub get_init($array, $index, $init) {
+    my $x = $array->[$index];
+    return $x if defined $x;
+
+    my $value = Sq::init($init, $index);
+    $array->[$index] = $value;
+    return $value;
+}
 
 sub push($array, @values) {
     for my $x ( @values ) {
