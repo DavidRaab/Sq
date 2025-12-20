@@ -194,4 +194,18 @@ is(
 
 ok(Sq->fs->search_upwards('README.md'), 'Must find README.md');
 
+# better test for children
+{
+    my $is_files = type [array => [of => [ref => 'Path::Tiny']]];
+    my $files    = Sq->fs->children($Dir)->to_array;
+
+    ok(is_type($is_files, $files), 'files are Path::Tiny objects');
+}
+
+# test sha512
+is(
+    Sq->fs->sha512($Dir->child('data', 'hop-preface.md')),
+    Ok("3518cc17afa576ef870ab0e869eb0ebf49fe137a97c6aec50ba05d72ce89331057403eaffbec8bd7dee38694bef67ebcd70a15ee41ee6e13e74ea731db3633cc"),
+    'sha512');
+
 done_testing;
