@@ -212,7 +212,7 @@ sig ('Array::intersect',         $array, $array, $sub,       $array);
 sig ('Array::shuffle',           $array,                     $array);
 sig ('Array::trim',              $astr,                       $astr);
 sig ('Array::cache',             $array,                     $array);
-sig ('Array::fill',              $array, $pint, $sub,        $array);
+sig ('Array::fill',              $array, $pint, $any,        $array);
 sig ('Array::permute',           $array,                       $aoa);
 sig ('Array::chunked_size',      $array, $pint, $sub,        $array);
 sig ('Array::tail',              t_array(t_min 1),           $array);

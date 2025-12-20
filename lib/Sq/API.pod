@@ -226,7 +226,7 @@ given type you must supply. Variables that start with C<$f_> are functions.
     distinct_by      ($array, $f_key)
     expand           ($array)
     extract          ($array, $pos, $length)
-    fill             ($array, $upto, $f_any)
+    fill             ($array, $upto, $init)
     find             ($array, $predicate)
     find_windowed    ($array, $amount, $predicate)
     first            ($array, $default=undef)

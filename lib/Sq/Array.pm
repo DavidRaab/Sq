@@ -806,13 +806,13 @@ sub trim($array) {
     return CORE::bless([map { builtin::trim($_) } @$array], 'Array');
 }
 
-sub fill($array, $upto, $f_any) {
+sub fill($array, $upto, $init) {
     return $array if $upto <= @$array;
     my @new  = @$array;
     my $idx  = @$array;
     my $stop = $upto - 1;
     while ( $idx <= $stop ) {
-        push @new, (scalar $f_any->($idx++));
+        push @new, (scalar Sq::init($init, $idx++));
     }
     return CORE::bless(\@new, 'Array');
 }
@@ -894,7 +894,7 @@ sub tail($array) {
 #          Here are functions designed for working with 2D Arrays             #
 #-----------------------------------------------------------------------------#
 
-sub fill2d($aoa, $f) {
+sub fill2d($aoa, $init) {
     my $maxX = 0;
     for my $array ( @$aoa ) {
         my $l = @$array;
@@ -911,7 +911,7 @@ sub fill2d($aoa, $f) {
                 push @inner, $value;
             }
             else {
-                push @inner, Sq::init($f, $x, $y);
+                push @inner, Sq::init($init, $x, $y);
             }
         }
         $y++;

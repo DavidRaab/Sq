@@ -2069,12 +2069,32 @@ is(
         'check static init2d');
 }
 
-is(sq([1,2,3])->fill(1,  sub { 0 }), [1,2,3],               'fill 1');
-is(sq([1,2,3])->fill(3,  sub { 0 }), [1,2,3],               'fill 2');
-is(sq([1,2,3])->fill(4,  sub { 0 }), [1,2,3,0],             'fill 3');
-is(sq([1,2,3])->fill(10, sub { 0 }), [1,2,3,0,0,0,0,0,0,0], 'fill 4');
-is(sq([1,2,3])->fill(10, \&id),      [1,2,3,3,4,5,6,7,8,9], 'fill 5');
-is(Array->empty->fill(100, \&id), Array->init(100, \&id),   'fill 6');
+is(array(1,2,3)->fill(1,  sub { 0 }), [1,2,3],               'fill 1');
+is(array(1,2,3)->fill(3,  sub { 0 }), [1,2,3],               'fill 2');
+is(array(1,2,3)->fill(4,  sub { 0 }), [1,2,3,0],             'fill 3');
+is(array(1,2,3)->fill(10, sub { 0 }), [1,2,3,0,0,0,0,0,0,0], 'fill 4');
+is(array(1,2,3)->fill(10,         0), [1,2,3,0,0,0,0,0,0,0], 'fill 5');
+is(array(1,2,3)->fill(10,  \&id),     [1,2,3,3,4,5,6,7,8,9], 'fill 6');
+is(array()     ->fill(100, \&id),    Array->init(100, \&id), 'fill 7');
+
+# fill creates copies
+{
+    my $default = [1,2,3];
+    my $array   = array(1,2)->fill(5, $default);
+    is($array,
+        [1,2, [1,2,3], [1,2,3], [1,2,3]],
+        'fill copies');
+
+    $default->[0] = 4;
+    is($array,
+        [1,2, [1,2,3], [1,2,3], [1,2,3]],
+        'changing $default has no effect on copies');
+
+    $array->[3][0] = 5;
+    is($array,
+        [1,2, [1,2,3], [5,2,3], [1,2,3]],
+        'every inner array is a copy');
+}
 
 # chunked_size
 #
