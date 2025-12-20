@@ -3,8 +3,7 @@ use v5.36;
 use open ':std', ':encoding(UTF-8)';
 use Getopt::Long::Descriptive;
 use Path::Tiny;
-use Sq;
-use Sq::Sig;
+use Sq -sig => 1;
 
 # This makes the code Lazy. That means the code is basically just wrapped
 # in a subroutine. But it has an intent over just a sub-ref. The idea is that
