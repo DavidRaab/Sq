@@ -295,7 +295,6 @@ sub to_seq($hash, $f) {
     }, 'Seq');
 }
 
-# TODO: Deep-Copy
 sub with_default($hash, %def) {
     my %new = %$hash;
     my $src_value;
