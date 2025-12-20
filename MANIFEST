@@ -312,11 +312,11 @@ t/20-sys.t
 t/Array/00-basics.t
 t/Array/03-fibonacci.t
 t/Array/06-min_max.t
-t/Array/08-group_by.t
 t/Array/10-option.t
 t/Array/11-regex.t
 t/Array/12-type.t
 t/Array/13-no_sig.t
+t/Array/14-ext.t
 t/Evaluator/00-type.t
 t/Evaluator/01-parser.t
 t/Fs/00-basics.t
