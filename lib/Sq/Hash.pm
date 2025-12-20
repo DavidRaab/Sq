@@ -218,15 +218,6 @@ sub get($hash, $key) {
     return Option::Some($value);
 }
 
-sub get_init($hash, $key, $init) {
-    my $x = $hash->{$key};
-    return $x if defined $x;
-
-    my $value = Sq::init($init, $key);
-    $hash->{$key} = $value;
-    return $value;
-}
-
 # Hash<'a> -> ListContext<string> -> Array<Option<'a>>
 sub extract($hash, @keys) {
     my $array = CORE::bless([], 'Array');
@@ -370,6 +361,15 @@ sub lock($hash, @keys) {
 #
 # MUTATION METHODS
 #
+
+sub get_init($hash, $key, $init) {
+    my $x = $hash->{$key};
+    return $x if defined $x;
+
+    my $value = Sq::init($init, $key);
+    $hash->{$key} = $value;
+    return $value;
+}
 
 sub set($hash, @kvs) {
     my $count = @kvs;
