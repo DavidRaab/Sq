@@ -4,15 +4,15 @@ use Sq::Evaluator;
 use Sq::Exporter;
 our @EXPORT = (
     qw(type),
-    qw(t_run t_valid t_assert),                                 # Runners
-    qw(t_and t_or t_is t_not t_rec t_maybe),                    # Combinators
-    qw(t_str t_enum t_match t_matchf t_parser t_eq),            # String
-    qw(t_num t_int t_positive t_negative t_range),              # Numbers
-    qw(t_hash t_with_keys t_keys t_as_hash t_key_is),           # Hash
-    qw(t_array t_idx t_tuple t_tuplev t_even_sized t_aoa),      # Array
-    qw(t_any t_opt t_sub t_regex t_bool t_seq t_void t_result), # Basic Types
+    qw(t_run t_valid t_assert),                                     # Runners
+    qw(t_and t_or t_is t_not t_rec t_maybe),                        # Combinators
+    qw(t_str t_enum t_match t_matchf t_parser t_eq),                # String
+    qw(t_num t_int t_positive t_negative t_range),                  # Numbers
+    qw(t_hash t_with_keys t_keys t_as_hash t_key_is),               # Hash
+    qw(t_array t_idx t_tuple t_tuplen t_tuplev t_even_sized t_aoa), # Array
+    qw(t_any t_opt t_sub t_regex t_bool t_seq t_void t_result),     # Basic Types
     qw(t_of t_min t_max t_length),
-    qw(t_ref t_isa t_can),                                      # Objects
+    qw(t_ref t_isa t_can),                                          # Objects
     qw(t_union t_runion),
 );
 
@@ -679,6 +679,26 @@ sub t_tuple(@checks) {
     }
     else {
         return $no_checks;
+    }
+}
+
+# A version of tuple that expects a minimum amount of the defined types.
+# this allows for easier checking functions with default values.
+sub t_tuplen($min, @types) {
+    my $max = @types;
+    Carp::croak "\$min must be smaller than provided types $max\n" if $min > $max;
+    return sub($any) {
+        my $ref    = ref $any;
+        my $amount = @$any;
+        return "tuplen: Expect Array"  if not ($ref eq 'Array' || $ref eq 'ARRAY');
+        return "tuplen: Tuple needs at least $min elements. Got: $amount" if $amount < $min;
+        return "tuplen: Tuple max elements are $max. Got: $amount"        if $amount > $max;
+        my $err;
+        for my $idx ( 0 .. ($amount-1) ) {
+            $err = $types[$idx]->($any->[$idx]);
+            return "tuplen: $idx: $err" if defined $err;
+        }
+        return $valid;
     }
 }
 

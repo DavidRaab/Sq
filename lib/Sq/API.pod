@@ -664,6 +664,7 @@ is expected.
     t_array     (@types)
     t_idx       ($index, @types)
     t_tuple     (@types)
+    t_tuplen    ($min, @types)
     t_tuplev    (@types, $type)
     t_even_sized()
 
