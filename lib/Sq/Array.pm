@@ -166,9 +166,7 @@ sub bind($array, $f) {
 sub flatten($array_of_array) {
     my @new;
     for my $inner ( @$array_of_array ) {
-        for my $x ( @$inner ) {
-            push @new, $x;
-        }
+        push @new, @$inner;
     }
     CORE::bless(\@new, 'Array');
 }
