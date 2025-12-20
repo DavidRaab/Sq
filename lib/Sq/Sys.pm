@@ -32,7 +32,8 @@ sub env($) {
         XDG_CONFIG_HOME => \&path,
         XDG_CONFIG_DIRS => $split,
         XDG_RUNTIME_DIR => \&path,
-    )->lock;
+    );
+    $env->lock;
     return $env;
 }
 
