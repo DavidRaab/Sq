@@ -111,6 +111,7 @@ is(parse_int("0O600"), Ok(384), 'oct 2');
 
 is(parse_int("0xBadFace"),            Ok(195951310),       'hex 1');
 is(parse_int("0xBad_Face"),           Ok(195951310),       'hex 2');
+# TODO
 # Emits warning; so disabled.
 # it works but complains about non-portability because hex number is bigger than 32bit
 # is(parse_int("0x_67_7a_2f_cc_40_c6"), Ok(113774485586118), 'hex 3');
