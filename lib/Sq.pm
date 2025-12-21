@@ -486,8 +486,8 @@ sub multi($name, @tf) {
     return;
 }
 
-sub array(@array) { bless(\@array, 'Array') }
-sub hash (%hash)  { bless(\%hash,  'Hash')  }
+sub array { bless([@_], 'Array') }
+sub hash  { bless({@_}, 'Hash')  }
 
 # returns a function that generates a hash from just the values. See: t/00-core.t
 sub record(@fields) {
@@ -550,7 +550,8 @@ sub dispatch {
 # times. But with the introduction of copy() i can now support both.
 # When a subroutine was passed, it get's executed, otherwise any other
 # value is just copied. init() helps in implementing those functions.
-sub init($f_or_value, @args) {
+sub init {
+    my ($f_or_value, @args) = @_;
     my $ref = ref $f_or_value;
     if ( $ref eq 'CODE' || $ref eq 'Sq::Lazy' ) {
         return $f_or_value->(@args);
