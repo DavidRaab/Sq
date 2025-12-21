@@ -111,7 +111,7 @@ static to_oct    => sub($num) { sprintf "0o%o", $num };
 # oct() not only converts octal numbers, it also handles strings
 # starting with "0b" and "0x" and treats them as binary or hex
 static from_binary => sub($str) { oct($str) };
-static from_oct    => sub($str) { oct($str) };
 static from_hex    => sub($str) { oct($str) };
+static from_oct    => sub($str) { oct($str) };
 
 1;

@@ -182,4 +182,18 @@ use Sq::Test;
         'to_hex vs to_num_system');
 }
 
+# from_ & to_
+{
+    my $nums = Sq->rand->int(0,1E9)->to_array(100);
+
+    my $bins = $nums->map(Sq->math->to_binary);
+    is($bins->map(Sq->math->from_binary), $nums, 'isomorph - to_binary, from_binary');
+
+    my $octs = $nums->map(Sq->math->to_oct);
+    is($octs->map(Sq->math->from_oct), $nums, 'isomorph - to_oct, from_oct');
+
+    my $hexs = $nums->map(Sq->math->to_hex);
+    is($hexs->map(Sq->math->from_hex), $nums, 'isomorph - to_hex, from_hex');
+}
+
 done_testing;
