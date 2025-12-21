@@ -6,7 +6,7 @@ use Sq::Exporter;
 our $SIGNATURE = 'Sq/Sig/Parser.pm';
 our @EXPORT = (
     qw(parser),
-    qw(p_run p_valid),                        # runners
+    qw(p_run p_runr p_valid),                 # runners
     qw(p_map p_bind p_return p_fail p_empty), # special?
     qw(p_match p_matchf p_matchf_opt),        # regex
     qw(p_str p_strc p_join p_split),          # string
@@ -16,6 +16,8 @@ our @EXPORT = (
 
 *Some = \&Option::Some;
 *None = \&Option::None;
+*Ok   = \&Result::Ok;
+*Err  = \&Result::Err;
 
 ##########
 ###
@@ -55,6 +57,12 @@ sub p_return(@values) {
     return sub($ctx,$str) {
         return {valid => 1, pos => $ctx->{pos}, matches => \@values};
     };
+}
+
+# returns an result instead of an option
+sub p_runr($parser, $str) {
+    my $p = $parser->({ valid => 1, pos => 0 }, $str);
+    return $p->{valid} ? Ok($p) : Err($p);
 }
 
 # returns a parser that always fails. Useful in bind functions.
