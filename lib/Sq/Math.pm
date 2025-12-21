@@ -104,7 +104,14 @@ static to_num_system => sub($str_places, $num) {
     reverse $result;
 };
 
-static to_binary => sub($num) { sprintf "%b", $num };
-static to_hex    => sub($num) { sprintf "%x", $num };
+static to_binary => sub($num) { sprintf "0b%b", $num };
+static to_hex    => sub($num) { sprintf "0x%x", $num };
+static to_oct    => sub($num) { sprintf "0o%o", $num };
+
+# oct() not only converts octal numbers, it also handles strings
+# starting with "0b" and "0x" and treats them as binary or hex
+static from_binary => sub($str) { oct($str) };
+static from_oct    => sub($str) { oct($str) };
+static from_hex    => sub($str) { oct($str) };
 
 1;

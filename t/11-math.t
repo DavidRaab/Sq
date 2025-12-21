@@ -173,12 +173,12 @@ use Sq::Test;
     my $nums = Sq->rand->int(0,256)->to_array(100);
     is(
         Array::map($nums, Sq->math->to_binary),
-        Array::map($nums, sub($x) { $ns->("01", $x) }),
+        Array::map($nums, sub($x) { "0b" . $ns->("01", $x) }),
         'to_binary vs to_num_system');
 
     is(
         Array::map($nums, Sq->math->to_hex),
-        Array::map($nums, sub($x) { $ns->("0123456789abcdef", $x) }),
+        Array::map($nums, sub($x) { "0x" . $ns->("0123456789abcdef", $x) }),
         'to_hex vs to_num_system');
 }
 
