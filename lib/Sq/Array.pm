@@ -163,12 +163,8 @@ sub bind($array, $f) {
     return CORE::bless(\@new, 'Array');
 }
 
-sub flatten($array_of_array) {
-    my @new;
-    for my $inner ( @$array_of_array ) {
-        push @new, @$inner;
-    }
-    CORE::bless(\@new, 'Array');
+sub flatten {
+    CORE::bless([map { @$_ } @{$_[0]}], 'Array');
 }
 
 # create merge as alias to flatten
