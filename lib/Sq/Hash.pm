@@ -106,14 +106,16 @@ sub remove($hash, $predicate) {
     return CORE::bless(\%new, 'Hash');
 }
 
-sub fold($hash, $state, $f) {
+sub fold($hash, $init, $f) {
+    my $state = Sq::init($init);
     for my ($key,$value) ( %$hash ) {
         $state = $f->($key, $value, $state);
     }
     return $state;
 }
 
-sub fold_back($hash, $state, $f) {
+sub fold_back($hash, $init, $f) {
+    my $state = Sq::init($init);
     for my ($key,$value) ( %$hash ) {
         $state = $f->($state, $key, $value);
     }
