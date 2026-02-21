@@ -295,6 +295,17 @@ sub concat($, @seqs) {
     }, 'Seq');
 }
 
+sub stdin($) {
+    return bless(sub {
+        return sub {
+            my $line = <STDIN>;
+            return undef if !defined $line;
+            chomp $line;
+            return $line;
+        }
+    }, 'Seq');
+}
+
 #----------------------------------------------------------------------------#
 # METHODS                                                                    #
 #          functions operating on Seq and returning another Seq              #
