@@ -399,7 +399,8 @@ given type you must supply. Variables that start with C<$f_> are functions.
     Seq->replicate ($count, $init)
     Seq->from_array($array)
     Seq->from_hash ($hash)
-    Seq->from_sub($f)
+    Seq->from_sub  ($f)
+    Seq->stdin     ()
 
     # METHODS
     all              ($seq, $predicate)
