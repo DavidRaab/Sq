@@ -1,7 +1,8 @@
 # Here is a list of modules currently lazy loaded by Sq when you
 # call certain functions.
 
-+ Path::Tiny   Sq->fs->*
-+ PerlIO::gzip Sq->fs->read_text_gz
-+ Benchmark    Sq->bench->*
-+ Digest::SHA  Sq->fs->sha512
++ Path::Tiny             Sq->fs->*
++ IO::Uncompress::Gunzip Sq->fs->read_text_gz
++ IO::Compress::Gzip     Sq->fs->write_text_gz
++ Benchmark              Sq->bench->*
++ Digest::SHA            Sq->fs->sha512

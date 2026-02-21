@@ -5,10 +5,11 @@ author:
 build_requires:
   Carp: '0'
   Digest::SHA: '0'
+  IO::Compress::Gzip: '0'
+  IO::Uncompress::Gunzip: '0'
   JSON: '0'
   List::Util: '0'
   Path::Tiny: '0'
-  PerlIO::gzip: '0'
   Scalar::Util: '0'
 configure_requires:
   Module::Build: '0.4004'

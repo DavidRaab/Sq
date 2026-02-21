@@ -147,17 +147,25 @@ static write_text => with_dispatch(
 
 static write_text_gz => with_dispatch(
     type [tuple => $path, ['str']] => sub($file,$content) {
+        require IO::Compress::Gzip;
+
+        # $file is allowed to be a Path::Tiny object. But IO::Compress doesn't
+        # support Path::Tiny objects. With this line we ensure that a Path::Tiny
+        # or string can be passed and it is converted to a string
+        $file = path($file)->stringify;
+
         # We want to write utf-8 but still open as raw because the encoding
         # is done manually. Perl string are either raw (Latin1 ISO-8859-1)
         # or Unicode (UTF-8). When a user provides a raw string
         # then no additionaly encoding to UTF-8 is done, and we assume
         # the user already did an Encode::encode('UTF-8', $str) or similar
         # call. Without this handling we would get double encoded output.
-        my $err = open my $fh, '>:gzip', $file;
-        if ( !defined $err ) {
-            return Err({op => 'open', file => $file, message => $!});
+        my $fh = IO::Compress::Gzip->new($file);
+        if ( !defined $fh ) {
+            return Err({op => 'open', file => $file, message => $IO::Compress::Gzip::GzipError});
         }
 
+        my $err;
         # when string is in unicode, we encode it to utf8 before printing
         if ( utf8::is_utf8($content) ) {
             utf8::encode($content);
@@ -171,24 +179,32 @@ static write_text_gz => with_dispatch(
         # check print for errors
         if ( !$err ) {
             close $fh;
-            return Err({op => 'print', file => $file, message => $!});
+            return Err({op => 'print', file => $file, message => $IO::Compress::Gzip::GzipError});
         }
 
         # close file
         $err = close $fh;
         if ( !$err ) {
-            return Err({op => 'close', file => $file, message => $!});
+            return Err({op => 'close', file => $file, message => $IO::Compress::Gzip::GzipError});
         }
 
         return Ok(1);
     },
     type [tuple => $path, [array => [of => ['str']]]] => sub($file,$aoa) {
+        require IO::Compress::Gzip;
+
+        # $file is allowed to be a Path::Tiny object. But IO::Compress doesn't
+        # support Path::Tiny objects. With this line we ensure that a Path::Tiny
+        # or string can be passed and it is converted to a string
+        $file = path($file)->stringify;
+
         # open file
-        my $err = open my $fh, '>:gzip', $file;
-        if ( !defined $err ) {
-            return Err({op => 'open', file => $file, message => $!});
+        my $fh = IO::Compress::Gzip->new($file);
+        if ( !defined $fh ) {
+            return Err({op => 'open', file => $file, message => $IO::Compress::Gzip::GzipError});
         }
 
+        my $err;
         # write file
         for ( @$aoa ) {
             # we need a copy, not an alias. Otherwise the function would
@@ -203,26 +219,34 @@ static write_text_gz => with_dispatch(
             }
             if ( !$err ) {
                 close $fh;
-                return Err({op => 'print', file => $file, message => $!});
+                return Err({op => 'print', file => $file, message => $IO::Compress::Gzip::GzipError});
             }
         }
 
         # close file
         $err = close $fh;
         if ( !$err ) {
-            return Err({op => 'close', file => $file, message => $!});
+            return Err({op => 'close', file => $file, message => $IO::Compress::Gzip::GzipError});
         }
 
         return Ok(1);
     },
     type [tuple => $path, ['seq']] => sub($file, $seq) {
+        require IO::Compress::Gzip;
+
+        # $file is allowed to be a Path::Tiny object. But IO::Compress doesn't
+        # support Path::Tiny objects. With this line we ensure that a Path::Tiny
+        # or string can be passed and it is converted to a string
+        $file = path($file)->stringify;
+
         # open file
-        my $err = open my $fh, '>:gzip', $file;
-        if ( !defined $err ) {
+        my $fh = IO::Compress::Gzip->new($file);
+        if ( !defined $fh ) {
             return Err({op => 'open', file => $file, message => $!});
         }
 
         # write file
+        my $err;
         $seq->iter(sub($line) {
             if ( utf8::is_utf8($line) ) {
                 utf8::encode($line);
@@ -233,14 +257,14 @@ static write_text_gz => with_dispatch(
             }
             if ( !$err ) {
                 close $fh;
-                return Err({op => 'print', file => $file, message => $!});
+                return Err({op => 'print', file => $file, message => $IO::Compress::Gzip::GzipError});
             }
         });
 
         # close file
         $err = close $fh;
         if ( !$err ) {
-            return Err({op => 'close', file => $file, message => $!});
+            return Err({op => 'close', file => $file, message => $IO::Compress::Gzip::GzipError});
         }
 
         return Ok(1);
@@ -249,20 +273,26 @@ static write_text_gz => with_dispatch(
 
 # reads a text file that is compressed as .gz
 static read_text_gz => sub(@path) {
-    require PerlIO::gzip;
-    my $file = path(@path);
+    require IO::Uncompress::Gunzip;
+
+    my $file = path(@path)->stringify;
     return Seq->from_sub(sub {
-        my $err = open my $fh, '<:raw:gzip:encoding(UTF-8)', $file;
-        if ( !defined $err ) {
+        my $fh = IO::Uncompress::Gunzip->new($file);
+        if ( !defined $fh ) {
             return sub { undef }
         }
         else {
             my $line;
             return sub {
-                $line = <$fh>;
+                $line = $fh->getline();
                 if ( defined $line ) {
-                    chomp $line;
-                    return $line;
+                    if ( utf8::decode($line) ) {
+                        chomp $line;
+                        return $line;
+                    }
+                    else {
+                        undef $fh;
+                    }
                 }
                 close $fh;
                 undef $fh;
